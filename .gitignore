@@ -3,7 +3,8 @@
 *src/main/java/frc/robot/BuildConstants.java
 simgui-ds.json
 simgui.json
-networktables.json### C++ ###
+networktables.json
+### C++ ###
 # Prerequisites
 *.d
 
