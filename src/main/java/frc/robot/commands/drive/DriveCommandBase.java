@@ -47,21 +47,16 @@ public abstract class DriveCommandBase extends Command {
   }
 
   public void calculatePoseFromLimelight(Limelight limelightNumber) {
-    double currentTimeStampSeconds = lastTimeStampSeconds;
-
     // Updates the robot's odometry with april tags
     if (vision.canSeeAprilTags(limelightNumber)) {
-      currentTimeStampSeconds = vision.getTimeStampSeconds(limelightNumber);
-
       double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelightNumber);
 
       // Depending on how many april tags we see, we change our confidence as more april tags
       // results in a much more accurate pose estimate
-      // TODO: check if this is necessary anymore with MT2, also we might want to set the limelight
-      //  so it only uses 1 april tag, if they set up the field wrong (they can set april tags +-1
-      // inch I believe)
-      //  using multiple *could* really mess things up.
+      // So if we only see 1 april tag, we have *high* standard deviations -> lower confidence
       if (vision.getNumberOfAprilTags(limelightNumber) == 1) {
+        // But then we use the lookup table here to account for how far away the robot is from the april tag
+        // because if we are closer to the april tag, we are more confident in our position -> lower standard deviation
         double[] standardDeviations =
             oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
@@ -73,11 +68,10 @@ public abstract class DriveCommandBase extends Command {
             standardDeviations[0], standardDeviations[1], standardDeviations[2]);
       }
 
+      // Adds the timestamped pose gotten from the limelights to our pose estimation
       swerveDrive.addPoseEstimatorVisionMeasurement(
           vision.getPoseFromAprilTags(limelightNumber),
           Timer.getFPGATimestamp() - vision.getLatencySeconds(limelightNumber));
     }
-
-    lastTimeStampSeconds = currentTimeStampSeconds;
   }
 }

@@ -6,8 +6,6 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-// import frc.robot.subsystems.vision.VisionSubsystem;
-
 public class DriveCommand extends DriveCommandBase {
 
   private final SwerveDrive driveSubsystem;
@@ -38,6 +36,7 @@ public class DriveCommand extends DriveCommandBase {
     super(driveSubsystem, visionSubsystem);
     this.driveSubsystem = driveSubsystem;
     addRequirements(driveSubsystem, visionSubsystem);
+
     this.leftJoystickY = leftJoystickY;
     this.leftJoystickX = leftJoystickX;
     this.rightJoystickX = rightJoystickX;
@@ -50,13 +49,15 @@ public class DriveCommand extends DriveCommandBase {
 
   @Override
   public void execute() {
-    // Drives the robot
+    // Most of the time the driver prefers that the robot rotates slowly, as it gives them more control
+    // but sometimes (e.g. when fighting defense bots) being able to rotate quickly is necessary
     if (isHighRotation.getAsBoolean()) {
       angularSpeed = DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
     } else {
       angularSpeed = DriveConstants.LOW_ANGULAR_SPEED_RADIANS_PER_SECOND;
     }
 
+    // Drives the robot by scaling the joystick inputs
     driveSubsystem.drive(
         leftJoystickY.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
         leftJoystickX.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
