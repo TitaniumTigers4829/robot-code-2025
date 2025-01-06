@@ -27,7 +27,7 @@ import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.PhysicalModule;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
-import frc.robot.subsystems.vision.SimulatedVision;
+// import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
@@ -107,9 +107,9 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[2]),
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
-        visionSubsystem =
-            new VisionSubsystem(
-                new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
+        visionSubsystem = null;
+        //     new VisionSubsystem(
+        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
 
         SimulatedField.getInstance().resetFieldForAuto();
         resetFieldAndOdometryForAuto(

@@ -6,7 +6,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import org.photonvision.PhotonCamera;
+
+// import org.photonvision.PhotonCamera;
 
 public final class VisionConstants {
   public enum Limelight {
@@ -51,11 +52,12 @@ public final class VisionConstants {
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
-  public static final PhotonCamera SHOOTER_CAMERA = new PhotonCamera(Limelight.SHOOTER.getName());
-  public static final PhotonCamera FRONT_LEFT_CAMERA =
-      new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  public static final PhotonCamera FRONT_RIGHT_CAMERA =
-      new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  // public static final PhotonCamera SHOOTER_CAMERA = new
+  // PhotonCamera(Limelight.SHOOTER.getName());
+  // public static final PhotonCamera FRONT_LEFT_CAMERA =
+  //     new PhotonCamera(Limelight.FRONT_LEFT.getName());
+  // public static final PhotonCamera FRONT_RIGHT_CAMERA =
+  //     new PhotonCamera(Limelight.FRONT_RIGHT.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
