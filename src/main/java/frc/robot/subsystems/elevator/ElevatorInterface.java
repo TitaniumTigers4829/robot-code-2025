@@ -1,28 +1,21 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorInterface {
-
+  /** Creates a new ElevatorInterface. */
   @AutoLog
-  public static class ElevatorInputs {
-    public double leaderMotorPosition = 0.0;
-
-    public double followerMotorPosition = 0.0;
+  public static class ElevatorInputs { // For values
+    public double rightMotorPosition = 0.0;
+    public double leftMotorPosition = 0.0;
   }
 
-  /**
-   * Updates inputs for elevator for AdvantageKit to log
-   *
-   * @param inputs values related to the elevator
-   */
   public default void updateInputs(ElevatorInputs inputs) {}
 
-  /**
-   * Gets the current position of the elevator
-   *
-   * @return
-   */
   public default double getElevatorPosition() {
     return 0.0;
   }
