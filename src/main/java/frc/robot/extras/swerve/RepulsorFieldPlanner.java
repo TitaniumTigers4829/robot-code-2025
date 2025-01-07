@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTableListener;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.extras.util.Force;
 
 @Logged
 public class RepulsorFieldPlanner {

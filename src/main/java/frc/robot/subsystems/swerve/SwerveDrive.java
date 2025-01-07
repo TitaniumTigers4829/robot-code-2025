@@ -13,8 +13,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
+import frc.robot.extras.swerve.RepulsorFieldPlanner;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.DeviceCANBus;
@@ -28,8 +30,12 @@ import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
 import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInputsAutoLogged;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import choreo.trajectory.SwerveSample;
 
 public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
@@ -57,6 +63,8 @@ public class SwerveDrive extends SubsystemBase {
   private final OdometryThread odometryThread;
 
   private Optional<DriverStation.Alliance> alliance;
+
+  private RepulsorFieldPlanner repulsor = new RepulsorFieldPlanner();
 
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
@@ -202,6 +210,41 @@ public class SwerveDrive extends SubsystemBase {
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
   }
+
+  /*
+   * @return The current ChassisSpeeds of the robot.
+   */
+  public ChassisSpeeds getChassisSpeeds() {
+    return setpoint.chassisSpeeds();
+  }
+
+    // public Command repulsorCommand(Supplier<Pose2d> target) {
+    //     return run(()->{
+    //         repulsor.setGoal(target.get().getTranslation());
+    //         followPath(getPose(), repulsor.getCmd(getPose(), getChassisSpeeds(), 4, true, target.get().getRotation()));
+    //     });
+    // }
+
+    // public void followPath(Pose2d pose, SwerveSample sample) {
+    //     m_pathThetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    //     var targetSpeeds = sample.getChassisSpeeds();
+    //     targetSpeeds.vxMetersPerSecond += m_pathXController.calculate(
+    //         pose.getX(), sample.x
+    //     );
+    //     targetSpeeds.vyMetersPerSecond += m_pathYController.calculate(
+    //         pose.getY(), sample.y
+    //     );
+    //     targetSpeeds.omegaRadiansPerSecond += m_pathThetaController.calculate(
+    //         pose.getRotation().getRadians(), sample.heading
+    //     );
+
+    //     setControl(
+    //         m_pathApplyFieldSpeeds.withSpeeds(targetSpeeds)
+    //             .withWheelForceFeedforwardsX(sample.moduleForcesX())
+    //             .withWheelForceFeedforwardsY(sample.moduleForcesY())
+    //     );
+    // }
 
   /**
    * Returns the heading of the robot in degrees from 0 to 360.
