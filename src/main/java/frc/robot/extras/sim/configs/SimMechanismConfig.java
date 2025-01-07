@@ -1,14 +1,8 @@
 package frc.robot.extras.sim.configs;
 
-import sham.ShamMechanism.Friction;
-import sham.ShamMechanism.HardLimits;
-import sham.ShamMechanism.MechanismDynamics;
-
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
-
-import sham.utils.GearRatio;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.VoltageUnit;
@@ -17,8 +11,11 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import monologue.ProceduralStructGenerator;
-import monologue.ProceduralStructGenerator.IgnoreStructField;
+import frc.robot.extras.sim.SimMechanism.Friction;
+import frc.robot.extras.sim.SimMechanism.HardLimits;
+import frc.robot.extras.sim.SimMechanism.MechanismDynamics;
+import frc.robot.extras.sim.utils.GearRatio;
+import frc.robot.extras.util.ProceduralStructGenerator.IgnoreStructField;
 
 public class SimMechanismConfig implements StructSerializable {
     public DCMotor motor;
@@ -101,5 +98,5 @@ public class SimMechanismConfig implements StructSerializable {
         return this;
     }
 
-    public static final Struct<SimMechanismConfig> struct = ProceduralStructGenerator.genObjectNoUnpack(SimMechanismConfig.class);
+    // public static final Struct<SimMechanismConfig> struct = ProceduralStructGenerator.genObjectNoUnpack(SimMechanismConfig.class);
 }

@@ -12,10 +12,10 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
-import monologue.ProceduralStructGenerator;
-import sham.utils.geometry.Velocity2d;
-import sham.utils.mathutils.GeometryConvertor;
+import frc.robot.extras.sim.utils.geometry.Velocity2d;
+import frc.robot.extras.util.GeomUtil;
 
 public class FrcBody extends Body {
     public record FrcBodySnapshot(
@@ -34,14 +34,14 @@ public class FrcBody extends Body {
         Translation2d accumulatedForce,
         Torque accumulatedTorque
     ) implements StructSerializable {
-        public static final Struct<FrcBodySnapshot> struct = ProceduralStructGenerator.genRecord(FrcBodySnapshot.class);
+        public static final Struct<FrcBodySnapshot> struct = StructGenerator.genRecord(FrcBodySnapshot.class);
     }
 
     public FrcBodySnapshot snapshot() {
         return new FrcBodySnapshot(
-            GeometryConvertor.toWpilibPose2d(getTransform()),
-            GeometryConvertor.toWpilibUnit(getMass()).getFirst(),
-            GeometryConvertor.toWpilibUnit(getMass()).getSecond(),
+            GeomUtil.toWpilibPose2d(getTransform()),
+            GeomUtil.toWpilibUnit(getMass()).getFirst(),
+            GeomUtil.toWpilibUnit(getMass()).getSecond(),
             new Velocity2d(getLinearVelocity().x, getLinearVelocity().y),
             RadiansPerSecond.of(-getAngularVelocity()),
             getLinearDamping(),

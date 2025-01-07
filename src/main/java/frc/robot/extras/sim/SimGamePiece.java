@@ -17,11 +17,6 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.MassType;
-import sham.utils.RuntimeLog;
-import sham.utils.ProjectileUtil.ProjectileDynamics;
-import sham.utils.geometry.Velocity2d;
-import sham.utils.geometry.Velocity3d;
-import sham.utils.mathutils.GeometryConvertor;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -31,8 +26,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructBuffer;
+import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
-import monologue.ProceduralStructGenerator;
+import frc.robot.extras.sim.utils.ProjectileUtil.ProjectileDynamics;
+import frc.robot.extras.sim.utils.RuntimeLog;
+import frc.robot.extras.sim.utils.geometry.Velocity2d;
+import frc.robot.extras.sim.utils.geometry.Velocity3d;
+import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.ProceduralStructGenerator;
 
 /**
  * A base class used for all gamepieces in the simulation.
@@ -154,7 +156,7 @@ public class SimGamePiece implements StructSerializable{
 
             @Override
             public Pose3d pose(SimGamePiece gp, SimArena arena) {
-                var pose2d = GeometryConvertor.toWpilibPose2d(body.getTransform());
+                var pose2d = GeomUtil.toWpilibPose2d(body.getTransform());
                 var t = pose2d.getTranslation();
                 return new Pose3d(
                         t.getX(),
@@ -260,7 +262,7 @@ public class SimGamePiece implements StructSerializable{
             return gp.isInState(this);
         }
 
-        public static final Struct<GamePieceState> struct = ProceduralStructGenerator.genEnum(GamePieceState.class);
+        public static final Struct<GamePieceState> struct = StructGenerator.genEnum(GamePieceState.class);
     }
 
     /**
@@ -294,13 +296,13 @@ public class SimGamePiece implements StructSerializable{
             bodyFixture.setDensity(gp.variant.mass / gp.variant.shape.getArea());
             body.setMass(MassType.NORMAL);
 
-            body.translate(GeometryConvertor.toDyn4jVector2(initialPosition));
+            body.translate(GeomUtil.toDyn4jVector2(initialPosition));
 
             body.setLinearDamping(LINEAR_DAMPING);
             body.setAngularDamping(ANGULAR_DAMPING);
             body.setBullet(true);
 
-            body.setLinearVelocity(GeometryConvertor.toDyn4jVector2(initialVelocity));
+            body.setLinearVelocity(GeomUtil.toDyn4jVector2(initialVelocity));
 
             return body;
         }
@@ -518,39 +520,39 @@ public class SimGamePiece implements StructSerializable{
         };
     }
 
-    public static final ShameGamePieceStruct struct = new ShameGamePieceStruct();
+    // public static final ShameGamePieceStruct struct = new ShameGamePieceStruct();
 
-    public static final class ShameGamePieceStruct implements Struct<SimGamePiece> {
-        @Override
-        public String getSchema() {
-            return "Pose3d pose;char type[16];GamePieceState state";
-        }
+    // public static final class ShameGamePieceStruct implements Struct<SimGamePiece> {
+    //     @Override
+    //     public String getSchema() {
+    //         return "Pose3d pose;char type[16];GamePieceState state";
+    //     }
 
-        @Override
-        public int getSize() {
-            return 16 + Pose3d.struct.getSize() + GamePieceState.struct.getSize();
-        }
+    //     @Override
+    //     public int getSize() {
+    //         return 16 + Pose3d.struct.getSize() + GamePieceState.struct.getSize();
+    //     }
 
-        @Override
-        public Class<SimGamePiece> getTypeClass() {
-            return SimGamePiece.class;
-        }
+    //     @Override
+    //     public Class<SimGamePiece> getTypeClass() {
+    //         return SimGamePiece.class;
+    //     }
 
-        @Override
-        public String getTypeName() {
-            return "ShamGamePiece";
-        }
+    //     @Override
+    //     public String getTypeName() {
+    //         return "ShamGamePiece";
+    //     }
 
-        @Override
-        public void pack(ByteBuffer bb, SimGamePiece value) {
-            Pose3d.struct.pack(bb, value.pose());
-            bb.put(ProceduralStructGenerator.fixedSizeString(value.variant.type, 16));
-            GamePieceState.struct.pack(bb, value.state());
-        }
+    //     @Override
+    //     public void pack(ByteBuffer bb, SimGamePiece value) {
+    //         Pose3d.struct.pack(bb, value.pose());
+    //         // bb.put(ProceduralStructGenerator.fixedSizeString(value.variant.type, 16));
+    //         GamePieceState.struct.pack(bb, value.state());
+    //     }
 
-        @Override
-        public SimGamePiece unpack(ByteBuffer bb) {
-            throw new UnsupportedOperationException("Unpacking ShamGamePiece is not supported");
-        }
-    }
+    //     @Override
+    //     public SimGamePiece unpack(ByteBuffer bb) {
+    //         throw new UnsupportedOperationException("Unpacking ShamGamePiece is not supported");
+    //     }
+    // }
 }

@@ -1,23 +1,23 @@
 package frc.robot.extras.sim;
 
-import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.struct.Struct;
-import monologue.ProceduralStructGenerator;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
+import frc.robot.extras.sim.configs.SimDriveTrainConfig;
+import frc.robot.extras.sim.configs.SimSwerveConfig;
+import frc.robot.extras.sim.utils.FrcBody;
+import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.ProceduralStructGenerator;
 
 import static edu.wpi.first.units.Units.Seconds;
+
 
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;
-
-import sham.ShamArena.ShamEnvTiming;
-import sham.configs.ShamDriveTrainConfig;
-import sham.configs.ShamSwerveConfig;
-import sham.utils.FrcBody;
-import sham.utils.mathutils.GeometryConvertor;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -40,9 +40,8 @@ public class SimDriveTrain {
      */
     public static final double kBumperCoR = 0.005;
 
-    protected final DataLogger logger;
     protected final FrcBody chassis = new FrcBody();
-    private final ShamEnvTiming timing;
+    private final SimEnvTiming timing;
 
     /**
      *
@@ -60,11 +59,10 @@ public class SimDriveTrain {
      * @param initialPoseOnField the initial pose of the drivetrain in the simulation world
      */
     @SuppressWarnings("unchecked")
-    protected SimDriveTrain(DataLogger logger, ShamDriveTrainConfig<?, ?> config, ShamEnvTiming timing) {
+    protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
         this.timing = timing;
-        this.logger = logger;
-        logger.log("config", config, (Struct<ShamDriveTrainConfig<?, ?>>) ProceduralStructGenerator
-                .extractClassStructDynamic(config.getClass()).get());
+        // Logger.recordOutput("config", config, (Struct<SimDriveTrainConfig<?, ?>>) ProceduralStructGenerator
+        //         .extractClassStructDynamic(config.getClass()).get());
         chassis.addFixture(
                 Geometry.createRectangle(config.bumperLengthXMeters, config.bumperWidthYMeters),
                 0.0, // zero density; mass is set explicitly
@@ -84,7 +82,7 @@ public class SimDriveTrain {
      * @param resetVelocity whether to reset the robot's velocity to zero after teleporting
      */
     public void setChassisWorldPose(Pose2d robotPose, boolean resetVelocity) {
-        chassis.setTransform(GeometryConvertor.toDyn4jTransform(robotPose));
+        chassis.setTransform(GeomUtil.toDyn4jTransform(robotPose));
         if (resetVelocity) {
             chassis.setLinearVelocity(0, 0);
             chassis.setAngularVelocity(0);
@@ -100,7 +98,7 @@ public class SimDriveTrain {
      * @param givenSpeeds the desired field-relative {@link ChassisSpeeds}
      */
     public void setChassisWorldSpeeds(ChassisSpeeds givenSpeeds) {
-        chassis.setLinearVelocity(GeometryConvertor.toDyn4jLinearVelocity(givenSpeeds));
+        chassis.setLinearVelocity(GeomUtil.toDyn4jLinearVelocity(givenSpeeds));
         chassis.setAngularVelocity(givenSpeeds.omegaRadiansPerSecond);
     }
 
@@ -114,7 +112,7 @@ public class SimDriveTrain {
      * @return a {@link Pose2d} object yielding the current world pose of the robot in the simulation
      */
     public Pose2d getChassisWorldPose() {
-        return GeometryConvertor.toWpilibPose2d(chassis.getTransform());
+        return GeomUtil.toWpilibPose2d(chassis.getTransform());
     }
 
     /**
@@ -123,7 +121,7 @@ public class SimDriveTrain {
      * @return the actual chassis speeds in the simulation world, <strong>Field-Relative</strong>
      */
     public ChassisSpeeds getChassisWorldSpeeds() {
-        return GeometryConvertor.toWpilibChassisSpeeds(chassis.getLinearVelocity(), -chassis.getAngularVelocity());
+        return GeomUtil.toWpilibChassisSpeeds(chassis.getLinearVelocity(), -chassis.getAngularVelocity());
     }
 
     public Twist2d getTickTwist() {
@@ -142,7 +140,7 @@ public class SimDriveTrain {
      * <p>It is responsible for applying the propelling forces to the robot during each sub-tick of the simulation.
      */
     protected void simTick() {
-        logger.log("chassis", chassis.snapshot(), FrcBody.FrcBodySnapshot.struct);
+        // logger.log("chassis", chassis.snapshot(), FrcBody.FrcBodySnapshot.struct);
     }
 
     /**

@@ -4,13 +4,12 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import sham.ShamArena.ShamEnvTiming;
-import sham.ShamGamePiece.GamePieceVariant;
-import sham.configs.ShamDriveTrainConfig;
-import sham.utils.RuntimeLog;
-import sham.utils.mathutils.GeometryConvertor;
-import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.math.geometry.Rectangle2d;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
+import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.extras.sim.configs.SimDriveTrainConfig;
+import frc.robot.extras.sim.utils.RuntimeLog;
+import frc.robot.extras.util.GeomUtil;
 
 /**
  * Represents a robot in the sham environment.
@@ -32,11 +31,10 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     private final SimBattery battery = new SimBattery();
     private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
-    final DataLogger logger;
 
     public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(SimArena arena, String name, C drivetrainConfig, int gamePieceStorageCapacity) {
         this.arena = arena;
-        logger = arena.logger.getSubLogger(name + "Robot");
+        // logger = arena.logger.getSubLogger(name + "Robot");
         arena.robots.add(this);
         this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
         arena.withWorld(world -> world.addBody(driveTrain.chassis));
@@ -56,7 +54,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
      * 
      * @return an object that stores the timing data for the simulation.
      */
-    public ShamEnvTiming timing() {
+    public SimEnvTiming timing() {
         return arena.timing;
     }
 
@@ -73,7 +71,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
         var intake = new SimIntake(
             driveTrain,
             gamePieceStorage,
-            GeometryConvertor.toDyn4jRectangle(boundingBox),
+            GeomUtil.toDyn4jRectangle(boundingBox),
             acceptedGamePieceVariants
         );
         intakes.add(intake);

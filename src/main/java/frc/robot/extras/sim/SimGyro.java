@@ -1,6 +1,5 @@
 package frc.robot.extras.sim;
 
-import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.math.geometry.Twist2d;
 // import edu.wpi.first.units.measure.Angle;
 // import edu.wpi.first.units.measure.AngularAcceleration;
@@ -8,6 +7,11 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
+import frc.robot.extras.sim.configs.SimGyroConfig;
+import frc.robot.extras.sim.utils.RuntimeLog;
+import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
+import frc.robot.extras.sim.utils.mathutils.SimCommonMath;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -18,12 +22,6 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.BiConsumer;
 
-import sham.ShamArena.ShamEnvTiming;
-import sham.configs.ShamGyroConfig;
-import sham.utils.RuntimeLog;
-import sham.utils.mathutils.ShamCommonMath;
-import sham.utils.mathutils.MeasureMath.XY;
-// import sham.utils.mathutils.MeasureMath;
 
 
 public class SimGyro {
@@ -32,9 +30,8 @@ public class SimGyro {
     // /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of the angular acceleration threshold. */
     // private static final Angle DRIFT_DUE_TO_IMPACT_COEFFICIENT = Radians.of(1);
 
-    private final DataLogger logger;
 
-    private final ShamEnvTiming timing;
+    private final SimEnvTiming timing;
     private BiConsumer<AngularVelocity, XY<LinearAcceleration>> updateConsumer;
 
     private final double veloStdDev;
@@ -43,14 +40,14 @@ public class SimGyro {
 
     private Twist2d lastTwist = new Twist2d();
 
-    public SimGyro(ShamEnvTiming timing, SimGyroConfig gyroConfig, DataLogger logger) {
-        this.logger = logger.getSubLogger("Gyro");
+    public SimGyro(SimEnvTiming timing, SimGyroConfig gyroConfig) {
+        // this.logger = logger.getSubLogger("Gyro");
         this.timing = timing;
         this.averageDriftingMotionless = Degrees.of(gyroConfig.averageDriftingIn30SecsMotionlessDeg)
                 .div(Seconds.of(30.0));
         this.veloStdDev = gyroConfig.velocityMeasurementStandardDeviationPercent;
 
-        this.logger.log("config", gyroConfig, SimGyroConfig.struct);
+        // this.logger.log("config", gyroConfig, SimGyroConfig.struct);
 
         RuntimeLog.debug("Created a swerve module simulation");
     }
@@ -81,7 +78,7 @@ public class SimGyro {
                 .plus(averageDriftingMotionless)
                 // .plus(getDriftingDueToImpact(actualAngularVelocity))
                 .plus(actualAngularVelocity
-                        .times(ShamCommonMath.generateRandomNormal(0.0, veloStdDev))
+                        .times(SimCommonMath.generateRandomNormal(0.0, veloStdDev))
                 );
 
         LinearVelocity lastXV = Meters.of(lastTwist.dx).div(timing.dt());
@@ -92,9 +89,9 @@ public class SimGyro {
         LinearAcceleration xA = xV.minus(lastXV).div(timing.dt());
         LinearAcceleration yA = yV.minus(lastYV).div(timing.dt());
 
-        logger.log("omegaV", omegaV);
-        logger.log("xA", xA);
-        logger.log("yA", yA);
+        // logger.log("omegaV", omegaV);
+        // logger.log("xA", xA);
+        // logger.log("yA", yA);
 
         if (updateConsumer != null) {
             updateConsumer.accept(omegaV, new XY<>(xA, yA));

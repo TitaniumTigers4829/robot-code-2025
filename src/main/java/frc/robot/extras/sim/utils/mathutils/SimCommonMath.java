@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import java.util.Random;
 
-public class ShamCommonMath {
+public class SimCommonMath {
     private static final Random random = new Random();
 
     /**

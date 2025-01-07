@@ -2,7 +2,8 @@ package frc.robot.extras.sim;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.epilogue.logging.DataLogger;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,21 +12,21 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
+import frc.robot.extras.sim.SimMechanism.MechanismDynamics;
+import frc.robot.extras.sim.SimMechanism.MechanismInputs;
+import frc.robot.extras.sim.SimMechanism.MechanismOutputs;
+import frc.robot.extras.sim.configs.SimSwerveConfig;
+import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
+import frc.robot.extras.sim.utils.RuntimeLog;
+import frc.robot.extras.sim.utils.geometry.Velocity2d;
+import frc.robot.extras.sim.utils.mathutils.MeasureMath;
+import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import sham.ShamArena.ShamEnvTiming;
-import sham.ShamMechanism.MechanismDynamics;
-import sham.ShamMechanism.MechanismInputs;
-import sham.ShamMechanism.MechanismOutputs;
-import sham.configs.ShamSwerveConfig;
-import sham.configs.ShamSwerveModuleConfig;
-import sham.utils.RuntimeLog;
-import sham.utils.geometry.Velocity2d;
-import sham.utils.mathutils.MeasureMath;
-import sham.utils.mathutils.MeasureMath.XY;
 
 public class SimSwerveModule {
     private final SimRobot<SimSwerve> robot;
@@ -36,20 +37,17 @@ public class SimSwerveModule {
     private final Distance wheelRadius;
     private final Translation2d translation;
     private final int moduleId;
-    protected final DataLogger logger;
 
-    private final ShamEnvTiming timing;
+    private final SimEnvTiming timing;
 
     SimSwerveModule(
             SimRobot<SimSwerve> robot,
             SimSwerveConfig config,
-            DataLogger logger,
             int moduleId,
             Force gravityForce,
             Supplier<MomentOfInertia> rotorInertia,
             SimMotorController driveController,
             SimMotorController steerController) {
-        this.logger = logger.getSubLogger("SwerveModule" + moduleId);
         this.robot = robot;
         final SimSwerveModuleConfig moduleConfig = config.swerveModuleConfig;
         timing = robot.timing();
@@ -124,7 +122,7 @@ public class SimSwerveModule {
     protected XY<Force> force(final Rotation2d robotHeading) {
         final Rotation2d steerMechAngle = new Rotation2d(steerMech.outputs().position())
                 .plus(robotHeading);
-        logger.log("worldAngle", steerMechAngle, Rotation2d.struct);
+        // Logger.recordOutput("worldAngle", steerMechAngle, Rotation2d.struct);
         final Force gripForce = gravityForce.times(wheelsCoefficientOfFriction);
         final Force driveMechAppliedForce = driveMech.inputs().torque().div(wheelRadius);
 
@@ -136,8 +134,8 @@ public class SimSwerveModule {
             propellingForce = driveMechAppliedForce;
         }
 
-        logger.log("isSkidding", isSkidding);
-        logger.log("propellingForce", propellingForce);
+        Logger.recordOutput("isSkidding", isSkidding);
+        Logger.recordOutput("propellingForce", propellingForce);
 
         return new XY<Force>(
                 propellingForce.times(steerMechAngle.getCos()),
@@ -170,12 +168,8 @@ public class SimSwerveModule {
                 .plus(tangentialVelocityVector)
                 .minus(moduleDriveVelocity);
 
-        logger.log("tangentialVelocity", tangentialVelocity);
-        logger.log("tangentialVelocityVector", tangentialVelocityVector, Velocity2d.struct);
-        logger.log("moduleWorldVelocity", moduleWorldVelocity, Velocity2d.struct);
-        logger.log("moduleDriveVelocity", moduleDriveVelocity, Velocity2d.struct);
-        logger.log("unwantedVelocity", unwantedVelocity, Velocity2d.struct);
-
+        Logger.recordOutput("tangentialVelocity", tangentialVelocity);
+        
         return new XY<Force>(
                 gripForce.times(-Math.signum(unwantedVelocity.getVX())),
                 gripForce.times(-Math.signum(unwantedVelocity.getVY()))

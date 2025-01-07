@@ -12,8 +12,9 @@ import org.dyn4j.dynamics.contact.SolvedContact;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.world.ContactCollisionData;
 import org.dyn4j.world.listener.ContactListener;
-import sham.ShamGamePiece.GamePieceCollisionBody;
-import sham.ShamGamePiece.GamePieceVariant;
+
+import frc.robot.extras.sim.SimGamePiece.GamePieceCollisionBody;
+import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 
 
 public class SimIntake {

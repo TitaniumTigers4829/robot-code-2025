@@ -34,16 +34,16 @@ import frc.robot.extras.sim.utils.FrcBody;
 import frc.robot.extras.sim.utils.ProjectileUtil;
 import frc.robot.extras.sim.utils.RuntimeLog;
 import frc.robot.extras.sim.utils.FrcBody.FrcBodySnapshot;
-import frc.robot.extras.sim.utils.mathutils.GeometryConvertor;
+import frc.robot.extras.util.GeomUtil;
 
 
 public abstract class SimArena {
-    public record ShamEnvTiming(Time period, int ticksPerPeriod, Time dt) implements StructSerializable {
-        private ShamEnvTiming(double robotPeriodSeconds, int simulationSubTicksPerPeriod) {
+    public record SimEnvTiming(Time period, int ticksPerPeriod, Time dt) implements StructSerializable {
+        private SimEnvTiming(double robotPeriodSeconds, int simulationSubTicksPerPeriod) {
             this(Seconds.of(robotPeriodSeconds), simulationSubTicksPerPeriod, Seconds.of(robotPeriodSeconds / ((double) simulationSubTicksPerPeriod)));
         }
 
-        public static final Struct<ShamEnvTiming> struct = StructGenerator.genRecord(ShamEnvTiming.class);
+        public static final Struct<SimEnvTiming> struct = StructGenerator.genRecord(SimEnvTiming.class);
     }
 
     // protected final DataLogger logger = RuntimeLog.loggerFor("Arena");
@@ -51,7 +51,7 @@ public abstract class SimArena {
     protected final World<Body> physicsWorld = new World<>();
     protected final Set<SimGamePiece> gamePieces = ConcurrentHashMap.newKeySet();
     protected final Set<SimRobot<?>> robots = ConcurrentHashMap.newKeySet();
-    public final ShamEnvTiming timing;
+    public final SimEnvTiming timing;
 
     /**
      *
@@ -70,7 +70,7 @@ public abstract class SimArena {
      * @param ticksPerPeriod the number of sub-ticks to execute in each simulation period
      */
     protected SimArena(FieldMap obstaclesMap, double period, int ticksPerPeriod) {
-        this.timing = new ShamEnvTiming(period, ticksPerPeriod);
+        this.timing = new SimEnvTiming(period, ticksPerPeriod);
         this.physicsWorld.setGravity(PhysicsWorld.ZERO_GRAVITY);
         for (FrcBody obstacle : obstaclesMap.obstacles) {
             this.physicsWorld.addBody(obstacle);
@@ -222,8 +222,8 @@ public abstract class SimArena {
         protected void addBorderLine(Translation2d startingPoint, Translation2d endingPoint) {
             addCustomObstacle(
                     Geometry.createSegment(
-                            GeometryConvertor.toDyn4jVector2(startingPoint),
-                            GeometryConvertor.toDyn4jVector2(endingPoint)),
+                            GeomUtil.toDyn4jVector2(startingPoint),
+                            GeomUtil.toDyn4jVector2(endingPoint)),
                     new Pose2d());
         }
 
@@ -235,7 +235,7 @@ public abstract class SimArena {
         protected void addCustomObstacle(Convex shape, Pose2d absolutePositionOnField) {
             final FrcBody obstacle = createObstacle(shape);
 
-            obstacle.getTransform().set(GeometryConvertor.toDyn4jTransform(absolutePositionOnField));
+            obstacle.getTransform().set(GeomUtil.toDyn4jTransform(absolutePositionOnField));
 
             obstacles.add(obstacle);
         }

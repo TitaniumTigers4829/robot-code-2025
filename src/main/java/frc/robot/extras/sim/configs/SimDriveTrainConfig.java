@@ -2,8 +2,8 @@ package frc.robot.extras.sim.configs;
 
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import monologue.ProceduralStructGenerator;
-import sham.ShamDriveTrain;
+import frc.robot.extras.sim.SimDriveTrain;
+import frc.robot.extras.util.ProceduralStructGenerator;
 
 /**
  *
@@ -102,8 +102,8 @@ public class SimDriveTrainConfig<T extends SimDriveTrain, S extends SimDriveTrai
         return robotMassKg / (bumperLengthXMeters * bumperWidthYMeters);
     }
 
-    @SuppressWarnings("rawtypes")
-    public static final Struct<SimDriveTrainConfig> struct = ProceduralStructGenerator.genObjectNoUnpack(
-        SimDriveTrainConfig.class
-    );
+    // @SuppressWarnings("rawtypes")
+    // public static final Struct<SimDriveTrainConfig> struct = ProceduralStructGenerator.genObjectNoUnpack(
+    //     SimDriveTrainConfig.class
+    // );
 }

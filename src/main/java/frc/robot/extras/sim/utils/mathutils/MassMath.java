@@ -1,7 +1,5 @@
 package frc.robot.extras.sim.utils.mathutils;
 
-import static sham.utils.mathutils.MeasureMath.*;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Distance;
@@ -10,6 +8,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
+import static frc.robot.extras.sim.utils.mathutils.MeasureMath.*;
 
 public class MassMath {
     public record PhysicsMass(Mass mass, MomentOfInertia moi) {

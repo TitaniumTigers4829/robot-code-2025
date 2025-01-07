@@ -23,7 +23,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Mult;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.util.struct.Struct;
-import monologue.ProceduralStructGenerator;
+import edu.wpi.first.util.struct.StructGenerator;
 
 public class MeasureMath {
     @SuppressWarnings("unchecked")
@@ -98,7 +98,7 @@ public class MeasureMath {
         }
 
         @SuppressWarnings("rawtypes")
-        public static final Struct<XY> struct = ProceduralStructGenerator.genRecord(XY.class);
+        public static final Struct<XY> struct = StructGenerator.genRecord(XY.class);
     }
 
     public static Torque times(Distance d, Force f) {

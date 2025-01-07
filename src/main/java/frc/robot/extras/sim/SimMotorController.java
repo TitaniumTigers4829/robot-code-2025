@@ -2,10 +2,9 @@ package frc.robot.extras.sim;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import sham.ShamMechanism.MechanismOutputs;
-
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.extras.sim.SimMechanism.MechanismOutputs;
 
 /**
  * An interface to represent a motor controller in the simulation.

@@ -8,16 +8,17 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
-import static sham.utils.mathutils.MeasureMath.div;
 
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import sham.ShamArena.ShamEnvTiming;
-import sham.utils.GearRatio;
-import sham.utils.RuntimeLog;
-import sham.utils.mathutils.MeasureMath;
-import edu.wpi.first.epilogue.logging.DataLogger;
+import org.littletonrobotics.junction.Logger;
+
+// import sham.ShamArena.ShamEnvTiming;
+// import sham.utils.GearRatio;
+// import sham.utils.RuntimeLog;
+// import sham.utils.mathutils.MeasureMath;
+// import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;
@@ -32,10 +33,13 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
+import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import monologue.ProceduralStructGenerator;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
+import frc.robot.extras.sim.utils.GearRatio;
+import static frc.robot.extras.sim.utils.mathutils.MeasureMath.*;
 
 public class SimMechanism {
     private static final double kMotorEfficiency = 0.85;
@@ -125,7 +129,7 @@ public class SimMechanism {
             return new Friction(NewtonMeters.zero(), NewtonMeters.zero());
         }
 
-        public static final Struct<Friction> struct = ProceduralStructGenerator.genRecord(Friction.class);
+        public static final Struct<Friction> struct = StructGenerator.genRecord(Friction.class);
     }
 
     public record HardLimits(Angle minAngle, Angle maxAngle) implements StructSerializable {
@@ -137,7 +141,7 @@ public class SimMechanism {
             return new HardLimits(Rad.of(-1_000_000_000_000.0), Rad.of(1_000_000_000_000.0));
         }
 
-        public static final Struct<HardLimits> struct = ProceduralStructGenerator.genRecord(HardLimits.class);
+        public static final Struct<HardLimits> struct = StructGenerator.genRecord(HardLimits.class);
     }
 
     /**
@@ -162,7 +166,7 @@ public class SimMechanism {
             return new MechanismOutputs(position.times(scalar), velocity.times(scalar), acceleration.times(scalar));
         }
 
-        public static final Struct<MechanismOutputs> struct = ProceduralStructGenerator.genRecord(MechanismOutputs.class);
+        public static final Struct<MechanismOutputs> struct = StructGenerator.genRecord(MechanismOutputs.class);
     }
 
     /**
@@ -189,17 +193,16 @@ public class SimMechanism {
             return new MechanismInputs(NewtonMeters.zero(), Volts.zero(), Volts.zero(), Amps.zero());
         }
 
-        public static final Struct<MechanismInputs> struct = ProceduralStructGenerator.genRecord(MechanismInputs.class);
+        public static final Struct<MechanismInputs> struct = StructGenerator.genRecord(MechanismInputs.class);
     }
 
     private final String name;
-    private final DataLogger logger;
     private final MechanismDynamics dynamics;
     private final Friction friction;
     private final GearRatio gearRatio;
     private final DCMotor motor;
     private final SimMotorController controller;
-    private final ShamEnvTiming timing;
+    private final SimEnvTiming timing;
     private final MomentOfInertia rotorInertia;
     private final HardLimits limits;
     private final double noise;
@@ -218,9 +221,9 @@ public class SimMechanism {
         MechanismDynamics dynamics,
         HardLimits limits,
         double noise,
-        ShamEnvTiming timing
+        SimEnvTiming timing
     ) {
-        this.logger = RuntimeLog.loggerFor("Mechanism/"+name);
+        // this.logger = RuntimeLog.loggerFor("Mechanism/"+name);
         this.dynamics = dynamics;
         this.friction = friction;
         this.gearRatio = gearRatio;
@@ -232,28 +235,28 @@ public class SimMechanism {
         this.limits = limits;
         this.noise = noise;
 
-        logger.log("dynamics", dynamics.getClass().getSimpleName());
-        logger.log("friction", friction, Friction.struct);
-        logger.log("gearRatio", gearRatio, GearRatio.struct);
-        logger.log("motor", motor, DCMotor.struct);
-        logger.log("controller", controller.getClass().getSimpleName());
-        logger.log("rotorInertia", rotorInertia);
-        logger.log("limits", limits, HardLimits.struct);
-        logger.log("noise", noise);
+        // Logger.recordOutput("dynamics", dynamics.getClass().getSimpleName());
+        // Logger.recordOutput("friction", friction, Friction.struct);
+        // Logger.recordOutput("gearRatio", gearRatio, GearRatio.struct);
+        // Logger.recordOutput("motor", motor, DCMotor.struct);
+        // Logger.recordOutput("controller", controller.getClass().getSimpleName());
+        // Logger.recordOutput("rotorInertia", rotorInertia);
+        // Logger.recordOutput("limits", limits, HardLimits.struct);
+        // Logger.recordOutput("noise", noise);
     }
 
     protected Torque getBrakingTorque() {
         if (!controller.brakeEnabled()) {
-            logger.log("Update/braking", false);
-            logger.log("Update/brakingTorque", 0.0);
-            logger.log("Update/brakingCurrent", 0.0);
+            // Logger.recordOutput("Update/braking", false);
+            // Logger.recordOutput("Update/brakingTorque", 0.0);
+            // Logger.recordOutput("Update/brakingCurrent", 0.0);
             return NewtonMeters.zero();
         }
         double current = motor.getCurrent(outputs.velocity().in(RadPS), Volts.zero().in(Volts));
         double torque = motor.getTorque(current);
-        logger.log("Update/braking", true);
-        logger.log("Update/brakingTorque", torque);
-        logger.log("Update/brakingCurrent", current);
+        // Logger.recordOutput("Update/braking", true);
+        // Logger.recordOutput("Update/brakingTorque", torque);
+        // Logger.recordOutput("Update/brakingCurrent", current);
         return NewtonMeters.of(torque);
     }
 
@@ -266,33 +269,33 @@ public class SimMechanism {
      */
     protected Torque antiTorque(Torque motor, Torque environment, MomentOfInertia inertia) {
         AngularVelocity velocity = outputs().velocity();
-        boolean isMoving = MeasureMath.abs(velocity).gt(RadPS.zero());
-        logger.log("Update/moving", isMoving);
+        boolean isMoving = abs(velocity).gt(RadPS.zero());
+        // Logger.recordOutput("Update/moving", isMoving);
         Torque frictionTorque = isMoving ? friction.kineticFriction() : friction.staticFriction();
         Torque brakingTorque = NewtonMeters.zero();
-        if (MeasureMath.abs(motor).lt(NewtonMeters.of(0.01))) {
+        if (abs(motor).lt(NewtonMeters.of(0.01))) {
             brakingTorque = getBrakingTorque();
         }
         // ensure that friction/braking opposes the motion
         Torque antiTorque = frictionTorque.plus(brakingTorque)
-                .times(-MeasureMath.signum(velocity) * gearRatio.getReduction());
+                .times(-signum(velocity) * gearRatio.getReduction());
 
-        logger.log("Update/frictionTorque", frictionTorque);
-        logger.log("Update/desiredAntiTorque", antiTorque);
+        // Logger.recordOutput("Update/frictionTorque", frictionTorque);
+        // Logger.recordOutput("Update/desiredAntiTorque", antiTorque);
 
         final AngularAcceleration unburdenedAccel = div(motor.plus(environment), inertia);
         final AngularAcceleration burdenAccel = div(antiTorque, inertia);
         final AngularAcceleration imposedAccel = unburdenedAccel.plus(burdenAccel);
-        logger.log("Update/unburdenedAccel", unburdenedAccel);
-        logger.log("Update/burdenAccel", burdenAccel);
-        logger.log("Update/imposedAccel", imposedAccel);
+        // Logger.recordOutput("Update/unburdenedAccel", unburdenedAccel);
+        // Logger.recordOutput("Update/burdenAccel", burdenAccel);
+        // Logger.recordOutput("Update/imposedAccel", imposedAccel);
 
         // the goal of anti torque is to reduce the velocity to 0
         // so we need to ensure that the anti torque is not so large that it causes the mechanism to reverse
 
         final AngularAcceleration accelNeededToStop = velocity.times(-1.0).div(timing.dt());
-        final Torque torqueNeededToStop = MeasureMath.times(accelNeededToStop, inertia);
-        logger.log("Update/accelNeededToStop", accelNeededToStop);
+        final Torque torqueNeededToStop = times(accelNeededToStop, inertia);
+        Logger.recordOutput("Update/accelNeededToStop", accelNeededToStop);
 
         if (accelNeededToStop.lt(RadPS2.zero())) {
             // accel needed to stop is negative
@@ -300,13 +303,13 @@ public class SimMechanism {
                 // the imposed accel has a greater magnitude in the same sign
                 // as the accel needed to stop, this will cause the mechanism
                 // to reverse
-                logger.log("Update/antiTorque", torqueNeededToStop);
+                Logger.recordOutput("Update/antiTorque", torqueNeededToStop);
                 return torqueNeededToStop;
             } else {
                 // the imposed accel has a lesser magnitude in the same sign
                 // as the accel needed to stop, this will cannot cause the mechanism
                 // to reverse
-                logger.log("Update/antiTorque", antiTorque);
+                Logger.recordOutput("Update/antiTorque", antiTorque);
                 return antiTorque;
             }
         } else {
@@ -315,13 +318,13 @@ public class SimMechanism {
                 // the imposed accel has a greater magnitude in the same sign
                 // as the accel needed to stop, this will cause the mechanism
                 // to reverse
-                logger.log("Update/antiTorque", torqueNeededToStop);
+                Logger.recordOutput("Update/antiTorque", torqueNeededToStop);
                 return torqueNeededToStop;
             } else {
                 // the imposed accel has a lesser magnitude in the same sign
                 // as the accel needed to stop, this will cannot cause the mechanism
                 // to reverse
-                logger.log("Update/antiTorque", antiTorque);
+                Logger.recordOutput("Update/antiTorque", antiTorque);
                 return antiTorque;
             }
         }
@@ -334,7 +337,7 @@ public class SimMechanism {
      */
     protected Voltage getControllerVoltage(Voltage supplyVoltage) {
         Voltage rv = controller.run(timing.dt(), supplyVoltage, outputs());
-        Voltage v = MeasureMath.clamp(rv, RobotController.getMeasureBatteryVoltage().times(-1.0), RobotController.getMeasureBatteryVoltage());
+        Voltage v = clamp(rv, RobotController.getMeasureBatteryVoltage().times(-1.0), RobotController.getMeasureBatteryVoltage());
         if (DriverStation.isDisabled()) {
             return Volts.zero();
         }
@@ -346,7 +349,7 @@ public class SimMechanism {
             return NewtonMeters.zero();
         }
         double current = motor.getCurrent(motorOutputs().velocity().in(RadPS), voltage.in(Volts));
-        logger.log("Update/current", current);
+        Logger.recordOutput("Update/current", current);
         double torque = motor.getTorque(MathUtil.clamp(current, -80.0, 80.0));
         return NewtonMeters.of(torque).times(gearRatio.getReduction());
     }
@@ -413,26 +416,26 @@ public class SimMechanism {
         final Time dt = timing.dt();
 
         final MomentOfInertia inertia = rotorInertia.plus(dynamics.extraInertia());
-        logger.log("Update/inertia", inertia);
+        Logger.recordOutput("Update/inertia", inertia);
 
         // run the motor controller loop
         final Voltage voltage = getControllerVoltage(supplyVoltage);
-        logger.log("Update/voltage", voltage);
+        Logger.recordOutput("Update/voltage", voltage);
 
         // calculate the torque acting on the mechanism
         final Torque environment = dynamics.environment(outputs().position(), outputs().velocity());
         final Torque motorTorque = getMotorTorque(voltage);
         final Torque antiTorque = antiTorque(motorTorque, environment, inertia);
         final Torque outputTorque = motorTorque.plus(antiTorque);
-        logger.log("Update/environmentTorque", environment);
-        logger.log("Update/motorTorque", motorTorque);
-        logger.log("Update/antiTorque", antiTorque);
-        logger.log("Update/outputTorque", outputTorque);
+        Logger.recordOutput("Update/environmentTorque", environment);
+        Logger.recordOutput("Update/motorTorque", motorTorque);
+        Logger.recordOutput("Update/antiTorque", antiTorque);
+        Logger.recordOutput("Update/outputTorque", outputTorque);
 
         // calculate the displacement, velocity, and acceleration of the mechanism
         final AngularAcceleration acceleration = div(outputTorque, inertia)
             .times(1.0 + (noise * RAND.nextGaussian()));
-        final AngularVelocity velocity = MeasureMath.nudgeZero(
+        final AngularVelocity velocity = nudgeZero(
             outputs().velocity().plus(acceleration.times(dt)),
             RotationsPerSecond.of(0.001)
         );
@@ -455,9 +458,9 @@ public class SimMechanism {
                 Amps.of(motor.getCurrent(outputs.velocity.in(RadPS), voltage.in(Volts)))
             );
         } finally {
-            logger.log("Update/outputs", outputs, MechanismOutputs.struct);
-            logger.log("Update/motorOutputs", motorOutputs(), MechanismOutputs.struct);
-            logger.log("Update/inputs", inputs, MechanismInputs.struct);
+            // Logger.recordOutput("Update/outputs", outputs, MechanismOutputs.struct);
+            // Logger.recordOutput("Update/motorOutputs", motorOutputs(), MechanismOutputs.struct);
+            // Logger.recordOutput("Update/inputs", inputs, MechanismInputs.struct);
             ioLock.writeLock().unlock();
         }
     }

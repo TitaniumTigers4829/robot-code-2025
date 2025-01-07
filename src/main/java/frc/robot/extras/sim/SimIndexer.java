@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
-import sham.ShamGamePiece.GamePieceVariant;
+import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 
 public class SimIndexer {
     protected final Queue<SimGamePiece> gamePieces;
