@@ -1,4 +1,4 @@
-package frc.robot.extras.setpointGen;
+package frc.robot.extras.swerve.setpointGen;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
