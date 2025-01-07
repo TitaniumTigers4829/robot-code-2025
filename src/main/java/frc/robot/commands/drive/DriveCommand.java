@@ -2,9 +2,15 @@ package frc.robot.commands.drive;
 
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.gyro.GyroInterface;
+import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.swerve.SwerveModule;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 
 // import frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -29,6 +35,7 @@ public class DriveCommand extends DriveCommandBase {
    */
   public DriveCommand(
       SwerveDrive driveSubsystem,
+      SwerveModule swerveModule,
       VisionSubsystem visionSubsystem,
       DoubleSupplier leftJoystickY,
       DoubleSupplier leftJoystickX,
@@ -68,7 +75,9 @@ public class DriveCommand extends DriveCommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    angularSpeed = 0;
+  }
 
   @Override
   public boolean isFinished() {

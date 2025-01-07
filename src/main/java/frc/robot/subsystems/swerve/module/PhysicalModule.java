@@ -188,6 +188,11 @@ public class PhysicalModule implements ModuleInterface {
   }
 
   @Override
+  public void xthing() {
+    turnMotor.setPosition(null);
+  }
+
+  @Override
   public void stopModule() {
     driveMotor.stopMotor();
     turnMotor.stopMotor();

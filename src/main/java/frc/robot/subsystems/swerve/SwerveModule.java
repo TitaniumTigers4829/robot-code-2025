@@ -77,6 +77,10 @@ public class SwerveModule extends SubsystemBase {
     return inputs.turnVelocity;
   }
 
+  public double xthing() {
+    return inputs.Angle
+  }
+
   /** Returns the current drive position of the module in meters. */
   public double getDrivePositionMeters() {
     return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.drivePosition;
