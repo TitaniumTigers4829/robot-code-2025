@@ -63,7 +63,10 @@ public interface VisionInterface {
   default void updateInputs(VisionInputs inputs) {}
 
   /**
-   * @param limelight The Limelight to retrieve the latency data from
+   * Gets the current latency of the Limelight in seconds. This latency is the time it takes for the
+   * Limelight to process an image and send the data to the robot.
+   * 
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current latency of the Limelight
    */
   default double getLatencySeconds(Limelight limelight) {
@@ -71,7 +74,10 @@ public interface VisionInterface {
   }
 
   /**
-   * @param limelight The Limelight to retrieve the timestamp data from
+   * Gets the current timestamp of the Limelight in seconds. This timestamp
+   * is the time at which the data was received from the Limelight.
+   * 
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current timestamp of the Limelight
    */
   default double getTimeStampSeconds(Limelight limelight) {
@@ -97,15 +103,17 @@ public interface VisionInterface {
   }
 
   /**
-   * @param limelight The Limelight to retrieve the data from
-   * @return The current number of April Tags of the Limelight
+   * Gets how many april tags the limelight can see.
+   * 
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return The current number of April Tags of the limelight sees
    */
   default int getNumberOfAprilTags(Limelight limelight) {
     return 0;
   }
 
   /**
-   * @param limelight The Limelight to retrieve the pose data from
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current pose of the Limelight
    */
   default Pose2d getPoseFromAprilTags(Limelight limelight) {
