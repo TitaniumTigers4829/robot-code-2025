@@ -79,7 +79,7 @@ public class PhysicalVision implements VisionInterface {
     // Different Limelights have different FOVs
     if (getNumberOfAprilTags(limelight) > VisionConstants.MIN_APRIL_TAG_ID
         && getNumberOfAprilTags(limelight) <= VisionConstants.MAX_APRIL_TAG_ID) {
-      if (limelight.getName().equals(Limelight.SHOOTER.getName())) {
+      if (limelight.getName().equals(Limelight.BACK.getName())) {
         return Math.abs(LimelightHelpers.getTX(limelight.getName()))
             <= VisionConstants.LL3G_FOV_MARGIN_OF_ERROR;
       } else {
@@ -336,7 +336,7 @@ public class PhysicalVision implements VisionInterface {
           latestInputs.set(inputs);
 
           limelightThreads.computeIfPresent(limelight, (key, value) -> latestInputs);
-          // // Handle threading for Limelight (start or stop threads if needed)
+          // Handle threading for Limelight (start or stop threads if needed)
           // Check if this Limelight thread exists in limelightThreads
           if (limelightThreads.get(limelight) != null) {
             // Update thread inputs or restart the thread if needed
@@ -350,7 +350,7 @@ public class PhysicalVision implements VisionInterface {
             lastSeenPose = getMegaTag1PoseEstimate(limelight).pose;
           }
         } else {
-          // // Retrieve the AtomicReference for the given limelight number
+          // Retrieve the AtomicReference for the given limelight number
           AtomicReference<VisionInputs> isThreadRunning =
               limelightThreads.getOrDefault(limelight, latestInputs);
           // Only stop the thread if it's currently running

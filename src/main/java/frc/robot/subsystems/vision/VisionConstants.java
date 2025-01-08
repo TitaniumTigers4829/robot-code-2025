@@ -10,7 +10,7 @@ import org.photonvision.PhotonCamera;
 
 public final class VisionConstants {
   public enum Limelight {
-    SHOOTER(0, VisionConstants.SHOOTER_LIMELIGHT_NAME),
+    BACK(0, VisionConstants.BACK_LIMELIGHT_NAME),
     FRONT_LEFT(1, VisionConstants.FRONT_LEFT_LIMELIGHT_NAME),
     FRONT_RIGHT(2, VisionConstants.FRONT_RIGHT_LIMELIGHT_NAME);
 
@@ -32,7 +32,7 @@ public final class VisionConstants {
 
     public static Limelight fromId(int id) {
       return switch (id) {
-        case 0 -> SHOOTER;
+        case 0 -> BACK;
         case 1 -> FRONT_LEFT;
         case 2 -> FRONT_RIGHT;
         default -> throw new IllegalArgumentException("Invalid Limelight ID: " + id);
@@ -51,7 +51,7 @@ public final class VisionConstants {
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
-  public static final PhotonCamera SHOOTER_CAMERA = new PhotonCamera(Limelight.SHOOTER.getName());
+  public static final PhotonCamera SHOOTER_CAMERA = new PhotonCamera(Limelight.BACK.getName());
   public static final PhotonCamera FRONT_LEFT_CAMERA =
       new PhotonCamera(Limelight.FRONT_LEFT.getName());
   public static final PhotonCamera FRONT_RIGHT_CAMERA =
@@ -77,7 +77,7 @@ public final class VisionConstants {
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = 0.5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;
 
-  public static final String SHOOTER_LIMELIGHT_NAME = "limelight-shooter";
+  public static final String BACK_LIMELIGHT_NAME = "limelight-shooter";
   public static final int SHOOTER_LIMELIGHT_NUMBER = 0;
   public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-left";
   public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 1;
