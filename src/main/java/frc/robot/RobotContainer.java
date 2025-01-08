@@ -54,7 +54,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     switch (Constants.CURRENT_MODE) {
-      case REAL -> {
+      case COMPROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
 
         /* Disable Simulations */
@@ -72,7 +72,7 @@ public class RobotContainer {
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
 
-      case SIM -> {
+      case SIMROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
 
         /* create simulations */

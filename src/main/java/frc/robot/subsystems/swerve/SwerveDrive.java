@@ -296,6 +296,12 @@ public class SwerveDrive extends SubsystemBase {
  public void setXStance(SwerveModuleState[] xState) {
     isMoving = false;
      if (threesecsinactive()) { // Only lock if inactive for 3 seconds
+      Rotation2d[] xStanceAngles = {
+        Rotation2d.fromDegrees(45),  // Front-left
+        Rotation2d.fromDegrees(-45), // Front-right
+        Rotation2d.fromDegrees(-45), // Back-left
+        Rotation2d.fromDegrees(45)   // Back-right
+      };
          Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
          for (int i = 0; i < swerveHeadings.length; i++) {
              swerveHeadings[i] = swerveModules[i].getPosition().angle;

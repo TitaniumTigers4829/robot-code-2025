@@ -43,19 +43,19 @@ public class Robot extends LoggedRobot {
 
     // Set up data receivers & replay source
     switch (Constants.CURRENT_MODE) {
-      case REAL:
+      case COMPROBOT:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         // Gets data from network tables
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      case SIM:
+      case SIMROBOT:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      case REPLAY:
+      case DEVROBOT:
         // Replaying a log, set up replay source
         setUseTiming(false); // Run as fast as possible
         String logPath = LogFileUtil.findReplayLog();
