@@ -8,13 +8,12 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.extras.simulation.OdometryTimestampsSim;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
+import frc.robot.extras.sim.SimSwerveModule;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
 public class SimulatedModule implements ModuleInterface {
-  private final SwerveModuleSimulation moduleSimulation;
+  private final SimSwerveModule moduleSimulation;
 
   private final PIDController drivePID = new PIDController(.27, 0, 0);
   private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(1, 1.5);
@@ -27,7 +26,7 @@ public class SimulatedModule implements ModuleInterface {
       new ProfiledPIDController(18, 0, 0, turnConstraints);
   private final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(0, 0, 0);
 
-  public SimulatedModule(SwerveModuleSimulation moduleSimulation) {
+  public SimulatedModule(SimSwerveModule moduleSimulation) {
     this.moduleSimulation = moduleSimulation;
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
   }

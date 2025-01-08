@@ -7,6 +7,10 @@ import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
 import java.util.Queue;
 
+import com.studica.frc.AHRS;
+import com.studica.frc.AHRS.NavXComType;
+import com.studica.frc.AHRS.NavXUpdateRate;
+
 public class PhysicalGyro implements GyroInterface {
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
   private final Queue<Angle> yawPositionInput;

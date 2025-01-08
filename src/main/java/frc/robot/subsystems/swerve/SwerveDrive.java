@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
+import frc.robot.extras.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -50,7 +50,7 @@ public class SwerveDrive extends SubsystemBase {
           58,
           7,
           ModuleConstants.WHEEL_DIAMETER_METERS,
-          WHEEL_GRIP.TIRE_WHEEL.cof,
+          WheelCof.BLACK_NITRILE.cof,
           0.0);
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
