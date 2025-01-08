@@ -56,7 +56,7 @@ public class RobotContainer {
     switch (Constants.CURRENT_MODE) {
       case REAL -> {
         /* Real robot, instantiate hardware IO implementations */
-
+        
         /* Disable Simulations */
         // this.simulatedArena = null;
         this.gyroSimulation = null;
