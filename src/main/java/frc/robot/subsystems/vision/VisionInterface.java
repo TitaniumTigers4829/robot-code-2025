@@ -6,21 +6,53 @@ import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionInterface {
+
+  /**
+   * This class is used to store the inputs for the vision subsystem. Each of its fields that are 
+   * arrays have a length equal to the number of Limelights on the robot. Each index of the arrays
+   * corresponds to a different Limelight (0 is back, 1 is front left, 2 is front right). 
+   */
   @AutoLog
   class VisionInputs {
+    /**
+     * This array stores whether each Limelight is connected to the robot.
+     */
     public boolean[] isLimelightConnected = new boolean[Limelight.values().length];
-
+    /**
+     * This array stores MegatagPoseEstimates for each Limelight.
+     */
     public MegatagPoseEstimate[] limelightMegatagPoses =
         new MegatagPoseEstimate[Limelight.values().length];
+    /**
+     * This array stores the latencies in seconds of each Limelight.
+     */
     public double[] limelightLatencies = new double[Limelight.values().length];
+    /**
+     * This array stores the number of april tags each Limelight sees.
+     */
     public int[] limelightTargets = new int[Limelight.values().length];
+    /**
+     * This array stores whether each Limelight sees any April Tags.
+     */
     public boolean[] limelightSeesAprilTags = new boolean[Limelight.values().length];
-
+    /**
+     * This array stores the poses calculated from the April Tags seen by each Limelight.
+     */
     public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
-    public Pose2d limelightLastSeenPose = new Pose2d();
+    /**
+     * This array stores the distances in meters to the April Tags seen by each Limelight.
+     */
     public double[] limelightAprilTagDistances = new double[Limelight.values().length];
-
+    /**
+     * This array stores the timestamps in seconds of the data from each Limelight.
+     */
     public double[] limelightTimestamps = new double[Limelight.values().length];
+
+    /**
+     * This stores the last seen pose of any Limelight that most recently saw a target.
+     * This is primarily used if a driver wants to reset the robot's pose to what the limelights are seeing.
+     */
+    public Pose2d limelightLastSeenPose = new Pose2d();
   }
 
   /**
