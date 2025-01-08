@@ -68,6 +68,9 @@ public class SwerveModule extends SubsystemBase {
     Logger.recordOutput("Drive/desired turn angle", state.angle.getRotations());
   }
 
+  public void stopModule() {
+    io.stopModule();
+  }
   /** Returns the current turn angle of the module. */
   public Rotation2d getTurnRotation() {
     return inputs.turnAbsolutePosition;
@@ -77,8 +80,8 @@ public class SwerveModule extends SubsystemBase {
     return inputs.turnVelocity;
   }
 
-  public double xthing() {
-    return inputs.Angle
+  public void xthing(double desiredPositionDegrees) {
+    io.xthing(desiredPositionDegrees);
   }
 
   /** Returns the current drive position of the module in meters. */

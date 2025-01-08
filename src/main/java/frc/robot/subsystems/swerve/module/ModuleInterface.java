@@ -47,7 +47,7 @@ public interface ModuleInterface {
 
   default void stopModule() {}
 
-  default void xthing() {}
+  default void xthing(double desiredPositionDegrees) {}
   default double getTurnRotations() {
     return 0.0;
   }

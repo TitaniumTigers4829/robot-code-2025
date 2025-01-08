@@ -188,8 +188,8 @@ public class PhysicalModule implements ModuleInterface {
   }
 
   @Override
-  public void xthing() {
-    turnMotor.setPosition(null);
+  public void xthing(double desiredPositionDegrees) {
+    turnMotor.setControl(mmPositionRequest.withPosition(Degrees.of(desiredPositionDegrees)));
   }
 
   @Override
