@@ -20,8 +20,6 @@ public abstract class DriveCommandBase extends Command {
   private final VisionSubsystem vision;
   private final SwerveDrive swerveDrive;
 
-  private double lastTimeStampSeconds = 0;
-
   /**
    * An abstract class that handles pose estimation while driving.
    *
