@@ -1,5 +1,3 @@
-// All praise 254 lib
-
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -9,6 +7,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
+  
   private final VisionInterface visionInterface;
   private final VisionInputsAutoLogged inputs = new VisionInputsAutoLogged();
 

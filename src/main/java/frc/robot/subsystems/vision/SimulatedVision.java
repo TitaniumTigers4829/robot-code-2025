@@ -65,7 +65,7 @@ public class SimulatedVision extends PhysicalVision {
         new PhotonCameraSim(getSimulationCamera(Limelight.FRONT_RIGHT), cameraProperties);
 
     visionSim.addCamera(
-        shooterCameraSim, VisionConstants.SHOOTER_TRANSFORM); // check inverse things
+        shooterCameraSim, VisionConstants.BACK_TRANSFORM); // check inverse things
     visionSim.addCamera(frontLeftCameraSim, VisionConstants.FRONT_LEFT_TRANSFORM);
     visionSim.addCamera(frontRightCameraSim, VisionConstants.FRONT_RIGHT_TRANSFORM);
 
@@ -174,7 +174,7 @@ public class SimulatedVision extends PhysicalVision {
    */
   private PhotonCamera getSimulationCamera(Limelight limelight) {
     return switch (limelight) {
-      case BACK -> VisionConstants.SHOOTER_CAMERA;
+      case BACK -> VisionConstants.BACK_CAMERA;
       case FRONT_LEFT -> VisionConstants.FRONT_LEFT_CAMERA;
       case FRONT_RIGHT -> VisionConstants.FRONT_RIGHT_CAMERA;
       default -> throw new IllegalArgumentException("Invalid limelight camera " + limelight);

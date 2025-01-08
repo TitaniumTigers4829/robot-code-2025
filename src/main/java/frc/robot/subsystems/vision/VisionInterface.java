@@ -79,8 +79,10 @@ public interface VisionInterface {
   }
 
   /**
-   * @param limelight The Limelight to retrieve the target data from
-   * @return Whether the Limelight can see any targets, and if it is within its field of view
+   * Checks if the specified limelight can fully see one or more April Tag.
+   *
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return true if the Limelight can see any april tags, and if it is within its field of view
    */
   default boolean canSeeAprilTags(Limelight limelight) {
     return false;
