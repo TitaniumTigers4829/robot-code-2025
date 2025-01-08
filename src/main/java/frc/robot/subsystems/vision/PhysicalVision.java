@@ -9,10 +9,7 @@ import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
-// import frc.robot.subsystems.vision.VisionInterface.VisionInputs;
 import java.util.concurrent.ConcurrentHashMap;
-// import java.util.concurrent.ExecutorService;
-// import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PhysicalVision implements VisionInterface {
@@ -20,9 +17,9 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d lastSeenPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
+  
   private final ConcurrentHashMap<Limelight, AtomicReference<VisionInputs>> limelightThreads =
       new ConcurrentHashMap<>();
-  // private final ExecutorService executorService = Executors.newFixedThreadPool(3);
   private final AtomicReference<VisionInputs> latestInputs =
       new AtomicReference<>(new VisionInputs());
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
@@ -42,7 +39,7 @@ public class PhysicalVision implements VisionInterface {
 
       // Start a vision input task for each Limelight
       threadManager.startVisionInputTask(
-          limelight.getName(), latestInputs.get(), () -> visionThreadTask(latestInputs.get()));
+          limelight.getName(), latestInputs.get(), () -> checkAndUpdatePose(limelight, latestInputs.get()));
     }
   }
 
@@ -368,33 +365,6 @@ public class PhysicalVision implements VisionInterface {
         System.err.println(
             "Error communicating with the: " + limelight.getName() + ": " + e.getMessage());
       }
-    }
-  }
-
-  /**
-   * Starts a separate thread dedicated to updating the pose estimate for a specified limelight.
-   * This approach is adopted to prevent loop overruns that would occur if we attempted to parse the
-   * JSON dump for each limelight sequentially within a single scheduler loop.
-   *
-   * <p>To achieve efficient and safe parallel execution, an ExecutorService is utilized to manage
-   * the lifecycle of these threads.
-   *
-   * <p>Each thread continuously runs the {@link #checkAndUpdatePose(int)} method as long as the
-   * corresponding limelight's thread is marked as "running". This ensures that pose estimates are
-   * updated in real-time, leveraging the parallel processing capabilities of the executor service.
-   *
-   * @param limelight the limelight number
-   */
-  public void visionThreadTask(VisionInputs inputs) { // Limelight limelight
-    try {
-      synchronized (inputs) {
-        for (Limelight limelight : Limelight.values()) {
-          checkAndUpdatePose(limelight, inputs);
-        }
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
     }
   }
 
