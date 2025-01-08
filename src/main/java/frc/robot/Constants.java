@@ -18,13 +18,13 @@ public final class Constants {
 
   public static enum Mode {
     /** Running on a real robot. */
-    REAL,
+    CompRobot,
 
     /** Running a physics simulator. */
-    SIM,
+    SimRobot,
 
     /** Replaying from a log file. */
-    REPLAY
+    DevRobot
   }
 
   /**
