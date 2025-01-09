@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.extras.simulation.OdometryTimestampsSim;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 
 public class SimulatedGyro implements GyroInterface {
@@ -17,11 +16,9 @@ public class SimulatedGyro implements GyroInterface {
   @Override
   public void updateInputs(GyroInputs inputs) {
     inputs.isConnected = true;
-    inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
-    inputs.odometryYawTimestamps = OdometryTimestampsSim.getTimestamps();
     inputs.yawDegreesRotation2d = gyroSimulation.getGyroReading();
     inputs.yawDegrees = gyroSimulation.getGyroReading().getDegrees();
-    inputs.yawVelocity =
+    inputs.yawVelocityDegreesPerSecond =
         RadiansPerSecond.of(gyroSimulation.getMeasuredAngularVelocityRadPerSec())
             .in(DegreesPerSecond);
   }

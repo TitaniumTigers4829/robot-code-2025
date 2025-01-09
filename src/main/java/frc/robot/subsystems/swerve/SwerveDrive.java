@@ -218,7 +218,7 @@ public class SwerveDrive extends SubsystemBase {
    * @return The current rate in degrees per second.
    */
   public double getGyroRate() {
-    return gyroInputs.yawVelocity;
+    return gyroInputs.yawVelocityDegreesPerSecond;
   }
 
   /** Returns a Rotation2d for the heading of the robot. */
