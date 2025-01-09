@@ -12,6 +12,14 @@ import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * This class is the implementation of the VisionInterface for the physical robot. It uses 
+ * the ThreadManager to make threads to run the code for processing the vision data from the
+ * limelights asynchonously.
+ * 
+ * @author Jack
+ * @author Ishan
+ */
 public class PhysicalVision implements VisionInterface {
 
   private Pose2d lastSeenPose = new Pose2d();
@@ -76,6 +84,46 @@ public class PhysicalVision implements VisionInterface {
             <= limelight.getAccurateFOV();
     }
     return false;
+  }
+
+  @Override
+  public Pose2d getPoseFromAprilTags(Limelight limelight) {
+    return limelightEstimates[limelight.getId()].fieldToCamera;
+  }
+
+  @Override
+  public int getNumberOfAprilTags(Limelight limelight) {
+    return limelightEstimates[limelight.getId()].tagCount;
+  }
+
+  @Override
+  public double getTimeStampSeconds(Limelight limelight) {
+    return limelightEstimates[limelight.getId()].timestampSeconds / 1000.0;
+  }
+
+  @Override
+  public double getLatencySeconds(Limelight limelight) {
+    return (limelightEstimates[limelight.getId()].latency) / 1000.0;
+  }
+
+  @Override
+  public Pose2d getLastSeenPose() {
+    return lastSeenPose;
+  }
+
+  @Override
+  public double getLimelightAprilTagDistance(Limelight limelight) {
+    if (canSeeAprilTags(limelight)) {
+      return limelightEstimates[limelight.getId()].avgTagDist;
+    }
+    // To be safe returns a big distance from the april tags if it can't see any
+    return Double.MAX_VALUE;
+  }
+
+  @Override
+  public void setHeadingInfo(double headingDegrees, double headingRateDegrees) {
+    this.headingDegrees = headingDegrees;
+    this.headingRateDegreesPerSecond = headingRateDegrees;
   }
 
   /**
@@ -146,7 +194,6 @@ public class PhysicalVision implements VisionInterface {
             mt1.pose.getRotation().getDegrees(),
             mt2.pose.getRotation().getDegrees(),
             VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD);
-    // return true;
   }
 
   /**
@@ -201,73 +248,6 @@ public class PhysicalVision implements VisionInterface {
             && megaTag2Estimate.pose.getX() <= FieldConstants.FIELD_WIDTH_METERS)
         && (megaTag2Estimate.pose.getY() > 0
             && megaTag2Estimate.pose.getY() <= FieldConstants.FIELD_WIDTH_METERS);
-  }
-
-  /**
-   * Gets the pose of the robot calculated by specified limelight via any April Tags it sees
-   *
-   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return the pose of the robot, if the limelight can't see any April Tags, it will return 0 for
-   *     x, y, and theta
-   */
-  @Override
-  public Pose2d getPoseFromAprilTags(Limelight limelight) {
-    return limelightEstimates[limelight.getId()].fieldToCamera;
-  }
-
-  @Override
-  public int getNumberOfAprilTags(Limelight limelight) {
-    return limelightEstimates[limelight.getId()].tagCount;
-  }
-
-  @Override
-  public double getTimeStampSeconds(Limelight limelight) {
-    return limelightEstimates[limelight.getId()].timestampSeconds / 1000.0;
-  }
-
-  /**
-   * Returns the latency in seconds of when the limelight that is being used for pose estimation
-   * calculated the robot's pose. It adds the pipeline latency, capture latency, and json parsing
-   * latency.
-   */
-  @Override
-  public double getLatencySeconds(Limelight limelight) {
-    return (limelightEstimates[limelight.getId()].latency) / 1000.0;
-  }
-
-  /** Gets the pose calculated the last time a limelight saw an April Tag */
-  @Override
-  public Pose2d getLastSeenPose() {
-    return lastSeenPose;
-  }
-
-  /**
-   * Gets the average distance between the specified limelight and the April Tags it sees
-   *
-   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return the average distance between the robot and the April Tag(s) in meters
-   */
-  @Override
-  public double getLimelightAprilTagDistance(Limelight limelight) {
-    if (canSeeAprilTags(limelight)) {
-      return limelightEstimates[limelight.getId()].avgTagDist;
-    }
-    // To be safe returns a big distance from the april tags if it can't see any
-    return Double.MAX_VALUE;
-  }
-
-  /**
-   * Sets the heading and heading rate of the robot, this is used for deciding between MegaTag 1 and
-   * 2 for pose estimation.
-   *
-   * @param headingDegrees the angle the robot is facing in degrees (0 degrees facing the red
-   *     alliance)
-   * @param headingRateDegrees the rate the robot is rotating, CCW positive
-   */
-  @Override
-  public void setHeadingInfo(double headingDegrees, double headingRateDegrees) {
-    this.headingDegrees = headingDegrees;
-    this.headingRateDegreesPerSecond = headingRateDegrees;
   }
 
   /**

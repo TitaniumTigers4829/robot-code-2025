@@ -95,8 +95,10 @@ public interface VisionInterface {
   }
 
   /**
-   * @param limelight The Limelight to retrieve the distance data from
-   * @return The current April Tag distance from the Limelight
+   * Gets the average distance between the specified limelight and the April Tags it sees
+   *
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return the average distance between the robot and the April Tag(s) in meters
    */
   default double getLimelightAprilTagDistance(Limelight limelight) {
     return 0.0;
@@ -113,22 +115,30 @@ public interface VisionInterface {
   }
 
   /**
+   * Gets the pose of the robot calculated by the specified limelight via any April Tags it sees
+   *
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return The current pose of the Limelight
+   * @return the pose of the robot, if the limelight can't see any April Tags, it will return 0 for
+   * x, y, and theta
    */
   default Pose2d getPoseFromAprilTags(Limelight limelight) {
     return null;
   }
 
   /**
-   * Sets the heading information of the robot, used with MT2
+   * Sets the heading and heading rate of the robot, this is used for deciding between MegaTag 1 and
+   * 2 for pose estimation.
    *
-   * @param headingDegrees The heading of the robot in degrees
-   * @param headingRateDegrees The rate of change of the heading of the robot in degrees
+   * @param headingDegrees the angle the robot is facing in degrees (0 degrees facing the red
+   * alliance)
+   * @param headingRateDegreesPerSecond the rate the robot is rotating, CCW positive
    */
-  default void setHeadingInfo(double headingDegrees, double headingRateDegrees) {}
+  default void setHeadingInfo(double headingDegrees, double headingRateDegreesPerSecond) {}
 
   /**
+   * Gets the pose calculated the last time a limelight saw an April Tag, used for resetting the
+   * robot's pose.
+   * 
    * @return The last seen pose of any Limelight that most recently saw a target
    */
   default Pose2d getLastSeenPose() {
