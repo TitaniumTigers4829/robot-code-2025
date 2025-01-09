@@ -9,10 +9,10 @@ import org.littletonrobotics.junction.Logger;
 /**
  * VisionSubsystem is a subsystem for managing vision-related tasks in the robot, including
  * interacting with limelights, processing vision data, and logging inputs.
- * 
- * It provides methods for getting detailed vision information, setting heading
- * data for pose estimation, and retrieving poses based on April Tag detection.
- * 
+ *
+ * <p>It provides methods for getting detailed vision information, setting heading data for pose
+ * estimation, and retrieving poses based on April Tag detection.
+ *
  * @author Ishan
  */
 public class VisionSubsystem extends SubsystemBase {
@@ -73,8 +73,8 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets heading information for the robot. This information is used to assist in pose
-   * estimation by distinguishing between multiple MegaTags.
+   * Sets heading information for the robot. This information is used to assist in pose estimation
+   * by distinguishing between multiple MegaTags.
    *
    * @param headingDegrees The robot's heading in degrees.
    * @param headingRateDegrees The robot's rate of rotation in degrees per second.

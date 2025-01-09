@@ -9,9 +9,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages threads for various tasks within the robot's vision system.
- * Provides methods to start, stop, and manage threads efficiently while preventing excessive updates.
- * 
+ * Manages threads for various tasks within the robot's vision system. Provides methods to start,
+ * stop, and manage threads efficiently while preventing excessive updates.
+ *
  * @author Ishan
  */
 public class ThreadManager {
@@ -70,8 +70,8 @@ public class ThreadManager {
   }
 
   /**
-   * Starts a vision-related task that periodically updates vision inputs.
-   * This method creates a thread that repeatedly executes the provided task until interrupted.
+   * Starts a vision-related task that periodically updates vision inputs. This method creates a
+   * thread that repeatedly executes the provided task until interrupted.
    *
    * @param threadName the name of the thread to start.
    * @param inputs the vision inputs to be updated.

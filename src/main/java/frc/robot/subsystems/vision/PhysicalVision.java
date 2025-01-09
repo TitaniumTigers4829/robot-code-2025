@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * This class is the implementation of the VisionInterface for the physical robot. It uses 
- * the ThreadManager to make threads to run the code for processing the vision data from the
- * limelights asynchonously.
- * 
+ * This class is the implementation of the VisionInterface for the physical robot. It uses the
+ * ThreadManager to make threads to run the code for processing the vision data from the limelights
+ * asynchonously.
+ *
  * @author Jack
  * @author Ishan
  */
@@ -25,7 +25,7 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d lastSeenPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
-  
+
   private final ConcurrentHashMap<Limelight, AtomicReference<VisionInputs>> limelightThreads =
       new ConcurrentHashMap<>();
   private final AtomicReference<VisionInputs> latestInputs =
@@ -46,7 +46,9 @@ public class PhysicalVision implements VisionInterface {
 
       // Start a vision input task for each Limelight
       threadManager.startVisionInputTask(
-          limelight.getName(), latestInputs.get(), () -> checkAndUpdatePose(limelight, latestInputs.get()));
+          limelight.getName(),
+          latestInputs.get(),
+          () -> checkAndUpdatePose(limelight, latestInputs.get()));
     }
   }
 
@@ -80,8 +82,7 @@ public class PhysicalVision implements VisionInterface {
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
     if (getNumberOfAprilTags(limelight) > 0) {
-      return Math.abs(LimelightHelpers.getTX(limelight.getName()))
-            <= limelight.getAccurateFOV();
+      return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
   }
@@ -159,7 +160,8 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void disabledPoseUpdate(Limelight limelight) {
-    limelightEstimates[limelight.getId()] = MegatagPoseEstimate.fromLimelight(getMegaTag1PoseEstimate(limelight));
+    limelightEstimates[limelight.getId()] =
+        MegatagPoseEstimate.fromLimelight(getMegaTag1PoseEstimate(limelight));
   }
 
   /**
@@ -170,9 +172,9 @@ public class PhysicalVision implements VisionInterface {
    */
   public void updatePoseEstimate(Limelight limelight, VisionInputs inputs) {
     synchronized (inputs) {
-      if (DriverStation.isEnabled()) { 
-        enabledPoseUpdate(limelight); 
-      } else { 
+      if (DriverStation.isEnabled()) {
+        enabledPoseUpdate(limelight);
+      } else {
         disabledPoseUpdate(limelight);
       }
     }
