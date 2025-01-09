@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swerve.SwerveConstants.*;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
@@ -34,7 +33,7 @@ public final class Constants {
   public static final class HardwareConstants {
     public static final double TIMEOUT_S = 0.02;
 
-    public static final double SIGNAL_FREQUENCY = 250;
+    public static final double STATUS_SIGNAL_FREQUENCY = 50;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";
