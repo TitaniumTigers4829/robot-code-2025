@@ -76,7 +76,7 @@ public class SimGyro {
 
         AngularVelocity omegaV = actualAngularVelocity
                 .plus(averageDriftingMotionless)
-                // .plus(getDriftingDueToImpact(actualAngularVelocity))
+                .plus(getDriftingDueToImpact(actualAngularVelocity))
                 .plus(actualAngularVelocity
                         .times(SimCommonMath.generateRandomNormal(0.0, veloStdDev))
                 );
@@ -98,18 +98,19 @@ public class SimGyro {
         }
     }
 
-    // private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
-    //     AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
-    //         lastTwist.dtheta * timing.dt().in(Seconds)
-    //     );
-    //     AngularAcceleration angularAcceleration = actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
-    //     if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
-    //         return DRIFT_DUE_TO_IMPACT_COEFFICIENT
-    //                 .times(MeasureMath.signum(angularAcceleration))
-    //                 .times(angularAcceleration.div(START_DRIFTING))
-    //                 .div(timing.dt());
-    //     } else {
-    //         return RadiansPerSecond.of(0);
-    //     }
-    // }
+    private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
+        AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
+            lastTwist.dtheta * timing.dt().in(Seconds)
+        );
+        AngularAcceleration angularAcceleration = actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
+        if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
+            return DRIFT_DUE_TO_IMPACT_COEFFICIENT
+                    .times(MeasureMath.signum(angularAcceleration))
+                    .times(angularAcceleration.div(START_DRIFTING))
+                    .div(timing.dt());
+        } else {
+            return RadiansPerSecond.of(0);
+        }
+    }
+
 }
