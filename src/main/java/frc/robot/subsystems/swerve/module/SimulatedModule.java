@@ -20,6 +20,7 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 public class SimulatedModule implements ModuleInterface {
   private final SimSwerveModule moduleSimulation;
 
+  // TODO: retune possibly most likely
   private final PIDController drivePID = new PIDController(.27, 0, 0);
   private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(1, 1.5);
 
@@ -52,7 +53,7 @@ public class SimulatedModule implements ModuleInterface {
     driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage();
     driveCurrentAmps = moduleSimulation.inputs().drive().statorCurrent();
 
-    turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position().in(Radians));
+    turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position());
     turnVelocity = moduleSimulation.outputs().steer().velocity();
     turnAppliedVolts = moduleSimulation.inputs().steer().statorVoltage();
     turnCurrentAmps = moduleSimulation.inputs().steer().statorCurrent();
@@ -84,7 +85,7 @@ public class SimulatedModule implements ModuleInterface {
 
   @Override
   public void setTurnVoltage(Voltage volts) {
-    volts = moduleSimulation.inputs().steer().statorVoltage(); // TODO: see if this works
+    volts = turnAppliedVolts; // TODO: see if this works
   }
 
   @Override
@@ -96,19 +97,17 @@ public class SimulatedModule implements ModuleInterface {
             / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS;
 
             // moduleSimulation.state().speedMetersPerSecond;
-    // moduleSimulation.requestDriveVoltageOut(
-    //     Volts.of(
-    //             drivePID.calculate(
-    //                 moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond)
-    //                     * ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
-    //                 moduleSimulation.state().speedMetersPerSecond * ModuleConstants.DRIVE_TO_METERS_PER_SECOND))
-    //         .plus(Volts.of(driveFF.calculate(desiredDriveRPS))));
-    // moduleSimulation.requestTurnVoltageOut(
-    //     Volts.of(
-    //             turnPID.calculate(
-    //                 moduleSimulation.getTurnAbsolutePosition().getRotations(),
-    //                 desiredState.angle.getRotations()))
-    //         .plus(Volts.of(turnFF.calculate(turnPID.getSetpoint().velocity))));
+    setDriveVoltage(
+              Volts.of(drivePID.calculate(
+                    moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond),
+                    desiredDriveRPS)
+            + (driveFF.calculate(desiredDriveRPS))));
+    setTurnVoltage(
+        Volts.of(
+                turnPID.calculate(
+                    getTurnRotations(),
+                    desiredState.angle.getRotations()) 
+                    + (turnFF.calculate(turnPID.getSetpoint().velocity))));
   }
 
   @Override
