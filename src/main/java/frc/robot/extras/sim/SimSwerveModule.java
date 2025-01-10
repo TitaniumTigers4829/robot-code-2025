@@ -122,7 +122,7 @@ public class SimSwerveModule {
     protected XY<Force> force(final Rotation2d robotHeading) {
         final Rotation2d steerMechAngle = new Rotation2d(steerMech.outputs().position())
                 .plus(robotHeading);
-        // Logger.recordOutput("worldAngle", steerMechAngle, Rotation2d.struct);
+        Logger.recordOutput("worldAngle", steerMechAngle);
         final Force gripForce = gravityForce.times(wheelsCoefficientOfFriction);
         final Force driveMechAppliedForce = driveMech.inputs().torque().div(wheelRadius);
 

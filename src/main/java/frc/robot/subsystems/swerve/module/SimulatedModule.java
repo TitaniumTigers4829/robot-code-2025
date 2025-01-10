@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerveModule;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
@@ -56,12 +57,13 @@ public class SimulatedModule implements ModuleInterface {
 
   @Override
   public void setDriveVoltage(Voltage volts) {
-    moduleSimulation.(volts);
+    // moduleSimulation.state().
+    // moduleSimulation.(volts);
   }
 
   @Override
   public void setTurnVoltage(Voltage volts) {
-    moduleSimulation.requestTurnVoltageOut(volts);
+    // moduleSimulation.requestTurnVoltageOut(volts);
   }
 
   @Override
@@ -72,20 +74,20 @@ public class SimulatedModule implements ModuleInterface {
             * ModuleConstants.DRIVE_GEAR_RATIO
             / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS;
 
-    moduleSimulation.requestDriveVoltageOut(
-        Volts.of(
-                drivePID.calculate(
-                    RadiansPerSecond.of(moduleSimulation.getDriveWheelFinalSpeedRadPerSec())
-                            .in(RotationsPerSecond)
-                        * ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
-                    desiredDriveRPS))
-            .plus(Volts.of(driveFF.calculate(desiredDriveRPS))));
-    moduleSimulation.requestTurnVoltageOut(
-        Volts.of(
-                turnPID.calculate(
-                    moduleSimulation.getTurnAbsolutePosition().getRotations(),
-                    desiredState.angle.getRotations()))
-            .plus(Volts.of(turnFF.calculate(turnPID.getSetpoint().velocity))));
+            // moduleSimulation.state().speedMetersPerSecond;
+    // moduleSimulation.requestDriveVoltageOut(
+    //     Volts.of(
+    //             drivePID.calculate(
+    //                 moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond)
+    //                     * ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
+    //                 moduleSimulation.state().speedMetersPerSecond * ModuleConstants.DRIVE_TO_METERS_PER_SECOND))
+    //         .plus(Volts.of(driveFF.calculate(desiredDriveRPS))));
+    // moduleSimulation.requestTurnVoltageOut(
+    //     Volts.of(
+    //             turnPID.calculate(
+    //                 moduleSimulation.getTurnAbsolutePosition().getRotations(),
+    //                 desiredState.angle.getRotations()))
+    //         .plus(Volts.of(turnFF.calculate(turnPID.getSetpoint().velocity))));
   }
 
   @Override
