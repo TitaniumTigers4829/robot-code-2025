@@ -8,8 +8,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages threads for various tasks within the robot. Provides methods to start, stop, and manage
- * threads efficiently while preventing excessive updates.
+ * Manages threads for various tasks within the robot code. Provides methods to start, stop, and
+ * manage threads efficiently while preventing excessive updates.
  *
  * @author Ishan
  */
@@ -69,8 +69,8 @@ public class ThreadManager {
   }
 
   /**
-   * Starts a task that periodically updates and will sleep for 20 ms. This method creates a thread
-   * that repeatedly executes the provided task until interrupted.
+   * Starts a task that periodically updates and will sleep for the specified sleepTime. This method
+   * creates a thread that repeatedly executes the provided task until interrupted.
    *
    * @param threadName the name of the thread to start.
    * @param task the task that is to be run.
