@@ -297,7 +297,6 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     poseEstimator.updateWithTime(
-        // odometryThreadInputs.measurementTimeStamps[timestampIndex],
         Logger.getTimestamp(), rawGyroRotation, modulePositions);
   }
 

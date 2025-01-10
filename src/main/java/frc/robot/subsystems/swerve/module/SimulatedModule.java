@@ -8,6 +8,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerveModule;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -28,42 +31,60 @@ public class SimulatedModule implements ModuleInterface {
       new ProfiledPIDController(18, 0, 0, turnConstraints);
   private final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(0, 0, 0);
 
+  // Drive signals
+  private Angle drivePosition;
+  private AngularVelocity driveVelocity;
+  private Voltage driveAppliedVolts;
+  private Current driveCurrentAmps;
+
+  // Turn signals
+  private Rotation2d turnAbsolutePosition;
+  private AngularVelocity turnVelocity;
+  private Voltage turnAppliedVolts;
+  private Current turnCurrentAmps;
+
   public SimulatedModule(SimSwerveModule moduleSimulation) {
     this.moduleSimulation = moduleSimulation;
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
+
+    drivePosition = moduleSimulation.outputs().drive().position();
+    driveVelocity = moduleSimulation.outputs().drive().velocity();
+    driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage();
+    driveCurrentAmps = moduleSimulation.inputs().drive().statorCurrent();
+
+    turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position().in(Radians));
+    turnVelocity = moduleSimulation.outputs().steer().velocity();
+    turnAppliedVolts = moduleSimulation.inputs().steer().statorVoltage();
+    turnCurrentAmps = moduleSimulation.inputs().steer().statorCurrent();
   }
 
-  // TODO: maybe add supply and stator?
+  // TODO: maybe add supply?
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.drivePosition = moduleSimulation.outputs().drive().position().in(Rotations);
-    inputs.driveVelocity = moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond);
+    // TODO: add drive accel
+    inputs.drivePosition = drivePosition.in(Rotations);
+    inputs.driveVelocity = driveVelocity.in(RotationsPerSecond);
 
-    inputs.driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage().in(Volts);
-    inputs.driveCurrentAmps = moduleSimulation.inputs().drive().statorCurrent().in(Amps);
+    inputs.driveAppliedVolts = driveAppliedVolts.in(Volts);
+    inputs.driveCurrentAmps = driveCurrentAmps.in(Amps);
 
-    inputs.turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position().in(Radians));
-    inputs.turnVelocity = moduleSimulation.outputs().steer().velocity().in(RotationsPerSecond);
+    inputs.turnAbsolutePosition = turnAbsolutePosition;
+    inputs.turnVelocity = turnVelocity.in(RotationsPerSecond);
 
-    inputs.turnAppliedVolts = moduleSimulation.inputs().steer().statorVoltage().in(Volts);
-    inputs.turnCurrentAmps = moduleSimulation.inputs().steer().statorCurrent().in(Amps);
-
-    // inputs.odometrySteerPositions = moduleSimulation.getCachedTurnAbsolutePositions();
-
-    // inputs.odometryTimestamps = OdometryTimestampsSim.getTimestamps();
+    inputs.turnAppliedVolts = turnAppliedVolts.in(Volts);
+    inputs.turnCurrentAmps = turnCurrentAmps.in(Amps);
 
     inputs.isConnected = true;
   }
 
   @Override
   public void setDriveVoltage(Voltage volts) {
-    // moduleSimulation.state().
-    // moduleSimulation.(volts);
+    volts = driveAppliedVolts; // TODO: see if this works
   }
 
   @Override
   public void setTurnVoltage(Voltage volts) {
-    // moduleSimulation.requestTurnVoltageOut(volts);
+    volts = moduleSimulation.inputs().steer().statorVoltage(); // TODO: see if this works
   }
 
   @Override
@@ -97,7 +118,7 @@ public class SimulatedModule implements ModuleInterface {
 
   @Override
   public void stopModule() {
-    moduleSimulation.requestDriveVoltageOut(Volts.of(0));
-    moduleSimulation.requestTurnVoltageOut(Volts.of(0));
+    setDriveVoltage(Volts.zero());
+    setTurnVoltage(Volts.zero());
   }
 }
