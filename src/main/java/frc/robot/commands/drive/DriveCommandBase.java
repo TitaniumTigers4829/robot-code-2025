@@ -20,7 +20,7 @@ public abstract class DriveCommandBase extends Command {
   private final VisionSubsystem vision;
   private final SwerveDrive swerveDrive;
 
-  private double lastTimeStampSeconds = 0;
+  private double lastTimeStampSeconds;
 
   /**
    * An abstract class that handles pose estimation while driving.
@@ -41,7 +41,7 @@ public abstract class DriveCommandBase extends Command {
     swerveDrive.addPoseEstimatorSwerveMeasurement();
     vision.setHeadingInfo(
         swerveDrive.getPose().getRotation().getDegrees(), swerveDrive.getGyroRate());
-    calculatePoseFromLimelight(Limelight.SHOOTER);
+    calculatePoseFromLimelight(Limelight.BACK);
     calculatePoseFromLimelight(Limelight.FRONT_LEFT);
     calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
   }
