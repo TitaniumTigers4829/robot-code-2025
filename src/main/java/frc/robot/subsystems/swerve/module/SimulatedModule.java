@@ -113,7 +113,7 @@ public class SimulatedModule implements ModuleInterface {
 
   @Override
   public double getTurnRotations() {
-    return moduleSimulation.getTurnAbsolutePosition().getRotations();
+    return turnAbsolutePosition.getRotations();
   }
 
   @Override
