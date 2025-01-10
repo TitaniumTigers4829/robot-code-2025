@@ -83,7 +83,7 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    if (isValidTagCount(numberOfAprilTags) && isValidID(limelight, numberOfAprilTags)) {
+    if (isValidID(limelight, numberOfAprilTags)) {
       return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
@@ -266,17 +266,6 @@ public class PhysicalVision implements VisionInterface {
             > VisionConstants.MIN_APRIL_TAG_ID
         && limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags]
             < VisionConstants.MAX_APRIL_TAG_ID;
-  }
-
-  /**
-   * Checks if the number of April Tags is within the valid range of 0-22
-   *
-   * @param numberOfAprilTags The number of April Tags detected by the specified Limelight
-   * @return True if the number of April Tags is within the valid range, false otherwise
-   */
-  private boolean isValidTagCount(int numberOfAprilTags) {
-    return numberOfAprilTags > VisionConstants.MIN_APRIL_TAG_ID
-        && numberOfAprilTags < VisionConstants.MAX_APRIL_TAG_ID;
   }
 
   /**
