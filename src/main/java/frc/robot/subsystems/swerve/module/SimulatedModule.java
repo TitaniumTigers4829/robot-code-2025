@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Voltage;
@@ -31,32 +32,31 @@ public class SimulatedModule implements ModuleInterface {
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
   }
 
+  // TODO: maybe add supply and stator?
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.drivePosition =
-        Radians.of(moduleSimulation.getDriveEncoderFinalPositionRad()).in(Rotations);
-    inputs.driveVelocity =
-        RadiansPerSecond.of(moduleSimulation.getDriveWheelFinalSpeedRadPerSec())
-            .in(RotationsPerSecond);
-    inputs.driveAppliedVolts = moduleSimulation.getDriveMotorAppliedVolts();
-    inputs.driveCurrentAmps = moduleSimulation.getDriveMotorSupplyCurrentAmps();
+    inputs.drivePosition = moduleSimulation.outputs().drive().position().in(Rotations);
+    inputs.driveVelocity = moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond);
 
-    inputs.turnAbsolutePosition = moduleSimulation.getTurnAbsolutePosition();
-    inputs.turnVelocity =
-        Radians.of(moduleSimulation.getTurnAbsoluteEncoderSpeedRadPerSec()).in(Rotations);
-    inputs.turnAppliedVolts = moduleSimulation.getTurnMotorAppliedVolts();
-    inputs.turnCurrentAmps = moduleSimulation.getTurnMotorSupplyCurrentAmps();
+    inputs.driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage().in(Volts);
+    inputs.driveCurrentAmps = moduleSimulation.inputs().drive().statorCurrent().in(Amps);
 
-    inputs.odometrySteerPositions = moduleSimulation.getCachedTurnAbsolutePositions();
+    inputs.turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position().in(Radians));
+    inputs.turnVelocity = moduleSimulation.outputs().steer().velocity().in(RotationsPerSecond);
 
-    inputs.odometryTimestamps = OdometryTimestampsSim.getTimestamps();
+    inputs.turnAppliedVolts = moduleSimulation.inputs().steer().statorVoltage().in(Volts);
+    inputs.turnCurrentAmps = moduleSimulation.inputs().steer().statorCurrent().in(Amps);
+
+    // inputs.odometrySteerPositions = moduleSimulation.getCachedTurnAbsolutePositions();
+
+    // inputs.odometryTimestamps = OdometryTimestampsSim.getTimestamps();
 
     inputs.isConnected = true;
   }
 
   @Override
   public void setDriveVoltage(Voltage volts) {
-    moduleSimulation.requestDriveVoltageOut(volts);
+    moduleSimulation.(volts);
   }
 
   @Override

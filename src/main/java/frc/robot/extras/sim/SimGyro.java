@@ -1,8 +1,7 @@
 package frc.robot.extras.sim;
 
 import edu.wpi.first.math.geometry.Twist2d;
-// import edu.wpi.first.units.measure.Angle;
-// import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -10,15 +9,11 @@ import edu.wpi.first.units.measure.Time;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimGyroConfig;
 import frc.robot.extras.sim.utils.RuntimeLog;
+import frc.robot.extras.sim.utils.mathutils.MeasureMath;
 import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
 import frc.robot.extras.sim.utils.mathutils.SimCommonMath;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-// import static edu.wpi.first.units.Units.RadiansPerSecond;
-// import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.*;
 
 import java.util.function.BiConsumer;
 
@@ -98,19 +93,19 @@ public class SimGyro {
         }
     }
 
-    private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
-        AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
-            lastTwist.dtheta * timing.dt().in(Seconds)
-        );
-        AngularAcceleration angularAcceleration = actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
-        if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
-            return DRIFT_DUE_TO_IMPACT_COEFFICIENT
-                    .times(MeasureMath.signum(angularAcceleration))
-                    .times(angularAcceleration.div(START_DRIFTING))
-                    .div(timing.dt());
-        } else {
-            return RadiansPerSecond.of(0);
-        }
-    }
+    // private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
+    //     AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
+    //         lastTwist.dtheta * timing.dt().in(Seconds)
+    //     );
+    //     AngularAcceleration angularAcceleration = actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
+    //     if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
+    //         return DRIFT_DUE_TO_IMPACT_COEFFICIENT
+    //                 .times(MeasureMath.signum(angularAcceleration))
+    //                 .times(angularAcceleration.div(START_DRIFTING))
+    //                 .div(timing.dt());
+    //     } else {
+    //         return RadiansPerSecond.of(0);
+    //     }
+    // }
 
 }
