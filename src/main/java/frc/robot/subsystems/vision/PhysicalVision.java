@@ -253,10 +253,10 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks if the ID of the April Tag is within the valid range of 1-22. 
-   * This is here to check if the IDs the limelight sees are within the range of April Tag IDs on the field.
-   *  If it randomly sees another April Tag outside of these bounds for whatever reason, 
-   * the limelight will crash the code, which we don't want. 
+   * Checks if the ID of the April Tag is within the valid range of 1-22. This is here to check if
+   * the IDs the limelight sees are within the range of April Tag IDs on the field. If it randomly
+   * sees another April Tag outside of these bounds for whatever reason, the limelight will crash
+   * the code, which we don't want.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @param numberOfAprilTags The number of April Tags detected by the specified Limelight

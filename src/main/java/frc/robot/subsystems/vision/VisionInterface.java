@@ -33,7 +33,9 @@ public interface VisionInterface {
     /** This array stores the poses calculated from the April Tags seen by each Limelight. */
     public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
 
-    /** This array stores the average distances in meters to the April Tags seen by each Limelight. */
+    /**
+     * This array stores the average distances in meters to the April Tags seen by each Limelight.
+     */
     public double[] limelightAprilTagDistances = new double[Limelight.values().length];
 
     /** This array stores the timestamps in seconds of the data from each Limelight. */
