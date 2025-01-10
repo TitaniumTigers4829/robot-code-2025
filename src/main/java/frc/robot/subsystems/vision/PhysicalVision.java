@@ -69,7 +69,7 @@ public class PhysicalVision implements VisionInterface {
         inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
         inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
         inputs.limelightLastSeenPose = getLastSeenPose();
-        
+
         latestInputs.set(inputs);
         limelightThreads.get(limelight).set(latestInputs.get());
       }
@@ -262,7 +262,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the ID of the April Tag is within the valid range, false otherwise
    */
   private boolean isValidID(Limelight limelight, int numberOfAprilTags) {
-    return limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags]
+    return limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags - 1]
             > VisionConstants.MIN_APRIL_TAG_ID
         && limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags]
             < VisionConstants.MAX_APRIL_TAG_ID;
