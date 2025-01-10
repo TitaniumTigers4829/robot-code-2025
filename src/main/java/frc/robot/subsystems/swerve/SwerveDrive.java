@@ -133,9 +133,7 @@ public class SwerveDrive extends SubsystemBase {
         VecBuilder.fill(xStandardDeviation, yStandardDeviation, thetaStandardDeviation));
   }
 
-   /**
-   * Updates the pose estimator with the pose calculated from the swerve modules.
-   */
+  /** Updates the pose estimator with the pose calculated from the swerve modules. */
   public void addPoseEstimatorSwerveMeasurement() {
     final SwerveModulePosition[] modulePositions = getModulePositions(),
         moduleDeltas = getModuleDeltas(modulePositions);
@@ -147,8 +145,7 @@ public class SwerveDrive extends SubsystemBase {
       rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
 
-    poseEstimator.updateWithTime(
-        Logger.getTimestamp(), rawGyroRotation, modulePositions);
+    poseEstimator.updateWithTime(Logger.getTimestamp(), rawGyroRotation, modulePositions);
   }
 
   @Override
