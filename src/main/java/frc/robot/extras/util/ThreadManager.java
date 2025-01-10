@@ -1,6 +1,5 @@
-package frc.robot.subsystems.vision;
+package frc.robot.extras.util;
 
-import frc.robot.subsystems.vision.VisionInterface.VisionInputs;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -9,8 +8,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages threads for various tasks within the robot's vision system. Provides methods to start,
- * stop, and manage threads efficiently while preventing excessive updates.
+ * Manages threads for various tasks within the robot code. Provides methods to start, stop, and
+ * manage threads efficiently while preventing excessive updates.
  *
  * @author Ishan
  */
@@ -70,21 +69,21 @@ public class ThreadManager {
   }
 
   /**
-   * Starts a vision-related task that periodically updates vision inputs. This method creates a
-   * thread that repeatedly executes the provided task until interrupted.
+   * Starts a task that periodically updates and will sleep for the specified sleepTime. This method
+   * creates a thread that repeatedly executes the provided task until interrupted.
    *
    * @param threadName the name of the thread to start.
-   * @param inputs the vision inputs to be updated.
-   * @param visionTask the task that updates vision inputs.
+   * @param task the task that is to be run.
+   * @param sleepTime the time to sleep between updates in milliseconds.
    */
-  public void startVisionInputTask(String threadName, VisionInputs inputs, Runnable visionTask) {
+  public void startTask(String threadName, Runnable task, long sleepTime) {
     startThread(
         threadName,
         () -> {
           try {
             while (!Thread.currentThread().isInterrupted()) {
-              visionTask.run();
-              Thread.sleep(VisionConstants.THREAD_SLEEP_MS); // Sleep to avoid excessive updates
+              task.run();
+              Thread.sleep(sleepTime); // Sleep to avoid excessive updates
             }
           } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

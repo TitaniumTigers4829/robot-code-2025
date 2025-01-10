@@ -5,6 +5,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
@@ -47,10 +48,10 @@ public class PhysicalVision implements VisionInterface {
       limelightThreads.put(limelight, new AtomicReference<>(latestInputs.get()));
 
       // Start a vision input task for each Limelight
-      threadManager.startVisionInputTask(
+      threadManager.startTask(
           limelight.getName(),
-          latestInputs.get(),
-          () -> checkAndUpdatePose(limelight, latestInputs.get()));
+          () -> checkAndUpdatePose(limelight, latestInputs.get()),
+          VisionConstants.THREAD_SLEEP_MS);
     }
   }
 
