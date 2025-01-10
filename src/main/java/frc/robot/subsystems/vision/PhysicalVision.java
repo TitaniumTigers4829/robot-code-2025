@@ -81,7 +81,7 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    if (isValidID(limelight, getNumberOfAprilTags(limelight);)) {
+    if (isValidID(limelight, getNumberOfAprilTags(limelight))) {
       return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
