@@ -11,9 +11,6 @@ public interface GyroInterface {
     public double yawDegrees = 0.0;
     public Rotation2d yawDegreesRotation2d = new Rotation2d();
     public double yawVelocity = 0.0;
-
-    public Rotation2d[] odometryYawPositions = new Rotation2d[] {};
-    public double[] odometryYawTimestamps = new double[] {};
   }
 
   /**

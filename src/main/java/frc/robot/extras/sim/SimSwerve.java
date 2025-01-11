@@ -16,6 +16,7 @@ import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.sim.utils.RuntimeLog;
 import frc.robot.extras.sim.utils.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.sim.utils.mathutils.MeasureMath;
+import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
 
 import static frc.robot.extras.sim.utils.mathutils.MeasureMath.*;
 
@@ -88,7 +89,7 @@ public class SimSwerve extends SimDriveTrain {
     protected void simTick() {
         simulateModulePropulsion();
         simulateModuleFriction();
-        gyroSimulation.updateSimulationSubTick(this.getTickTwist());
+        gyroSimulation.updateSimulationSubTick(this.getChassisWorldPose().getRotation().getMeasure(), this.getTickTwist());
         super.simTick();
     }
 

@@ -10,11 +10,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.extras.simulation.field.SimulatedField;
-import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -46,7 +41,7 @@ public class RobotContainer {
 
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;
-  private final SwerveDriveSimulation swerveDriveSimulation;
+  private final  swerveDriveSimulation;
   private final GyroSimulation gyroSimulation;
 
   // Subsystems

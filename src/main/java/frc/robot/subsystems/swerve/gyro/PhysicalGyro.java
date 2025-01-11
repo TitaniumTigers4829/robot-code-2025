@@ -25,17 +25,6 @@ public class PhysicalGyro implements GyroInterface {
     inputs.yawDegreesRotation2d = gyro.getRotation2d();
     inputs.yawVelocity = gyro.getRate();
     inputs.yawDegrees = gyro.getAngle();
-
-    // Handle odometry yaw positions
-    if (!yawPositionInput.isEmpty()) {
-      Rotation2d[] odometryYawPositions = new Rotation2d[yawPositionInput.size()];
-      int index = 0;
-      for (Angle angle : yawPositionInput) {
-        odometryYawPositions[index++] = Rotation2d.fromDegrees(angle.in(Degrees));
-      }
-      inputs.odometryYawPositions = odometryYawPositions;
-      yawPositionInput.clear();
-    }
   }
 
   @Override
