@@ -80,8 +80,8 @@ public class SwerveModule extends SubsystemBase {
     return inputs.turnVelocity;
   }
 
-  public void xthing(double desiredPositionDegrees) {
-    io.xthing(desiredPositionDegrees);
+  public void setXStance(double desiredPositionDegrees) {
+    io.setXStance(desiredPositionDegrees);
   }
 
   /** Returns the current drive position of the module in meters. */

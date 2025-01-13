@@ -11,8 +11,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
@@ -30,8 +32,6 @@ import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
@@ -62,6 +62,9 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
+
+     
+
 
   public SwerveDrive(
       GyroInterface gyroIO,
@@ -278,8 +281,16 @@ public class SwerveDrive extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].runSetPoint((desiredStates[i]));
+
+    private double lastActiveTime = Timer.getFPGATimestamp();
+   
+    }
+    if (Timer.getFPGATimestamp() - lastActiveTime > 3.0) {
+      setXStance(xState);
+    }
   }
  }
+
 
  private boolean isMoving; // Tracks if the robot is moving
  private long lastMovementTime = System.currentTimeMillis(); // Time of the last movement
@@ -292,19 +303,17 @@ public class SwerveDrive extends SubsystemBase {
      }
      return false; // Still moving or not enough time passed
  }
- 
- public void setXStance(SwerveModuleState[] xState) {
-    isMoving = false;
-     if (threesecsinactive()) { // Only lock if inactive for 3 seconds
+
+   public void setXStance(SwerveModuleState[] xState) {
          Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
-         for (int i = 0; i < swerveHeadings.length; i++) {
+         for (int i = 0; i < 4; i++) {
              swerveHeadings[i] = swerveModules[i].getPosition().angle;
          }
          DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
-         for (int i = 0; i < swerveModules.length; i++) {
+         for (int i = 0; i < 4; i++) {
              swerveModules[i].stopModule();
          }
-     }
+        
  }
 
   /**
