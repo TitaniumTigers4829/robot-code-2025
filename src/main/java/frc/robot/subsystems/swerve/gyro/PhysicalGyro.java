@@ -22,9 +22,10 @@ public class PhysicalGyro implements GyroInterface {
   @Override
   public void updateInputs(GyroInputs inputs) {
     inputs.isConnected = gyro.isConnected();
-    inputs.yawDegreesRotation2d = gyro.getRotation2d();
     inputs.yawVelocity = gyro.getRate();
     inputs.yawDegrees = gyro.getAngle();
+    inputs.accelX = gyro.getWorldLinearAccelX();
+    inputs.accelY = gyro.getWorldLinearAccelY();
   }
 
   @Override

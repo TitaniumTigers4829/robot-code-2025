@@ -13,6 +13,7 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.sim.SimArena;
 import frc.robot.extras.sim.SimGyro;
 import frc.robot.extras.sim.SimSwerve;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -72,27 +73,28 @@ public class RobotContainer {
 
       case SIM -> {
         /* Sim robot, instantiate physics sim IO implementations */
-
+        // SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
+        // gyroSimulation = new SimGyro(, null);
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
-        this.gyroSimulation = GyroSimulation.createNavX2();
+        // this.gyroSimulation = GyroSimulation.createNavX2();
         /* create a swerve drive simulation */
-        this.swerveDriveSimulation =
-            new SwerveDriveSimulation(
-                SimulationConstants.ROBOT_MASS_KG,
-                DriveConstants.TRACK_WIDTH,
-                DriveConstants.WHEEL_BASE,
-                DriveConstants.TRACK_WIDTH + .2,
-                DriveConstants.WHEEL_BASE + .2,
-                SwerveModuleSimulation.getModule(
-                    DCMotor.getFalcon500(1),
-                    DCMotor.getFalcon500(1),
-                    60,
-                    WHEEL_GRIP.TIRE_WHEEL,
-                    ModuleConstants.DRIVE_GEAR_RATIO),
-                gyroSimulation,
-                new Pose2d(3, 3, new Rotation2d()));
-        simulatedArena.addDriveTrainSimulation(swerveDriveSimulation);
+        // this.swerveDriveSimulation =
+        //     new SwerveDriveSimulation(
+        //         SimulationConstants.ROBOT_MASS_KG,
+        //         DriveConstants.TRACK_WIDTH,
+        //         DriveConstants.WHEEL_BASE,
+        //         DriveConstants.TRACK_WIDTH + .2,
+        //         DriveConstants.WHEEL_BASE + .2,
+        //         SwerveModuleSimulation.getModule(
+        //             DCMotor.getFalcon500(1),
+        //             DCMotor.getFalcon500(1),
+        //             60,
+        //             WHEEL_GRIP.TIRE_WHEEL,
+        //             ModuleConstants.DRIVE_GEAR_RATIO),
+        //         gyroSimulation,
+        //         new Pose2d(3, 3, new Rotation2d()));
+        // simulatedArena.addDriveTrainSimulation(swerveDriveSimulation);
         swerveDrive =
             new SwerveDrive(
                 new SimulatedGyro(
