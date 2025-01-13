@@ -73,8 +73,8 @@ public class RobotContainer {
 
       case SIM -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        // SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
-        // gyroSimulation = new SimGyro(, null);
+        SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
+        gyroSimulation = new SimGyro(, null);
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
         // this.gyroSimulation = GyroSimulation.createNavX2();
