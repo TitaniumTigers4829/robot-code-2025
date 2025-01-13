@@ -21,7 +21,6 @@ public class PhysicalGyro implements GyroInterface {
 
   @Override
   public void updateInputs(GyroInputs inputs) {
-    // Handle turn absolute positions
     if (!yawPositionInput.isEmpty()) {
       double gyroAngle = 0.0;
       for (Angle angle : yawPositionInput) {
