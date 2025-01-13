@@ -6,7 +6,7 @@ public interface IntakeInterface {
     @AutoLog
     public static class IntakeInputs {
         public boolean isConnected = true;
-        public double intakeSpeed = 0.0;
+        public double intakeVelocity = 0.0;
         public double intakeTemp = 0.0;
         public double appliedVolts = 0.0;
         public double currentAmps = 0.0;
@@ -14,9 +14,9 @@ public interface IntakeInterface {
 
     default void updateInputs(IntakeInputs inputs){}
 
-    default void setSpeed(double speed){}
+    default void setIntakeSpeed(double speed){}
 
-    default double getSpeed(){
+    default double getIntakeSpeed(){
         return 0.0;
     }
 }
