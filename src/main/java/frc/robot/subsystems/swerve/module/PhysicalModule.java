@@ -192,4 +192,16 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
   }
+
+  public TalonFX getTurnMotor() {
+      return turnMotor;
+  }
+
+  public TalonFX getDriveMotor() {
+      return driveMotor;
+  }
+
+  public CANcoder getTurnEncoder() {
+      return turnEncoder;
+  }
 }

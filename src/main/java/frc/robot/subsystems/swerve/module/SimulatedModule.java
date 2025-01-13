@@ -2,6 +2,8 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -13,13 +15,19 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerveModule;
+import frc.robot.extras.sim.utils.GearRatio;
+import frc.robot.extras.util.CTREUtil.FusedTalonFxSimController;
+import frc.robot.extras.util.CTREUtil.TalonFXSimController;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
-public class SimulatedModule implements ModuleInterface {
+public class SimulatedModule extends PhysicalModule {
   private final SimSwerveModule moduleSimulation;
 
+  FusedTalonFxSimController turnSim
+  TalonFXSimController driveSim;
   // TODO: retune possibly most likely
   private final PIDController drivePID = new PIDController(.27, 0, 0);
   private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(1, 1.5);
@@ -44,15 +52,16 @@ public class SimulatedModule implements ModuleInterface {
   private Voltage turnAppliedVolts;
   private Current turnCurrentAmps;
 
-  public SimulatedModule(SimSwerveModule moduleSimulation) {
+  public SimulatedModule(ModuleConfig config, SimSwerveModule moduleSimulation) {
+    super(config);
     this.moduleSimulation = moduleSimulation;
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
-
+    turnSim = new FusedTalonFxSimController(getTurnMotor().getSimState(), getTurnEncoder().getSimState(), GearRatio.reduction(ModuleConstants.TURN_GEAR_RATIO));
+    driveSim =  new TalonFXSimController(getDriveMotor().getSimState(), config.driveReversed());
     drivePosition = moduleSimulation.outputs().drive().position();
     driveVelocity = moduleSimulation.outputs().drive().velocity();
     driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage();
     driveCurrentAmps = moduleSimulation.inputs().drive().statorCurrent();
-
     turnAbsolutePosition = new Rotation2d(moduleSimulation.outputs().steer().position());
     turnVelocity = moduleSimulation.outputs().steer().velocity();
     turnAppliedVolts = moduleSimulation.inputs().steer().statorVoltage();
@@ -65,7 +74,6 @@ public class SimulatedModule implements ModuleInterface {
     // TODO: add drive accel
     inputs.drivePosition = drivePosition.in(Rotations);
     inputs.driveVelocity = driveVelocity.in(RotationsPerSecond);
-
     inputs.driveAppliedVolts = driveAppliedVolts.in(Volts);
     inputs.driveCurrentAmps = driveCurrentAmps.in(Amps);
 
@@ -90,6 +98,7 @@ public class SimulatedModule implements ModuleInterface {
 
   @Override
   public void setDesiredState(SwerveModuleState desiredState) {
+    // driveSim.run(null, driveAppliedVolts, desiredState)
     // Converts meters per second to rotations per second
     double desiredDriveRPS =
         desiredState.speedMetersPerSecond

@@ -65,7 +65,7 @@ public static class ReefscapeSimArena extends SimArena {
           super.addBorderLine(new Translation2d(1.672, 0), new Translation2d(17.548 - 1.672, 0));
 
           // blue reef
-          Translation2d[] reefVorticesBlue = new Translation2d[] {
+          Translation2d[] reefVerticesBlue = new Translation2d[] {
               new Translation2d(3.658, 3.546),
               new Translation2d(3.658, 4.506),
               new Translation2d(4.489, 4.987),
@@ -73,10 +73,10 @@ public static class ReefscapeSimArena extends SimArena {
               new Translation2d(5.3213, 3.546),
               new Translation2d(4.489, 3.065)
           };
-          for (int i = 0; i < 6; i++) super.addBorderLine(reefVorticesBlue[i], reefVorticesBlue[(i + 1) % 6]);
+          for (int i = 0; i < 6; i++) super.addBorderLine(reefVerticesBlue[i], reefVerticesBlue[(i + 1) % 6]);
 
           // red reef
-          Translation2d[] reefVorticesRed = Arrays.stream(reefVorticesBlue)
+          Translation2d[] reefVorticesRed = Arrays.stream(reefVerticesBlue)
                   .map(pointAtBlue ->
                           new Translation2d(FieldMirroringUtils.FIELD_WIDTH - pointAtBlue.getX(), pointAtBlue.getY()))
                   .toArray(Translation2d[]::new);

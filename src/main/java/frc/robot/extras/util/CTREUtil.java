@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MagnetHealthValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
@@ -53,12 +54,15 @@ public final class CTREUtil {
 
         private final TalonFXSimState talonFXSimState;
 
-        public TalonFXSimController(TalonFX talonFX, boolean motorInverted) {
+
+
+        public TalonFXSimController(TalonFXSimState talonFXSimState, InvertedValue motorInverted) {
             this.id = instances++;
 
-            this.talonFXSimState = talonFX.getSimState();
-            talonFXSimState.Orientation =
-                    motorInverted ? ChassisReference.Clockwise_Positive : ChassisReference.CounterClockwise_Positive;
+            this.talonFXSimState = talonFXSimState;
+
+            // jank af
+            talonFXSimState.Orientation = motorInverted == InvertedValue.Clockwise_Positive ? ChassisReference.Clockwise_Positive : ChassisReference.CounterClockwise_Positive;
         }
 
         @Override
@@ -82,7 +86,7 @@ public final class CTREUtil {
             return brakeEnabled.get();
         }
     }
-    
+
 public class FusedTalonFxSimController implements SimMotorController {
     private final TalonFXSimState talonSimState;
     private final CANcoderSimState cancoderSimState;
