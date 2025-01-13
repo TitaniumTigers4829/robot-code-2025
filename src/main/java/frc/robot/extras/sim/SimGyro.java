@@ -45,13 +45,10 @@ public class SimGyro {
   private Twist2d lastTwist = new Twist2d();
 
   public SimGyro(SimEnvTiming timing, SimGyroConfig gyroConfig) {
-    // this.logger = logger.getNested("Gyro");
     this.timing = timing;
     this.averageDriftingMotionless =
         Degrees.of(gyroConfig.averageDriftingIn30SecsMotionlessDeg).div(Seconds.of(30.0));
     this.veloStdDev = gyroConfig.velocityMeasurementStandardDeviationPercent;
-
-    // this.logger.log("config", gyroConfig, ShamGyroConfig.struct);
 
     RuntimeLog.debug("Created a swerve module simulation");
   }
@@ -89,10 +86,6 @@ public class SimGyro {
 
     LinearAcceleration xA = xV.minus(lastXV).div(timing.dt());
     LinearAcceleration yA = yV.minus(lastYV).div(timing.dt());
-
-    // logger.log("omegaV", omegaV);
-    // logger.log("xA", xA);
-    // logger.log("yA", yA);
 
     if (updateConsumer != null) {
       updateConsumer.accept(Pair.of(angleThisTick, omegaV), new XY<>(xA, yA));
