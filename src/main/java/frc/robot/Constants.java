@@ -131,10 +131,17 @@ public final class Constants {
    * the field, but also the coordinates of obstacles, game pieces, or other places of interest.
    */
   public static final class FieldConstants {
-    // TODO: Now that I think about it, I'm pretty sure these measurements stay the same every year,
-    // so consider setting them in the base code
-    public static final double FIELD_LENGTH_METERS = Units.inchesToMeters(0 - 9);
-    public static final double FIELD_WIDTH_METERS = Units.inchesToMeters(0 - 9);
+    public static final double FIELD_LENGTH_METERS = Units.inchesToMeters(690);
+    public static final double FIELD_WIDTH_METERS = Units.inchesToMeters(317);
+
+    public static final double REEF_LEVEL_ONE_METERS = Units.inchesToMeters(18);
+    public static final double REEF_LEVEL_TWO_METERS = Units.inchesToMeters(24);
+    public static final double REEF_LEVEL_THREE_METERS = Units.inchesToMeters(18);
+    public static final double REEF_LEVEL_FOUR_METERS = Units.inchesToMeters(18);
+    
+    public static final Pose2d BLUE_REEF_ONE = new Pose2d(Units.inchesToMeters(155.975), 
+                                                                  Units.inchesToMeters(152.032),
+                                                                  new Rotation2D(Units.degreesToRadians(180)));  
   }
 
   public static final class JoystickConstants {
