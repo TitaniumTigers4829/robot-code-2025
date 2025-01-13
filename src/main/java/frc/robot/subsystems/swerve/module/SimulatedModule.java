@@ -26,7 +26,7 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 public class SimulatedModule extends PhysicalModule {
   private final SimSwerveModule moduleSimulation;
 
-  FusedTalonFxSimController turnSim
+  FusedTalonFxSimController turnSim;
   TalonFXSimController driveSim;
   // TODO: retune possibly most likely
   private final PIDController drivePID = new PIDController(.27, 0, 0);
@@ -56,6 +56,7 @@ public class SimulatedModule extends PhysicalModule {
     super(config);
     this.moduleSimulation = moduleSimulation;
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
+    // moduleSimulation.inputs().drive().statorVoltage()
     turnSim = new FusedTalonFxSimController(getTurnMotor().getSimState(), getTurnEncoder().getSimState(), GearRatio.reduction(ModuleConstants.TURN_GEAR_RATIO));
     driveSim =  new TalonFXSimController(getDriveMotor().getSimState(), config.driveReversed());
     drivePosition = moduleSimulation.outputs().drive().position();
