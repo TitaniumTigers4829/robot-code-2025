@@ -139,9 +139,31 @@ public final class Constants {
     public static final double REEF_LEVEL_THREE_METERS = Units.inchesToMeters(18);
     public static final double REEF_LEVEL_FOUR_METERS = Units.inchesToMeters(18);
     
-    public static final Pose2d BLUE_REEF_ONE = new Pose2d(Units.inchesToMeters(155.975), 
-                                                                  Units.inchesToMeters(152.032),
-                                                                  new Rotation2D(Units.degreesToRadians(180)));  
+    public static final Pose2d BLUE_REEF_ONE = new Pose2d(Units.inchesToMeters(155.975), Units.inchesToMeters(152.032), new Rotation2D(Units.degreesToRadians(180)));
+    public static final Pose2d BLUE_REEF_TWO = new Pose2d(Units.inchesToMeters(156.02), Units.inchesToMeters(164.97), new Rotation2D(Units.degreesToRadians(180)));
+    public static final Pose2d BLUE_REEF_THREE = new Pose2d(Units.inchesToMeters(160.776), Units.inchesToMeters(173.226), new Rotation2D(Units.degreesToRadians(120)));
+    public static final Pose2d BLUE_REEF_FOUR = new Pose2d(Units.inchesToMeters(172.003), Units.inchesToMeters(179.655), new Rotation2D(Units.degreesToRadians(120)));
+    public static final Pose2d BLUE_REEF_FIVE = new Pose2d(Units.inchesToMeters(181.511), Units.inchesToMeters(179.655), new Rotation2D(Units.degreesToRadians(60)));
+    public static final Pose2d BLUE_REEF_SIX = new Pose2d(Units.inchesToMeters(192.693), Units.inchesToMeters(173.266), new Rotation2D(Units.degreesToRadians(60)));
+    public static final Pose2d BLUE_REEF_SEVEN = new Pose2d(Units.inchesToMeters(197.515), Units.inchesToMeters(165.362), new Rotation2D(Units.degreesToRadians(0)));
+    public static final Pose2d BLUE_REEF_EIGHT = new Pose2d(Units.inchesToMeters(197.47), Units.inchesToMeters(152.03), new Rotation2D(Units.degreesToRadians(0)));
+    public static final Pose2d BLUE_REEF_NINE = new Pose2d(Units.inchesToMeters(192.714), Units.inchesToMeters(143.774), new Rotation2D(Units.degreesToRadians(300)));
+    public static final Pose2d BLUE_REEF_TEN = new Pose2d(Units.inchesToMeters(181.487), Units.inchesToMeters(137.345), new Rotation2D(Units.degreesToRadians(300)));
+    public static final Pose2d BLUE_REEF_ELEVEN = new Pose2d(Units.inchesToMeters(137.345), Units.inchesToMeters(137.345), new Rotation2D(Units.degreesToRadians(240)));
+    public static final Pose2d BLUE_REEF_TWELEVE = new Pose2d(Units.inchesToMeters(160.797), Units.inchesToMeters(143.814), new Rotation2D(Units.degreesToRadians(240)));
+
+    public static final Pose2d RED_REEF_ONE = new Pose2d(Units.inchesToMeters(493.365), Units.inchesToMeters(152.032), new Rotation2D(Units.degreesToRadians(180)));
+    public static final Pose2d RED_REEF_TWO = new Pose2d(Units.inchesToMeters(493.41), Units.inchesToMeters(164.97), new Rotation2D(Units.degreesToRadians(180)));
+    public static final Pose2d RED_REEF_THREE = new Pose2d(Units.inchesToMeters(498.156), Units.inchesToMeters(173.226), new Rotation2D(Units.degreesToRadians(120)));
+    public static final Pose2d RED_REEF_FOUR = new Pose2d(Units.inchesToMeters(509.383), Units.inchesToMeters(179.655), new Rotation2D(Units.degreesToRadians(120)));
+    public static final Pose2d RED_REEF_FIVE = new Pose2d(Units.inchesToMeters(518.901), Units.inchesToMeters(179.693), new Rotation2D(Units.degreesToRadians(60)));
+    public static final Pose2d RED_REEF_SIX = new Pose2d(Units.inchesToMeters(530.083), Units.inchesToMeters(173.186), new Rotation2D(Units.degreesToRadians(60)));
+    public static final Pose2d RED_REEF_SEVEN = new Pose2d(Units.inchesToMeters(534.895), Units.inchesToMeters(164.968), new Rotation2D(Units.degreesToRadians(0)));
+    public static final Pose2d RED_REEF_EIGHT = new Pose2d(Units.inchesToMeters(534.85), Units.inchesToMeters(152.03), new Rotation2D(Units.degreesToRadians(0)));
+    public static final Pose2d RED_REEF_NINE = new Pose2d(Units.inchesToMeters(530.104), Units.inchesToMeters(143.774), new Rotation2D(Units.degreesToRadians(300)));
+    public static final Pose2d RED_REEF_TEN = new Pose2d(Units.inchesToMeters(518.877), Units.inchesToMeters(137.345), new Rotation2D(Units.degreesToRadians(300)));
+    public static final Pose2d RED_REEF_ELEVEN = new Pose2d(Units.inchesToMeters(509.359), Units.inchesToMeters(137.307), new Rotation2D(Units.degreesToRadians(240)));
+    public static final Pose2d RED_REEF_TWELEVE = new Pose2d(Units.inchesToMeters(498.177), Units.inchesToMeters(143.814), new Rotation2D(Units.degreesToRadians(240)));
   }
 
   public static final class JoystickConstants {
