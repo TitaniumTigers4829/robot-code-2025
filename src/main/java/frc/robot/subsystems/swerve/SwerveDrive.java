@@ -33,6 +33,8 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
@@ -54,6 +56,8 @@ public class SwerveDrive extends SubsystemBase {
           ModuleConstants.WHEEL_DIAMETER_METERS,
           WHEEL_GRIP.TIRE_WHEEL.cof,
           0.0);
+  
+
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
   private final OdometryThread odometryThread;
@@ -63,7 +67,13 @@ public class SwerveDrive extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
 
-     
+  private final Timer inactiveTimer = new Timer();
+
+  private boolean isMoving; // Tracks if the robot is moving
+
+  private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
+
+  private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
 
 
   public SwerveDrive(
@@ -186,7 +196,6 @@ public class SwerveDrive extends SubsystemBase {
   private void modulesPeriodic() {
     for (SwerveModule module : swerveModules) module.periodic();
   }
-
   /**
    * Drives the robot using the joysticks.
    *
@@ -196,6 +205,12 @@ public class SwerveDrive extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the field.
    */
   public void drive(double xSpeed, double ySpeed, double rotationSpeed, boolean fieldRelative) {
+    if (getZeroedSpeeds(new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed))) {
+      inactiveTimer.start();
+    }
+    if (isThreeSecsInactive()) {
+      setXStance();
+    }
     ChassisSpeeds desiredSpeeds =
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -206,6 +221,12 @@ public class SwerveDrive extends SubsystemBase {
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
+  }
+
+  public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
+    return speeds.vxMetersPerSecond == 0
+        && speeds.vyMetersPerSecond == 0
+        && speeds.omegaRadiansPerSecond == 0;
   }
 
   /**
@@ -281,33 +302,26 @@ public class SwerveDrive extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].runSetPoint((desiredStates[i]));
-
-    private double lastActiveTime = Timer.getFPGATimestamp();
    
-    }
-    if (Timer.getFPGATimestamp() - lastActiveTime > 3.0) {
-      setXStance(xState);
     }
   }
  }
 
 
- private boolean isMoving; // Tracks if the robot is moving
- private long lastMovementTime = System.currentTimeMillis(); // Time of the last movement
- private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
+ 
  
  // Check if the robot has been inactive for 3 seconds
- public boolean threesecsinactive() {
+ public boolean isThreeSecsInactive() {
      if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
          return true; // 3 seconds of inactivity
      }
      return false; // Still moving or not enough time passed
  }
 
-   public void setXStance(SwerveModuleState[] xState) {
+   public void setXStance() {
          Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
          for (int i = 0; i < 4; i++) {
-             swerveHeadings[i] = swerveModules[i].getPosition().angle;
+             swerveHeadings[i] = Rotation2d.fromDegrees(45);
          }
          DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
          for (int i = 0; i < 4; i++) {
