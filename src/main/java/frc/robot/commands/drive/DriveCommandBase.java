@@ -45,15 +45,19 @@ public abstract class DriveCommandBase extends Command {
     calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
   }
 
-  public void calculatePoseFromLimelight(Limelight limelightNumber) {
-    // Updates the robot's odometry with april tags
-    if (vision.canSeeAprilTags(limelightNumber)) {
-      double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelightNumber);
+  /**
+   * Calculates the pose from the limelight and adds it to the pose estimator.
+   * @param limelight The limelight to calculate the pose from
+   */
+  public void calculatePoseFromLimelight(Limelight limelight) {
+    // Only do pose calculation if we can see the april tags
+    if (vision.canSeeAprilTags(limelight)) {
+      double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelight);
 
       // Depending on how many april tags we see, we change our confidence as more april tags
       // results in a much more accurate pose estimate
       // So if we only see 1 april tag, we have *high* standard deviations -> lower confidence
-      if (vision.getNumberOfAprilTags(limelightNumber) == 1) {
+      if (vision.getNumberOfAprilTags(limelight) == 1) {
         // But then we use the lookup table here to account for how far away the robot is from the
         // april tag
         // because if we are closer to the april tag, we are more confident in our position -> lower
@@ -62,7 +66,7 @@ public abstract class DriveCommandBase extends Command {
             oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
             standardDeviations[0], standardDeviations[1], standardDeviations[2]);
-      } else if (vision.getNumberOfAprilTags(limelightNumber) > 1) {
+      } else if (vision.getNumberOfAprilTags(limelight) > 1) {
         double[] standardDeviations =
             twoAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
@@ -71,8 +75,8 @@ public abstract class DriveCommandBase extends Command {
 
       // Adds the timestamped pose gotten from the limelights to our pose estimation
       swerveDrive.addPoseEstimatorVisionMeasurement(
-          vision.getPoseFromAprilTags(limelightNumber),
-          TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelightNumber));
+          vision.getPoseFromAprilTags(limelight),
+          TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
     }
   }
 }
