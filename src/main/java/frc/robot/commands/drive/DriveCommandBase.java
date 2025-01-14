@@ -53,8 +53,10 @@ public abstract class DriveCommandBase extends Command {
       // results in a much more accurate pose estimate
       // So if we only see 1 april tag, we have *high* standard deviations -> lower confidence
       if (vision.getNumberOfAprilTags(limelightNumber) == 1) {
-        // But then we use the lookup table here to account for how far away the robot is from the april tag
-        // because if we are closer to the april tag, we are more confident in our position -> lower standard deviation
+        // But then we use the lookup table here to account for how far away the robot is from the
+        // april tag
+        // because if we are closer to the april tag, we are more confident in our position -> lower
+        // standard deviation
         double[] standardDeviations =
             oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(

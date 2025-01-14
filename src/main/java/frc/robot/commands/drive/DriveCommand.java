@@ -49,7 +49,8 @@ public class DriveCommand extends DriveCommandBase {
 
   @Override
   public void execute() {
-    // Most of the time the driver prefers that the robot rotates slowly, as it gives them more control
+    // Most of the time the driver prefers that the robot rotates slowly, as it gives them more
+    // control
     // but sometimes (e.g. when fighting defense bots) being able to rotate quickly is necessary
     if (isHighRotation.getAsBoolean()) {
       angularSpeed = DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND;
