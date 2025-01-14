@@ -192,12 +192,15 @@ public class RobotContainer {
         .x()
         .onTrue(
             new InstantCommand(
-                () -> swerveDrive.resetEstimatedPose(swerveDriveSimulation.getSimulatedDriveTrainPose())));
+                () ->
+                    swerveDrive.resetEstimatedPose(
+                        swerveDriveSimulation.getSimulatedDriveTrainPose())));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
     driverLeftDirectionPad.onTrue(
-        new InstantCommand(() -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+        new InstantCommand(
+            () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
   }
 
   public Command getAutonomousCommand() {

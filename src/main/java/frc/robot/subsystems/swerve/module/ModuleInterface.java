@@ -55,9 +55,7 @@ public interface ModuleInterface {
    */
   default void setTurnVoltage(Voltage voltage) {}
 
-  /**
-   * Stops the motors in the module.
-   */
+  /** Stops the motors in the module. */
   default void stopModule() {}
 
   /**

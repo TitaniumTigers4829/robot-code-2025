@@ -1,17 +1,38 @@
 package frc.robot.subsystems.swerve.gyro;
 
+import java.util.Queue;
+
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
+import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
+
+import static edu.wpi.first.units.Units.*;
+
 public class PhysicalGyro implements GyroInterface {
 
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
+  private final Queue<Angle> yawPositionInput;
 
-  public PhysicalGyro() {}
+  public PhysicalGyro() {
+    yawPositionInput = OdometryThread.registerInput(() -> Degrees.of(gyro.getAngle()));
+  }
 
   @Override
   public void updateInputs(GyroInputs inputs) {
+    // Handle odometry yaw positions
+    if (!yawPositionInput.isEmpty()) {
+      Rotation2d gyroAngle = new Rotation2d();
+      for (Angle yaw : yawPositionInput) {
+        gyroAngle = Rotation2d.fromDegrees(yaw.in(Degrees));
+      }
+      inputs.yawDegrees = gyroAngle.getDegrees();
+      yawPositionInput.clear();
+    }
+
     inputs.isConnected = gyro.isConnected();
     inputs.yawDegreesRotation2d = gyro.getRotation2d();
     inputs.yawVelocityDegreesPerSecond = gyro.getRate();

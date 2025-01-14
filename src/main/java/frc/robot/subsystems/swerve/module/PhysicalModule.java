@@ -27,10 +27,10 @@ import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
 import java.util.Queue;
 
 /**
- * PhysicalModule is the class that interfaces with the physical hardware of the swerve module.
- * It has code for controlling the drive and turn motors, as well as reading the current state of
- * the module from its Cancoder.
- * 
+ * PhysicalModule is the class that interfaces with the physical hardware of the swerve module. It
+ * has code for controlling the drive and turn motors, as well as reading the current state of the
+ * module from its Cancoder.
+ *
  * @author Ishan
  * @author Jack
  * @author Ryan
@@ -77,7 +77,8 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
-    // Setting the deadband is important because it is 4% by default, which is too high for precise control
+    // Setting the deadband is important because it is 4% by default, which is too high for precise
+    // control
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
@@ -134,7 +135,8 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(HardwareConstants.STATUS_SIGNAL_FREQUENCY, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.STATUS_SIGNAL_FREQUENCY, periodicallyRefreshedSignals);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }

@@ -5,6 +5,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.extras.interpolators.MultiLinearInterpolator;
+import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
@@ -71,7 +72,7 @@ public abstract class DriveCommandBase extends Command {
       // Adds the timestamped pose gotten from the limelights to our pose estimation
       swerveDrive.addPoseEstimatorVisionMeasurement(
           vision.getPoseFromAprilTags(limelightNumber),
-          Timer.getFPGATimestamp() - vision.getLatencySeconds(limelightNumber));
+          TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelightNumber));
     }
   }
 }
