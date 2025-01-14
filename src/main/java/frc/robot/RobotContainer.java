@@ -145,7 +145,7 @@ public class RobotContainer {
     }
 
     // swerveDrive.periodic();
-    swerveDrive.setPose(startingPose);
+    swerveDrive.resetEstimatedPose(startingPose);
   }
 
   public void teleopInit() {
@@ -246,19 +246,19 @@ public class RobotContainer {
     driverRightDirectionPad.onTrue(
         new InstantCommand(
             () ->
-                swerveDrive.setPose(
+                swerveDrive.resetEstimatedPose(
                     new Pose2d(
-                        swerveDrive.getPose().getX(),
-                        swerveDrive.getPose().getY(),
+                        swerveDrive.getEstimatedPose().getX(),
+                        swerveDrive.getEstimatedPose().getY(),
                         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
     driverController
         .x()
         .onTrue(
             new InstantCommand(
-                () -> swerveDrive.setPose(swerveDriveSimulation.getSimulatedDriveTrainPose())));
+                () -> swerveDrive.resetEstimatedPose(swerveDriveSimulation.getSimulatedDriveTrainPose())));
     // // // Reset robot odometry based on vision pose measurement from april tags
     driverLeftDirectionPad.onTrue(
-        new InstantCommand(() -> swerveDrive.setPose(visionSubsystem.getLastSeenPose())));
+        new InstantCommand(() -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
     // // driverLeftDpad.onTrue(new InstantCommand(() -> swerveDrive.resetOdometry(new
     // Pose2d(15.251774787902832, 5.573054313659668, Rotation2d.fromRadians(3.14159265)))));
     // // driverBButton.whileTrue(new ShootPass(swerveDrive, shooterSubsystem, pivotSubsystem,
@@ -307,10 +307,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
-    swerveDrive.setPose(
+    swerveDrive.resetEstimatedPose(
         new Pose2d(
-            swerveDrive.getPose().getX(),
-            swerveDrive.getPose().getY(),
+            swerveDrive.getEstimatedPose().getX(),
+            swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     // return autoChooser.getSelected();
     // return new DriveForwardAndBack(swerveDrive);
