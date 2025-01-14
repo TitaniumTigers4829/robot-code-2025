@@ -14,11 +14,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.littletonrobotics.junction.Logger;
 
-// import sham.ShamArena.ShamEnvTiming;
-// import sham.utils.GearRatio;
-// import sham.utils.RuntimeLog;
-// import sham.utils.mathutils.MeasureMath;
-// import edu.wpi.first.epilogue.logging.DataLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;

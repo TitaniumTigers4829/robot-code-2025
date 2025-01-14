@@ -1,7 +1,5 @@
 package frc.robot.extras.sim.configs;
 
-import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 
 public class SimSwerveModuleConfig implements StructSerializable {

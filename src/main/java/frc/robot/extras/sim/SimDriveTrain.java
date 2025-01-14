@@ -3,13 +3,11 @@ package frc.robot.extras.sim;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.util.struct.Struct;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.sim.utils.FrcBody;
 import frc.robot.extras.util.GeomUtil;
-import frc.robot.extras.util.ProceduralStructGenerator;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -17,7 +15,6 @@ import static edu.wpi.first.units.Units.Seconds;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;
-import org.littletonrobotics.junction.Logger;
 
 /**
  *

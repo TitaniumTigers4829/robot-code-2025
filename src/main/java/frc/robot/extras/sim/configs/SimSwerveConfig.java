@@ -1,7 +1,6 @@
 package frc.robot.extras.sim.configs;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.struct.Struct;
 import frc.robot.extras.sim.SimSwerve;
 import frc.robot.extras.util.ProceduralStructGenerator.FixedSizeArray;
 

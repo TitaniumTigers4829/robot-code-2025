@@ -2,7 +2,6 @@ package frc.robot.extras.sim;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +25,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.struct.Struct;
-import edu.wpi.first.util.struct.StructBuffer;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.sim.utils.ProjectileUtil.ProjectileDynamics;
@@ -34,7 +32,6 @@ import frc.robot.extras.sim.utils.RuntimeLog;
 import frc.robot.extras.sim.utils.geometry.Velocity2d;
 import frc.robot.extras.sim.utils.geometry.Velocity3d;
 import frc.robot.extras.util.GeomUtil;
-import frc.robot.extras.util.ProceduralStructGenerator;
 
 /**
  * A base class used for all gamepieces in the simulation.

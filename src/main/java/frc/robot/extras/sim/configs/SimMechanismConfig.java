@@ -9,7 +9,6 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.sim.SimMechanism.Friction;
 import frc.robot.extras.sim.SimMechanism.HardLimits;

@@ -1,8 +1,6 @@
 package frc.robot.extras.sim.configs;
 
-import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.util.ProceduralStructGenerator;
 
 public class SimGyroConfig implements StructSerializable {
     public double averageDriftingIn30SecsMotionlessDeg;
