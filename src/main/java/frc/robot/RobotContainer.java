@@ -54,7 +54,7 @@ public class RobotContainer {
 
   public RobotContainer() {
     switch (Constants.CURRENT_MODE) {
-      case COMPROBOT -> {
+      case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
 
         /* Disable Simulations */
@@ -71,11 +71,11 @@ public class RobotContainer {
                 new PhysicalModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
-      case DEVROBOT -> {
+      case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
       }
 
-      case SIMROBOT -> {
+      case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
 
         /* create simulations */
