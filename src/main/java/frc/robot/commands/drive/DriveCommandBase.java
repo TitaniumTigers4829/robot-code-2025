@@ -2,7 +2,6 @@
 
 package frc.robot.commands.drive;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.extras.interpolators.MultiLinearInterpolator;
 import frc.robot.extras.util.TimeUtil;
@@ -47,6 +46,7 @@ public abstract class DriveCommandBase extends Command {
 
   /**
    * Calculates the pose from the limelight and adds it to the pose estimator.
+   *
    * @param limelight The limelight to calculate the pose from
    */
   public void calculatePoseFromLimelight(Limelight limelight) {

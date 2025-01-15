@@ -7,8 +7,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
@@ -137,7 +135,8 @@ public class SwerveModule {
   }
 
   /**
-   * This is called in the periodic method of the SwerveDrive. It is used to update module values periodically
+   * This is called in the periodic method of the SwerveDrive. It is used to update module values
+   * periodically
    */
   public void periodic() {}
 }
