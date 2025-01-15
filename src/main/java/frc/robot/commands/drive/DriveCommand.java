@@ -70,7 +70,9 @@ public class DriveCommand extends DriveCommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    angularSpeed = 0;
+  }
 
   @Override
   public boolean isFinished() {
