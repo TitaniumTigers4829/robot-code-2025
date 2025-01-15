@@ -188,11 +188,6 @@ public class DevModule implements ModuleInterface {
   }
 
   @Override
-  public void xthing(double desiredPositionDegrees) {
-    turnMotor.setControl(mmPositionRequest.withPosition(Degrees.of(desiredPositionDegrees)));
-  }
-
-  @Override
   public void stopModule() {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
