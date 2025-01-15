@@ -12,6 +12,7 @@ import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
 
 public class PhysicalGyro implements GyroInterface {
+
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
   private final Queue<Angle> yawPositionInput;
 
@@ -33,6 +34,7 @@ public class PhysicalGyro implements GyroInterface {
     inputs.yawVelocity = gyro.getRate();
     inputs.accelX = gyro.getWorldLinearAccelX();
     inputs.accelY = gyro.getWorldLinearAccelY();
+
   }
 
   @Override
