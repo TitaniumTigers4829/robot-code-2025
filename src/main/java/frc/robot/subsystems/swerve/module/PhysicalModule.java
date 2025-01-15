@@ -26,6 +26,15 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
 import java.util.Queue;
 
+/**
+ * PhysicalModule is the class that interfaces with the physical hardware of the swerve module. It
+ * has code for controlling the drive and turn motors, as well as reading the current state of the
+ * module from its Cancoder.
+ *
+ * @author Ishan
+ * @author Jack
+ * @author Ryan
+ */
 public class PhysicalModule implements ModuleInterface {
   private final TalonFX driveMotor;
   private final TalonFX turnMotor;
@@ -48,6 +57,7 @@ public class PhysicalModule implements ModuleInterface {
   private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
   public PhysicalModule(ModuleConfig moduleConfig) {
+    // Initialize the drive and turn motors and the turn encoder
     driveMotor = new TalonFX(moduleConfig.driveMotorChannel(), DeviceCANBus.CANIVORE.name);
     turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), DeviceCANBus.CANIVORE.name);
     turnEncoder = new CANcoder(moduleConfig.turnEncoderChannel(), DeviceCANBus.CANIVORE.name);
@@ -57,6 +67,7 @@ public class PhysicalModule implements ModuleInterface {
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
     turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.TIMEOUT_S);
 
+    // Set the configurations for the drive motor
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
     driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
@@ -66,6 +77,8 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
+    // Setting the deadband is important because it is 4% by default, which is too high for precise
+    // control
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
@@ -74,6 +87,7 @@ public class PhysicalModule implements ModuleInterface {
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.TIMEOUT_S);
 
+    // Set the configurations for the turn motor
     TalonFXConfiguration turnConfig = new TalonFXConfiguration();
     turnConfig.Slot0.kP = ModuleConstants.TURN_P;
     turnConfig.Slot0.kI = ModuleConstants.TURN_I;
@@ -95,6 +109,8 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.TIMEOUT_S);
 
+    // Register the signals for the drive and turn motors. We run these on a separate thread to
+    // because its faster.
     drivePosition = OdometryThread.registerSignalInput(driveMotor.getPosition());
     driveVelocity = driveMotor.getVelocity();
     driveMotorAppliedVoltage = driveMotor.getMotorVoltage();
@@ -119,7 +135,8 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.STATUS_SIGNAL_FREQUENCY, periodicallyRefreshedSignals);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
@@ -181,6 +198,7 @@ public class PhysicalModule implements ModuleInterface {
         mmPositionRequest.withPosition(Rotations.of(desiredState.angle.getRotations())));
   }
 
+  @Override
   public double getTurnRotations() {
     turnEncoder.getAbsolutePosition().refresh();
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
