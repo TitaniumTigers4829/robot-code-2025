@@ -32,7 +32,7 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
-  
+
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final OdometryThreadInputsAutoLogged odometryThreadInputs;
@@ -178,9 +178,9 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the total characterization velocity of the modules.
-   * 
+   *
    * @return the summed characterization velocity of the modules
-   */ 
+   */
   public double getCharacterizationVelocity() {
     double velocity = 0.0;
     for (SwerveModule module : swerveModules) {
@@ -189,9 +189,7 @@ public class SwerveDrive extends SubsystemBase {
     return velocity;
   }
 
-  /**
-   * Updates and logs the inputs for the odometry thread, gyro, and swerve modules.
-   */
+  /** Updates and logs the inputs for the odometry thread, gyro, and swerve modules. */
   private void updateSwerveInputs() {
     odometryThread.lockOdometry();
     odometryThread.updateInputs(odometryThreadInputs);
@@ -207,8 +205,8 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Returns the heading of the robot in degrees from 0 to 360.
-   * TODO: make sure this is correct
+   * Returns the heading of the robot in degrees from 0 to 360. TODO: make sure this is correct
+   *
    * @return The yaw in degrees, Counter-clockwise positive.
    */
   public double getHeading() {
@@ -224,9 +222,9 @@ public class SwerveDrive extends SubsystemBase {
     return gyroInputs.yawVelocityDegreesPerSecond;
   }
 
-  /** 
+  /**
    * Gets the rotation of the robot represented as a Rotation2d.
-   * 
+   *
    * @return a Rotation2d for the heading of the robot.
    */
   public Rotation2d getGyroRotation2d() {
@@ -234,11 +232,12 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Gets the rotation of the robot relative to the field from the driver's perspective. This means that
-   * if the driver is on the red alliance and this method says the robot is facing 0 degrees, the robot
-   * is actually facing 180 degrees and facing the blue alliance wall.
-   * 
-   * @return a Rotation2d for the heading of the robot relative to the field from the driver's perspective.
+   * Gets the rotation of the robot relative to the field from the driver's perspective. This means
+   * that if the driver is on the red alliance and this method says the robot is facing 0 degrees,
+   * the robot is actually facing 180 degrees and facing the blue alliance wall.
+   *
+   * @return a Rotation2d for the heading of the robot relative to the field from the driver's
+   *     perspective.
    */
   public Rotation2d getGyroFieldRelativeRotation2d() {
     return Rotation2d.fromDegrees(getHeading() + getAllianceAngleOffset());
@@ -246,12 +245,13 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the angle offset of the robot based on the alliance color.
-   * 
+   *
    * @return 0 degrees if the robot is on the blue alliance, 180 if on the red alliance.
    */
   public double getAllianceAngleOffset() {
     alliance = DriverStation.getAlliance();
-    // If theres a glitch in the FMS and for some reason we don't know if we're red or blue, just assume we're blue
+    // If theres a glitch in the FMS and for some reason we don't know if we're red or blue, just
+    // assume we're blue
     // This should NEVER happen
     return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red ? 180.0 : 0.0;
   }
@@ -265,9 +265,9 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Gets the estimated field-relative pose of the robot. Positive x being forward, positive y
-   * being left. We estimate the robot's pose using the swerve modules, gyro, and vision.
-   * 
+   * Gets the estimated field-relative pose of the robot. Positive x being forward, positive y being
+   * left. We estimate the robot's pose using the swerve modules, gyro, and vision.
+   *
    * @return the estimated pose of the robot
    */
   @AutoLogOutput(key = "Odometry/Odometry")
@@ -276,14 +276,15 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Gets the rotation of the robot from the odometry. This value is only influenced
-   * by the gyro as we have set the standard deviations of the rotation from the vision measurements
-   * to a very high number (this means we have very low confidence in the rotation from vision 
-   * measurements). The gyro only drifts a very small amount over time, so this value is very accurate.
-   * 
-   * For pretty much everything, use this method to get the rotation of the robot. This value can differ
-   * from the gyro rotation for multiple reasons, but this is the value used by anything autonomous.
-   * 
+   * Gets the rotation of the robot from the odometry. This value is only influenced by the gyro as
+   * we have set the standard deviations of the rotation from the vision measurements to a very high
+   * number (this means we have very low confidence in the rotation from vision measurements). The
+   * gyro only drifts a very small amount over time, so this value is very accurate.
+   *
+   * <p>For pretty much everything, use this method to get the rotation of the robot. This value can
+   * differ from the gyro rotation for multiple reasons, but this is the value used by anything
+   * autonomous.
+   *
    * @return a Rotation2d for the heading of the robot.
    */
   public Rotation2d getOdometryRotation2d() {
@@ -294,19 +295,20 @@ public class SwerveDrive extends SubsystemBase {
    * Gets the Rotation2d for the heading of the robot relative to the field from the driver's
    * perspective. This method is needed so that the drive command and poseEstimator don't fight each
    * other. It uses odometry rotation.
-   * 
-   * @return a Rotation2d for the heading of the robot relative to the field from the driver's perspective.
+   *
+   * @return a Rotation2d for the heading of the robot relative to the field from the driver's
+   *     perspective.
    */
   public Rotation2d getOdometryAllianceRelativeRotation2d() {
     return getEstimatedPose().getRotation().plus(Rotation2d.fromDegrees(getAllianceAngleOffset()));
   }
 
   /**
-   * Sets the modules to the specified states. This is what actually tells the modules what to do, so
-   * setting their rotation and speeds.
+   * Sets the modules to the specified states. This is what actually tells the modules what to do,
+   * so setting their rotation and speeds.
    *
    * @param desiredStates The desired states for the swerve modules. The order is: frontLeft,
-   * frontRight, backLeft, backRight (should be the same as the kinematics).
+   *     frontRight, backLeft, backRight (should be the same as the kinematics).
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
@@ -317,14 +319,15 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Updates the pose estimator with the pose calculated from the swerve modules. This works because
    * if you know the circumference of the wheel and the angle of the wheel, you can calculate the
-   * distance the wheel has traveled. This is done for all the wheels and then the pose estimator
-   * is updated with this information.
+   * distance the wheel has traveled. This is done for all the wheels and then the pose estimator is
+   * updated with this information.
    */
   public void addPoseEstimatorSwerveMeasurement() {
     final SwerveModulePosition[] modulePositions = getModulePositions(),
         moduleDeltas = getModulesDelta(modulePositions);
 
-    // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the modules.
+    // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the
+    // modules.
     if (gyroInputs.isConnected) {
       rawGyroRotation = getGyroRotation2d();
     } else {
@@ -338,7 +341,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the change in the module positions between the current and last update.
-   * 
+   *
    * @param freshModulesPosition Latest module positions
    * @return The change of the module distances and angles since the last update.
    */
@@ -357,8 +360,9 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the module states (speed and angle) for all the modules.
-   * 
-   * @return The module states for all the modules in the order: frontLeft, frontRight, backLeft, backRight.
+   *
+   * @return The module states for all the modules in the order: frontLeft, frontRight, backLeft,
+   *     backRight.
    */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
@@ -369,8 +373,9 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the module positions (distance and angle) for all the modules.
-   * 
-   * @return The module positions for all the modules in the order: frontLeft, frontRight, backLeft, backRight.
+   *
+   * @return The module positions for all the modules in the order: frontLeft, frontRight, backLeft,
+   *     backRight.
    */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[swerveModules.length];
@@ -379,9 +384,9 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Resets the estimated pose of the robot. The gyro does not need to be reset as the pose estimator
-   * will take care of that.
-   * 
+   * Resets the estimated pose of the robot. The gyro does not need to be reset as the pose
+   * estimator will take care of that.
+   *
    * @param pose the new pose to set the robot to
    */
   public void resetEstimatedPose(Pose2d pose) {

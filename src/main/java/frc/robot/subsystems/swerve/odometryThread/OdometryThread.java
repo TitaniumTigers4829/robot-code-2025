@@ -10,7 +10,6 @@ import frc.robot.Robot;
 import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.OdometryThreadConstants;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -38,7 +37,8 @@ public interface OdometryThread {
   List<BaseStatusSignal> registeredStatusSignals = new ArrayList<>();
 
   static Queue<Angle> registerSignalInput(StatusSignal<Angle> signal) {
-    signal.setUpdateFrequency(OdometryThreadConstants.SIGNAL_FREQUENCY, HardwareConstants.TIMEOUT_S);
+    signal.setUpdateFrequency(
+        OdometryThreadConstants.SIGNAL_FREQUENCY, HardwareConstants.TIMEOUT_S);
     registeredStatusSignals.add(signal);
     return registerInput(signal.asSupplier());
   }

@@ -34,20 +34,18 @@ public class SwerveModule extends SubsystemBase {
     CommandScheduler.getInstance().unregisterSubsystem(this);
   }
 
-  /** 
-   * Updates the module's odometry inputs. 
-   */
+  /** Updates the module's odometry inputs. */
   public void updateOdometryInputs() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module-" + name, inputs);
     this.hardwareFaultAlert.set(!inputs.isConnected);
   }
 
-  /** 
-   * Sets the drive voltage of the module. 
-   * 
+  /**
+   * Sets the drive voltage of the module.
+   *
    * @param volts the voltage to set the drive motor to
-   * */
+   */
   public void setVoltage(Voltage volts) {
     io.setDriveVoltage(volts);
     io.setTurnVoltage(Volts.zero());
@@ -55,7 +53,7 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the drive voltage of the module.
-   * 
+   *
    * @return the drive voltage of the module
    */
   public double getDriveVoltage() {
@@ -64,7 +62,7 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the drive velocity of the module.
-   * 
+   *
    * @return the drive velocity of the module
    */
   public double getCharacterizationVelocity() {
@@ -72,10 +70,10 @@ public class SwerveModule extends SubsystemBase {
   }
 
   /**
-   * Sets the desired state of the module. It optimizes this meaning that it will
-   * adjust the turn angle to be the shortest path to the desired angle. So rather
-   * than turning 170 degrees CW it will turn 10 degrees CCW and invert the motor.
-   * 
+   * Sets the desired state of the module. It optimizes this meaning that it will adjust the turn
+   * angle to be the shortest path to the desired angle. So rather than turning 170 degrees CW it
+   * will turn 10 degrees CCW and invert the motor.
+   *
    * @param state
    */
   public void setOptimizedDesiredState(SwerveModuleState state) {
@@ -89,6 +87,7 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the turn angle of the module.
+   *
    * @return the turn angle of the module 0 being forward, CCW being positive
    */
   public Rotation2d getTurnRotation() {
@@ -97,6 +96,7 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the turn velocity of the module.
+   *
    * @return the turn velocity in rotations per second
    */
   public double getTurnVelocity() {
@@ -105,14 +105,16 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the drive position of the module in meters.
+   *
    * @return the drive position in meters
    */
   public double getDrivePositionMeters() {
     return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.drivePosition;
   }
 
-  /** 
+  /**
    * Gets the drive velocity of the module in meters per second.
+   *
    * @return the drive velocity in meters per second
    */
   public double getDriveVelocityMetersPerSec() {
@@ -121,6 +123,7 @@ public class SwerveModule extends SubsystemBase {
 
   /**
    * Gets the measured state of the module consisting of the velocity and angle.
+   *
    * @return a SwerveModuleState object containing velocity and angle
    */
   public SwerveModuleState getMeasuredState() {
