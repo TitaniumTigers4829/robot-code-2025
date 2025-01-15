@@ -5,6 +5,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
+import frc.robot.subsystems.swerve.SwerveConstants.OdometryThreadConstants;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -24,11 +25,11 @@ public class OdometryThreadReal extends Thread implements OdometryThread {
       BaseStatusSignal[] statusSignals) {
     this.canBus = canBus;
     // Create a queue with a capacity of 10
-    this.timeStampsQueue = new ArrayBlockingQueue<>(10);
+    this.timeStampsQueue = new ArrayBlockingQueue<>(OdometryThreadConstants.QUEUE_SIZE);
     this.odometryDoubleInputs = odometryDoubleInputs;
     this.statusSignals = statusSignals;
 
-    setName("OdometryThread");
+    setName(OdometryThreadConstants.THREAD_NAME);
     setDaemon(true);
   }
 
@@ -56,7 +57,7 @@ public class OdometryThreadReal extends Thread implements OdometryThread {
     switch (canBus) {
       case RIO -> {
         BaseStatusSignal.setUpdateFrequencyForAll(
-            1.0 / HardwareConstants.SIGNAL_FREQUENCY, statusSignals);
+            1.0 / OdometryThreadConstants.SIGNAL_FREQUENCY, statusSignals);
         BaseStatusSignal.refreshAll();
       }
       case CANIVORE -> BaseStatusSignal.waitForAll(HardwareConstants.TIMEOUT_S, statusSignals);
