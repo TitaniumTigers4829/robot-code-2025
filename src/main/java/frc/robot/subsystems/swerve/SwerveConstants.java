@@ -2,6 +2,8 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -53,6 +55,38 @@ public class SwerveConstants {
     public static final double FRONT_RIGHT_ZERO_ANGLE = -0.420654296875;
     public static final double REAR_LEFT_ZERO_ANGLE = -0.475341796875;
     public static final double REAR_RIGHT_ZERO_ANGLE = -0.05078125;
+
+    public static final double AUTO_LINEUP_REEF_ROTATION_P = 0;
+    public static final double AUTO_LINEUP_REEF_ROTATION_I = 0;
+    public static final double AUTO_LINEUP_REEF_ROTATION_D = 0;
+    public static final double AUTO_LINEUP_REEF_ROTATION_CONSTRAINTS = 0;
+
+    public static final double AUTO_LINEUP_PROCESSOR_ROTATION_P = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_ROTATION_I = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_ROTATION_D = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_ROTATION_CONSTRAINTS = 0;
+
+    public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_P = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_I = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_D = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_CONSTRAINTS = 0;
+
+    public static final double AUTO_LINEUP_REEF_TRANSLATION_P = 0;
+    public static final double AUTO_LINEUP_REEF_TRANSLATION_I = 0;
+    public static final double AUTO_LINEUP_REEF_TRANSLATION_D = 0;
+    public static final double AUTO_LINEUP_REEF_TRANSLATION_CONSTRAINTS = 0;
+
+    public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_P = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_I = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_D = 0;
+    public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_CONSTRAINTS = 0;
+
+    public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_P = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_I = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_D = 0;
+    public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_CONSTRAINTS = 0;
+
+ 
 
     public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
         SensorDirectionValue.CounterClockwise_Positive;
