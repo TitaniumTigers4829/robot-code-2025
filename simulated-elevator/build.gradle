@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation files('lib/wpi-library.jar')
+}
+
+test {
+    useJUnitPlatform()
+}
