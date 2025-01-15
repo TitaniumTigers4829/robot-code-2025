@@ -46,11 +46,11 @@ public class PhysicalVision implements VisionInterface {
     for (Limelight limelight : Limelight.values()) {
       limelightThreads.put(limelight, new AtomicReference<>(latestInputs.get()));
 
-      // Start a vision input task for each Limelight
-      threadManager.startTask(
-          limelight.getName(),
-          () -> checkAndUpdatePose(limelight, latestInputs.get()),
-          VisionConstants.THREAD_SLEEP_MS);
+      // // Start a vision input task for each Limelight
+      // threadManager.startTask(
+      //     limelight.getName(),
+      //     () -> checkAndUpdatePose(limelight, latestInputs.get()),
+      //     VisionConstants.THREAD_SLEEP_MS);
     }
   }
 
