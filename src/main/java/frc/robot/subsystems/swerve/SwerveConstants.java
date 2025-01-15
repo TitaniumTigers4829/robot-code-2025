@@ -49,10 +49,10 @@ public class SwerveConstants {
     public static final int REAR_LEFT_CANCODER_ID = 11;
     public static final int REAR_RIGHT_CANCODER_ID = 13;
 
-    public static final double FRONT_LEFT_ZERO_ANGLE = 0.0;
-    public static final double FRONT_RIGHT_ZERO_ANGLE = 0;
-    public static final double REAR_LEFT_ZERO_ANGLE = 0;
-    public static final double REAR_RIGHT_ZERO_ANGLE = 0;
+    public static final double FRONT_LEFT_ZERO_ANGLE = 0.137939453125;
+    public static final double FRONT_RIGHT_ZERO_ANGLE = -0.420654296875;
+    public static final double REAR_LEFT_ZERO_ANGLE = -0.475341796875;
+    public static final double REAR_RIGHT_ZERO_ANGLE = -0.05078125;
 
     public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
         SensorDirectionValue.CounterClockwise_Positive;
