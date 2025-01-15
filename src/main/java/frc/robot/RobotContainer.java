@@ -10,12 +10,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.Eject;
+import frc.robot.commands.drive.Intake;
 import frc.robot.extras.simulation.field.SimulatedField;
+import frc.robot.extras.simulation.mechanismSim.IntakeSimulation.IntakeSide;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -43,6 +48,7 @@ public class RobotContainer {
   // private final Pivot pivot = new Pivot(new PivotIOTalonFX());
   // private final Flywheel flywheel = new Flywheel(new FlywheelIOTalonFX());
   private final CommandXboxController driverController = new CommandXboxController(0);
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
 
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;
@@ -179,6 +185,10 @@ public class RobotContainer {
     Trigger driverDownDirectionPad = new Trigger(driverController.pov(180));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
 
+    driverController.a().whileTrue(new Intake(intakeSubsystem));
+    driverController.b().whileTrue(new Eject(intakeSubsystem));  
+
+
     // // autodrive
     // Trigger driverAButton = new Trigger(driverController::getAButton);
     // lol whatever
@@ -211,17 +221,7 @@ public class RobotContainer {
 
     // // driving
 
-    Command driveCommand =
-        new DriveCommand(
-            swerveDrive,
-            visionSubsystem,
-            driverLeftStick[1],
-            driverLeftStick[0],
-            () -> JoystickUtil.modifyAxis(driverRightStickX, 3),
-            () -> !driverRightBumper.getAsBoolean(),
-            () -> driverLeftBumper.getAsBoolean());
-    swerveDrive.setDefaultCommand(driveCommand);
-
+    
     // // shooterSubsystem.setDefaultCommand(new FlywheelSpinUpAuto(shooterSubsystem,
     // visionSubsystem));
 
