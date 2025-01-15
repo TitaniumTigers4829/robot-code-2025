@@ -3,6 +3,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
 import frc.robot.extras.util.ThreadManager;
@@ -32,8 +33,6 @@ public class PhysicalVision implements VisionInterface {
   private final AtomicReference<VisionInputs> latestInputs =
       new AtomicReference<>(new VisionInputs());
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
-
-  // private final RawFiducial rawFiducial = new RawFiducial();
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -73,6 +72,8 @@ public class PhysicalVision implements VisionInterface {
 
         latestInputs.set(inputs);
         limelightThreads.get(limelight).set(latestInputs.get());
+        SmartDashboard.putNumber(
+            "tagcount " + limelight.getName(), getNumberOfAprilTags(limelight));
       }
     }
   }
@@ -82,10 +83,11 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    if (isValidID(limelight, getNumberOfAprilTags(limelight))) {
-      return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
-    }
-    return false;
+    // if (getNumberOfAprilTags(limelight) > 0) {
+    return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
+    // }
+    // return false;
+    // return true;
   }
 
   @Override
@@ -134,24 +136,31 @@ public class PhysicalVision implements VisionInterface {
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
+  @Override
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
 
     if (canSeeAprilTags(limelight)
-        && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)) {
-      if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
-          && getLimelightAprilTagDistance(limelight)
-              < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
-        limelightEstimates[limelight.getId()] = MegatagPoseEstimate.fromLimelight(megatag1Estimate);
-      } else if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE) {
-        LimelightHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0, 0, 0, 0, 0);
-        limelightEstimates[limelight.getId()] = MegatagPoseEstimate.fromLimelight(megatag2Estimate);
-      } else {
-        limelightEstimates[limelight.getId()] = MegatagPoseEstimate.fromLimelight(megatag1Estimate);
-      }
+    // && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)
+    ) {
+      // if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
+      //     && getLimelightAprilTagDistance(limelight)
+      //         < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
+      //   limelightEstimates[limelight.getId()] =
+      // MegatagPoseEstimate.fromLimelight(megatag1Estimate);
+
+      // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE) {
+      //   LimelightHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0, 0, 0, 0, 0);
+      //   limelightEstimates[limelight.getId()] =
+      // MegatagPoseEstimate.fromLimelight(megatag2Estimate);
+      // }
+      // else {
+      limelightEstimates[limelight.getId()] = MegatagPoseEstimate.fromLimelight(megatag1Estimate);
+      // }
+    } else {
+      limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
     }
-    limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
   }
 
   /**
@@ -231,8 +240,7 @@ public class PhysicalVision implements VisionInterface {
    */
   public boolean isValidPoseEstimate(Limelight limelight, PoseEstimate mt1, PoseEstimate mt2) {
     return LimelightHelpers.isValidPoseEstimate(mt1)
-        && LimelightHelpers.isValidPoseEstimate(mt2)
-        && isWithinFieldBounds(mt1, mt2);
+        || LimelightHelpers.isValidPoseEstimate(mt2) && isWithinFieldBounds(mt1, mt2);
   }
 
   /**
@@ -244,13 +252,13 @@ public class PhysicalVision implements VisionInterface {
   private boolean isWithinFieldBounds(
       PoseEstimate megaTag1Estimate, PoseEstimate megaTag2Estimate) {
     return (megaTag1Estimate.pose.getX() > 0
-            && megaTag1Estimate.pose.getX() <= FieldConstants.FIELD_WIDTH_METERS)
-        && (megaTag1Estimate.pose.getY() > 0
-            && megaTag1Estimate.pose.getY() <= FieldConstants.FIELD_WIDTH_METERS)
-        && (megaTag2Estimate.pose.getX() > 0
-            && megaTag2Estimate.pose.getX() <= FieldConstants.FIELD_WIDTH_METERS)
-        && (megaTag2Estimate.pose.getY() > 0
-            && megaTag2Estimate.pose.getY() <= FieldConstants.FIELD_WIDTH_METERS);
+                && megaTag1Estimate.pose.getX() <= FieldConstants.FIELD_WIDTH_METERS)
+            && (megaTag1Estimate.pose.getY() > 0
+                && megaTag1Estimate.pose.getY() <= FieldConstants.FIELD_WIDTH_METERS)
+        || (megaTag2Estimate.pose.getX() > 0
+                && megaTag2Estimate.pose.getX() <= FieldConstants.FIELD_WIDTH_METERS)
+            && (megaTag2Estimate.pose.getY() > 0
+                && megaTag2Estimate.pose.getY() <= FieldConstants.FIELD_WIDTH_METERS);
   }
 
   /**
@@ -264,10 +272,13 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the ID of the April Tag is within the valid range, false otherwise
    */
   private boolean isValidID(Limelight limelight, int numberOfAprilTags) {
-    return limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags - 1]
-            > VisionConstants.MIN_APRIL_TAG_ID
-        && limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags - 1]
-            < VisionConstants.MAX_APRIL_TAG_ID;
+    if (getNumberOfAprilTags(limelight) > 0) {
+      return limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags - 1]
+              >= VisionConstants.MIN_APRIL_TAG_ID
+          && limelightEstimates[limelight.getId()].fiducialIds[numberOfAprilTags - 1]
+              <= VisionConstants.MAX_APRIL_TAG_ID;
+    }
+    return false;
   }
 
   /**
@@ -351,6 +362,7 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void stopLimelightThread(Limelight limelight) {
+    limelightEstimates[limelight.getId()].fieldToCamera = new Pose2d();
     threadManager.stopThread(limelight.getName());
   }
 
