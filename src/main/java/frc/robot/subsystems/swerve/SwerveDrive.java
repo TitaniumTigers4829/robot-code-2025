@@ -335,8 +335,7 @@ public class SwerveDrive extends SubsystemBase {
       rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
 
-    // TODO: make sure this is correct
-    poseEstimator.updateWithTime(Logger.getTimestamp(), rawGyroRotation, modulePositions);
+    poseEstimator.updateWithTime(TimeUtil.getLogTimeSeconds(), rawGyroRotation, modulePositions);
   }
 
   /**

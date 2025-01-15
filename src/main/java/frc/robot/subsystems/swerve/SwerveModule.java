@@ -14,7 +14,7 @@ import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import org.littletonrobotics.junction.Logger;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule {
 
   private final ModuleInterface io;
   private final String name;
@@ -23,15 +23,11 @@ public class SwerveModule extends SubsystemBase {
   private final Alert hardwareFaultAlert;
 
   public SwerveModule(ModuleInterface io, String name) {
-    super("Module-" + name);
     this.io = io;
     this.name = name;
     this.hardwareFaultAlert =
         new Alert("Module-" + name + " Hardware Fault", Alert.AlertType.kError);
     this.hardwareFaultAlert.set(false);
-
-    // We have essentially a nested subsystem here, so we need to unregister it with the scheduler
-    CommandScheduler.getInstance().unregisterSubsystem(this);
   }
 
   /** Updates the module's odometry inputs. */
@@ -139,4 +135,9 @@ public class SwerveModule extends SubsystemBase {
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getDrivePositionMeters(), getTurnRotation());
   }
+
+  /**
+   * This is called in the periodic method of the SwerveDrive. It is used to update module values periodically
+   */
+  public void periodic() {}
 }
