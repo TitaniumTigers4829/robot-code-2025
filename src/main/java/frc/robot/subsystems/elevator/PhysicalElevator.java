@@ -36,8 +36,6 @@ public class PhysicalElevator implements ElevatorInterface {
     followerPosition = followerMotor.getRotorPosition();
     followerAppliedVoltage = followerMotor.getMotorVoltage();
 
-    followerMotor.setControl(followerMotorControl);
-
     TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
     
     elevatorConfig.Slot0.kP = ElevatorConstants.ELEVATOR_P;
@@ -61,6 +59,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
     BaseStatusSignal.setUpdateFrequencyForAll(HardwareConstants.SIGNAL_FREQUENCY, leaderPosition, leaderAppliedVoltage, followerPosition, followerAppliedVoltage);
   }
+
   public void updateInputs(ElevatorInputs inputs) {
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
@@ -68,6 +67,7 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
   }
 
+  @Override
   public double getElevatorPosition() {
     return leaderPosition.getValueAsDouble();
   }

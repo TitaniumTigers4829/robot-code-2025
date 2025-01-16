@@ -10,8 +10,10 @@ public interface ElevatorInterface {
   /** Creates a new ElevatorInterface. */
   @AutoLog
   public static class ElevatorInputs { // For values
-    public double rightMotorPosition = 0.0;
-    public double leftMotorPosition = 0.0;
+    public double leaderMotorPosition = 0.0;
+    public double followerMotorPosition = 0.0;
+    public double leaderMotorVoltage = 0.0;
+    public double followerMotorVoltage = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}
@@ -23,6 +25,8 @@ public interface ElevatorInterface {
   public default void setElevatorPosition(double position) {}
 
   public default void setVolts(double volts) {}
+
+  public default void SimulatedElevator(double simulation) {}
 
   public default double getVolts() {
     return 0.0;

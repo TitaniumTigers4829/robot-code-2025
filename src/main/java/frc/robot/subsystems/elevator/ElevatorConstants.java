@@ -15,7 +15,8 @@ public class ElevatorConstants {
     public static final double ELEVATOR_S = 0 - 9;
     public static final double ELEVATOR_V = 0 - 9;
     public static final double ELEVATOR_A = 0 - 9;
-  
+    public static final double ELEVATOR_G = 0 - 9;
+
     public static final double DRUM_RADIUS = 0 - 9;
     public static final double ELEVATOR_GEAR_RATIO = 2;
     public static final double ELEVATOR_CARRIAGE_MASS = 0 - 9;
@@ -27,4 +28,5 @@ public class ElevatorConstants {
     public static final double SUPPLY_CURRENT_LIMIT = 0 - 9;
     public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
     public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = true;
+
   }
