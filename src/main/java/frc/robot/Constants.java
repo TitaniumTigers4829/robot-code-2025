@@ -140,6 +140,14 @@ public final class Constants {
     public static final double RED_REEF_PLACE_X = 0;
     public static final double RED_REEF_PLACE_Y = 0;
     public static final Rotation2d RED_REEF_ROTATION = Rotation2d.fromDegrees(-90);
+
+    public static final double RED_PROCESSOR_PLACE_X = 0;
+    public static final double RED_PROCESSOR_PLACE_Y = 0;
+    public static final Rotation2d RED_PROCESSOR_ROTATION = Rotation2d.fromDegrees(-90);
+
+    public static final double RED_FEEDER_STATION_PLACE_X = 0;
+    public static final double RED_FEEDER_STATION_PLACE_Y = 0;
+    public static final Rotation2d RED_FEEDER_STATION_ROTATION = Rotation2d.fromDegrees(-90);
   }
 
   public static final class JoystickConstants {

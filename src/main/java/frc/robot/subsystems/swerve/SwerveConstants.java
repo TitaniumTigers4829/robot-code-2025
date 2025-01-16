@@ -168,12 +168,12 @@ public class SwerveConstants {
     public static final double AUTO_LINEUP_PROCESSOR_ROTATION_P = 0;
     public static final double AUTO_LINEUP_PROCESSOR_ROTATION_I = 0;
     public static final double AUTO_LINEUP_PROCESSOR_ROTATION_D = 0;
-    public static final double AUTO_LINEUP_PROCESSOR_ROTATION_CONSTRAINTS = 0;
+    public static final Constraints AUTO_LINEUP_PROCESSOR_ROTATION_CONSTRAINTS = new Constraints(0, 0);;
 
     public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_P = 0;
     public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_I = 0;
     public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_D = 0;
-    public static final double AUTO_LINEUP_FEEDER_STATION_ROTATION_CONSTRAINTS = 0;
+    public static final Constraints AUTO_LINEUP_FEEDER_STATION_ROTATION_CONSTRAINTS = new Constraints(0, 0);;
 
     public static final double AUTO_LINEUP_REEF_TRANSLATION_P = 0;
     public static final double AUTO_LINEUP_REEF_TRANSLATION_I = 0;
@@ -183,12 +183,12 @@ public class SwerveConstants {
     public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_P = 0;
     public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_I = 0;
     public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_D = 0;
-    public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_CONSTRAINTS = 0;
+    public static final Constraints AUTO_LINEUP_PROCESSOR_TRANSLATION_CONSTRAINTS = new Constraints(0, 0);;
 
     public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_P = 0;
     public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_I = 0;
     public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_D = 0;
-    public static final double AUTO_LINEUP_FEEDER_STATION_TRANSLATION_CONSTRAINTS = 0;
+    public static final Constraints AUTO_LINEUP_FEEDER_STATION_TRANSLATION_CONSTRAINTS = new Constraints(0, 0);;
 
   }
 
