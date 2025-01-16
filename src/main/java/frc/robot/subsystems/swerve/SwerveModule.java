@@ -79,6 +79,11 @@ public class SwerveModule {
     Logger.recordOutput("Drive/desired turn angle", state.angle.getRotations());
   }
 
+  /** Stops the module */
+  public void stopModule() {
+    io.stopModule();
+  }
+
   /**
    * Gets the turn angle of the module.
    *

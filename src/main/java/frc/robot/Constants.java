@@ -13,17 +13,20 @@ public final class Constants {
     public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
   }
 
-  public static final Mode CURRENT_MODE = Mode.SIM;
+  public static final RobotType CURRENT_MODE = RobotType.SIM_ROBOT;
 
-  public static enum Mode {
+  public static enum RobotType {
     /** Running on a real robot. */
-    REAL,
+    COMP_ROBOT,
 
     /** Running a physics simulator. */
-    SIM,
+    SIM_ROBOT,
 
     /** Replaying from a log file. */
-    REPLAY
+    DEV_ROBOT,
+
+    /** Running the swerve robot. */
+    SWERVE_ROBOT
   }
 
   /**
