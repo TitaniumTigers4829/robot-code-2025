@@ -79,10 +79,11 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    // if (getNumberOfAprilTags(limelight) > 0) {
+    if (getNumberOfAprilTags(limelight) > 0) {
+      isThreadRunning[limelight.getId()].set(true);
     return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
-    // }
-    // return false;
+    }
+    return false;
     // return true;
   }
 
@@ -319,7 +320,6 @@ public class PhysicalVision implements VisionInterface {
       ) {
 
         updatePoseEstimate(limelight);
-        isThreadRunning[limelight.getId()].set(true);
 
         // This is to keep track of the last valid pose calculated by the limelights
         // it is used when the driver resets the robot odometry to the limelight calculated
