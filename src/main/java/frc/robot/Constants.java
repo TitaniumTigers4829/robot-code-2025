@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swerve.SwerveConstants.*;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
@@ -14,17 +13,20 @@ public final class Constants {
     public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
   }
 
-  public static final Mode CURRENT_MODE = Mode.SIM;
+  public static final RobotType CURRENT_MODE = RobotType.SIM_ROBOT;
 
-  public static enum Mode {
+  public static enum RobotType {
     /** Running on a real robot. */
-    REAL,
+    COMP_ROBOT,
 
     /** Running a physics simulator. */
-    SIM,
+    SIM_ROBOT,
 
     /** Replaying from a log file. */
-    REPLAY
+    DEV_ROBOT,
+
+    /** Running the swerve robot. */
+    SWERVE_ROBOT
   }
 
   /**
@@ -34,7 +36,7 @@ public final class Constants {
   public static final class HardwareConstants {
     public static final double TIMEOUT_S = 0.02;
 
-    public static final double SIGNAL_FREQUENCY = 250;
+    public static final double STATUS_SIGNAL_FREQUENCY = 50;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";

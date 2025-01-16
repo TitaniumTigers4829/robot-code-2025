@@ -26,7 +26,7 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
 import java.util.Queue;
 
-public class PhysicalModule implements ModuleInterface {
+public class CompModule implements ModuleInterface {
   private final TalonFX driveMotor;
   private final TalonFX turnMotor;
   private final CANcoder turnEncoder;
@@ -47,7 +47,7 @@ public class PhysicalModule implements ModuleInterface {
 
   private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
-  public PhysicalModule(ModuleConfig moduleConfig) {
+  public CompModule(ModuleConfig moduleConfig) {
     driveMotor = new TalonFX(moduleConfig.driveMotorChannel(), DeviceCANBus.CANIVORE.name);
     turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), DeviceCANBus.CANIVORE.name);
     turnEncoder = new CANcoder(moduleConfig.turnEncoderChannel(), DeviceCANBus.CANIVORE.name);
@@ -185,11 +185,6 @@ public class PhysicalModule implements ModuleInterface {
     turnEncoder.getAbsolutePosition().refresh();
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
         .getRotations();
-  }
-
-  @Override
-  public void xthing(double desiredPositionDegrees) {
-    turnMotor.setControl(mmPositionRequest.withPosition(Degrees.of(desiredPositionDegrees)));
   }
 
   @Override

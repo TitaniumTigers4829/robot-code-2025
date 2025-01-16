@@ -9,6 +9,7 @@ import frc.robot.Constants.SimulationConstants;
 import frc.robot.Robot;
 import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
+import frc.robot.subsystems.swerve.SwerveConstants.OdometryThreadConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -24,7 +25,7 @@ public interface OdometryThread {
     public OdometryDoubleInput(Supplier<Angle> signal) {
       this.supplier = signal;
       // Create a queue with a capacity of 10
-      this.queue = new ArrayBlockingQueue<>(10);
+      this.queue = new ArrayBlockingQueue<>(OdometryThreadConstants.QUEUE_SIZE);
     }
 
     public void cacheInputToQueue() {
@@ -36,7 +37,8 @@ public interface OdometryThread {
   List<BaseStatusSignal> registeredStatusSignals = new ArrayList<>();
 
   static Queue<Angle> registerSignalInput(StatusSignal<Angle> signal) {
-    signal.setUpdateFrequency(HardwareConstants.SIGNAL_FREQUENCY, HardwareConstants.TIMEOUT_S);
+    signal.setUpdateFrequency(
+        OdometryThreadConstants.SIGNAL_FREQUENCY, HardwareConstants.TIMEOUT_S);
     registeredStatusSignals.add(signal);
     return registerInput(signal.asSupplier());
   }
@@ -49,12 +51,12 @@ public interface OdometryThread {
 
   static OdometryThread createInstance(DeviceCANBus canBus) {
     return switch (Constants.CURRENT_MODE) {
-      case REAL ->
+      case COMP_ROBOT ->
           new OdometryThreadReal(
               canBus,
               registeredInputs.toArray(new OdometryDoubleInput[0]),
               registeredStatusSignals.toArray(new BaseStatusSignal[0]));
-      case SIM -> new OdometryThreadSim();
+      case SIM_ROBOT -> new OdometryThreadSim();
         // case REPLAY -> inputs -> {};
       default -> throw new IllegalArgumentException("Unexpected value: " + Constants.CURRENT_MODE);
     };

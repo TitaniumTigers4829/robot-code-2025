@@ -6,21 +6,22 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-
-// import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonCamera;
 
 public final class VisionConstants {
   public enum Limelight {
-    SHOOTER(0, VisionConstants.SHOOTER_LIMELIGHT_NAME),
-    FRONT_LEFT(1, VisionConstants.FRONT_LEFT_LIMELIGHT_NAME),
-    FRONT_RIGHT(2, VisionConstants.FRONT_RIGHT_LIMELIGHT_NAME);
+    BACK(0, VisionConstants.BACK_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR), // We have one LL3G
+    FRONT_LEFT(1, VisionConstants.FRONT_LEFT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR),
+    FRONT_RIGHT(2, VisionConstants.FRONT_RIGHT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR);
 
     private final int id;
     private final String name;
+    private final double accurateFOV;
 
-    Limelight(int id, String name) {
+    Limelight(int id, String name, double accurateFOV) {
       this.id = id;
       this.name = name;
+      this.accurateFOV = accurateFOV;
     }
 
     public int getId() {
@@ -31,9 +32,13 @@ public final class VisionConstants {
       return name;
     }
 
+    public double getAccurateFOV() {
+      return accurateFOV;
+    }
+
     public static Limelight fromId(int id) {
       return switch (id) {
-        case 0 -> SHOOTER;
+        case 0 -> BACK;
         case 1 -> FRONT_LEFT;
         case 2 -> FRONT_RIGHT;
         default -> throw new IllegalArgumentException("Invalid Limelight ID: " + id);
@@ -41,7 +46,7 @@ public final class VisionConstants {
     }
   }
 
-  public static final Transform3d SHOOTER_TRANSFORM =
+  public static final Transform3d BACK_TRANSFORM =
       new Transform3d(
           new Translation3d(-0.3119324724, 0.0, 0.1865472012), new Rotation3d(0.0, 35, 180.0));
   public static final Transform3d FRONT_LEFT_TRANSFORM =
@@ -52,12 +57,11 @@ public final class VisionConstants {
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
-  // public static final PhotonCamera SHOOTER_CAMERA = new
-  // PhotonCamera(Limelight.SHOOTER.getName());
-  // public static final PhotonCamera FRONT_LEFT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  // public static final PhotonCamera FRONT_RIGHT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
+  public static final PhotonCamera FRONT_LEFT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_LEFT.getName());
+  public static final PhotonCamera FRONT_RIGHT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_RIGHT.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
@@ -79,15 +83,15 @@ public final class VisionConstants {
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = 0.5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;
 
-  public static final String SHOOTER_LIMELIGHT_NAME = "limelight-shooter";
-  public static final int SHOOTER_LIMELIGHT_NUMBER = 0;
+  public static final String BACK_LIMELIGHT_NAME = "limelight-shooter";
+  public static final int BACK_LIMELIGHT_NUMBER = 0;
   public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-left";
   public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 1;
   public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
   public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 2;
 
   public static final int MIN_APRIL_TAG_ID = 1;
-  public static final int MAX_APRIL_TAG_ID = 16;
+  public static final int MAX_APRIL_TAG_ID = 22;
 
   public static final double[][] ONE_APRIL_TAG_LOOKUP_TABLE = {
     // {distance in meters, x std deviation, y std deviation, r (in degrees) std deviation}
