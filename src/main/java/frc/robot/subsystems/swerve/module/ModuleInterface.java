@@ -67,5 +67,5 @@ public interface ModuleInterface {
     return 0.0;
   }
 
-  void setXStance(double desiredPositionDegrees);
+  default void setXStance(double desiredPositionDegrees) {}
 }

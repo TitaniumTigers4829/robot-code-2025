@@ -11,7 +11,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -55,7 +54,6 @@ public class SwerveDrive extends SubsystemBase {
           ModuleConstants.WHEEL_DIAMETER_METERS,
           WHEEL_GRIP.TIRE_WHEEL.cof,
           0.0);
-  
 
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
@@ -73,7 +71,6 @@ public class SwerveDrive extends SubsystemBase {
   private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
 
   private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
-
 
   public SwerveDrive(
       GyroInterface gyroIO,
@@ -337,33 +334,27 @@ public class SwerveDrive extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].setOptimizedDesiredState((desiredStates[i]));
-   
     }
   }
- 
 
+  // Check if the robot has been inactive for 3 seconds
+  public boolean isThreeSecsInactive() {
+    if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
+      return true; // 3 seconds of inactivity
+    }
+    return false; // Still moving or not enough time passed
+  }
 
- 
- 
- // Check if the robot has been inactive for 3 seconds
- public boolean isThreeSecsInactive() {
-     if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
-         return true; // 3 seconds of inactivity
-     }
-     return false; // Still moving or not enough time passed
- }
-
-   public void setXStance() {
-         Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
-         for (int i = 0; i < 4; i++) {
-             swerveHeadings[i] = Rotation2d.fromDegrees(45);
-         }
-         DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
-         for (int i = 0; i < 4; i++) {
-             swerveModules[i].stopModule();
-         }
-        
- }
+  public void setXStance() {
+    Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
+    for (int i = 0; i < 4; i++) {
+      swerveHeadings[i] = Rotation2d.fromDegrees(45);
+    }
+    DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].stopModule();
+    }
+  }
 
   /**
    * Updates the pose estimator with the pose calculated from the swerve modules. This works because
@@ -441,4 +432,3 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 }
-
