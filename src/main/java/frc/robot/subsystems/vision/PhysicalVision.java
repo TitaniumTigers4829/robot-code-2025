@@ -46,17 +46,18 @@ public class PhysicalVision implements VisionInterface {
     for (Limelight limelight : Limelight.values()) {
       limelightThreads.put(limelight, new AtomicReference<>(latestInputs.get()));
 
-      // // Start a vision input task for each Limelight
-      // threadManager.startTask(
-      //     limelight.getName(),
-      //     () -> checkAndUpdatePose(limelight, latestInputs.get()),
-      //     VisionConstants.THREAD_SLEEP_MS);
+      // Start a vision input task for each Limelight
+      threadManager.startTask(
+          limelight.getName(),
+          () -> checkAndUpdatePose(limelight),
+          VisionConstants.THREAD_SLEEP_MS);
     }
   }
 
   @Override
   public void updateInputs(VisionInputs inputs) {
     // Combine inputs into the main inputs object
+    // try deleting this?
     synchronized (inputs) {
       for (Limelight limelight : Limelight.values()) {
         inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
@@ -72,8 +73,6 @@ public class PhysicalVision implements VisionInterface {
 
         latestInputs.set(inputs);
         limelightThreads.get(limelight).set(latestInputs.get());
-        SmartDashboard.putNumber(
-            "tagcount " + limelight.getName(), getNumberOfAprilTags(limelight));
       }
     }
   }
@@ -140,7 +139,7 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-
+    synchronized (this) {
     if (canSeeAprilTags(limelight)
     // && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)
     ) {
@@ -162,6 +161,7 @@ public class PhysicalVision implements VisionInterface {
       limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
     }
   }
+  }
 
   /**
    * If the robot is not enabled, update the pose using MegaTag1 and after it is enabled, run {@link
@@ -180,13 +180,11 @@ public class PhysicalVision implements VisionInterface {
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
-  public void updatePoseEstimate(Limelight limelight, VisionInputs inputs) {
-    synchronized (inputs) {
+  public void updatePoseEstimate(Limelight limelight) {
       if (DriverStation.isEnabled()) {
         enabledPoseUpdate(limelight);
       } else {
         disabledPoseUpdate(limelight);
-      }
     }
   }
 
@@ -297,7 +295,7 @@ public class PhysicalVision implements VisionInterface {
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
-  public void checkAndUpdatePose(Limelight limelight, VisionInputs inputs) {
+  public void checkAndUpdatePose(Limelight limelight) {
     double last_TX = 0;
     double last_TY = 0;
 
@@ -308,7 +306,7 @@ public class PhysicalVision implements VisionInterface {
     // A race condition could cause unpredictable things to happen. Such as causing a limelight to
     // be unable to reference an
     // object, as its reference was modified earlier.
-    synchronized (this) {
+    // synchronized (this) {
       try {
         double current_TX = LimelightHelpers.getTX(limelight.getName());
         double current_TY = LimelightHelpers.getTY(limelight.getName());
@@ -319,16 +317,16 @@ public class PhysicalVision implements VisionInterface {
         // very demanding whereas this only has to get the Network Table entries for TX and TY.
         if (current_TX != last_TX || current_TY != last_TY) {
 
-          updatePoseEstimate(limelight, inputs);
-          latestInputs.set(inputs);
+          updatePoseEstimate(limelight);
+          // latestInputs.set(inputs);
 
-          limelightThreads.computeIfPresent(limelight, (key, value) -> latestInputs);
-          // Handle threading for Limelight (start or stop threads if needed)
-          // Check if this Limelight thread exists in limelightThreads
-          if (limelightThreads.get(limelight) != null) {
-            // Update thread inputs or restart the thread if needed
-            limelightThreads.get(limelight).set(latestInputs.get());
-          }
+          // limelightThreads.computeIfPresent(limelight, (key, value) -> latestInputs);
+          // // Handle threading for Limelight (start or stop threads if needed)
+          // // Check if this Limelight thread exists in limelightThreads
+          // if (limelightThreads.get(limelight) != null) {
+          //   // Update thread inputs or restart the thread if needed
+          //   limelightThreads.get(limelight).set(latestInputs.get());
+          // }
 
           // This is to keep track of the last valid pose calculated by the limelights
           // it is used when the driver resets the robot odometry to the limelight calculated
@@ -351,7 +349,7 @@ public class PhysicalVision implements VisionInterface {
       } catch (Exception e) {
         System.err.println(
             "Error communicating with the: " + limelight.getName() + ": " + e.getMessage());
-      }
+      // }
     }
   }
 
