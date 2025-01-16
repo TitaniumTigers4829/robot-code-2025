@@ -192,4 +192,10 @@ public class CompModule implements ModuleInterface {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
   }
+
+  @Override
+  public void setXStance(double desiredPositionDegrees) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setXStance'");
+  }
 }
