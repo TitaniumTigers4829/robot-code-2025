@@ -313,7 +313,10 @@ public class PhysicalVision implements VisionInterface {
       // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
       // because to get the timestamp of the reading, you need to parse the JSON dump which can be
       // very demanding whereas this only has to get the Network Table entries for TX and TY.
-      if (current_TX != last_TX || current_TY != last_TY) {
+      if (current_TX != last_TX || current_TY != last_TY 
+      // idk where to put this \/ thoughts?
+      // && isLimelightConnected(limelight)
+      ) {
 
         updatePoseEstimate(limelight);
         isThreadRunning[limelight.getId()].set(true);
