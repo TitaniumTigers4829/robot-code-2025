@@ -137,6 +137,4 @@ public interface VisionInterface {
   default Pose2d getLastSeenPose() {
     return null;
   }
-
-  default void enabledPoseUpdate(Limelight limelight) {}
 }

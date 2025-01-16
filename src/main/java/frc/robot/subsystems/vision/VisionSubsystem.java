@@ -27,12 +27,10 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    for (Limelight limelight : Limelight.values()) {
-      visionInterface.enabledPoseUpdate(limelight);
-    }
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
+    // SmartDashboard.putString("limelight estimates", inputs.limelightMegatagPoses.);
   }
 
   /**
