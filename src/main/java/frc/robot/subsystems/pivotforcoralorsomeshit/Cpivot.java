@@ -13,31 +13,29 @@ import frc.robot.Constants;
 public class Cpivot extends SubsystemBase {
   /** Creates a new Cpivot. */
   public TalonFX pivotMotor = new TalonFX(Constants.CORAL_PIVOT_MOTOR);
-  private static final int TICKS_PER_ROTATION = 2048; // For Falcon500 (TalonFX)
-  private static final double GEAR_RATIO = 10.0; // Update with your gear ratio
+  private static final int TICKS_PER_ROTATION = 2048;
+  private static final double GEAR_RATIO = 10.0;
   
   public Cpivot(int motorID) {
     pivotMotor = new TalonFX(motorID);
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.slot0.kP = 0.1; // Replace with your tuning values
+    config.slot0.kP = 0.0;
     config.slot0.kI = 0.0;
     config.slot0.kD = 0.0;
     config.slot0.kF = 0.0;
-    config.motionCruiseVelocity = 15000; // Example value, tune as needed
-    config.motionAcceleration = 6000; // Example value, tune as needed
+    config.motionCruiseVelocity = 15000;
+    config.motionAcceleration = 6000;
     pivotMotor.configAllSettings(config);
     pivotMotor.setNeutralMode(NeutralMode.Brake);  
     pivotMotor.setSelectedSensorPosition(0);
     }
 
     public void setPivotPosition(double degrees) {
-        // Convert degrees to encoder ticks
         double ticks = degreesToTicks(degrees);
         pivotMotor.set(ControlMode.MotionMagic, ticks);
     }
 
     public double getCurrentPosition() {
-        // Get position in degrees
         return ticksToDegrees(pivotMotor.getSelectedSensorPosition());
     }
 
@@ -55,7 +53,6 @@ public class Cpivot extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // Log current position for debugging
         System.out.println("Current Position: " + getCurrentPosition());
     }
 }
