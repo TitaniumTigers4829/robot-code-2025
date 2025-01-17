@@ -19,11 +19,11 @@ public class ClimbPivot extends SubsystemBase {
   public ClimbPivot(TalonFX climbPivotMotor) {
     this.climbPivotMotor = climbPivotMotor;
     TalonFXConfiguration config = new TalonFXConfiguration();
-    climb.slot0.kP = 0.0;
-    climb.slot0.kI = 0.0;
-    climb.slot0.kD = 0.0;
-    climb.slot0.kF = 0.0;
-    climb.motionCruiseVelocity = 15000;
+    config.slot0.kP = 0.0;
+    config.slot0.kI = 0.0;
+    config.slot0.kD = 0.0;
+    config.slot0.kF = 0.0;
+    config.motionCruiseVelocity = 15000;
     climb.motionAcceleration = 6000;
     climbPivotMotor.configAllSettings(config);
     climbPivotMotor.setNeutralMode(NeutralMode.Brake);  
