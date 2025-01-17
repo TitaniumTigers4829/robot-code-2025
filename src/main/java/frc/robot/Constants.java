@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -137,6 +138,18 @@ public final class Constants {
     // so consider setting them in the base code
     public static final double FIELD_LENGTH_METERS = Units.inchesToMeters(0 - 9);
     public static final double FIELD_WIDTH_METERS = Units.inchesToMeters(0 - 9);
+
+    public static final double RED_REEF_PLACE_X = 0;
+    public static final double RED_REEF_PLACE_Y = 0;
+    public static final Rotation2d RED_REEF_ROTATION = Rotation2d.fromDegrees(-90);
+
+    public static final double RED_PROCESSOR_PLACE_X = 0;
+    public static final double RED_PROCESSOR_PLACE_Y = 0;
+    public static final Rotation2d RED_PROCESSOR_ROTATION = Rotation2d.fromDegrees(-90);
+
+    public static final double RED_FEEDER_STATION_PLACE_X = 0;
+    public static final double RED_FEEDER_STATION_PLACE_Y = 0;
+    public static final Rotation2d RED_FEEDER_STATION_ROTATION = Rotation2d.fromDegrees(-90);
   }
 
   public static final class JoystickConstants {
