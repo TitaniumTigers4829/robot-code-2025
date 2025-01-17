@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.pivotforcoralorsomeshit;
+package frc.robot.subsystems.pivot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.TalonFXConfiguration;
@@ -10,14 +10,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Cpivot extends SubsystemBase {
+public class CoralPivot extends SubsystemBase {
   /** Creates a new Cpivot. */
-  public TalonFX pivotMotor = new TalonFX(Constants.CORAL_PIVOT_MOTOR);
+  public TalonFX coralPivotMotor = new TalonFX(Constants.CORAL_PIVOT_MOTOR);
   private static final int TICKS_PER_ROTATION = 2048;
   private static final double GEAR_RATIO = 10.0;
   
-  public Cpivot(int motorID) {
-    pivotMotor = new TalonFX(motorID);
+  public CoralPivot(TalonFX coralPivotMotor) {
+    this.coralPivotMotor = coralPivotMotor;
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.slot0.kP = 0.0;
     config.slot0.kI = 0.0;
@@ -25,22 +25,22 @@ public class Cpivot extends SubsystemBase {
     config.slot0.kF = 0.0;
     config.motionCruiseVelocity = 15000;
     config.motionAcceleration = 6000;
-    pivotMotor.configAllSettings(config);
-    pivotMotor.setNeutralMode(NeutralMode.Brake);  
-    pivotMotor.setSelectedSensorPosition(0);
+    coralPivotMotor.configAllSettings(config);
+    coralPivotMotor.setNeutralMode(NeutralMode.Brake);  
+    coralPivotMotor.setSelectedSensorPosition(0);
     }
 
     public void setPivotPosition(double degrees) {
         double ticks = degreesToTicks(degrees);
-        pivotMotor.set(ControlMode.MotionMagic, ticks);
+        coralPivotMotor.set(ControlMode.MotionMagic, ticks);
     }
 
     public double getCurrentPosition() {
-        return ticksToDegrees(pivotMotor.getSelectedSensorPosition());
+        return ticksToDegrees(coralPivotMotor.getSelectedSensorPosition());
     }
 
     public void stop() {
-        pivotMotor.set(ControlMode.PercentOutput, 0);
+        coralPivotMotor.set(ControlMode.PercentOutput, 0);
     }
 
     private double degreesToTicks(double degrees) {
