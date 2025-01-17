@@ -305,8 +305,8 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void checkAndUpdatePose(Limelight limelight) {
-    double last_TX = 0;
-    double last_TY = 0;
+    // double last_TX = 0;
+    // double last_TY = 0;
 
     // Syncronization block to ensure thread safety during the critical section where pose
     // information is read and compared.
@@ -316,42 +316,42 @@ public class PhysicalVision implements VisionInterface {
     // be unable to reference an
     // object, as its reference was modified earlier.
     // synchronized (this) {
-    try {
-      double current_TX = LimelightHelpers.getTX(limelight.getName());
-      double current_TY = LimelightHelpers.getTY(limelight.getName());
+    // try {
+    //   double current_TX = LimelightHelpers.getTX(limelight.getName());
+    //   double current_TY = LimelightHelpers.getTY(limelight.getName());
 
-      // This checks if the limelight reading is new. The reasoning being that if the TX and TY
-      // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
-      // because to get the timestamp of the reading, you need to parse the JSON dump which can be
-      // very demanding whereas this only has to get the Network Table entries for TX and TY.
-      if (current_TX != last_TX || current_TY != last_TY
-      // idk where to put this \/ thoughts?
-      // && isLimelightConnected(limelight)
-      ) {
+    // This checks if the limelight reading is new. The reasoning being that if the TX and TY
+    // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
+    // because to get the timestamp of the reading, you need to parse the JSON dump which can be
+    // very demanding whereas this only has to get the Network Table entries for TX and TY.
+    // if (current_TX != last_TX || current_TY != last_TY
+    // idk where to put this \/ thoughts?
+    // && isLimelightConnected(limelight)
+    // ) {
+    // isThreadRunning[limelight.getId()].set(true);
+    updatePoseEstimate(limelight);
 
-        // isThreadRunning[limelight.getId()].set(true);
-        updatePoseEstimate(limelight);
-
-        // This is to keep track of the last valid pose calculated by the limelights
-        // it is used when the driver resets the robot odometry to the limelight calculated
-        // position
-        if (canSeeAprilTags(limelight)) {
-          lastSeenPose = getMegaTag1PoseEstimate(limelight).pose;
-        }
-      } else {
-        // // Only stop the thread if it's currently running
-        // if (isThreadRunning[limelight.getId()].get()) {
-        //   // stop the thread for the specified limelight
-        //   stopLimelightThread(limelight);
-        // }
-      }
-      last_TX = current_TX;
-      last_TY = current_TY;
-    } catch (Exception e) {
-      System.err.println(
-          "Error communicating with the: " + limelight.getName() + ": " + e.getMessage());
-      // }
+    // This is to keep track of the last valid pose calculated by the limelights
+    // it is used when the driver resets the robot odometry to the limelight calculated
+    // position
+    if (canSeeAprilTags(limelight)) {
+      lastSeenPose = getMegaTag1PoseEstimate(limelight).pose;
     }
+
+    // } else {
+    // // Only stop the thread if it's currently running
+    // if (isThreadRunning[limelight.getId()].get()) {
+    //   // stop the thread for the specified limelight
+    //   stopLimelightThread(limelight);
+    // }
+    // }
+    // last_TX = current_TX;
+    //   // last_TY = current_TY;
+    // } catch (Exception e) {
+    //   System.err.println(
+    //       "Error communicating with the: " + limelight.getName() + ": " + e.getMessage());
+    //   // }
+    // }
   }
 
   /**
