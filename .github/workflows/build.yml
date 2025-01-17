@@ -51,7 +51,7 @@ jobs:
       - name: Run formatter
         run: ./gradlew spotlessCheck
 
-   lint:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
