@@ -13,14 +13,17 @@ public class Eject extends Command{
     addRequirements(this.intakeSubsystem);
   }
 
+@Override
   public void execute(){
     intakeSubsystem.setIntakeSpeed(IntakeConstants.ejectSpeed);
   }
 
-  public void end(){
+@Override
+  public void end(boolean interrupted){
     intakeSubsystem.setIntakeSpeed(0);
   }
 
+@Override
   public boolean isFinished(){
     return false;
   }
