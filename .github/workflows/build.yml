@@ -62,5 +62,6 @@ jobs:
           java-version: 17
       - uses: pmd/pmd-github-action@v2
         with:
-          rulesets: 'pmd-ruleset.xml'
-          analyzeModifiedFilesOnly: false
+            analyzeModifiedFilesOnly: true
+            failOnViolation: true
+            maxViolations: 20
