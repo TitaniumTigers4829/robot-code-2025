@@ -246,4 +246,5 @@ pmd {
     reportsDir = file("${project.buildDir}/reports/pmd")
     ruleSetFiles = files(file("$rootDir/pmd-ruleset.xml"))
     ruleSets = []
+    maxFailures = project.hasProperty('pmdMaxFailures') ? project.pmdMaxFailures.toInteger() : 1000000
 }
