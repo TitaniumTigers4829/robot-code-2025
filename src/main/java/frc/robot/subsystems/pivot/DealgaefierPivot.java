@@ -16,8 +16,7 @@ public class CoralPivot extends SubsystemBase {
   private static final int TICKS_PER_ROTATION = 2048;
   private static final double GEAR_RATIO = 10.0;
   
-  public CoralPivot(TalonFX dealgaefierPivotMotor) {
-    this.dealgaefierPivotMotor = dealgaefierPivotMotor;
+  public CoralPivot() {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.slot0.kP = 0.0;
     config.slot0.kI = 0.0;

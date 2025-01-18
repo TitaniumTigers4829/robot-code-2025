@@ -16,8 +16,7 @@ public class ClimbPivot extends SubsystemBase {
   private static final int TICKS_PER_ROTATION = 2048;
   private static final double GEAR_RATIO = 10.0;
 
-  public ClimbPivot(TalonFX climbPivotMotor) {
-    this.climbPivotMotor = climbPivotMotor;
+  public ClimbPivot() {
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.slot0.kP = 0.0;
     config.slot0.kI = 0.0;
