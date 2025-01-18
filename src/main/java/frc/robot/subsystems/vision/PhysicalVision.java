@@ -1,7 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +10,7 @@ import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * This class is the implementation of the VisionInterface for the physical robot. It uses the
@@ -31,9 +30,10 @@ public class PhysicalVision implements VisionInterface {
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
   private final AtomicReferenceArray<MegatagPoseEstimate> limelightEstimates =
-      new AtomicReferenceArray<>(new MegatagPoseEstimate[] {
-        new MegatagPoseEstimate(), new MegatagPoseEstimate(), new MegatagPoseEstimate()
-      });
+      new AtomicReferenceArray<>(
+          new MegatagPoseEstimate[] {
+            new MegatagPoseEstimate(), new MegatagPoseEstimate(), new MegatagPoseEstimate()
+          });
 
   // private final AtomicBoolean[] isThreadRunning = new AtomicBoolean[Limelight.values().length];
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
@@ -128,30 +128,30 @@ public class PhysicalVision implements VisionInterface {
     // if (!canSeeAprilTags(limelight)) {
     //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
     // } else {
-      // if (canSeeAprilTags(limelight)) {
-      // limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
+    // if (canSeeAprilTags(limelight)) {
+    // limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
 
-      // && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)) {
-      // if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
-      //     && getLimelightAprilTagDistance(limelight)
-      //         < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
-      //   limelightEstimates[limelight.getId()] =
-      // MegatagPoseEstimate.fromLimelight(megatag1Estimate);
+    // && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)) {
+    // if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
+    //     && getLimelightAprilTagDistance(limelight)
+    //         < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
+    //   limelightEstimates[limelight.getId()] =
+    // MegatagPoseEstimate.fromLimelight(megatag1Estimate);
 
-      // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE) {
-      //   LimelightHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0, 0, 0, 0,
-      // 0);
-      //   limelightEstimates[limelight.getId()] =
-      //       MegatagPoseEstimate.fromLimelight(megatag2Estimate);
-      // }
-      // else {
-      limelightEstimates.set(limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
-      // }
-      // }
-      // }
-      // else {
-      //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
-      // }
+    // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE) {
+    //   LimelightHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0, 0, 0, 0,
+    // 0);
+    //   limelightEstimates[limelight.getId()] =
+    //       MegatagPoseEstimate.fromLimelight(megatag2Estimate);
+    // }
+    // else {
+    limelightEstimates.set(limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
+    // }
+    // }
+    // }
+    // else {
+    //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
+    // }
   }
 
   /**
@@ -162,7 +162,8 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
-      limelightEstimates.set(limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
+    limelightEstimates.set(
+        limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
 
   /**
@@ -233,7 +234,7 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks whether the pose estimate for MT1 and MT2 is within the field
+   * Checks whether the pose estimate for MT1 or MT2 is within the field
    *
    * @param megaTag1Estimate the MT1 pose estimate to check
    * @param megaTag2Estimate the MT2 pose estimate to check
@@ -297,7 +298,9 @@ public class PhysicalVision implements VisionInterface {
     // it is used when the driver resets the robot odometry to the limelight calculated
     // position
     if (canSeeAprilTags(limelight)) {
-      lastSeenPose = getMegaTag1PoseEstimate(limelight).pose;
+      // We use this rather than getMegaTag1PoseEstimate this is already calculated but
+      // getMegatag1PoseEstimate would require parsing the JSON dump again
+      lastSeenPose = getPoseFromAprilTags(limelight);
     }
 
     // } else {
