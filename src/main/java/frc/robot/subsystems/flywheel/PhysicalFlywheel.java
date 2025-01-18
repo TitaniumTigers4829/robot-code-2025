@@ -5,7 +5,4 @@
 package frc.robot.subsystems.flywheel;
 
 /** Add your docs here. */
-public class FlywheelConstants {
-    public static final TalonFX FLYWHEEL_MOTOR = 0-9;
-    public static final int FLYWHEEL_GEAR_RATIO;
-}
+public class PhysicalFlywheel {}

@@ -5,7 +5,7 @@
 package frc.robot.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.subsystems.flywheel.FlywheelConstants;
 
 public class FlywheelSubsystem extends SubsystemBase {
   /** Creates a new FlywheelSubsystem. */
@@ -13,20 +13,20 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   private FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
-  public Elevator(ElevatorInterface elevatorInterface) {
-    this.flywheelInterface = flywheelInterface;
+  public Flywheel() {
+   
   }
 
-  public double getElevatorPosition() {
-    return flywheelInterface.getElevatorPosition();
+  public double getFlywheelSpeed() {
+    return flywheelInterface.getFlywheelSpeed();
   }
 
   public double getVolts() {
     return flywheelInterface.getVolts();
   }
 
-  public void setElevatorPosition(double position) {
-    flywheelInterface.setElevatorPosition(position);
+  public void setFlywheelSpeed(double speed) {
+    flywheelInterface.setFlywheelSpeed(speed);
   }
 
   public void setVolts(double volts) {
@@ -37,6 +37,6 @@ public class FlywheelSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     flywheelInterface.updateInputs(inputs);
-    Logger.processInputs("Elevator/", inputs);
+    Logger.processInputs("Flywheel/", inputs);
   }
 }

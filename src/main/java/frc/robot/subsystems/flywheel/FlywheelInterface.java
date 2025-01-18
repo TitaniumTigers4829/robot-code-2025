@@ -25,11 +25,11 @@ public class FlywheelInterface {
    *
    * @return
    */
-  public double getFlywheelPosition() {
+  public double getFlywheelSpeed() {
     return 0.0;
   }
 
-  public void setFlywheelPosition(double position) {}
+  public void setFlywheelSpeed(double speed) {}
 
   public void setVolts(double volts) {}
 
