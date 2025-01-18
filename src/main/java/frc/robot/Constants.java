@@ -184,13 +184,13 @@ public final class Constants {
     public static final Pose2d RED_PROCESSOR = new Pose2d(Units.inchesToMeters(455.15), Units.inchesToMeters(317), new Rotation2d(Units.degreesToRadians(270)));
 
     // We wont be able to pick these game pieces up
-    public static final Pose2d BLUE_LEFT_STARTING_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(86.50), new Rotation2d(Units.degreesToRadians(0)));
-    public static final Pose2d BLUE_MIDDLE_STARTING_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(158.50), new Rotation2d(Units.degreesToRadians(0)));
-    public static final Pose2d BLUE_RIGHT_STARTING_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(230.50), new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d BLUE_LEFT_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(86.50), new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d BLUE_MIDDLE_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(158.50), new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d BLUE_RIGHT_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(47.967), Units.inchesToMeters(230.50), new Rotation2d(Units.degreesToRadians(0)));
 
-    public static final Pose2d RED_LEFT_STARTING_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(230.50), new Rotation2d(Units.degreesToRadians(180)));
-    public static final Pose2d RED_MIDDLE_STARTING_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(158.50), new Rotation2d(Units.degreesToRadians(180)));
-    public static final Pose2d RED_RIGHT_STARTING_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(86.50), new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d RED_LEFT_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(230.50), new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d RED_MIDDLE_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(158.50), new Rotation2d(Units.degreesToRadians(180)));
+    public static final Pose2d RED_RIGHT_PRE_PLACED_POINT = new Pose2d(Units.inchesToMeters(642.903), Units.inchesToMeters(86.50), new Rotation2d(Units.degreesToRadians(180)));
   }
 
   public static final class JoystickConstants {
