@@ -271,52 +271,28 @@ public class PhysicalVision implements VisionInterface {
     // double last_TX = 0;
     // double last_TY = 0;
 
-    // Syncronization block to ensure thread safety during the critical section where pose
-    // information is read and compared.
-    // This helps prevent race conditions, where one limelight may be updating an object that
-    // another limelight is reading.
-    // A race condition could cause unpredictable things to happen. Such as causing a limelight to
-    // be unable to reference an
-    // object, as its reference was modified earlier.
-    // synchronized (this) {
-    // try {
-    //   double current_TX = LimelightHelpers.getTX(limelight.getName());
-    //   double current_TY = LimelightHelpers.getTY(limelight.getName());
+    // double current_TX = LimelightHelpers.getTX(limelight.getName());
+    // double current_TY = LimelightHelpers.getTY(limelight.getName());
 
     // This checks if the limelight reading is new. The reasoning being that if the TX and TY
     // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
     // because to get the timestamp of the reading, you need to parse the JSON dump which can be
     // very demanding whereas this only has to get the Network Table entries for TX and TY.
-    // if (current_TX != last_TX || current_TY != last_TY
-    // idk where to put this \/ thoughts?
-    // && isLimelightConnected(limelight)
-    // ) {
-    // isThreadRunning[limelight.getId()].set(true);
-    updatePoseEstimate(limelight);
+    // if (current_TX != last_TX || current_TY != last_TY && isLimelightConnected(limelight)) {
+      updatePoseEstimate(limelight);
 
-    // This is to keep track of the last valid pose calculated by the limelights
-    // it is used when the driver resets the robot odometry to the limelight calculated
-    // position
-    if (canSeeAprilTags(limelight)) {
-      // We use this rather than getMegaTag1PoseEstimate this is already calculated but
-      // getMegatag1PoseEstimate would require parsing the JSON dump again
-      lastSeenPose = getPoseFromAprilTags(limelight);
-    }
+      // This is to keep track of the last valid pose calculated by the limelights
+      // it is used when the driver resets the robot odometry to the limelight calculated
+      // position
+      if (canSeeAprilTags(limelight)) {
+        // We use this rather than getMegaTag1PoseEstimate because this is already calculated but
+        // getMegatag1PoseEstimate would require parsing the JSON dump again
+        lastSeenPose = getPoseFromAprilTags(limelight);
+      }
+    // }
 
-    // } else {
-    // // Only stop the thread if it's currently running
-    // if (isThreadRunning[limelight.getId()].get()) {
-    //   // stop the thread for the specified limelight
-    //   stopLimelightThread(limelight);
-    // }
-    // }
     // last_TX = current_TX;
-    //   // last_TY = current_TY;
-    // } catch (Exception e) {
-    //   System.err.println(
-    //       "Error communicating with the: " + limelight.getName() + ": " + e.getMessage());
-    //   // }
-    // }
+    // last_TY = current_TY;
   }
 
   /**
