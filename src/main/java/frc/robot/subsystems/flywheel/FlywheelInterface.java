@@ -7,33 +7,23 @@ import org.littletonrobotics.junction.AutoLog;
 /** Add your docs here. */
 public class FlywheelInterface {
     @AutoLog
-  public static class ElevatorInputs {
+  public static class FlywheelInterface {
     public double leaderMotorPosition = 0.0;
-
-    public double followerMotorPosition = 0.0;
   }
 
-  /**
-   * Updates inputs for elevator for AdvantageKit to log
-   *
-   * @param inputs values related to the elevator
-   */
-  public void updateInputs(FlywheelInputs inputs) {}
 
-  /**
-   * Gets the current position of the elevator
-   *
-   * @return
-   */
-  public double getFlywheelSpeed() {
+  public default void updateInputs(FlywheelInterface inputs) {}
+
+ 
+  public default double getFlywheelSpeed() {
     return 0.0;
   }
 
-  public void setFlywheelSpeed(double speed) {}
+  public default void setFlywheelSpeed(double speed) {}
 
-  public void setVolts(double volts) {}
+  public default void setVolts(double volts) {}
 
-  public double getVolts() {
+  public default double getVolts() {
     return 0.0;
   }
 

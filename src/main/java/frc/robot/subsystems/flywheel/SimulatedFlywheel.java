@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.flywheel;
 
-import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /** Add your docs here. */
-public class SimulatedFlywheel {
-    private FlywheelSim flywheelSim =
-      new FlywheelSim(
+public class SimulatedFlywheel implements FlywheelInterface {
+    private SimulatedFlywheel simulatedflywheel =
+      new SimulatedFlywheel(
           DCMotor.getFalcon500(2),
           FlywheelConstants.FLYWHEEL_GEAR_RATIO,
           true,
@@ -17,7 +19,7 @@ public class SimulatedFlywheel {
   private PIDController simPID;
   private double currentVolts;
 
-  public SimulatedFlywheel() {
+  public SimulatedFlywheel(DCMotor dcMotor, double flywheelGearRatio, boolean b, double d) {
     simPID =
         new PIDController(
             FlywheelConstants.FLYWHEEL_P,
@@ -35,7 +37,7 @@ public class SimulatedFlywheel {
   }
 
   public double getFlywheelSpeed() {
-    // return 
+    return flywheelSim.getAngularVelocityRPM(); 
   }
 
   public void setVolts(double volts) {
