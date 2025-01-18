@@ -4,13 +4,14 @@
 
 package frc.robot.subsystems.flywheel;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-
 /** Add your docs here. */
 public class FlywheelConstants {
-    public static final int FLYWHEEL_MOTOR_ID = 0-9;
-    public static final double FLYWHEEL_GEAR_RATIO = 0;
-    public static final double FLYWHEEL_P = 0;
-    public static final double FLYWHEEL_I = 0;
-    public static final double FLYWHEEL_D = 0;
+  public static final int FLYWHEEL_MOTOR_ID = 0 - 9;
+  public static final double FLYWHEEL_GEAR_RATIO = 0 - 9;
+  public static final double FLYWHEEL_P = 0 - 9;
+  public static final double FLYWHEEL_I = 0 - 9;
+  public static final double FLYWHEEL_D = 0 - 9;
+
+  public static final double JKG_METERS_SQUARED = 0 - 9;
+  public static final double GEAR_RATIO = 0 - 9;
 }

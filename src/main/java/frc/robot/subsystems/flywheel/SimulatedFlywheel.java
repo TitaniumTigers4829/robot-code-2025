@@ -6,16 +6,12 @@ package frc.robot.subsystems.flywheel;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /** Add your docs here. */
 public class SimulatedFlywheel implements FlywheelInterface {
-    private SimulatedFlywheel simulatedflywheel =
-      new SimulatedFlywheel(
-          DCMotor.getFalcon500(2),
-          FlywheelConstants.FLYWHEEL_GEAR_RATIO,
-          true,
-          0.0);
+  private FlywheelSim simulatedFlywheel = new FlywheelSim(null ,DCMotor.getFalcon500(2), 0);
   private PIDController simPID;
   private double currentVolts;
 
@@ -28,8 +24,8 @@ public class SimulatedFlywheel implements FlywheelInterface {
   }
 
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.leaderMotorPosition = getFlywheelPosition();
-    inputs.followerMotorPosition = getFlywheelPosition();
+    inputs.leaderMotorPosition = getFlywheelSpeed();
+    inputs.followerMotorPosition = getFlywheelSpeed();
   }
 
   public void setFlywheelspeed(double speed) {
@@ -37,12 +33,12 @@ public class SimulatedFlywheel implements FlywheelInterface {
   }
 
   public double getFlywheelSpeed() {
-    return flywheelSim.getAngularVelocityRPM(); 
+    return simulatedFlywheel.getAngularVelocityRPM();
   }
 
   public void setVolts(double volts) {
     currentVolts = simPID.calculate(volts);
-    elevatorSim.setInputVoltage(currentVolts);
+    simulatedFlywheel.setInputVoltage(currentVolts);
   }
 
   public double getVolts() {

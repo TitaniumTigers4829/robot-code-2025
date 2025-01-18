@@ -3,18 +3,19 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.flywheel;
+
 import org.littletonrobotics.junction.AutoLog;
+
 /** Add your docs here. */
-public class FlywheelInterface {
-    @AutoLog
-  public static class FlywheelInterface {
+public interface FlywheelInterface {
+  @AutoLog
+  public static class FlywheelInputs {
     public double leaderMotorPosition = 0.0;
+    public double followerMotorPosition = 0.0;
   }
 
+  public default void updateInputs(FlywheelInputs inputs) {}
 
-  public default void updateInputs(FlywheelInterface inputs) {}
-
- 
   public default double getFlywheelSpeed() {
     return 0.0;
   }
@@ -26,5 +27,4 @@ public class FlywheelInterface {
   public default double getVolts() {
     return 0.0;
   }
-
 }

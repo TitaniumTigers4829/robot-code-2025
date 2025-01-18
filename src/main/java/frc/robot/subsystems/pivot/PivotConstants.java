@@ -6,7 +6,7 @@ package frc.robot.subsystems.pivot;
 
 /** Add your docs here. */
 public class PivotConstants {
-    public static final TalonFX CORAL_PIVOT_MOTOR = 0-9;
-    public static final TalonFX CLIMB_PIVOT_MOTOR = 0-9;
-    public static final TalonFX FLYWHEEL_MOTOR = 0-9;
+  public static final int DEALGAEFIER_PIVOT_MOTOR_ID = 0 - 9;
+  public static final int CLIMB_PIVOT_MOTOR_ID = 0 - 9;
+  public static final int FLYWHEEL_MOTOR_ID = 0 - 9;
 }

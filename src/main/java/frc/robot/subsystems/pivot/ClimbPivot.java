@@ -3,55 +3,49 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.pivot;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class ClimbPivot extends SubsystemBase {
   /** Creates a new ClimbPivot. */
-  public TalonFX climbPivotMotor = new TalonFX(Constants.CLIMB_PIVOT_MOTOR);
+  public TalonFX climbPivotMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
+
   private static final int TICKS_PER_ROTATION = 2048;
   private static final double GEAR_RATIO = 10.0;
 
   public ClimbPivot() {
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.slot0.kP = 0.0;
-    config.slot0.kI = 0.0;
-    config.slot0.kD = 0.0;
-    config.slot0.kF = 0.0;
-    config.motionCruiseVelocity = 15000;
-    climb.motionAcceleration = 6000;
-    climbPivotMotor.configAllSettings(config);
-    climbPivotMotor.setNeutralMode(NeutralMode.Brake);  
-    climbPivotMotor.setSelectedSensorPosition(0);
+    config.Slot0.kP = 0.0;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.0;
+    config.MotionMagic.MotionMagicCruiseVelocity = 15000;
+    config.MotionMagic.MotionMagicAcceleration = 6000;
+    climbPivotMotor.getConfigurator().apply(new TalonFXConfiguration());
+    climbPivotMotor.getConfigurator().apply(config);
   }
 
   public void setPivotPosition(double degrees) {
     double ticks = degreesToTicks(degrees);
-    climbPivotMotor.set(ControlMode.MotionMagic, ticks);
-}
+    climbPivotMotor.set(ticks);
+  }
 
-public double getCurrentPosition() {
-    return ticksToDegrees(climbPivotMotor.getSelectedSensorPosition());
-}
-
-public void stop() {
-    climbPivotMotor.set(ControlMode.PercentOutput, 0);
-}
-
-private double degreesToTicks(double degrees) {
-    return degrees / 360.0 * TICKS_PER_ROTATION * GEAR_RATIO;
-}
-
-private double ticksToDegrees(double ticks) {
+  private double ticksToDegrees(double ticks) {
     return ticks / (TICKS_PER_ROTATION * GEAR_RATIO) * 360.0;
-}
+  }
 
-@Override
-public void periodic() {
-    System.out.println("Current Position: " + getCurrentPosition());
-}
+  public double getCurrentPosition() {
+    return climbPivotMotor.getPosition().getValueAsDouble();
+  }
+
+  public void stop() {
+    climbPivotMotor.set(0);
+  }
+
+  private double degreesToTicks(double degrees) {
+    return degrees / 360.0 * TICKS_PER_ROTATION * GEAR_RATIO;
+  }
+
+  public void periodic() {}
 }
