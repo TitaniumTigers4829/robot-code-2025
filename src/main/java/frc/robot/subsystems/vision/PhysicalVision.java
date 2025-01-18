@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  */
 public class PhysicalVision implements VisionInterface {
 
-  private Pose2d lastSeenPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
@@ -61,7 +60,6 @@ public class PhysicalVision implements VisionInterface {
           getLimelightAprilTagDistance(limelight);
       inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
       inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
-      inputs.limelightLastSeenPose = getLastSeenPose();
     }
   }
 
@@ -94,11 +92,6 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public double getLatencySeconds(Limelight limelight) {
     return limelightEstimates.get(limelight.getId()).latency / 1000.0;
-  }
-
-  @Override
-  public Pose2d getLastSeenPose() {
-    return lastSeenPose;
   }
 
   @Override
@@ -280,15 +273,6 @@ public class PhysicalVision implements VisionInterface {
     // very demanding whereas this only has to get the Network Table entries for TX and TY.
     // if (current_TX != last_TX || current_TY != last_TY && isLimelightConnected(limelight)) {
       updatePoseEstimate(limelight);
-
-      // This is to keep track of the last valid pose calculated by the limelights
-      // it is used when the driver resets the robot odometry to the limelight calculated
-      // position
-      if (canSeeAprilTags(limelight)) {
-        // We use this rather than getMegaTag1PoseEstimate because this is already calculated but
-        // getMegatag1PoseEstimate would require parsing the JSON dump again
-        lastSeenPose = getPoseFromAprilTags(limelight);
-      }
     // }
 
     // last_TX = current_TX;
