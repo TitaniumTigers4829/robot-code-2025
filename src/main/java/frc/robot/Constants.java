@@ -66,6 +66,7 @@ public final class Constants {
         STEER_MOTOR = DCMotor.getFalcon500(1);
     public static final TalonFX CORAL_PIVOT_MOTOR = 0-9;
     public static final TalonFX CLIMB_PIVOT_MOTOR = 0-9;
+    public static final TalonFX FLYWHEEL_MOTOR = 0-9;
 
     public static final double WHEEL_RADIUS_METERS = ModuleConstants.WHEEL_DIAMETER_METERS / 2.0,
         DRIVE_GEAR_RATIO = ModuleConstants.DRIVE_GEAR_RATIO,
