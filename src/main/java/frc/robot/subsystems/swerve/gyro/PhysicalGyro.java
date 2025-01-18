@@ -33,8 +33,7 @@ public class PhysicalGyro implements GyroInterface {
 
     inputs.isConnected = gyro.isConnected();
     inputs.yawDegreesRotation2d = gyro.getRotation2d();
-    inputs.yawVelocityDegreesPerSecond = gyro.getRate();
-    inputs.yawDegrees = gyro.getAngle();
+    inputs.yawVelocityDegreesPerSecond = -gyro.getRate();
   }
 
   @Override
