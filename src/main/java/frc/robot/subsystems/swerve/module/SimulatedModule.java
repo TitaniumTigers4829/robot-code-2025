@@ -16,18 +16,13 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerveModule;
 import frc.robot.extras.sim.utils.GearRatio;
-import frc.robot.extras.util.CTREUtil.FusedTalonFxSimController;
-import frc.robot.extras.util.CTREUtil.TalonFXSimController;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
-public class SimulatedModule extends PhysicalModule {
+public class SimulatedModule implements ModuleInterface {
   private final SimSwerveModule moduleSimulation;
-
-  FusedTalonFxSimController turnSim;
-  TalonFXSimController driveSim;
   // TODO: retune possibly most likely
   private final PIDController drivePID = new PIDController(.27, 0, 0);
   private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(1, 1.5);
@@ -52,13 +47,10 @@ public class SimulatedModule extends PhysicalModule {
   private Voltage turnAppliedVolts;
   private Current turnCurrentAmps;
 
-  public SimulatedModule(ModuleConfig config, SimSwerveModule moduleSimulation) {
-    super(config);
+  public SimulatedModule(SimSwerveModule moduleSimulation) {
     this.moduleSimulation = moduleSimulation;
     turnPID.enableContinuousInput(-Math.PI, Math.PI);
     // moduleSimulation.inputs().drive().statorVoltage()
-    turnSim = new FusedTalonFxSimController(getTurnMotor().getSimState(), getTurnEncoder().getSimState(), GearRatio.reduction(ModuleConstants.TURN_GEAR_RATIO));
-    driveSim =  new TalonFXSimController(getDriveMotor().getSimState(), config.driveReversed());
     drivePosition = moduleSimulation.outputs().drive().position();
     driveVelocity = moduleSimulation.outputs().drive().velocity();
     driveAppliedVolts = moduleSimulation.inputs().drive().statorVoltage();
