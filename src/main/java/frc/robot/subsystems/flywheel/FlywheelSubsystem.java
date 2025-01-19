@@ -1,0 +1,42 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems.flywheel;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
+import java.util.logging.Logger;
+
+public class FlywheelSubsystem extends SubsystemBase {
+  /** Creates a new FlywheelSubsystem. */
+  private FlywheelInterface flywheelInterface;
+
+  private FlywheelInputs inputs = new FlywheelInputs();
+
+  public static void Flywheel() {}
+
+  public double getFlywheelSpeed() {
+    return flywheelInterface.getFlywheelSpeed();
+  }
+
+  public double getVolts() {
+    return flywheelInterface.getVolts();
+  }
+
+  public void setFlywheelSpeed(double speed) {
+    flywheelInterface.setFlywheelSpeed(speed);
+  }
+
+  public void setVolts(double volts) {
+    flywheelInterface.setVolts(volts);
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    flywheelInterface.updateInputs(inputs);
+    Logger.getLogger(FlywheelSubsystem.class.getName())
+        .info("Flywheel/ inputs: " + inputs.toString());
+  }
+}
