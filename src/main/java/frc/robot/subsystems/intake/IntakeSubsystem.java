@@ -4,14 +4,13 @@
 
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
   private IntakeInterface intakeInterface;
   private IntakeInputsAutoLogged inputs = new IntakeInputsAutoLogged();
- 
+
   public IntakeSubsystem(IntakeInterface intakeInterface) {
     this.intakeInterface = intakeInterface;
   }
@@ -19,8 +18,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setIntakeSpeed(double speed) {
     intakeInterface.setIntakeSpeed(speed);
   }
+
   @Override
-  public void periodic(){
+  public void periodic() {
     intakeInterface.updateInputs(inputs);
     Logger.processInputs("IntakeSubsystem/", inputs);
   }

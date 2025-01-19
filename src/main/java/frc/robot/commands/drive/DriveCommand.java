@@ -1,16 +1,11 @@
 package frc.robot.commands.drive;
 
+import com.ctre.phoenix6.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.subsystems.swerve.gyro.GyroInterface;
-import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-
-import com.ctre.phoenix6.swerve.SwerveModule;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 
 // import frc.robot.subsystems.vision.VisionSubsystem;
 

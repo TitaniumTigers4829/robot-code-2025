@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems.elevator;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -10,11 +11,8 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface.ElevatorInputs;
 
@@ -22,8 +20,10 @@ public class PhysicalElevator implements ElevatorInterface {
 
   /** Creates a new ElevatorHardware. */
   private final TalonFX leaderMotor = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID);
+
   private final TalonFX followerMotor = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID);
-  private final Follower followerMotorControl = new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
+  private final Follower followerMotorControl =
+      new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
 
   StatusSignal<Angle> leaderPosition;
   StatusSignal<Angle> followerPosition;
@@ -39,7 +39,7 @@ public class PhysicalElevator implements ElevatorInterface {
     followerMotor.setControl(followerMotorControl);
 
     TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
-    
+
     elevatorConfig.Slot0.kP = ElevatorConstants.ELEVATOR_P;
     elevatorConfig.Slot0.kI = ElevatorConstants.ELEVATOR_I;
     elevatorConfig.Slot0.kD = ElevatorConstants.ELEVATOR_D;
@@ -48,21 +48,28 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Slot0.kA = ElevatorConstants.ELEVATOR_A;
     elevatorConfig.Slot0.kG = ElevatorConstants.ELEVATOR_G;
 
-
     elevatorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     elevatorConfig.CurrentLimits.StatorCurrentLimit = ElevatorConstants.STATOR_CURRENT_LIMIT;
     elevatorConfig.CurrentLimits.SupplyCurrentLimit = ElevatorConstants.SUPPLY_CURRENT_LIMIT;
-    elevatorConfig.CurrentLimits.StatorCurrentLimitEnable = ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
-    elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable = ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
+    elevatorConfig.CurrentLimits.StatorCurrentLimitEnable =
+        ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
+    elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable =
+        ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
 
     elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
     leaderMotor.getConfigurator().apply(elevatorConfig);
     followerMotor.getConfigurator().apply(elevatorConfig);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(HardwareConstants.SIGNAL_FREQUENCY, leaderPosition, leaderAppliedVoltage, followerPosition, followerAppliedVoltage);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.SIGNAL_FREQUENCY,
+        leaderPosition,
+        leaderAppliedVoltage,
+        followerPosition,
+        followerAppliedVoltage);
   }
+
   public void updateInputs(ElevatorInputs inputs) {
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
@@ -73,14 +80,15 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getElevatorPosition() {
     return leaderPosition.getValueAsDouble();
   }
+
   public void setElevatorLevel(int number) {
-    switch(number) {
+    switch (number) {
       case 1:
 
       case 2:
 
       case 3:
-      
+
       case 4:
     }
   }
@@ -98,8 +106,4 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getVolts() {
     return leaderMotor.getMotorVoltage().getValueAsDouble();
   }
-
-  
-
-
 }

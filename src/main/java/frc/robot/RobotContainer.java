@@ -9,11 +9,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
-import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
 import frc.robot.extras.simulation.field.SimulatedField;
-import frc.robot.extras.simulation.mechanismSim.IntakeSimulation.IntakeSide;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
@@ -186,8 +184,7 @@ public class RobotContainer {
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
 
     driverController.a().whileTrue(new Intake(intakeSubsystem));
-    driverController.b().whileTrue(new Eject(intakeSubsystem));  
-
+    driverController.b().whileTrue(new Eject(intakeSubsystem));
 
     // // autodrive
     // Trigger driverAButton = new Trigger(driverController::getAButton);
@@ -221,7 +218,6 @@ public class RobotContainer {
 
     // // driving
 
-    
     // // shooterSubsystem.setDefaultCommand(new FlywheelSpinUpAuto(shooterSubsystem,
     // visionSubsystem));
 

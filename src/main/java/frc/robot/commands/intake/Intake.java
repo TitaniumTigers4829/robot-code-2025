@@ -4,26 +4,26 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
-public class Intake extends Command{
+public class Intake extends Command {
   private final IntakeSubsystem intakeSubsystem;
 
-  public Intake(IntakeSubsystem intakeSubsystem){
+  public Intake(IntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(this.intakeSubsystem);
   }
 
   @Override
-  public void execute(){
+  public void execute() {
     intakeSubsystem.setIntakeSpeed(IntakeConstants.intakeSpeed);
   }
 
   @Override
-  public void end(boolean interrupted){
+  public void end(boolean interrupted) {
     intakeSubsystem.setIntakeSpeed(0);
   }
 
   @Override
-  public boolean isFinished(){
+  public boolean isFinished() {
     return false;
   }
 }
