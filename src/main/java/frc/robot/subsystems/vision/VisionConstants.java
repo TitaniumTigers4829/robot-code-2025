@@ -79,7 +79,8 @@ public final class VisionConstants {
   public static final double MEGA_TAG_2_MAX_HEADING_RATE =
       180; // degrees/s // TODO: This can be tested more
 
-  public static final double MAX_TRANSLATION_DELTA_METERS = 0.5; // Adjust based on expected movement
+  public static final double MAX_TRANSLATION_DELTA_METERS =
+      0.5; // Adjust based on expected movement
   public static final double MAX_ROTATION_DELTA_DEGREES = 20.0; // Adjust based on expected rotation
   public static final double CLOSENESS_THRESHOLD = 0.5; // meters
   public static final double MIN_CONFIDENCE_THRESHOLD = 0.8;

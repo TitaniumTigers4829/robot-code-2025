@@ -8,7 +8,6 @@ import frc.robot.extras.util.GeomUtil;
 import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
-import frc.robot.extras.vision.LimelightHelpers.RawFiducial;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 
@@ -288,11 +287,11 @@ public class PhysicalVision implements VisionInterface {
 
   private boolean isTeleporting(Pose2d newPose) {
     double distance = lastSeenPose.getTranslation().getDistance(newPose.getTranslation());
-    double rotationDifference = Math.abs(
-        lastSeenPose.getRotation().getDegrees() - newPose.getRotation().getDegrees());
+    double rotationDifference =
+        Math.abs(lastSeenPose.getRotation().getDegrees() - newPose.getRotation().getDegrees());
 
-    return distance > VisionConstants.MAX_TRANSLATION_DELTA_METERS ||
-           rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
+    return distance > VisionConstants.MAX_TRANSLATION_DELTA_METERS
+        || rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
   }
 
   private boolean isCloseEnough(Pose2d newPose) {
@@ -301,8 +300,9 @@ public class PhysicalVision implements VisionInterface {
   }
 
   private boolean isConfident(Limelight limelight) {
-    return limelightEstimates[limelight.getId()].ambiguity >= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
-}
+    return limelightEstimates[limelight.getId()].ambiguity
+        >= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
+  }
 
   /**
    * This checks is there is new pose detected by a limelight, and if so, updates the pose estimate
@@ -327,7 +327,8 @@ public class PhysicalVision implements VisionInterface {
 
     if (isLimelightConnected(limelight)) {
       if (isValidPoseEstimate(
-          limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight)) && isValidMeasurement(getPoseFromAprilTags(limelight))) {
+              limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
+          && isValidMeasurement(getPoseFromAprilTags(limelight))) {
         // This checks if the limelight reading is new. The reasoning being that if the TX and TY
         // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
         // because to get the timestamp of the reading, you need to parse the JSON dump which can be
