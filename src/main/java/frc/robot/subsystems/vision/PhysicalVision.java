@@ -31,7 +31,6 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Pose2d[] poses = new Pose2d[Limelight.values().length];
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
@@ -45,9 +44,6 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
-      if (limelightEstimates != null) {
-        poses[limelight.getId()] = limelightEstimates.get(limelight.getId()).fieldToCamera;
-      }
       // Start a vision input task for each Limelight
       threadManager.startTask(
           limelight.getName(),
@@ -284,9 +280,22 @@ public class PhysicalVision implements VisionInterface {
     return false;
   }
 
-  private boolean isValidMeasurement(Pose2d newPose) {
-    return !isTeleporting(newPose) && arePosesWithinThreshold();
+  private boolean isValidMeasurement(Limelight limelight, Pose2d... newPose) {
+    return !isSpecificPoseTeleporting(limelight, newPose) && arePosesWithinThreshold(newPose);
   }
+
+  /**
+ * Checks if a specific pose in the poses array is teleporting.
+ *
+ * @param poseIndex The index of the pose in the poses array.
+ * @return true if the specific pose is teleporting, false otherwise.
+ */
+private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) {
+  if (limelight.getId()  >= 0 && limelight.getId() < Limelight.values().length && poses[limelight.getId()] != null) {
+      return isTeleporting(poses[limelight.getId()]);
+  }
+  return false;  // Return false if the index is out of bounds or pose is null.
+}
 
   private boolean isTeleporting(Pose2d newPose) {
     double distance = odometryPose.getTranslation().getDistance(newPose.getTranslation());
@@ -305,7 +314,7 @@ public class PhysicalVision implements VisionInterface {
  * @param poses Varargs of Pose2d objects from Limelights
  * @return true if all poses are within the thresholds
  */
-public boolean arePosesWithinThreshold() {
+public boolean arePosesWithinThreshold(Pose2d... poses) {
     // Check translations and rotations
     // ARBITRTATATATATRRRY CONSTANTS!
     return GeomUtil.arePosesWithinThreshold(VisionConstants.MAX_TRANSLATION_DELTA_METERS, VisionConstants.MAX_ROTATION_DELTA_DEGREES, poses);
@@ -332,7 +341,7 @@ public boolean arePosesWithinThreshold() {
     if (isLimelightConnected(limelight)) {
       if (isValidPoseEstimate(
               limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
-          && isValidMeasurement(getPoseFromAprilTags(limelight))) {
+          && isValidMeasurement(limelight, getPoseFromAprilTags(limelight))) {
         // This checks if the limelight reading is new. The reasoning being that if the TX and TY
         // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
         // because to get the timestamp of the reading, you need to parse the JSON dump which can be
