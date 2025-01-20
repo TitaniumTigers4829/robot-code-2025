@@ -17,6 +17,8 @@ import org.littletonrobotics.junction.Logger;
  */
 public class VisionSubsystem extends SubsystemBase {
 
+  private Pose2d lastSeenPose = new Pose2d();
+
   private final VisionInterface visionInterface;
   private final VisionInputsAutoLogged inputs = new VisionInputsAutoLogged();
 
@@ -30,6 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
+    // SmartDashboard.putString("limelight estimates", inputs.limelightMegatagPoses.);
   }
 
   /**
@@ -110,6 +113,12 @@ public class VisionSubsystem extends SubsystemBase {
    * @return The last seen pose of the robot.
    */
   public Pose2d getLastSeenPose() {
-    return visionInterface.getLastSeenPose();
+    for (Pose2d pose : inputs.limelightCalculatedPoses) {
+      if (pose != null && !pose.equals(new Pose2d())) {
+        lastSeenPose = pose;
+      }
+    }
+
+    return lastSeenPose;
   }
 }
