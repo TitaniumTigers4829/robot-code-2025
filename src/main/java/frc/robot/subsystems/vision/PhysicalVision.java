@@ -1,20 +1,14 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
 import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
-import frc.robot.extras.vision.LimelightHelpers.LimelightResults;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
-
-import static edu.wpi.first.units.Units.Newton;
-
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -55,15 +49,15 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public void updateInputs(VisionInputs inputs) {
     // Combine inputs into the main inputs object
-      for (Limelight limelight : Limelight.values()) {
-        inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
-        inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
-        inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
-        inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
-        inputs.limelightAprilTagDistances[limelight.getId()] =
-            getLimelightAprilTagDistance(limelight);
-        inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
-        inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
+    for (Limelight limelight : Limelight.values()) {
+      inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
+      inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
+      inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
+      inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
+      inputs.limelightAprilTagDistances[limelight.getId()] =
+          getLimelightAprilTagDistance(limelight);
+      inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
+      inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
     }
   }
 
@@ -108,7 +102,8 @@ public class PhysicalVision implements VisionInterface {
   }
 
   @Override
-  public void setOdometryInfo(double headingDegrees, double headingRateDegrees, Pose2d odometryPose) {
+  public void setOdometryInfo(
+      double headingDegrees, double headingRateDegrees, Pose2d odometryPose) {
     this.headingDegrees = headingDegrees;
     this.headingRateDegreesPerSecond = headingRateDegrees;
     this.odometryPose = odometryPose;
@@ -191,7 +186,7 @@ public class PhysicalVision implements VisionInterface {
             mt1.pose.getTranslation(),
             mt2.pose.getTranslation())
         || !GeomUtil.areRotationsWithinThreshold(
-        VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+            VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
             mt1.pose.getRotation(),
             mt2.pose.getRotation());
   }
@@ -259,7 +254,6 @@ public class PhysicalVision implements VisionInterface {
     return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
-  
   /**
    * Checks if the ID of the April Tag is within the valid range of 1-22. This is here to check if
    * the IDs the limelight sees are within the range of April Tag IDs on the field. If it randomly
@@ -285,17 +279,19 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
- * Checks if a specific pose in the poses array is teleporting.
- *
- * @param poseIndex The index of the pose in the poses array.
- * @return true if the specific pose is teleporting, false otherwise.
- */
-private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) {
-  if (limelight.getId()  >= 0 && limelight.getId() < Limelight.values().length && poses[limelight.getId()] != null) {
+   * Checks if a specific pose in the poses array is teleporting.
+   *
+   * @param poseIndex The index of the pose in the poses array.
+   * @return true if the specific pose is teleporting, false otherwise.
+   */
+  private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) {
+    if (limelight.getId() >= 0
+        && limelight.getId() < Limelight.values().length
+        && poses[limelight.getId()] != null) {
       return isTeleporting(poses[limelight.getId()]);
+    }
+    return false; // Return false if the index is out of bounds or pose is null.
   }
-  return false;  // Return false if the index is out of bounds or pose is null.
-}
 
   private boolean isTeleporting(Pose2d newPose) {
     double distance = odometryPose.getTranslation().getDistance(newPose.getTranslation());
@@ -306,20 +302,22 @@ private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) 
         || rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
   }
 
- /**
- * Checks if all poses provided are close to each other within a certain threshold.
- *
- * @param thresholdMeters The threshold for translation in meters
- * @param thresholdDegrees The threshold for rotation in degrees
- * @param poses Varargs of Pose2d objects from Limelights
- * @return true if all poses are within the thresholds
- */
-public boolean arePosesWithinThreshold(Pose2d... poses) {
+  /**
+   * Checks if all poses provided are close to each other within a certain threshold.
+   *
+   * @param thresholdMeters The threshold for translation in meters
+   * @param thresholdDegrees The threshold for rotation in degrees
+   * @param poses Varargs of Pose2d objects from Limelights
+   * @return true if all poses are within the thresholds
+   */
+  public boolean arePosesWithinThreshold(Pose2d... poses) {
     // Check translations and rotations
     // ARBITRTATATATATRRRY CONSTANTS!
-    return GeomUtil.arePosesWithinThreshold(VisionConstants.MAX_TRANSLATION_DELTA_METERS, VisionConstants.MAX_ROTATION_DELTA_DEGREES, poses);
-}
-
+    return GeomUtil.arePosesWithinThreshold(
+        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
+        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
+        poses);
+  }
 
   private boolean isConfident(Limelight limelight) {
     return limelightEstimates.get(limelight.getId()).ambiguity
@@ -352,7 +350,7 @@ public boolean arePosesWithinThreshold(Pose2d... poses) {
         // ) {
         // isThreadRunning[limelight.getId()].set(true);
         updatePoseEstimate(limelight);
-          }
+      }
       // } else {
       //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
       // }

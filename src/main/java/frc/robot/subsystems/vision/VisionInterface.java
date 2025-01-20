@@ -120,5 +120,6 @@ public interface VisionInterface {
    *     alliance)
    * @param headingRateDegreesPerSecond the rate the robot is rotating, CCW positive
    */
-  default void setOdometryInfo(double headingDegrees, double headingRateDegreesPerSecond, Pose2d odometryPose) {}
+  default void setOdometryInfo(
+      double headingDegrees, double headingRateDegreesPerSecond, Pose2d odometryPose) {}
 }

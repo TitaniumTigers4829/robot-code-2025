@@ -38,7 +38,9 @@ public abstract class DriveCommandBase extends Command {
   public void execute() {
     swerveDrive.addPoseEstimatorSwerveMeasurement();
     vision.setOdometryInfo(
-        swerveDrive.getOdometryRotation2d().getDegrees(), swerveDrive.getGyroRate(), swerveDrive.getEstimatedPose());
+        swerveDrive.getOdometryRotation2d().getDegrees(),
+        swerveDrive.getGyroRate(),
+        swerveDrive.getEstimatedPose());
     calculatePoseFromLimelight(Limelight.BACK);
     calculatePoseFromLimelight(Limelight.FRONT_LEFT);
     calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
