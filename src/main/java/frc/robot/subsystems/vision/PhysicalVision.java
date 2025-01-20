@@ -33,8 +33,6 @@ public class PhysicalVision implements VisionInterface {
       new AtomicReference<>(new VisionInputs());
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
 
-  // private final RawFiducial rawFiducial = new RawFiducial();
-
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
@@ -64,7 +62,6 @@ public class PhysicalVision implements VisionInterface {
         inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
         inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
         inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
-        inputs.limelightMegatagPoses[limelight.getId()] = limelightEstimates[limelight.getId()];
         inputs.limelightAprilTagDistances[limelight.getId()] =
             getLimelightAprilTagDistance(limelight);
         inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);

@@ -130,18 +130,11 @@ public class CompModule implements ModuleInterface {
     inputs.isConnected = BaseStatusSignal.isAllGood(periodicallyRefreshedSignals);
 
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
-
     inputs.drivePosition = drivePosition.getValueAsDouble();
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
-
-    inputs.driveAppliedVolts = driveMotorAppliedVoltage.getValueAsDouble();
-    inputs.driveCurrentAmps = driveMotorCurrent.getValueAsDouble();
-
     inputs.turnVelocity = turnEncoderVelocity.getValueAsDouble();
-    inputs.turnAppliedVolts = turnMotorAppliedVolts.getValueAsDouble();
-    inputs.turnCurrentAmps = turnMotorCurrent.getValueAsDouble();
   }
 
   @Override
