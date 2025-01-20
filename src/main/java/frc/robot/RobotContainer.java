@@ -23,11 +23,10 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
+import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
-import frc.robot.subsystems.swerve.module.PhysicalModule;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
-import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
@@ -53,7 +52,7 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Auto", null);
 
     switch (Constants.CURRENT_MODE) {
-      case REAL -> {
+      case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
 
         /* Disable Simulations */
@@ -64,14 +63,20 @@ public class RobotContainer {
         swerveDrive =
             new SwerveDrive(
                 new PhysicalGyro(),
-                new PhysicalModule(SwerveConstants.moduleConfigs[0]),
-                new PhysicalModule(SwerveConstants.moduleConfigs[1]),
-                new PhysicalModule(SwerveConstants.moduleConfigs[2]),
-                new PhysicalModule(SwerveConstants.moduleConfigs[3]));
+                new CompModule(SwerveConstants.moduleConfigs[0]),
+                new CompModule(SwerveConstants.moduleConfigs[1]),
+                new CompModule(SwerveConstants.moduleConfigs[2]),
+                new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
+      case DEV_ROBOT -> {
+        swerveDrive = new SwerveDrive(null, null, null, null, null);
+        gyroSimulation = null;
+        swerveDriveSimulation = null;
+        visionSubsystem = null;
+      }
 
-      case SIM -> {
+      case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
         SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
         gyroSimulation = new SimGyro(, null);
@@ -107,9 +112,9 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[2]),
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
-        visionSubsystem =
-            new VisionSubsystem(
-                new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
+        visionSubsystem = null;
+        //     new VisionSubsystem(
+        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
 
         SimulatedField.getInstance().resetFieldForAuto();
         resetFieldAndOdometryForAuto(
