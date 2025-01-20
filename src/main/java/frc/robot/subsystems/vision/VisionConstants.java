@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision;
 
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -58,11 +60,11 @@ public final class VisionConstants {
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
-  // public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
-  // public static final PhotonCamera FRONT_LEFT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  // public static final PhotonCamera FRONT_RIGHT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
+  public static final PhotonCamera FRONT_LEFT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_LEFT.getName());
+  public static final PhotonCamera FRONT_RIGHT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_RIGHT.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 

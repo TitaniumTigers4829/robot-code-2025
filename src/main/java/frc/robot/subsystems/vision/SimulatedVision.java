@@ -190,12 +190,7 @@ public class SimulatedVision extends PhysicalVision {
   }
 
   @Override
-  public void setHeadingInfo(double headingDegrees, double headingRateDegrees) {
-    super.setHeadingInfo(headingDegrees, headingRateDegrees);
-  }
-
-  @Override
-  public Pose2d getLastSeenPose() {
-    return lastSeenPose;
+  public void setOdometryInfo(double headingDegrees, double headingRateDegrees, Pose2d odometryPose) {
+    super.setOdometryInfo(headingDegrees, headingRateDegrees, odometryPose);
   }
 }
