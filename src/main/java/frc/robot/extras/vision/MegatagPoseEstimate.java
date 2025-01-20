@@ -47,8 +47,9 @@ public class MegatagPoseEstimate implements StructSerializable {
       rv.latency = bb.getDouble();
       rv.avgTagArea = bb.getDouble();
       rv.fiducialIds = new int[0];
+      rv.ambiguity = bb.getDouble();
       rv.avgTagDist = bb.getDouble();
-      rv.timestampSeconds = bb.getInt();
+      rv.timestampSeconds = bb.getDouble();
       return rv;
     }
 
@@ -73,6 +74,7 @@ public class MegatagPoseEstimate implements StructSerializable {
   public double latency;
   public double avgTagArea;
   public int[] fiducialIds;
+  public double ambiguity;
   public int tagCount;
   public double avgTagDist;
 
@@ -88,8 +90,10 @@ public class MegatagPoseEstimate implements StructSerializable {
     rv.avgTagDist = poseEstimate.avgTagDist;
     rv.tagCount = poseEstimate.tagCount;
     rv.fiducialIds = new int[poseEstimate.rawFiducials.length];
+    rv.ambiguity = 0.0;
     for (int i = 0; i < rv.fiducialIds.length; ++i) {
       rv.fiducialIds[i] = poseEstimate.rawFiducials[i].id;
+      rv.ambiguity = poseEstimate.rawFiducials[i].ambiguity;
     }
 
     return rv;

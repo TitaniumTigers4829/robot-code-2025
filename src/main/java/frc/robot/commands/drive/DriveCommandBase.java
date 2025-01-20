@@ -37,8 +37,10 @@ public abstract class DriveCommandBase extends Command {
   @Override
   public void execute() {
     swerveDrive.addPoseEstimatorSwerveMeasurement();
-    vision.setHeadingInfo(
-        swerveDrive.getEstimatedPose().getRotation().getDegrees(), swerveDrive.getGyroRate());
+    vision.setOdometryInfo(
+        swerveDrive.getOdometryRotation2d().getDegrees(),
+        swerveDrive.getGyroRate(),
+        swerveDrive.getEstimatedPose());
     calculatePoseFromLimelight(Limelight.BACK);
     calculatePoseFromLimelight(Limelight.FRONT_LEFT);
     calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
@@ -78,8 +80,5 @@ public abstract class DriveCommandBase extends Command {
           vision.getPoseFromAprilTags(limelight),
           TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
     }
-    // else {
-    //   swerveDrive.addPoseEstimatorVisionMeasurement(new Pose2d(), TimeUtil.getLogTimeSeconds());
-    // }
   }
 }
