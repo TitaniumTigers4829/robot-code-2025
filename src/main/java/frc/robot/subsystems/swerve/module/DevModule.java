@@ -20,22 +20,10 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import java.util.Queue;
 
-/**
- * PhysicalModule is the class that interfaces with the physical hardware of the swerve module. It
- * has code for controlling the drive and turn motors, as well as reading the current state of the
- * module from its Cancoder.
- *
- * @author Ishan
- * @author Jack
- * @author Ryan
- */
-public class PhysicalModule implements ModuleInterface {
+public class DevModule implements ModuleInterface {
   private final TalonFX driveMotor;
   private final TalonFX turnMotor;
   private final CANcoder turnEncoder;
@@ -44,30 +32,31 @@ public class PhysicalModule implements ModuleInterface {
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
 
-  private final Queue<Angle> drivePosition;
+  private final StatusSignal<Angle> drivePosition;
   private final StatusSignal<AngularVelocity> driveVelocity;
   private final StatusSignal<Voltage> driveMotorAppliedVoltage;
   private final StatusSignal<Current> driveMotorCurrent;
 
-  private final Queue<Angle> turnEncoderAbsolutePosition;
+  private final StatusSignal<Angle> turnEncoderAbsolutePosition;
   private final StatusSignal<AngularVelocity> turnEncoderVelocity;
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
   private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
-  public PhysicalModule(ModuleConfig moduleConfig) {
-    // Initialize the drive and turn motors and the turn encoder
-    driveMotor = new TalonFX(moduleConfig.driveMotorChannel(), DeviceCANBus.CANIVORE.name);
-    turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), DeviceCANBus.CANIVORE.name);
-    turnEncoder = new CANcoder(moduleConfig.turnEncoderChannel(), DeviceCANBus.CANIVORE.name);
+  public DevModule(ModuleConfig moduleConfig) {
+    driveMotor =
+        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+    turnMotor =
+        new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+    turnEncoder =
+        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
 
     CANcoderConfiguration turnEncoderConfig = new CANcoderConfiguration();
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
     turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.TIMEOUT_S);
 
-    // Set the configurations for the drive motor
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
     driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
@@ -77,8 +66,6 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
-    // Setting the deadband is important because it is 4% by default, which is too high for precise
-    // control
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
@@ -87,7 +74,6 @@ public class PhysicalModule implements ModuleInterface {
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.TIMEOUT_S);
 
-    // Set the configurations for the turn motor
     TalonFXConfiguration turnConfig = new TalonFXConfiguration();
     turnConfig.Slot0.kP = ModuleConstants.TURN_P;
     turnConfig.Slot0.kI = ModuleConstants.TURN_I;
@@ -109,24 +95,23 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.TIMEOUT_S);
 
-    // Register the signals for the drive and turn motors. We run these on a separate thread to
-    // because its faster.
-    drivePosition = OdometryThread.registerSignalInput(driveMotor.getPosition());
+    drivePosition = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();
     driveMotorAppliedVoltage = driveMotor.getMotorVoltage();
     driveMotorCurrent = driveMotor.getSupplyCurrent();
 
-    turnEncoderAbsolutePosition =
-        OdometryThread.registerSignalInput(turnEncoder.getAbsolutePosition());
+    turnEncoderAbsolutePosition = turnEncoder.getAbsolutePosition();
     turnEncoderVelocity = turnEncoder.getVelocity();
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
 
     periodicallyRefreshedSignals =
         new BaseStatusSignal[] {
+          drivePosition,
           driveVelocity,
           driveMotorAppliedVoltage,
           driveMotorCurrent,
+          turnEncoderAbsolutePosition,
           turnEncoderVelocity,
           turnMotorAppliedVolts,
           turnMotorCurrent
@@ -135,8 +120,7 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        HardwareConstants.STATUS_SIGNAL_FREQUENCY, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, periodicallyRefreshedSignals);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
@@ -147,25 +131,10 @@ public class PhysicalModule implements ModuleInterface {
 
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
 
-    // Handle drive positions
-    if (!drivePosition.isEmpty()) {
-      Angle driveRelativePosition = Rotations.zero();
-      for (Angle angle : drivePosition) {
-        driveRelativePosition = angle;
-      }
-      inputs.drivePosition = driveRelativePosition.in(Rotations);
-      drivePosition.clear();
-    }
+    inputs.drivePosition = drivePosition.getValueAsDouble();
 
-    // Handle turn absolute positions
-    if (!turnEncoderAbsolutePosition.isEmpty()) {
-      Rotation2d turnPosition = new Rotation2d();
-      for (Angle angle : turnEncoderAbsolutePosition) {
-        turnPosition = Rotation2d.fromRotations(angle.in(Rotations));
-      }
-      inputs.turnAbsolutePosition = turnPosition;
-      turnEncoderAbsolutePosition.clear();
-    }
+    inputs.turnAbsolutePosition =
+        Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
 
     inputs.driveAppliedVolts = driveMotorAppliedVoltage.getValueAsDouble();
     inputs.driveCurrentAmps = driveMotorCurrent.getValueAsDouble();
@@ -198,7 +167,6 @@ public class PhysicalModule implements ModuleInterface {
         mmPositionRequest.withPosition(Rotations.of(desiredState.angle.getRotations())));
   }
 
-  @Override
   public double getTurnRotations() {
     turnEncoder.getAbsolutePosition().refresh();
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
@@ -209,5 +177,11 @@ public class PhysicalModule implements ModuleInterface {
   public void stopModule() {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
+  }
+
+  @Override
+  public void setXStance(double desiredPositionDegrees) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setXStance'");
   }
 }

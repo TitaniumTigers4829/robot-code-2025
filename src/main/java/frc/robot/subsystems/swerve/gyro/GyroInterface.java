@@ -1,6 +1,5 @@
 package frc.robot.subsystems.swerve.gyro;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface GyroInterface {
@@ -10,7 +9,6 @@ public interface GyroInterface {
     public boolean isConnected = false;
 
     public double yawDegrees = 0.0;
-    public Rotation2d yawDegreesRotation2d = new Rotation2d();
     public double yawVelocityDegreesPerSecond = 0.0;
   }
 

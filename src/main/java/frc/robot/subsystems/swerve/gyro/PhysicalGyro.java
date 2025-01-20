@@ -5,35 +5,21 @@ import static edu.wpi.first.units.Units.*;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import java.util.Queue;
 
 public class PhysicalGyro implements GyroInterface {
 
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
-  private final Queue<Angle> yawPositionInput;
 
-  public PhysicalGyro() {
-    yawPositionInput = OdometryThread.registerInput(() -> Degrees.of(gyro.getAngle()));
-  }
+  public PhysicalGyro() {}
 
   @Override
   public void updateInputs(GyroInputs inputs) {
-    // Handle odometry yaw positions
-    if (!yawPositionInput.isEmpty()) {
-      Rotation2d gyroAngle = new Rotation2d();
-      for (Angle yaw : yawPositionInput) {
-        gyroAngle = Rotation2d.fromDegrees(yaw.in(Degrees));
-      }
-      inputs.yawDegrees = gyroAngle.getDegrees();
-      yawPositionInput.clear();
-    }
-
     inputs.isConnected = gyro.isConnected();
-    inputs.yawDegreesRotation2d = gyro.getRotation2d();
+    // These values are negated to make sure CCW is positive for our gyro rotation as is consistent
+    // with the rest of pose estimation. We do this
+    // because sometimes the gyro can be oriented differently, causing the reading to be negative.
     inputs.yawVelocityDegreesPerSecond = -gyro.getRate();
+    inputs.yawDegrees = -gyro.getAngle();
   }
 
   @Override

@@ -13,19 +13,17 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
-import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInputsAutoLogged;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -35,7 +33,6 @@ public class SwerveDrive extends SubsystemBase {
 
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
-  private final OdometryThreadInputsAutoLogged odometryThreadInputs;
   private final SwerveModule[] swerveModules;
 
   private Rotation2d rawGyroRotation;
@@ -55,12 +52,18 @@ public class SwerveDrive extends SubsystemBase {
           0.0);
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
-  private final OdometryThread odometryThread;
-
   private Optional<DriverStation.Alliance> alliance;
 
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
+
+  private final Timer inactiveTimer = new Timer();
+
+  private boolean isMoving; // Tracks if the robot is moving
+
+  private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
+
+  private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
 
   public SwerveDrive(
       GyroInterface gyroIO,
@@ -99,10 +102,6 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_X_POS_TRUST,
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
-
-    this.odometryThread = OdometryThread.createInstance(DeviceCANBus.RIO);
-    this.odometryThreadInputs = new OdometryThreadInputsAutoLogged();
-    this.odometryThread.start();
 
     gyroDisconnectedAlert.set(false);
   }
@@ -191,23 +190,23 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Updates and logs the inputs for the odometry thread, gyro, and swerve modules. */
   private void updateSwerveInputs() {
-    odometryThread.lockOdometry();
-    odometryThread.updateInputs(odometryThreadInputs);
-    Logger.processInputs("Drive/OdometryThread", odometryThreadInputs);
-
     for (SwerveModule module : swerveModules) module.updateOdometryInputs();
 
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
+  }
 
-    odometryThread.unlockOdometry();
+  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
+    return speeds.vxMetersPerSecond == 0
+        && speeds.vyMetersPerSecond == 0
+        && speeds.omegaRadiansPerSecond == 0;
   }
 
   /**
-   * Returns the heading of the robot in degrees from 0 to 360. TODO: make sure this is correct
+   * Returns the heading of the robot in degrees from 0 to 360.
    *
-   * @return The yaw in degrees, Counter-clockwise positive.
+   * @return Value is Counter-clockwise positive.
    */
   public double getHeading() {
     return gyroInputs.yawDegrees;
@@ -313,6 +312,25 @@ public class SwerveDrive extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
       swerveModules[i].setOptimizedDesiredState((desiredStates[i]));
+    }
+  }
+
+  // Check if the robot has been inactive for 3 seconds
+  public boolean isThreeSecsInactive() {
+    if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
+      return true; // 3 seconds of inactivity
+    }
+    return false; // Still moving or not enough time passed
+  }
+
+  public void setXStance() {
+    Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
+    for (int i = 0; i < 4; i++) {
+      swerveHeadings[i] = Rotation2d.fromDegrees(45);
+    }
+    DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].stopModule();
     }
   }
 
