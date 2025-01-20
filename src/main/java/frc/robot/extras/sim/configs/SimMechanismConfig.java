@@ -13,8 +13,8 @@ import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.sim.SimMechanism.Friction;
 import frc.robot.extras.sim.SimMechanism.HardLimits;
 import frc.robot.extras.sim.SimMechanism.MechanismDynamics;
-import frc.robot.extras.sim.utils.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator.IgnoreStructField;
+import frc.robot.extras.util.utils.GearRatio;
 
 public class SimMechanismConfig implements StructSerializable {
     public DCMotor motor;

@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.utils.mathutils;
+package frc.robot.extras.util.utils.mathutils;
 
 import java.util.function.BiFunction;
 

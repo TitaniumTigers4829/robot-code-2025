@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.extras.util.utils.mathutils.MeasureMath.*;
 
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,8 +34,7 @@ import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.utils.GearRatio;
-import static frc.robot.extras.sim.utils.mathutils.MeasureMath.*;
+import frc.robot.extras.util.utils.GearRatio;
 
 public class SimMechanism {
     private static final double kMotorEfficiency = 0.85;

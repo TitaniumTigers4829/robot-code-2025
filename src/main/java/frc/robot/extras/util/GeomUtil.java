@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.sim.utils.geometry.Velocity2d;
+import frc.robot.extras.util.utils.geometry.Velocity2d;
 
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Rotation;

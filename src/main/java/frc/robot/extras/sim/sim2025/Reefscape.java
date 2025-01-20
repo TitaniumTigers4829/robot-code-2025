@@ -14,8 +14,8 @@ import frc.robot.extras.sim.SimArena;
 import frc.robot.extras.sim.SimArena.FieldMap;
 import frc.robot.extras.sim.SimGamePiece.GamePieceTarget;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
-import frc.robot.extras.sim.utils.FieldMirroringUtils;
 import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.utils.FieldMirroringUtils;
 
 import static edu.wpi.first.units.Units.*;
 

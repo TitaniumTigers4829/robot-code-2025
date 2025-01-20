@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.utils;
+package frc.robot.extras.util.utils;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;

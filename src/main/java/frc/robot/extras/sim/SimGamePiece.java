@@ -27,11 +27,11 @@ import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.sim.utils.ProjectileUtil.ProjectileDynamics;
-import frc.robot.extras.sim.utils.RuntimeLog;
-import frc.robot.extras.sim.utils.geometry.Velocity2d;
-import frc.robot.extras.sim.utils.geometry.Velocity3d;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.utils.RuntimeLog;
+import frc.robot.extras.util.utils.ProjectileUtil.ProjectileDynamics;
+import frc.robot.extras.util.utils.geometry.Velocity2d;
+import frc.robot.extras.util.utils.geometry.Velocity3d;
 
 /**
  * A base class used for all gamepieces in the simulation.

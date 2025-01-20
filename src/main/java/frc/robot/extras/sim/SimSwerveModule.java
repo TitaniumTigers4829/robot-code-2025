@@ -18,10 +18,10 @@ import frc.robot.extras.sim.SimMechanism.MechanismInputs;
 import frc.robot.extras.sim.SimMechanism.MechanismOutputs;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
-import frc.robot.extras.sim.utils.RuntimeLog;
-import frc.robot.extras.sim.utils.geometry.Velocity2d;
-import frc.robot.extras.sim.utils.mathutils.MeasureMath;
-import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
+import frc.robot.extras.util.utils.RuntimeLog;
+import frc.robot.extras.util.utils.geometry.Velocity2d;
+import frc.robot.extras.util.utils.mathutils.MeasureMath;
+import frc.robot.extras.util.utils.mathutils.MeasureMath.XY;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;

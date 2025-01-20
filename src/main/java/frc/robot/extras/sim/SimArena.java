@@ -30,11 +30,11 @@ import org.dyn4j.geometry.MassType;
 import org.dyn4j.world.PhysicsWorld;
 import org.dyn4j.world.World;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
-import frc.robot.extras.sim.utils.FrcBody;
-import frc.robot.extras.sim.utils.ProjectileUtil;
-import frc.robot.extras.sim.utils.RuntimeLog;
-import frc.robot.extras.sim.utils.FrcBody.FrcBodySnapshot;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.utils.FrcBody;
+import frc.robot.extras.util.utils.ProjectileUtil;
+import frc.robot.extras.util.utils.RuntimeLog;
+import frc.robot.extras.util.utils.FrcBody.FrcBodySnapshot;
 
 
 public abstract class SimArena {

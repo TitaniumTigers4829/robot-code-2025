@@ -6,8 +6,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
-import frc.robot.extras.sim.utils.FrcBody;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.utils.FrcBody;
 
 import static edu.wpi.first.units.Units.Seconds;
 

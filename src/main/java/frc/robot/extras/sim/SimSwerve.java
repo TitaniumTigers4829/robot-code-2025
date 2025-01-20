@@ -13,12 +13,10 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
-import frc.robot.extras.sim.utils.RuntimeLog;
-import frc.robot.extras.sim.utils.mathutils.MassMath.PhysicsMass;
-import frc.robot.extras.sim.utils.mathutils.MeasureMath;
-import frc.robot.extras.sim.utils.mathutils.MeasureMath.XY;
-
-import static frc.robot.extras.sim.utils.mathutils.MeasureMath.*;
+import frc.robot.extras.util.utils.RuntimeLog;
+import frc.robot.extras.util.utils.mathutils.MeasureMath;
+import frc.robot.extras.util.utils.mathutils.MassMath.PhysicsMass;
+import frc.robot.extras.util.utils.mathutils.MeasureMath.XY;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
@@ -29,6 +27,7 @@ import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static frc.robot.extras.util.utils.mathutils.MeasureMath.*;
 
 import java.util.Arrays;
 

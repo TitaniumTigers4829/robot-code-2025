@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Rectangle2d;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
-import frc.robot.extras.sim.utils.RuntimeLog;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.utils.RuntimeLog;
 
 /**
  * Represents a robot in the sham environment.

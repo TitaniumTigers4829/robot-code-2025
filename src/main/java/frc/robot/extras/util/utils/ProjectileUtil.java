@@ -1,6 +1,6 @@
-package frc.robot.extras.sim.utils;
+package frc.robot.extras.util.utils;
 
-import frc.robot.extras.sim.utils.geometry.Velocity3d;
+import frc.robot.extras.util.utils.geometry.Velocity3d;
 
 public class ProjectileUtil {
 

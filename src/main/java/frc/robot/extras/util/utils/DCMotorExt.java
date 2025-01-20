@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.utils;
+package frc.robot.extras.util.utils;
 
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Amps;
@@ -23,7 +23,7 @@ import edu.wpi.first.units.measure.Power;
 import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.extras.sim.utils.mathutils.MeasureMath;
+import frc.robot.extras.util.utils.mathutils.MeasureMath;
 
 public class DCMotorExt extends DCMotor {
 
