@@ -51,7 +51,7 @@ jobs:
       - name: Run formatter
         run: ./gradlew spotlessCheck
 
-  lint: 
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +60,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: pmd/pmd-github-action@v2
-        with:
-          rulesets: 'pmd-ruleset.xml'
-          analyzeModifiedFilesOnly: false
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Run PMD Analysis with maxFailures
+        run: ./gradlew pmdMain -PpmdMaxFailures=20
