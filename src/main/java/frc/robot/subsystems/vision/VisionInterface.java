@@ -40,12 +40,6 @@ public interface VisionInterface {
 
     /** This array stores the timestamps in seconds of the data from each Limelight. */
     public double[] limelightTimestamps = new double[Limelight.values().length];
-
-    /**
-     * This stores the last seen pose of any Limelight that most recently saw a target. This is
-     * primarily used if a driver wants to reset the robot's pose to what the limelights are seeing.
-     */
-    public Pose2d limelightLastSeenPose = new Pose2d();
   }
 
   /**
@@ -127,14 +121,4 @@ public interface VisionInterface {
    * @param headingRateDegreesPerSecond the rate the robot is rotating, CCW positive
    */
   default void setHeadingInfo(double headingDegrees, double headingRateDegreesPerSecond) {}
-
-  /**
-   * Gets the pose calculated the last time a limelight saw an April Tag, used for resetting the
-   * robot's pose.
-   *
-   * @return The last seen pose of any Limelight that most recently saw a target
-   */
-  default Pose2d getLastSeenPose() {
-    return null;
-  }
 }

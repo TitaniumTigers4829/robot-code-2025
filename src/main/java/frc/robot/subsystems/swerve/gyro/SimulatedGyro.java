@@ -16,7 +16,6 @@ public class SimulatedGyro implements GyroInterface {
   @Override
   public void updateInputs(GyroInputs inputs) {
     inputs.isConnected = true;
-    inputs.yawDegreesRotation2d = gyroSimulation.getGyroReading();
     inputs.yawDegrees = gyroSimulation.getGyroReading().getDegrees();
     inputs.yawVelocityDegreesPerSecond =
         RadiansPerSecond.of(gyroSimulation.getMeasuredAngularVelocityRadPerSec())

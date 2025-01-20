@@ -108,7 +108,7 @@ public class SwerveModule {
 
   /** Returns the current drive position of the module in meters. */
   public double getDrivePositionMeters() {
-    return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.drivePosition;
+    return ModuleConstants.DRIVE_TO_METERS * inputs.drivePosition;
   }
 
   /**
@@ -117,7 +117,7 @@ public class SwerveModule {
    * @return the drive velocity in meters per second
    */
   public double getDriveVelocityMetersPerSec() {
-    return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.driveVelocity;
+    return ModuleConstants.DRIVE_TO_METERS_PER_SECOND * inputs.driveVelocity;
   }
 
   /**
