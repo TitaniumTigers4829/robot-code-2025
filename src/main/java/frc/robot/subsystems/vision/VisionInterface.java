@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -16,10 +15,6 @@ public interface VisionInterface {
   class VisionInputs {
     /** This array stores whether each Limelight is connected to the robot. */
     public boolean[] isLimelightConnected = new boolean[Limelight.values().length];
-
-    /** This array stores MegatagPoseEstimates for each Limelight. */
-    public MegatagPoseEstimate[] limelightMegatagPoses =
-        new MegatagPoseEstimate[Limelight.values().length];
 
     /** This array stores the latencies in seconds of each Limelight. */
     public double[] limelightLatencies = new double[Limelight.values().length];

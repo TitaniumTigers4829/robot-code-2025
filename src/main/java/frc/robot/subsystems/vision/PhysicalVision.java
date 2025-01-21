@@ -338,8 +338,9 @@ public class PhysicalVision implements VisionInterface {
 
     if (isLimelightConnected(limelight)) {
       if (isValidPoseEstimate(
-              limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
-          && isValidMeasurement(limelight, getPoseFromAprilTags(limelight))) {
+          limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
+      // && isValidMeasurement(limelight, getPoseFromAprilTags(limelight))
+      ) {
         // This checks if the limelight reading is new. The reasoning being that if the TX and TY
         // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
         // because to get the timestamp of the reading, you need to parse the JSON dump which can be
@@ -351,9 +352,8 @@ public class PhysicalVision implements VisionInterface {
         // isThreadRunning[limelight.getId()].set(true);
         updatePoseEstimate(limelight);
       }
-      // } else {
-      //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
-      // }
+    } else {
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
 
     // } else {
