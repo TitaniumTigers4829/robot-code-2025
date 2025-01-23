@@ -16,6 +16,6 @@ public class ExampleAuto extends SequentialCommandGroup {
   public ExampleAuto(ExampleSubsystem exampleSubsystem) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(exampleSubsystem.exampleCommand());
+    addCommands(exampleSubsystem.exampleStartEndCommand());
   }
 }
