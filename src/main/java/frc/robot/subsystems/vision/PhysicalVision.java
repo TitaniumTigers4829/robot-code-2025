@@ -33,8 +33,6 @@ public class PhysicalVision implements VisionInterface {
       new AtomicReference<>(new VisionInputs());
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
 
-  // private final RawFiducial rawFiducial = new RawFiducial();
-
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
