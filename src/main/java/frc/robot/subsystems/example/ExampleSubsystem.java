@@ -4,14 +4,16 @@
 
 package frc.robot.subsystems.example;
 
-import java.time.chrono.ThaiBuddhistChronology;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.DoubleSupplier;
 
 public class ExampleSubsystem extends SubsystemBase {
+  private DoubleSupplier DOUBLELOL;
+
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {}
 
@@ -23,57 +25,79 @@ public class ExampleSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void exampleSubsystemFunction() {}
+  private void exampleSubsystemFunction() {}
 
-  public void setExamplePivotAngle(double angle) {
+  private void setExamplePivotAngle(double angle) {
     // normal subsystem stuff
   }
-  public double getExamplePivotAngle() {
+
+  private double getExamplePivotAngle() {
     return 0.0;
   }
- 
- 
+
+  private boolean isAngleSet() {
+    return false;
+  }
+
+  private boolean isGamepieceinRobot() {
+    return false;
+  }
+
+  // Public Command Factory
+  // create these for everything you would need to access from a command
+  // so you don't input values or acces the internals of a subsystem in the commands themselves
   public Command exampleFunctionalCommand() {
     // the command is written here instead of in it's own seperate file.
     // this saves space and makes the code more readable
-    // it's only really good for commands that use 1 subsystem though(manual override commands and
-    // such)
+
     return new FunctionalCommand(
         // does on init
         () -> this.setExamplePivotAngle(0),
         // does on execute
         () -> this.setExamplePivotAngle(1),
         // does when command ends
-        interrupted -> this.setExamplePivotAngle(0), 
+        interrupted -> this.setExamplePivotAngle(0),
         // ends the command when this is true
-        () -> getExamplePivotAngle() >= 0, 
+        () -> getExamplePivotAngle() >= 0,
         // requirements for the command
         this);
-    
-    
   }
 
-  public Command exampleStartEndCommand() {
+  // Shared internal implementation
+  private Command exampleStartEndCommand() {
     // the command is written here instead of in it's own seperate file.
     // this saves space and makes the code more readable
-    // it's only really good for commands that use 1 subsystem though(manual override commands and
-    // such)
+
     return new StartEndCommand(
-        // Sets the pivot to 1 while the command is active(runs on init())
-        () -> this.setExamplePivotAngle(1), 
-        // Sets the pivot to 0 when the command ends(runs on end())
-        () -> this.setExamplePivotAngle(0), 
+        // Sets the pivot to 1 while the command is active
+        () -> this.setExamplePivotAngle(1),
+        // Sets the pivot to 0 when the command ends
+        () -> this.setExamplePivotAngle(0),
         // requirements for the command
         this);
   }
 
-  public Command exampleRunOnceCommand() {
-    // the command is written here instead of in it's own seperate file.
-    // this saves space and makes the code more readable
-    // it's only really good for commands that use 1 subsystem though(manual override commands and
-    // such)
-
-    // runs this one time
-    return this.runOnce(() -> getExamplePivotAngle());
+  // Shared internal implementation
+  private Command exampleRunOnceCommand(double angle) {
+    return this.runOnce(() -> setExamplePivotAngle(angle));
   }
+
+  // Public Command Factory
+  public Command setPivotToScore() {
+    return exampleRunOnceCommand(ExampleConstants.SHOOTER_PIVOT_ANGLE);
+  }
+
+  // Public Command Factory
+  public Command setPivotToAngle(DoubleSupplier angle) {
+    // if you need to pass a value in do it this way
+    return exampleRunOnceCommand(angle.getAsDouble());
+  }
+
+  // this is a trigger
+  // if you need to give information from the subsystem do it like this
+  // must be a boolean
+  public final Trigger isAngleInRightSpot = new Trigger(() -> isAngleSet());
+
+  // another trigger example
+  public final Trigger hasGamepiece = new Trigger(() -> isGamepieceinRobot());
 }
