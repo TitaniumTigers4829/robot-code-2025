@@ -3,7 +3,6 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -93,7 +92,6 @@ public class VisionSubsystem extends SubsystemBase {
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return True if the limelight sees any April Tags, false otherwise.
    */
-  @AutoLogOutput(key = "Vision/Has Targets")
   public boolean canSeeAprilTags(Limelight limelight) {
     return inputs.limelightSeesAprilTags[limelight.getId()];
   }
@@ -121,5 +119,9 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     return lastSeenPose;
+  }
+
+  public boolean isValidMeasurement(Limelight limelight) {
+    return visionInterface.isValidMeasurement(getPoseFromAprilTags(limelight));
   }
 }

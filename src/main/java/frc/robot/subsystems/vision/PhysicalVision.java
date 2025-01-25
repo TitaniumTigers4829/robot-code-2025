@@ -51,13 +51,18 @@ public class PhysicalVision implements VisionInterface {
     // Combine inputs into the main inputs object
     for (Limelight limelight : Limelight.values()) {
       inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
-      inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
-      inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
+
       inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
+
+      inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
+
+      inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
       inputs.limelightAprilTagDistances[limelight.getId()] =
           getLimelightAprilTagDistance(limelight);
-      inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
       inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
+      inputs.limelightAmbiguities[limelight.getId()] = getAmbiguity(limelight);
+
+      inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
     }
   }
 
@@ -99,6 +104,11 @@ public class PhysicalVision implements VisionInterface {
     }
     // To be safe returns a big distance from the april tags if it can't see any
     return Double.MAX_VALUE;
+  }
+
+  @Override
+  public double getAmbiguity(Limelight limelight) {
+    return limelightEstimates.get(limelight.getId()).ambiguity;
   }
 
   @Override
@@ -254,12 +264,16 @@ public class PhysicalVision implements VisionInterface {
     return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
-  private boolean isValidMeasurement(Pose2d measuredVisionPose) {
-    return !isTeleporting(measuredVisionPose);
+  @Override
+  public boolean isValidMeasurement(Pose2d measuredVisionPose) {
+    return !isTeleporting(measuredVisionPose)
+        && arePosesWithinThreshold(measuredVisionPose)
+        && isConfident(null);
   }
 
   private boolean isTeleporting(Pose2d measuredVisionPose) {
-    double distance = odometryPose.getTranslation().getDistance(measuredVisionPose.getTranslation());
+    double distance =
+        odometryPose.getTranslation().getDistance(measuredVisionPose.getTranslation());
     double rotationDifference =
         Math.abs(odometryPose.getRotation().minus(measuredVisionPose.getRotation()).getDegrees());
 
@@ -295,14 +309,11 @@ public class PhysicalVision implements VisionInterface {
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight)) {
       if (isValidPoseEstimate(
-          limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
-      && isValidMeasurement(getPoseFromAprilTags(limelight))
-      ) {
+          limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))) {
         updatePoseEstimate(limelight);
       }
-      else {
-        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-      }
+    } else {
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
 

@@ -25,7 +25,6 @@ public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim frontRightCameraSim;
   private final VisionSystemSim visionSim;
   private final Supplier<Pose2d> robotSimulationPose;
-  private Pose2d lastSeenPose = new Pose2d();
 
   private final int kResWidth = 1280;
   private final int kResHeight = 800;
@@ -149,12 +148,6 @@ public class SimulatedVision extends PhysicalVision {
 
         table.getEntry("tv").setInteger(result.hasTargets() ? 1 : 0);
         table.getEntry("cl").setDouble(result.metadata.getLatencyMillis());
-        lastSeenPose =
-            new Pose2d(
-                result.getMultiTagResult().get().estimatedPose.best.getTranslation().getX(),
-                result.getMultiTagResult().get().estimatedPose.best.getY(),
-                new Rotation2d(
-                    result.getMultiTagResult().get().estimatedPose.best.getRotation().getAngle()));
       }
     }
   }
