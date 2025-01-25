@@ -15,7 +15,7 @@ public final class Constants {
     public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
   }
 
-  public static final RobotType CURRENT_MODE = RobotType.SIM_ROBOT;
+  public static final RobotType CURRENT_MODE = RobotType.DEV_ROBOT;
 
   public static enum RobotType {
     /** Running on a real robot. */
@@ -40,7 +40,7 @@ public final class Constants {
 
     public static final double STATUS_SIGNAL_FREQUENCY = 50;
 
-    public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
+    public static final String CANIVORE_CAN_BUS_STRING = "rio";
     public static final String RIO_CAN_BUS_STRING = "rio";
 
     /**

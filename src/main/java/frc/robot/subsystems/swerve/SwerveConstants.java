@@ -34,20 +34,20 @@ public class SwerveConstants {
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
-    public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 22;
-    public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 24;
+    public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 6;
+    public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 18;
     public static final int REAR_LEFT_DRIVE_MOTOR_ID = 23;
-    public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 21;
+    public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 4;
 
-    public static final int FRONT_LEFT_TURN_MOTOR_ID = 5;
-    public static final int FRONT_RIGHT_TURN_MOTOR_ID = 6;
-    public static final int REAR_LEFT_TURN_MOTOR_ID = 8;
-    public static final int REAR_RIGHT_TURN_MOTOR_ID = 7;
+    public static final int FRONT_LEFT_TURN_MOTOR_ID = 7;
+    public static final int FRONT_RIGHT_TURN_MOTOR_ID = 1;
+    public static final int REAR_LEFT_TURN_MOTOR_ID = 25;
+    public static final int REAR_RIGHT_TURN_MOTOR_ID = 3;
 
-    public static final int FRONT_LEFT_CANCODER_ID = 14;
-    public static final int FRONT_RIGHT_CANCODER_ID = 12;
+    public static final int FRONT_LEFT_CANCODER_ID = 33;
+    public static final int FRONT_RIGHT_CANCODER_ID = 0;
     public static final int REAR_LEFT_CANCODER_ID = 11;
-    public static final int REAR_RIGHT_CANCODER_ID = 13;
+    public static final int REAR_RIGHT_CANCODER_ID = 12;
 
     public static final double FRONT_LEFT_ZERO_ANGLE = 0.137939453125;
     public static final double FRONT_RIGHT_ZERO_ANGLE = -0.420654296875;
@@ -178,7 +178,43 @@ public class SwerveConstants {
         new Constraints(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2);
   }
 
-  public static final ModuleConfig[] moduleConfigs =
+  public static final ModuleConfig[] compModuleConfigs =
+      new ModuleConfig[] {
+        new ModuleConfig(
+            DriveConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
+            DriveConstants.FRONT_LEFT_TURN_MOTOR_ID,
+            DriveConstants.FRONT_LEFT_CANCODER_ID,
+            DriveConstants.FRONT_LEFT_ZERO_ANGLE,
+            DriveConstants.FRONT_LEFT_CANCODER_REVERSED,
+            DriveConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
+            DriveConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DriveConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
+            DriveConstants.FRONT_RIGHT_TURN_MOTOR_ID,
+            DriveConstants.FRONT_RIGHT_CANCODER_ID,
+            DriveConstants.FRONT_RIGHT_ZERO_ANGLE,
+            DriveConstants.FRONT_RIGHT_CANCODER_REVERSED,
+            DriveConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
+            DriveConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DriveConstants.REAR_LEFT_DRIVE_MOTOR_ID,
+            DriveConstants.REAR_LEFT_TURN_MOTOR_ID,
+            DriveConstants.REAR_LEFT_CANCODER_ID,
+            DriveConstants.REAR_LEFT_ZERO_ANGLE,
+            DriveConstants.REAR_LEFT_CANCODER_REVERSED,
+            DriveConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
+            DriveConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DriveConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
+            DriveConstants.REAR_RIGHT_TURN_MOTOR_ID,
+            DriveConstants.REAR_RIGHT_CANCODER_ID,
+            DriveConstants.REAR_RIGHT_ZERO_ANGLE,
+            DriveConstants.REAR_RIGHT_CANCODER_REVERSED,
+            DriveConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
+            DriveConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
+      };
+
+  public static final ModuleConfig[] devModuleConfigs =
       new ModuleConfig[] {
         new ModuleConfig(
             DriveConstants.FRONT_LEFT_DRIVE_MOTOR_ID,

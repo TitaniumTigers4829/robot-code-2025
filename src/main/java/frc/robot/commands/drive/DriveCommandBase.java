@@ -37,11 +37,11 @@ public abstract class DriveCommandBase extends Command {
   @Override
   public void execute() {
     swerveDrive.addPoseEstimatorSwerveMeasurement();
-    vision.setHeadingInfo(
+    /*vision.setHeadingInfo(
         swerveDrive.getEstimatedPose().getRotation().getDegrees(), swerveDrive.getGyroRate());
     addLimelightVisionMeasurement(Limelight.BACK);
     addLimelightVisionMeasurement(Limelight.FRONT_LEFT);
-    addLimelightVisionMeasurement(Limelight.FRONT_RIGHT);
+    addLimelightVisionMeasurement(Limelight.FRONT_RIGHT); */
   }
 
   /**

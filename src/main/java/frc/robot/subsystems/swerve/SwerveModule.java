@@ -139,5 +139,7 @@ public class SwerveModule {
    * This is called in the periodic method of the SwerveDrive. It is used to update module values
    * periodically
    */
-  public void periodic() {}
+  public void periodic() {
+    // SmartDashboard.putNumber(robo, getCharacterizationVelocity())
+  }
 }

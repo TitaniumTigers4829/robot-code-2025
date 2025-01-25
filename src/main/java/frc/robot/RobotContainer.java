@@ -64,17 +64,21 @@ public class RobotContainer {
         swerveDrive =
             new SwerveDrive(
                 new PhysicalGyro(),
-                new CompModule(SwerveConstants.moduleConfigs[0]),
-                new CompModule(SwerveConstants.moduleConfigs[1]),
-                new CompModule(SwerveConstants.moduleConfigs[2]),
-                new CompModule(SwerveConstants.moduleConfigs[3]));
+                new CompModule(SwerveConstants.compModuleConfigs[0]),
+                new CompModule(SwerveConstants.compModuleConfigs[1]),
+                new CompModule(SwerveConstants.compModuleConfigs[2]),
+                new CompModule(SwerveConstants.compModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
       case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
-        gyroSimulation = null;
-        swerveDriveSimulation = null;
-        visionSubsystem = null;
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new CompModule(SwerveConstants.devModuleConfigs[0]),
+                new CompModule(SwerveConstants.devModuleConfigs[1]),
+                new CompModule(SwerveConstants.devModuleConfigs[2]),
+                new CompModule(SwerveConstants.devModuleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
 
       case SIM_ROBOT -> {
