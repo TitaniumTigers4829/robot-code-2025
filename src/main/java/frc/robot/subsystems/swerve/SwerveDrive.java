@@ -2,7 +2,9 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,6 +24,7 @@ import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
@@ -38,6 +41,21 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInputsAutoLogged gyroInputs;
   private final OdometryThreadInputsAutoLogged odometryThreadInputs;
   private final SwerveModule[] swerveModules;
+  private final PIDController xController =
+      new PIDController(
+          TrajectoryConstants.AUTO_TRANSLATION_P,
+          TrajectoryConstants.AUTO_TRANSLATION_I,
+          TrajectoryConstants.AUTO_TRANSLATION_D);
+  private final PIDController yController =
+      new PIDController(
+          TrajectoryConstants.AUTO_TRANSLATION_P,
+          TrajectoryConstants.AUTO_TRANSLATION_I,
+          TrajectoryConstants.AUTO_TRANSLATION_D);
+  private final PIDController headingController =
+      new PIDController(
+          TrajectoryConstants.AUTO_THETA_P,
+          TrajectoryConstants.AUTO_THETA_I,
+          TrajectoryConstants.AUTO_THETA_D);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -212,6 +230,20 @@ public class SwerveDrive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
 
     odometryThread.unlockOdometry();
+  }
+
+  /**
+   * follow Trajectory
+   *
+   * @param sample trajectory
+   */
+  public void followTrajectory(SwerveSample sample) {
+    Pose2d pose = getEstimatedPose();
+    double moveX = sample.vx + xController.calculate(pose.getX(), sample.x);
+    double moveY = sample.vy + yController.calculate(pose.getY(), sample.y);
+    double moveTheta =
+        sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
+    drive(moveX, moveY, moveTheta, true);
   }
 
   /** Runs the SwerveModules periodic methods */

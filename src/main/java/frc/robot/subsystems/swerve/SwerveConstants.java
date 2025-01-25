@@ -145,8 +145,10 @@ public class SwerveConstants {
     public static final double MAX_ACCELERATION = 3;
 
     public static final double AUTO_TRANSLATION_P = 1.5; // 1.7
+    public static final double AUTO_TRANSLATION_I = 0;
     public static final double AUTO_TRANSLATION_D = 0.2;
     public static final double AUTO_THETA_P = 4.5; // 5
+    public static final double AUTO_THETA_I = 0; // 5
     public static final double AUTO_THETA_D = 0.4;
 
     public static final double AUTO_SHOOT_HEADING_OFFSET = 2;

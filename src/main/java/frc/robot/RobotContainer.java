@@ -1,10 +1,11 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -46,11 +47,10 @@ public class RobotContainer {
   private final SwerveDriveSimulation swerveDriveSimulation;
   private final GyroSimulation gyroSimulation;
 
-  private final SendableChooser<Command> autoChooser;
+  private AutoFactory autoFactory;
+  public AutoChooser autoChooser;
 
   public RobotContainer() {
-    autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("Auto", null);
 
     switch (Constants.CURRENT_MODE) {
       case COMP_ROBOT -> {
@@ -208,16 +208,16 @@ public class RobotContainer {
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
   }
 
-  public Command getAutonomousCommand() {
-    // Resets the pose factoring in the robot side
-    // This is just a failsafe, pose should be reset at the beginning of auto
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    return autoChooser.getSelected();
-  }
+  // public Command getAutonomousCommand() {
+  //   // Resets the pose factoring in the robot side
+  //   // This is just a failsafe, pose should be reset at the beginning of auto
+  //   swerveDrive.resetEstimatedPose(
+  //       new Pose2d(
+  //           swerveDrive.getEstimatedPose().getX(),
+  //           swerveDrive.getEstimatedPose().getY(),
+  //           Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+  //   return autoChooser.getSelected();
+  // }
 
   public void updateFieldSimAndDisplay() {
     if (swerveDriveSimulation == null) return;

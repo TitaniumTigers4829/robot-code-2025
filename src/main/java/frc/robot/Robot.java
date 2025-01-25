@@ -1,8 +1,17 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.extras.simulation.field.SimulatedField;
+import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.subsystems.example.ExampleSubsystem;
+import frc.robot.subsystems.swerve.SwerveDrive;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -17,8 +26,12 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
+  private RobotContainer robotContainer;
+
+  private ExampleSubsystem exampleSubsystem;
+  private SwerveDrive swerveDrive;
+  private AutoFactory autoFactory;
+  public AutoChooser autoChooser;
 
   public Robot() {
     // Record metadata
@@ -68,8 +81,59 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
+
+    exampleSubsystem = new ExampleSubsystem();
+
+    // this sets up the auto factory
+    autoFactory =
+        new AutoFactory(
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            // provided Pose2d
+            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            swerveDrive); // The drive subsystem
+
+    // this will put our autonomous chooser on the dashboard.
+    autoChooser = new AutoChooser();
+    autoChooser.addRoutine("Example routine", this::exampleAutoRoutine);
+    SmartDashboard.putData(autoChooser);
+    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
+  }
+
+  private AutoRoutine exampleAutoRoutine() {
+
+    AutoRoutine routine = autoFactory.newRoutine("exampleAutoRoutine");
+
+    AutoTrajectory startToETraj = routine.trajectory("startToE");
+    AutoTrajectory eToPickupTraj = routine.trajectory("eToPickup");
+    AutoTrajectory cToPickupTraj = routine.trajectory("cToPickup");
+    AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
+
+    // reset odometry and start first trajectory
+    routine.active().onTrue(Commands.sequence(startToETraj.resetOdometry(), startToETraj.cmd()));
+
+    startToETraj
+        .active()
+        .onTrue(
+            exampleSubsystem
+                .exampleFunctionalCommand()); // TODO: replace with elevator to L4 command
+    startToETraj
+        .atTime("score")
+        .onTrue(
+            exampleSubsystem.exampleFunctionalCommand()); // TODO: replace with command for rollers
+    startToETraj
+        .done()
+        .onTrue(
+            eToPickupTraj
+                .cmd()
+                .alongWith(
+                    exampleSubsystem
+                        .exampleFunctionalCommand())); // TODO: replace with elevator to intake
+    // command
+
+    return routine;
   }
 
   /** This function is called periodically during all modes. */
@@ -98,17 +162,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-  }
-
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
@@ -120,11 +173,8 @@ public class Robot extends LoggedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
 
-    m_robotContainer.teleopInit();
+    robotContainer.teleopInit();
   }
 
   /** This function is called periodically during operator control. */
@@ -150,6 +200,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedField.getInstance().simulationPeriodic();
-    m_robotContainer.updateFieldSimAndDisplay();
+    robotContainer.updateFieldSimAndDisplay();
   }
 }
