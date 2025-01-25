@@ -135,10 +135,10 @@ public interface VisionInterface {
 
   /***
    * Checks if the measurement from the limelight is valid
-   * @param measuredVisionPose the pose estimate to check
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return true if the measurement is valid, false otherwise
    */
-  default boolean isValidMeasurement(Pose2d measuredVisionPose) {
+  default boolean isValidMeasurement(Limelight limelight) {
     return false;
   }
 }

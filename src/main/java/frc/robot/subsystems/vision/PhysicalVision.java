@@ -128,13 +128,6 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    // if (!canSeeAprilTags(limelight)) {
-    //   limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
-    // } else {
-    // if (canSeeAprilTags(limelight)) {
-    // limelightEstimates[limelight.getId()] = new MegatagPoseEstimate();
-
-    // && isValidPoseEstimate(limelight, megatag1Estimate, megatag2Estimate)) {
     // if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
     //     && getLimelightAprilTagDistance(limelight)
     //         < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
@@ -265,36 +258,19 @@ public class PhysicalVision implements VisionInterface {
   }
 
   @Override
-  public boolean isValidMeasurement(Pose2d measuredVisionPose) {
-    return !isTeleporting(measuredVisionPose)
-        && arePosesWithinThreshold(measuredVisionPose)
-        && isConfident(null);
+  public boolean isValidMeasurement(Limelight limelight) {
+    return !isTeleporting(limelight)
+        && isConfident(limelight);
   }
 
-  private boolean isTeleporting(Pose2d measuredVisionPose) {
-    double distance =
-        odometryPose.getTranslation().getDistance(measuredVisionPose.getTranslation());
-    double rotationDifference =
-        Math.abs(odometryPose.getRotation().minus(measuredVisionPose.getRotation()).getDegrees());
-
-    return distance > VisionConstants.MAX_TRANSLATION_DELTA_METERS
-        || rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
-  }
-
-  /**
-   * Checks if all poses provided are close to each other within a certain threshold.
-   *
-   * @param poses Varargs of Pose2d objects from Limelights
-   * @return true if all poses are within the thresholds
-   */
-  public boolean arePosesWithinThreshold(Pose2d... poses) {
-    // Check translations and rotations
-    // ARBITRTATATATATRRRY CONSTANTS!
+  private boolean isTeleporting(Limelight limelight) {
     return GeomUtil.arePosesWithinThreshold(
-        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
-        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        poses);
+      VisionConstants.MAX_TRANSLATION_DELTA_METERS,
+      VisionConstants.MAX_ROTATION_DELTA_DEGREES,
+      getPoseFromAprilTags(limelight)
+    );
   }
+
 
   private boolean isConfident(Limelight limelight) {
     return limelightEstimates.get(limelight.getId()).ambiguity
