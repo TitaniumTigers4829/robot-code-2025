@@ -122,6 +122,6 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   public boolean isValidMeasurement(Limelight limelight) {
-    return visionInterface.isValidMeasurement(getPoseFromAprilTags(limelight));
+    return visionInterface.isValidMeasurement(limelight);
   }
 }
