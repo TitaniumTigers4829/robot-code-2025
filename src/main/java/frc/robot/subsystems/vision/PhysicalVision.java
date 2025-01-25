@@ -258,10 +258,10 @@ public class PhysicalVision implements VisionInterface {
     return !isTeleporting(measuredVisionPose);
   }
 
-  private boolean isTeleporting(Pose2d newPose) {
-    double distance = odometryPose.getTranslation().getDistance(newPose.getTranslation());
+  private boolean isTeleporting(Pose2d measuredVisionPose) {
+    double distance = odometryPose.getTranslation().getDistance(measuredVisionPose.getTranslation());
     double rotationDifference =
-        Math.abs(odometryPose.getRotation().minus(newPose.getRotation()).getDegrees());
+        Math.abs(odometryPose.getRotation().minus(measuredVisionPose.getRotation()).getDegrees());
 
     return distance > VisionConstants.MAX_TRANSLATION_DELTA_METERS
         || rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
@@ -293,42 +293,17 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void checkAndUpdatePose(Limelight limelight) {
-    // double last_TX = 0;
-    // double last_TY = 0;
-
-    // double current_TX = LimelightHelpers.getTX(limelight.getName());
-    // double current_TY = LimelightHelpers.getTY(limelight.getName());
-
     if (isLimelightConnected(limelight)) {
       if (isValidPoseEstimate(
           limelight, getMegaTag1PoseEstimate(limelight), getMegaTag2PoseEstimate(limelight))
-      // && isValidMeasurement(limelight, getPoseFromAprilTags(limelight))
+      && isValidMeasurement(getPoseFromAprilTags(limelight))
       ) {
-        // This checks if the limelight reading is new. The reasoning being that if the TX and TY
-        // are EXACTLY the same, it hasn't updated yet with a new reading. We are doing it this way,
-        // because to get the timestamp of the reading, you need to parse the JSON dump which can be
-        // very demanding whereas this only has to get the Network Table entries for TX and TY.
-        // if (current_TX != last_TX || current_TY != last_TY
-        // idk where to put this \/ thoughts?
-        // && isLimelightConnected(limelight)
-        // ) {
-        // isThreadRunning[limelight.getId()].set(true);
         updatePoseEstimate(limelight);
       }
-    } else {
-      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      else {
+        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      }
     }
-
-    // } else {
-    // // Only stop the thread if it's currently running
-    // if (isThreadRunning[limelight.getId()].get()) {
-    //   // stop the thread for the specified limelight
-    //   stopLimelightThread(limelight);
-    // }
-    // }
-
-    // last_TX = current_TX;
-    // last_TY = current_TY;
   }
 
   /**
