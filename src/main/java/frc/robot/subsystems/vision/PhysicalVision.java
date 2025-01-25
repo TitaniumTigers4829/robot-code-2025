@@ -66,7 +66,7 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    if (isValidID(limelight, getNumberOfAprilTags(limelight))) {
+    if (getNumberOfAprilTags(limelight) > 0) {
       return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
@@ -254,26 +254,6 @@ public class PhysicalVision implements VisionInterface {
     return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
-  /**
-   * Checks if the ID of the April Tag is within the valid range of 1-22. This is here to check if
-   * the IDs the limelight sees are within the range of April Tag IDs on the field. If it randomly
-   * sees another April Tag outside of these bounds for whatever reason, the limelight will crash
-   * the code, which we don't want.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @param numberOfAprilTags The number of April Tags detected by the specified Limelight
-   * @return True if the ID of the April Tag is within the valid range, false otherwise
-   */
-  private boolean isValidID(Limelight limelight, int numberOfAprilTags) {
-    if (getNumberOfAprilTags(limelight) > 0) {
-      return limelightEstimates.get(limelight.getId()).fiducialIds[numberOfAprilTags - 1]
-              >= VisionConstants.MIN_APRIL_TAG_ID
-          && limelightEstimates.get(limelight.getId()).fiducialIds[numberOfAprilTags - 1]
-              <= VisionConstants.MAX_APRIL_TAG_ID;
-    }
-    return false;
-  }
-
   private boolean isValidMeasurement(Limelight limelight, Pose2d... newPose) {
     return !isSpecificPoseTeleporting(limelight, newPose) && arePosesWithinThreshold(newPose);
   }
@@ -281,7 +261,6 @@ public class PhysicalVision implements VisionInterface {
   /**
    * Checks if a specific pose in the poses array is teleporting.
    *
-   * @param poseIndex The index of the pose in the poses array.
    * @return true if the specific pose is teleporting, false otherwise.
    */
   private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) {
@@ -305,8 +284,6 @@ public class PhysicalVision implements VisionInterface {
   /**
    * Checks if all poses provided are close to each other within a certain threshold.
    *
-   * @param thresholdMeters The threshold for translation in meters
-   * @param thresholdDegrees The threshold for rotation in degrees
    * @param poses Varargs of Pose2d objects from Limelights
    * @return true if all poses are within the thresholds
    */
