@@ -30,7 +30,7 @@ public interface VisionInterface {
     /** This array stores the timestamps in seconds of the data from each Limelight. */
     public double[] limelightTimestamps = new double[Limelight.values().length];
 
-    /** This array stores the ambiguities of the Limelight's pose calculation. */
+    /** This array stores the ambiguities from 0 to 1 of the Limelight's pose calculation. */
     public double[] limelightAmbiguities = new double[Limelight.values().length];
 
     /** This array stores the latencies in seconds of each Limelight. */
