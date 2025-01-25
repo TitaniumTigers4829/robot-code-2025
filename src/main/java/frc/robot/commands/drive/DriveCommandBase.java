@@ -57,34 +57,34 @@ public abstract class DriveCommandBase extends Command {
   public void calculatePoseFromLimelight(Limelight limelight) {
     // Only do pose calculation if we can see the april tags
     if (vision.canSeeAprilTags(limelight)) {
-        // Only do pose calculation if the measurement from the limelight is valid
-        double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelight);
+      // Only do pose calculation if the measurement from the limelight is valid
+      double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelight);
 
-        // Depending on how many april tags we see, we change our confidence as more april tags
-        // results in a much more accurate pose estimate
-        // So if we only see 1 april tag, we have *high* standard deviations -> lower confidence
-        if (vision.getNumberOfAprilTags(limelight) == 1) {
-          // But then we use the lookup table here to account for how far away the robot is from the
-          // april tag
-          // because if we are closer to the april tag, we are more confident in our position ->
-          // lower
-          // standard deviation
-          double[] standardDeviations =
-              oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
-          swerveDrive.setPoseEstimatorVisionConfidence(
-              standardDeviations[0], standardDeviations[1], standardDeviations[2]);
-        } else if (vision.getNumberOfAprilTags(limelight) > 1) {
-          double[] standardDeviations =
-              twoAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
-          swerveDrive.setPoseEstimatorVisionConfidence(
-              standardDeviations[0], standardDeviations[1], standardDeviations[2]);
-        }
-        // }
-        // Adds the timestamped pose gotten from the limelights to our pose estimation
-        swerveDrive.addPoseEstimatorVisionMeasurement(
-            vision.getPoseFromAprilTags(limelight),
-            TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
-      } 
-    // }
+      // Depending on how many april tags we see, we change our confidence as more april tags
+      // results in a much more accurate pose estimate
+      // So if we only see 1 april tag, we have *high* standard deviations -> lower confidence
+      if (vision.getNumberOfAprilTags(limelight) == 1) {
+        // But then we use the lookup table here to account for how far away the robot is from the
+        // april tag
+        // because if we are closer to the april tag, we are more confident in our position ->
+        // lower
+        // standard deviation
+        double[] standardDeviations =
+            oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
+        swerveDrive.setPoseEstimatorVisionConfidence(
+            standardDeviations[0], standardDeviations[1], standardDeviations[2]);
+      } else if (vision.getNumberOfAprilTags(limelight) > 1) {
+        double[] standardDeviations =
+            twoAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
+        swerveDrive.setPoseEstimatorVisionConfidence(
+            standardDeviations[0], standardDeviations[1], standardDeviations[2]);
+      }
+      // }
+      // Adds the timestamped pose gotten from the limelights to our pose estimation
+      swerveDrive.addPoseEstimatorVisionMeasurement(
+          vision.getPoseFromAprilTags(limelight),
+          TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
+      // }
+    }
   }
 }

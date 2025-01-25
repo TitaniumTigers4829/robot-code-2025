@@ -138,8 +138,6 @@ public class PhysicalVision implements VisionInterface {
     } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
-    } else {
-      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
 
@@ -285,8 +283,6 @@ public class PhysicalVision implements VisionInterface {
       } else {
         limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
       }
-    } else {
-      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
 
