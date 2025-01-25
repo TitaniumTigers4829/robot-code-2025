@@ -79,7 +79,8 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public Pose2d getPoseFromAprilTags(Limelight limelight) {
-    return limelightEstimates.get(limelight.getId()).fieldToCamera;
+    Pose2d currentPose = limelightEstimates.get(limelight.getId()).fieldToCamera;
+    return currentPose != null ? currentPose : odometryPose;
   }
 
   @Override
@@ -128,25 +129,16 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    if (canSeeAprilTags(limelight)) {
-      // if (isLargeDiscrepancyBetweenMegaTag1And2(limelight, megatag1Estimate, megatag2Estimate)
-      //     && getLimelightAprilTagDistance(limelight)
-      //         < VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD) {
-      //   limelightEstimates[limelight.getId()] =
-      // MegatagPoseEstimate.fromLimelight(megatag1Estimate);
-
-      // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE) {
-      //   LimelightHelpers.SetRobotOrientation(
-      //       limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-      //   limelightEstimates.set(
-      //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-      // } else {
+    if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+        && isWithinFieldBounds(megatag2Estimate.pose)) {
+      LimelightHelpers.SetRobotOrientation(
+          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+      limelightEstimates.set(
+          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
-    }
-    // }
-    // }
-    else {
+    } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
@@ -237,7 +229,7 @@ public class PhysicalVision implements VisionInterface {
    * @param megaTag2Estimate the MT2 pose estimate to check
    */
   private boolean isWithinFieldBounds(Pose2d poseEstimate) {
-    return ((poseEstimate.getX() > 0 && poseEstimate.getX() <= FieldConstants.FIELD_WIDTH_METERS)
+    return ((poseEstimate.getX() > 0 && poseEstimate.getX() <= FieldConstants.FIELD_LENGTH_METERS)
         && (poseEstimate.getY() > 0 && poseEstimate.getY() <= FieldConstants.FIELD_WIDTH_METERS));
   }
 
@@ -253,7 +245,8 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return !isTeleporting(limelight);
+    return isValidPoseEstimate(limelight);
+    // !isTeleporting(limelight);.
     //  && isConfident(limelight);
   }
 
@@ -287,12 +280,14 @@ public class PhysicalVision implements VisionInterface {
    */
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight)) {
-      updatePoseEstimate(limelight);
+      if (canSeeAprilTags(limelight)) {
+        updatePoseEstimate(limelight);
+      } else {
+        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      }
+    } else {
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
-    // else {
-    //   limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-    // }
-    // }
   }
 
   /**
