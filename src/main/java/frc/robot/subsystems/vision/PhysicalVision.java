@@ -254,28 +254,14 @@ public class PhysicalVision implements VisionInterface {
     return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
-  private boolean isValidMeasurement(Limelight limelight, Pose2d... newPose) {
-    return !isSpecificPoseTeleporting(limelight, newPose) && arePosesWithinThreshold(newPose);
-  }
-
-  /**
-   * Checks if a specific pose in the poses array is teleporting.
-   *
-   * @return true if the specific pose is teleporting, false otherwise.
-   */
-  private boolean isSpecificPoseTeleporting(Limelight limelight, Pose2d... poses) {
-    if (limelight.getId() >= 0
-        && limelight.getId() < Limelight.values().length
-        && poses[limelight.getId()] != null) {
-      return isTeleporting(poses[limelight.getId()]);
-    }
-    return false; // Return false if the index is out of bounds or pose is null.
+  private boolean isValidMeasurement(Pose2d measuredVisionPose) {
+    return !isTeleporting(measuredVisionPose);
   }
 
   private boolean isTeleporting(Pose2d newPose) {
     double distance = odometryPose.getTranslation().getDistance(newPose.getTranslation());
     double rotationDifference =
-        Math.abs(odometryPose.getRotation().getDegrees() - newPose.getRotation().getDegrees());
+        Math.abs(odometryPose.getRotation().minus(newPose.getRotation()).getDegrees());
 
     return distance > VisionConstants.MAX_TRANSLATION_DELTA_METERS
         || rotationDifference > VisionConstants.MAX_ROTATION_DELTA_DEGREES;
