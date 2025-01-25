@@ -278,12 +278,12 @@ public class PhysicalVision implements VisionInterface {
    */
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight)) {
-      if (canSeeAprilTags(limelight)) {
-        updatePoseEstimate(limelight);
-      } else {
-        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-      }
+      updatePoseEstimate(limelight);
     }
+    // else {
+    //   limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+    // }
+    // }
   }
 
   /**
