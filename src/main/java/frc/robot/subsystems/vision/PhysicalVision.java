@@ -1,6 +1,8 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
@@ -9,7 +11,10 @@ import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
+
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.stream.Collectors;
 
 /**
  * This class is the implementation of the VisionInterface for the physical robot. It uses the
@@ -263,6 +268,12 @@ public class PhysicalVision implements VisionInterface {
         && isConfident(limelight);
   }
 
+  /**
+   * Checks if the robot is teleporting based on the pose estimate from the limelight
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the robot is teleporting, false otherwise
+   */
   private boolean isTeleporting(Limelight limelight) {
     return GeomUtil.arePosesWithinThreshold(
       VisionConstants.MAX_TRANSLATION_DELTA_METERS,
@@ -271,7 +282,12 @@ public class PhysicalVision implements VisionInterface {
     );
   }
 
-
+  /**
+   * Checks if the limelight is confident in its pose estimate
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the limelight is confident in its pose estimate, false otherwise
+   */
   private boolean isConfident(Limelight limelight) {
     return limelightEstimates.get(limelight.getId()).ambiguity
         >= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
