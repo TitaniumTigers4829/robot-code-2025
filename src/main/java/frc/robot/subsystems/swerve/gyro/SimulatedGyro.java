@@ -2,7 +2,6 @@ package frc.robot.subsystems.swerve.gyro;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.extras.sim.SimGyro;
 
 public class SimulatedGyro implements GyroInterface {
@@ -12,12 +11,13 @@ public class SimulatedGyro implements GyroInterface {
   private double accelY = 0.0;
 
   public SimulatedGyro(SimGyro simGyro) {
-    simGyro.setUpdateConsumer((yawPair, accelVector) -> {
-      this.yawRads = yawPair.getFirst().in(Degrees);
-      this.yawVelRadsPerSec = yawPair.getSecond().in(DegreesPerSecond);
-      this.accelX = accelVector.x().in(MetersPerSecondPerSecond);
-      this.accelY = accelVector.y().in(MetersPerSecondPerSecond);
-    });
+    simGyro.setUpdateConsumer(
+        (yawPair, accelVector) -> {
+          this.yawRads = yawPair.getFirst().in(Degrees);
+          this.yawVelRadsPerSec = yawPair.getSecond().in(DegreesPerSecond);
+          this.accelX = accelVector.x().in(MetersPerSecondPerSecond);
+          this.accelY = accelVector.y().in(MetersPerSecondPerSecond);
+        });
   }
 
   @Override

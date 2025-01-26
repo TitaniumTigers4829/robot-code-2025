@@ -3,7 +3,6 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,11 +12,8 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.sim.SimArena;
 import frc.robot.extras.sim.SimGyro;
 import frc.robot.extras.sim.SimSwerve;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
@@ -77,8 +73,8 @@ public class RobotContainer {
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
-        gyroSimulation = new SimGyro(, null);
+        // SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
+        // gyroSimulation = new SimGyro(, null);
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
         // this.gyroSimulation = GyroSimulation.createNavX2();

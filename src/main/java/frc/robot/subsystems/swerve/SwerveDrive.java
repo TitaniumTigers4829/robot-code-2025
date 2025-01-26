@@ -374,7 +374,7 @@ public class SwerveDrive extends SubsystemBase {
       Twist2d twist = DriveConstants.DRIVE_KINEMATICS.toTwist2d(moduleDeltas);
       rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
-    
+
     poseEstimator.updateWithTime(TimeUtil.getLogTimeSeconds(), rawGyroRotation, modulePositions);
   }
 

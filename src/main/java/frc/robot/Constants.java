@@ -2,10 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 public final class Constants {
 
@@ -50,7 +47,7 @@ public final class Constants {
      */
     public static final double MIN_FALCON_DEADBAND = 0.001;
   }
-  
+
   /**
    * This is where constants used to describe the game's field go. This will have the dimensions of
    * the field, but also the coordinates of obstacles, game pieces, or other places of interest.

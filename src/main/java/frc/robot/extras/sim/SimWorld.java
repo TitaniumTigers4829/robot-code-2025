@@ -1,9 +1,10 @@
 package frc.robot.extras.sim;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.sim.configs.SimGyroConfig;
 import frc.robot.extras.sim.configs.SimMechanismConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
@@ -13,13 +14,12 @@ import frc.robot.extras.util.utils.DCMotorExt;
 import frc.robot.extras.util.utils.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import static edu.wpi.first.units.Units.*;
 
 public class SimWorld {
 
   private final SimArena arena;
   private final SimRobot<SimSwerve> simRobot;
-    
+
   private final SimMechanismConfig driveMotorCfg =
       new SimMechanismConfig(new DCMotorExt(DCMotor.getKrakenX60Foc(1), 1))
           .withFriction(Volts.of(ModuleConstants.DRIVE_S), Volts.of(ModuleConstants.DRIVE_S * 0.8))
@@ -34,7 +34,10 @@ public class SimWorld {
           .withRotorInertia(KilogramSquareMeters.of(0.02));
   private final SimSwerveModuleConfig moduleCfg =
       new SimSwerveModuleConfig(
-          driveMotorCfg, steerMotorCfg, WheelCof.BLACK_NITRILE.cof, ModuleConstants.WHEEL_DIAMETER_METERS / 2.0);
+          driveMotorCfg,
+          steerMotorCfg,
+          WheelCof.BLACK_NITRILE.cof,
+          ModuleConstants.WHEEL_DIAMETER_METERS / 2.0);
   private final SimSwerveConfig swerveConfig =
       new SimSwerveConfig(
           60.0,
@@ -46,15 +49,13 @@ public class SimWorld {
           SimGyroConfig.ofNavX2());
 
   public SimWorld() {
-      arena =
-          new SimArena.FieldMap(Seconds.of(ConstValues.PERIODIC_TIME), 5);
-      simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
+    arena = new SimArena.FieldMap(Seconds.of(ConstValues.PERIODIC_TIME), 5);
+    simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
     //   aprilTagSim = new VisionSystemSim("AprilTags");
     //   aprilTagSim.addAprilTags(FieldConstants.APRIL_TAG_FIELD);
     //   objectDetectionSim = new VisionSystemSim("ObjectDetection");
   }
 
-  
   public SimArena arena() {
     return arena;
   }
@@ -63,22 +64,22 @@ public class SimWorld {
     return simRobot;
   }
 
-//   public VisionSystemSim aprilTagSim() {
-//     return aprilTagSim;
-//   }
+  //   public VisionSystemSim aprilTagSim() {
+  //     return aprilTagSim;
+  //   }
 
-//   public VisionSystemSim objectDetectionSim() {
-//     return objectDetectionSim;
-//   }
+  //   public VisionSystemSim objectDetectionSim() {
+  //     return objectDetectionSim;
+  //   }
 
   public void update() {
     // if (isSimulation) {
     //   if (resetReceiver.hasData()) {
-        // final var poses;
-        robot().getDriveTrain().setChassisWorldPose(poses[poses.length - 1], true);
+    // final var poses;
+    robot().getDriveTrain().setChassisWorldPose(poses[poses.length - 1], true);
     //   }
-      arena.simulationPeriodic();
-      final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose();
+    arena.simulationPeriodic();
+    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose();
     //   poseSender.send(new NamedPositions("SimRobot", robotPose));
     //   aprilTagSim.update(robotPose);
     //   objectDetectionSim.update(robotPose);

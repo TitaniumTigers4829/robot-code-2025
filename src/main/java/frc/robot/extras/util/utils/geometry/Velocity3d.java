@@ -1,7 +1,5 @@
 package frc.robot.extras.util.utils.geometry;
 
-import java.util.Objects;
-
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.LinearVelocity;
+import java.util.Objects;
 
 public class Velocity3d implements Interpolatable<Velocity3d> {
   private final double m_vx;
@@ -49,8 +48,8 @@ public class Velocity3d implements Interpolatable<Velocity3d> {
   }
 
   /**
-   * Constructs a Velocity3d from the provided velocity vector's X, Y, and Z components. The
-   * values are assumed to be in meters.
+   * Constructs a Velocity3d from the provided velocity vector's X, Y, and Z components. The values
+   * are assumed to be in meters.
    *
    * @param vector The velocity vector to represent.
    */
@@ -123,8 +122,8 @@ public class Velocity3d implements Interpolatable<Velocity3d> {
   /**
    * Applies a rotation to the velocity in 3D space.
    *
-   * <p>For example, rotating a Velocity3d of &lt;2, 0, 0&gt; by 90 degrees around the Z axis
-   * will return a Velocity3d of &lt;0, 2, 0&gt;.
+   * <p>For example, rotating a Velocity3d of &lt;2, 0, 0&gt; by 90 degrees around the Z axis will
+   * return a Velocity3d of &lt;0, 2, 0&gt;.
    *
    * @param other The rotation to rotate the velocity by.
    * @return The new rotated velocity.
@@ -138,8 +137,8 @@ public class Velocity3d implements Interpolatable<Velocity3d> {
   /**
    * Returns the sum of two velocitys in 3D space.
    *
-   * <p>For example, Velocity3d(1.0, 2.5, 3.5) + Velocity3d(2.0, 5.5, 7.5) =
-   * Velocity3d{3.0, 8.0, 11.0).
+   * <p>For example, Velocity3d(1.0, 2.5, 3.5) + Velocity3d(2.0, 5.5, 7.5) = Velocity3d{3.0, 8.0,
+   * 11.0).
    *
    * @param other The velocity to add.
    * @return The sum of the velocitys.
@@ -151,8 +150,8 @@ public class Velocity3d implements Interpolatable<Velocity3d> {
   /**
    * Returns the difference between two velocitys.
    *
-   * <p>For example, Velocity3d(5.0, 4.0, 3.0) - Velocity3d(1.0, 2.0, 3.0) =
-   * Velocity3d(4.0, 2.0, 0.0).
+   * <p>For example, Velocity3d(5.0, 4.0, 3.0) - Velocity3d(1.0, 2.0, 3.0) = Velocity3d(4.0, 2.0,
+   * 0.0).
    *
    * @param other The velocity to subtract.
    * @return The difference between the two velocitys.
@@ -162,8 +161,8 @@ public class Velocity3d implements Interpolatable<Velocity3d> {
   }
 
   /**
-   * Returns the inverse of the current velocity. This is equivalent to negating all components
-   * of the velocity.
+   * Returns the inverse of the current velocity. This is equivalent to negating all components of
+   * the velocity.
    *
    * @return The inverse of the current velocity.
    */

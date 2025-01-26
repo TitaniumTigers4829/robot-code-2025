@@ -1,4 +1,3 @@
-
 package frc.robot.extras.sim;
 
 import static edu.wpi.first.units.Units.Degrees;
@@ -15,9 +14,8 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimGyroConfig;
 import frc.robot.extras.util.utils.RuntimeLog;
-import frc.robot.extras.util.utils.mathutils.SimCommonMath;
 import frc.robot.extras.util.utils.mathutils.MeasureMath.XY;
-
+import frc.robot.extras.util.utils.mathutils.SimCommonMath;
 import java.util.function.BiConsumer;
 
 // import sham.utils.mathutils.MeasureMath;
@@ -71,8 +69,7 @@ public class SimGyro {
         actualAngularVelocity
             .plus(averageDriftingMotionless)
             // .plus(getDriftingDueToImpact(actualAngularVelocity))
-            .plus(
-                actualAngularVelocity.times(SimCommonMath.generateRandomNormal(0.0, veloStdDev)));
+            .plus(actualAngularVelocity.times(SimCommonMath.generateRandomNormal(0.0, veloStdDev)));
 
     LinearVelocity lastXV = Meters.of(lastTwist.dx).div(timing.dt());
     LinearVelocity lastYV = Meters.of(lastTwist.dy).div(timing.dt());

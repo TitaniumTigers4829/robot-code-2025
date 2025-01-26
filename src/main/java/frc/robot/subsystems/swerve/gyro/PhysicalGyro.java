@@ -2,14 +2,12 @@ package frc.robot.subsystems.swerve.gyro;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import java.util.Queue;
-
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
+import edu.wpi.first.units.measure.Angle;
+import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
+import java.util.Queue;
 
 public class PhysicalGyro implements GyroInterface {
 
@@ -34,7 +32,6 @@ public class PhysicalGyro implements GyroInterface {
     inputs.yawVelocity = gyro.getRate();
     inputs.accelX = gyro.getWorldLinearAccelX();
     inputs.accelY = gyro.getWorldLinearAccelY();
-
   }
 
   @Override

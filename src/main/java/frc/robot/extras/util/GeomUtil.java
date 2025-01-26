@@ -1,5 +1,7 @@
 package frc.robot.extras.util;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
@@ -11,13 +13,10 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 import frc.robot.extras.util.utils.geometry.Velocity2d;
-
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Rotation;
 import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
-
-import static edu.wpi.first.units.Units.*;
 
 /** utils to convert between WPILIB and dyn4j geometry classes */
 public class GeomUtil {
@@ -73,9 +72,11 @@ public class GeomUtil {
   //  * Gets the x and y velocities of a ChassisSpeeds
   //  *
   //  * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
-  //  * @return a Translation2d containing the velocities in the x and y direction in meters per second
+  //  * @return a Translation2d containing the velocities in the x and y direction in meters per
+  // second
   //  */
-  // public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
+  // public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds)
+  // {
   //   return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
   // }
 
@@ -104,21 +105,19 @@ public class GeomUtil {
     return Math.abs(r1 - r2) <= thresholdDegrees;
   }
 
-  
-
   public static Velocity2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
     return new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-}
+  }
 
-public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
+  public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
     return NewtonMeters.of(torque.getTorque());
-}
+  }
 
-public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
+  public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
     return Newtons.of(force.getForce().getMagnitude());
-}
+  }
 
-public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
+  public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
     return Pair.of(Kilograms.of(mass.getMass()), KilogramSquareMeters.of(mass.getInertia()));
-}
+  }
 }

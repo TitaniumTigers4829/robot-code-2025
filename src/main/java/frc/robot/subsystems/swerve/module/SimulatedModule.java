@@ -2,8 +2,6 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,9 +13,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerveModule;
-import frc.robot.extras.util.utils.GearRatio;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
@@ -98,18 +93,17 @@ public class SimulatedModule implements ModuleInterface {
             * ModuleConstants.DRIVE_GEAR_RATIO
             / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS;
 
-            // moduleSimulation.state().speedMetersPerSecond;
+    // moduleSimulation.state().speedMetersPerSecond;
     setDriveVoltage(
-              Volts.of(drivePID.calculate(
+        Volts.of(
+            drivePID.calculate(
                     moduleSimulation.outputs().drive().velocity().in(RotationsPerSecond),
                     desiredDriveRPS)
-            + (driveFF.calculate(desiredDriveRPS))));
+                + (driveFF.calculate(desiredDriveRPS))));
     setTurnVoltage(
         Volts.of(
-                turnPID.calculate(
-                    getTurnRotations(),
-                    desiredState.angle.getRotations()) 
-                    + (turnFF.calculate(turnPID.getSetpoint().velocity))));
+            turnPID.calculate(getTurnRotations(), desiredState.angle.getRotations())
+                + (turnFF.calculate(turnPID.getSetpoint().velocity))));
   }
 
   @Override
