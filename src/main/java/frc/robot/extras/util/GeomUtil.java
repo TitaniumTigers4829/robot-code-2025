@@ -30,6 +30,10 @@ public class GeomUtil {
     return new Vector2(wpilibTranslation2d.getX(), wpilibTranslation2d.getY());
   }
 
+  public static Vector2 toDyn4jVector2(Velocity2d velocity2d) {
+    return new Vector2(velocity2d.getVX(), velocity2d.getVY());
+  }
+
   /**
    * Converts a dyn4j Vector2 to a WPILIB Translation2d
    *
