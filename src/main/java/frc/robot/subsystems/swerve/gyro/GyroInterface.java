@@ -9,7 +9,7 @@ public interface GyroInterface {
     public boolean isConnected = false;
 
     public double yawDegrees = 0.0;
-    public double yawVelocity = 0.0;
+    public double yawVelocityDegreesPerSecond = 0.0;
     public double accelX = 0.0;
     public double accelY = 0.0;
   }

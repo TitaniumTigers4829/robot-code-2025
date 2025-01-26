@@ -78,5 +78,8 @@ public abstract class DriveCommandBase extends Command {
           vision.getPoseFromAprilTags(limelight),
           TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
     }
+    // else {
+    //   swerveDrive.addPoseEstimatorVisionMeasurement(new Pose2d(), TimeUtil.getLogTimeSeconds());
+    // }
   }
 }

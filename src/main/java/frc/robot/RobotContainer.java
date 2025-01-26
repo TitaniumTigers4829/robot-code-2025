@@ -44,7 +44,7 @@ public class RobotContainer {
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("Auto", null);
 
-    switch (Constants.CURRENT_MODE) {
+    switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
 
@@ -91,6 +91,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     configureButtonBindings();
+    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
   private void configureButtonBindings() {
