@@ -39,9 +39,9 @@ public abstract class DriveCommandBase extends Command {
     swerveDrive.addPoseEstimatorSwerveMeasurement();
     vision.setHeadingInfo(
         swerveDrive.getEstimatedPose().getRotation().getDegrees(), swerveDrive.getGyroRate());
-    calculatePoseFromLimelight(Limelight.BACK);
-    calculatePoseFromLimelight(Limelight.FRONT_LEFT);
-    calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
+    addLimelightVisionMeasurement(Limelight.BACK);
+    addLimelightVisionMeasurement(Limelight.FRONT_LEFT);
+    addLimelightVisionMeasurement(Limelight.FRONT_RIGHT);
   }
 
   /**
@@ -49,7 +49,7 @@ public abstract class DriveCommandBase extends Command {
    *
    * @param limelight The limelight to calculate the pose from
    */
-  public void calculatePoseFromLimelight(Limelight limelight) {
+  public void addLimelightVisionMeasurement(Limelight limelight) {
     // Only do pose calculation if we can see the april tags
     if (vision.canSeeAprilTags(limelight)) {
       double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelight);
