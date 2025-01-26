@@ -31,7 +31,6 @@ public class VisionSubsystem extends SubsystemBase {
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
-    // SmartDashboard.putString("limelight estimates", inputs.limelightMegatagPoses.);
   }
 
   /**
