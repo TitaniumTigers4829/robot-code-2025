@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Time;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.sim.SimArena;
@@ -137,7 +138,7 @@ public class Reefscape {
    * <p>It extends {@link SimulatedArena} and includes specific details of the Reefscape game
    * environment.
    */
-  public static class ReefscapeSimArena extends SimArena {
+  public static class ReefscapeSimArena extends SimArena{
     public static final class ReefscapeFieldObstacleMap extends FieldMap {
       public ReefscapeFieldObstacleMap() {
         super();
@@ -192,35 +193,24 @@ public class Reefscape {
       }
     }
 
-    public ReefscapeSimArena() {
-      super(new ReefscapeFieldObstacleMap(), 0, 0);
-    }
+    public ReefscapeSimArena(Time period, int simulationSubTick) {
+        super(new ReefscapeFieldObstacleMap(), period.in(Seconds), simulationSubTick);
+      }
 
-    //   @Override
-    //   public void placeGamePiecesOnField() {
-    //       Translation2d[] bluePositions = new Translation2d[] {
-    //           new Translation2d(1.219, 5.855), new Translation2d(1.219, 4.026), new
-    // Translation2d(1.219, 2.197),
-    //       };
-    //       for (Translation2d position : bluePositions) super.addGamePiece(new
-    // ReefscapeCoralAlgaeStack(position));
-
-    //       Translation2d[] redPositions = Arrays.stream(bluePositions)
-    //               .map(bluePosition ->
-    //                       new Translation2d(FieldMirroringUtils.FIELD_WIDTH -
-    // bluePosition.getX(), bluePosition.getY()))
-    //               .toArray(Translation2d[]::new);
-    //       for (Translation2d position : redPositions) super.addGamePiece(new
-    // ReefscapeCoralAlgaeStack(position));
-    //   }
 
     @Override
     public void competitionPeriodic() {}
 
     @Override
     protected void placeGamePiecesOnField() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'placeGamePiecesOnField'");
+        Translation2d[] bluePositions = new Translation2d[] {
+            new Translation2d(1.219, 5.855), new Translation2d(1.219, 4.026), new Translation2d(1.219, 2.197),
+        };
+
+        Translation2d[] redPositions = Arrays.stream(bluePositions)
+                .map(bluePosition ->
+                        new Translation2d(FieldMirroringUtils.FIELD_WIDTH - bluePosition.getX(), bluePosition.getY()))
+                .toArray(Translation2d[]::new);
     }
   }
-}
+} 

@@ -2,9 +2,9 @@ package frc.robot.extras.sim;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.HardwareConstants;
 import frc.robot.extras.sim.configs.SimGyroConfig;
 import frc.robot.extras.sim.configs.SimMechanismConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
@@ -14,6 +14,7 @@ import frc.robot.extras.util.utils.DCMotorExt;
 import frc.robot.extras.util.utils.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+import frc.robot.extras.sim.sim2025.Reefscape.ReefscapeSimArena;
 
 public class SimWorld {
 
@@ -49,47 +50,36 @@ public class SimWorld {
           SimGyroConfig.ofNavX2());
 
   public SimWorld() {
-    arena = new SimArena.FieldMap(Seconds.of(ConstValues.PERIODIC_TIME), 5);
+    arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.TIMEOUT_S), 5);
     simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
-    //   aprilTagSim = new VisionSystemSim("AprilTags");
-    //   aprilTagSim.addAprilTags(FieldConstants.APRIL_TAG_FIELD);
-    //   objectDetectionSim = new VisionSystemSim("ObjectDetection");
   }
 
+  /**
+   * Returns the simulation arena.
+   *
+   * @return the simulation arena
+   */
   public SimArena arena() {
     return arena;
   }
 
+
+  /**
+   * 
+   * @return
+   */
   public SimRobot<SimSwerve> robot() {
     return simRobot;
   }
 
-  //   public VisionSystemSim aprilTagSim() {
-  //     return aprilTagSim;
-  //   }
+  public SimSwerveConfig getSwerveConfig() {
+    return swerveConfig;
+  }
 
-  //   public VisionSystemSim objectDetectionSim() {
-  //     return objectDetectionSim;
-  //   }
-
+  /**
+   * Updates the simulation.
+   */
   public void update() {
-    // if (isSimulation) {
-    //   if (resetReceiver.hasData()) {
-    // final var poses;
-    robot().getDriveTrain().setChassisWorldPose(poses[poses.length - 1], true);
-    //   }
-    arena.simulationPeriodic();
-    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose();
-    //   poseSender.send(new NamedPositions("SimRobot", robotPose));
-    //   aprilTagSim.update(robotPose);
-    //   objectDetectionSim.update(robotPose);
-    //   objectDetectionSim.clearVisionTargets();
-    //   final var objectTargets =
-    //       arena
-    //           .gamePieces()
-    //           .map(gp -> new VisionTargetSim(gp.pose(), gpTargetModel))
-    //           .toArray(VisionTargetSim[]::new);
-    //   objectDetectionSim.addVisionTargets("gamepieces", objectTargets);
-    // // }
+      arena().simulationPeriodic();
   }
 }

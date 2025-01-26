@@ -12,6 +12,8 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.sim.SimArena;
 import frc.robot.extras.sim.SimGyro;
 import frc.robot.extras.sim.SimSwerve;
+import frc.robot.extras.sim.SimWorld;
+import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -22,6 +24,7 @@ import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
+import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
@@ -35,11 +38,6 @@ public class RobotContainer {
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
 
-  // Simulation, we store them here in the robot container
-  private final SimArena simulatedArena;
-  private final SimSwerve swerveDriveSimulation;
-  private final SimGyro gyroSimulation;
-
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -49,11 +47,6 @@ public class RobotContainer {
     switch (Constants.CURRENT_MODE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
-
-        /* Disable Simulations */
-        // this.simulatedArena = null;
-        this.gyroSimulation = null;
-        this.swerveDriveSimulation = null;
 
         swerveDrive =
             new SwerveDrive(
@@ -66,54 +59,18 @@ public class RobotContainer {
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
-        gyroSimulation = null;
-        swerveDriveSimulation = null;
+
         visionSubsystem = null;
       }
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        // SimEnvTiming timing = new SimEnvTiming(Time.of(0.02), 1, null);
-        // gyroSimulation = new SimGyro(, null);
-        /* create simulations */
-        /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
-        // this.gyroSimulation = GyroSimulation.createNavX2();
-        /* create a swerve drive simulation */
-        // this.swerveDriveSimulation =
-        //     new SwerveDriveSimulation(
-        //         SimulationConstants.ROBOT_MASS_KG,
-        //         DriveConstants.TRACK_WIDTH,
-        //         DriveConstants.WHEEL_BASE,
-        //         DriveConstants.TRACK_WIDTH + .2,
-        //         DriveConstants.WHEEL_BASE + .2,
-        //         SwerveModuleSimulation.getModule(
-        //             DCMotor.getFalcon500(1),
-        //             DCMotor.getFalcon500(1),
-        //             60,
-        //             WHEEL_GRIP.TIRE_WHEEL,
-        //             ModuleConstants.DRIVE_GEAR_RATIO),
-        //         gyroSimulation,
-        //         new Pose2d(3, 3, new Rotation2d()));
-        // simulatedArena.addDriveTrainSimulation(swerveDriveSimulation);
-        swerveDrive =
-            new SwerveDrive(
-                new SimulatedGyro(
-                    gyroSimulation), // SimulatedGyro is a wrapper around gyro simulation, that
-                // reads
-                // the simulation result
-                /* SimulatedModule are edited such that they also wraps around module simulations */
-                new SimulatedModule(swerveDriveSimulation.getModules()[0]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[1]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[2]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[3]));
+        SimWorld simWorld = new SimWorld();
+        swerveDrive = new SwerveDrive(new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[0]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[1]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[2]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[3]));
 
-        visionSubsystem = null;
-        //     new VisionSubsystem(
-        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
-
-        SimulatedField.getInstance().resetFieldForAuto();
-        resetFieldAndOdometryForAuto(
-            new Pose2d(1.3980597257614136, 5.493067741394043, Rotation2d.fromRadians(3.1415)));
+        visionSubsystem = 
+            new VisionSubsystem(
+                new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
       }
 
       default -> {
@@ -121,9 +78,6 @@ public class RobotContainer {
         /* Replayed robot, disable IO implementations */
 
         /* physics simulations are also not needed */
-        this.gyroSimulation = null;
-        this.swerveDriveSimulation = null;
-        // this.simulatedArena = null;
         swerveDrive =
             new SwerveDrive(
                 new GyroInterface() {},
@@ -133,18 +87,6 @@ public class RobotContainer {
                 new ModuleInterface() {});
       }
     }
-  }
-
-  private void resetFieldAndOdometryForAuto(Pose2d robotStartingPoseAtBlueAlliance) {
-    final Pose2d startingPose = robotStartingPoseAtBlueAlliance;
-
-    if (swerveDriveSimulation != null) {
-      swerveDriveSimulation.setSimulationWorldPose(startingPose);
-      SimulatedField.getInstance().resetFieldForAuto();
-      updateFieldSimAndDisplay();
-    }
-
-    swerveDrive.resetEstimatedPose(startingPose);
   }
 
   public void teleopInit() {
@@ -188,13 +130,6 @@ public class RobotContainer {
                         swerveDrive.getEstimatedPose().getX(),
                         swerveDrive.getEstimatedPose().getY(),
                         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    swerveDrive.resetEstimatedPose(
-                        swerveDriveSimulation.getSimulatedDriveTrainPose())));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
@@ -212,14 +147,5 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     return autoChooser.getSelected();
-  }
-
-  public void updateFieldSimAndDisplay() {
-    if (swerveDriveSimulation == null) return;
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition", swerveDriveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Notes",
-        SimulatedField.getInstance().getGamePiecesByType("Note").toArray(Pose3d[]::new));
   }
 }
