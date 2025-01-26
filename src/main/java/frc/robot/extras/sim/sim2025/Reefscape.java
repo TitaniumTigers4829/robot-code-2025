@@ -138,7 +138,7 @@ public class Reefscape {
    * <p>It extends {@link SimulatedArena} and includes specific details of the Reefscape game
    * environment.
    */
-  public static class ReefscapeSimArena extends SimArena{
+  public static class ReefscapeSimArena extends SimArena {
     public static final class ReefscapeFieldObstacleMap extends FieldMap {
       public ReefscapeFieldObstacleMap() {
         super();
@@ -194,23 +194,29 @@ public class Reefscape {
     }
 
     public ReefscapeSimArena(Time period, int simulationSubTick) {
-        super(new ReefscapeFieldObstacleMap(), period.in(Seconds), simulationSubTick);
-      }
-
+      super(new ReefscapeFieldObstacleMap(), period.in(Seconds), simulationSubTick);
+    }
 
     @Override
     public void competitionPeriodic() {}
 
     @Override
     protected void placeGamePiecesOnField() {
-        Translation2d[] bluePositions = new Translation2d[] {
-            new Translation2d(1.219, 5.855), new Translation2d(1.219, 4.026), new Translation2d(1.219, 2.197),
-        };
+      Translation2d[] bluePositions =
+          new Translation2d[] {
+            new Translation2d(1.219, 5.855),
+            new Translation2d(1.219, 4.026),
+            new Translation2d(1.219, 2.197),
+          };
 
-        Translation2d[] redPositions = Arrays.stream(bluePositions)
-                .map(bluePosition ->
-                        new Translation2d(FieldMirroringUtils.FIELD_WIDTH - bluePosition.getX(), bluePosition.getY()))
-                .toArray(Translation2d[]::new);
+      Translation2d[] redPositions =
+          Arrays.stream(bluePositions)
+              .map(
+                  bluePosition ->
+                      new Translation2d(
+                          FieldMirroringUtils.FIELD_WIDTH - bluePosition.getX(),
+                          bluePosition.getY()))
+              .toArray(Translation2d[]::new);
     }
   }
-} 
+}

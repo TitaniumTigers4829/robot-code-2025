@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -9,11 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.extras.sim.SimArena;
-import frc.robot.extras.sim.SimGyro;
-import frc.robot.extras.sim.SimSwerve;
 import frc.robot.extras.sim.SimWorld;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -28,7 +23,6 @@ import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
@@ -66,9 +60,15 @@ public class RobotContainer {
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
         SimWorld simWorld = new SimWorld();
-        swerveDrive = new SwerveDrive(new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[0]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[1]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[2]), new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[3]));
+        swerveDrive =
+            new SwerveDrive(
+                new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
+                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[0]),
+                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[1]),
+                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[2]),
+                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[3]));
 
-        visionSubsystem = 
+        visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
       }

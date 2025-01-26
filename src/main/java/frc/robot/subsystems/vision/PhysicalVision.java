@@ -50,15 +50,15 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public void updateInputs(VisionInputs inputs) {
     // Combine inputs into the main inputs object
-      for (Limelight limelight : Limelight.values()) {
-        inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
-        inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
-        inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
-        inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
-        inputs.limelightAprilTagDistances[limelight.getId()] =
-            getLimelightAprilTagDistance(limelight);
-        inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
-        inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
+    for (Limelight limelight : Limelight.values()) {
+      inputs.isLimelightConnected[limelight.getId()] = isLimelightConnected(limelight);
+      inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
+      inputs.limelightTargets[limelight.getId()] = getNumberOfAprilTags(limelight);
+      inputs.limelightSeesAprilTags[limelight.getId()] = canSeeAprilTags(limelight);
+      inputs.limelightAprilTagDistances[limelight.getId()] =
+          getLimelightAprilTagDistance(limelight);
+      inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
+      inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
     }
   }
 

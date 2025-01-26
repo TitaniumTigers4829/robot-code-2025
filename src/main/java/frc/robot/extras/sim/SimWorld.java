@@ -10,11 +10,11 @@ import frc.robot.extras.sim.configs.SimMechanismConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
 import frc.robot.extras.sim.configs.SimSwerveModuleConfig.WheelCof;
+import frc.robot.extras.sim.sim2025.Reefscape.ReefscapeSimArena;
 import frc.robot.extras.util.utils.DCMotorExt;
 import frc.robot.extras.util.utils.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.extras.sim.sim2025.Reefscape.ReefscapeSimArena;
 
 public class SimWorld {
 
@@ -63,9 +63,7 @@ public class SimWorld {
     return arena;
   }
 
-
   /**
-   * 
    * @return
    */
   public SimRobot<SimSwerve> robot() {
@@ -76,10 +74,8 @@ public class SimWorld {
     return swerveConfig;
   }
 
-  /**
-   * Updates the simulation.
-   */
+  /** Updates the simulation. */
   public void update() {
-      arena().simulationPeriodic();
+    arena().simulationPeriodic();
   }
 }
