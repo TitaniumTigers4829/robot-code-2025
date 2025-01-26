@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -17,21 +16,11 @@ public interface VisionInterface {
     /** This array stores whether each Limelight is connected to the robot. */
     public boolean[] isLimelightConnected = new boolean[Limelight.values().length];
 
-    /** This array stores MegatagPoseEstimates for each Limelight. */
-    public MegatagPoseEstimate[] limelightMegatagPoses =
-        new MegatagPoseEstimate[Limelight.values().length];
-
-    /** This array stores the latencies in seconds of each Limelight. */
-    public double[] limelightLatencies = new double[Limelight.values().length];
-
-    /** This array stores the number of april tags each Limelight sees. */
-    public int[] limelightTargets = new int[Limelight.values().length];
-
     /** This array stores whether each Limelight sees any April Tags. */
     public boolean[] limelightSeesAprilTags = new boolean[Limelight.values().length];
 
-    /** This array stores the poses calculated from the April Tags seen by each Limelight. */
-    public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
+    /** This array stores the number of april tags each Limelight sees. */
+    public int[] limelightTargets = new int[Limelight.values().length];
 
     /**
      * This array stores the average distances in meters to the April Tags seen by each Limelight.
@@ -40,6 +29,15 @@ public interface VisionInterface {
 
     /** This array stores the timestamps in seconds of the data from each Limelight. */
     public double[] limelightTimestamps = new double[Limelight.values().length];
+
+    /** This array stores the ambiguities from 0 to 1 of the Limelight's pose calculation. */
+    public double[] limelightAmbiguities = new double[Limelight.values().length];
+
+    /** This array stores the latencies in seconds of each Limelight. */
+    public double[] limelightLatencies = new double[Limelight.values().length];
+
+    /** This array stores the poses calculated from the April Tags seen by each Limelight. */
+    public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
   }
 
   /**
@@ -68,6 +66,17 @@ public interface VisionInterface {
    * @return The current timestamp of the Limelight
    */
   default double getTimeStampSeconds(Limelight limelight) {
+    return 0.0;
+  }
+
+  /**
+   * Gets the current ambiguity of the Limelight's pose calculation. This ambiguity is a measure of
+   * how confident the Limelight is in its pose calculation.
+   *
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return The current ambiguity of the Limelight
+   */
+  default double getAmbiguity(Limelight limelight) {
     return 0.0;
   }
 
@@ -113,12 +122,23 @@ public interface VisionInterface {
   }
 
   /**
-   * Sets the heading and heading rate of the robot, this is used for deciding between MegaTag 1 and
-   * 2 for pose estimation.
+   * Sets the heading, heading rate, and current calculated position of the robot, this is used for
+   * calculating filters for vision pose estimates
    *
    * @param headingDegrees the angle the robot is facing in degrees (0 degrees facing the red
    *     alliance)
    * @param headingRateDegreesPerSecond the rate the robot is rotating, CCW positive
+   * @param odometryPose the current fused pose of the robot
    */
-  default void setHeadingInfo(double headingDegrees, double headingRateDegreesPerSecond) {}
+  default void setOdometryInfo(
+      double headingDegrees, double headingRateDegreesPerSecond, Pose2d odometryPose) {}
+
+  /***
+   * Checks if the measurement from the limelight is valid
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return true if the measurement is valid, false otherwise
+   */
+  default boolean isValidMeasurement(Limelight limelight) {
+    return false;
+  }
 }
