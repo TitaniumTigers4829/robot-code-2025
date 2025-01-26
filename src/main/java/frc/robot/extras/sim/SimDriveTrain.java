@@ -10,7 +10,6 @@ import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.GeomUtil;
-
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;

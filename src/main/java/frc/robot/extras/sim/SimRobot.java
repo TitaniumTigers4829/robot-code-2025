@@ -8,7 +8,6 @@ import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.util.GeomUtil;
 import frc.robot.extras.util.RuntimeLog;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
