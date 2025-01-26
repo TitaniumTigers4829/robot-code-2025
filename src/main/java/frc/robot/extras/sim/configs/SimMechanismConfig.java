@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Velocity;
@@ -13,11 +12,12 @@ import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.sim.SimMechanism.Friction;
 import frc.robot.extras.sim.SimMechanism.HardLimits;
 import frc.robot.extras.sim.SimMechanism.MechanismDynamics;
+import frc.robot.extras.util.DCMotorExt;
+import frc.robot.extras.util.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator.IgnoreStructField;
-import frc.robot.extras.util.utils.GearRatio;
 
 public class SimMechanismConfig implements StructSerializable {
-  public DCMotor motor;
+  public DCMotorExt motor;
   public MomentOfInertia rotorInertia;
   public GearRatio gearRatio;
   public Friction friction;
@@ -27,7 +27,7 @@ public class SimMechanismConfig implements StructSerializable {
   public double noise;
 
   public SimMechanismConfig(
-      DCMotor motor,
+      DCMotorExt motor,
       MomentOfInertia rotorInertia,
       GearRatio gearRatio,
       Friction friction,
@@ -45,7 +45,7 @@ public class SimMechanismConfig implements StructSerializable {
     this.noise = noise;
   }
 
-  public SimMechanismConfig(DCMotor motor) {
+  public SimMechanismConfig(DCMotorExt motor) {
     this.motor = motor;
     this.rotorInertia = KilogramSquareMeters.of(0.01);
     this.gearRatio = GearRatio.reduction(1.0);

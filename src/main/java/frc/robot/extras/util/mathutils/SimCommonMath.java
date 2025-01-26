@@ -1,4 +1,4 @@
-package frc.robot.extras.util.utils.mathutils;
+package frc.robot.extras.util.mathutils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;

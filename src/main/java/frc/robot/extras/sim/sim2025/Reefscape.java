@@ -14,7 +14,6 @@ import frc.robot.extras.sim.SimArena;
 import frc.robot.extras.sim.SimArena.FieldMap;
 import frc.robot.extras.sim.SimGamePiece.GamePieceTarget;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
-import frc.robot.extras.util.utils.FieldMirroringUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -182,7 +181,7 @@ public class Reefscape {
                 .map(
                     pointAtBlue ->
                         new Translation2d(
-                            FieldMirroringUtils.FIELD_WIDTH - pointAtBlue.getX(),
+                            FieldConstants.FIELD_WIDTH_METERS - pointAtBlue.getX(),
                             pointAtBlue.getY()))
                 .toArray(Translation2d[]::new);
         for (int i = 0; i < 6; i++)
@@ -214,7 +213,7 @@ public class Reefscape {
               .map(
                   bluePosition ->
                       new Translation2d(
-                          FieldMirroringUtils.FIELD_WIDTH - bluePosition.getX(),
+                          FieldConstants.FIELD_WIDTH_METERS - bluePosition.getX(),
                           bluePosition.getY()))
               .toArray(Translation2d[]::new);
     }

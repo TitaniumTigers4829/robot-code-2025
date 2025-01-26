@@ -19,7 +19,8 @@ public class SimBattery {
   }
 
   public void addMechanism(SimMechanism simMechanism) {
-    this.electricalAppliances.put(simMechanism, () -> simMechanism.inputs().supplyCurrent());
+    this.electricalAppliances.put(
+        simMechanism, () -> simMechanism.getMotorCurrent(getBatteryVoltage()));
   }
 
   public void removeMechanism(SimMechanism simMechanism) {

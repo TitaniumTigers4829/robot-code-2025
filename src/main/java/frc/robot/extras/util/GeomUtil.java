@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.util.utils.geometry.Velocity2d;
+import frc.robot.extras.util.geometry.Velocity2d;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Rotation;
 import org.dyn4j.geometry.Transform;
@@ -20,6 +20,7 @@ import org.dyn4j.geometry.Vector2;
 
 /** utils to convert between WPILIB and dyn4j geometry classes */
 public class GeomUtil {
+
   /**
    * Converts a WPILIB Translation2d to a dyn4j Vector2
    *
@@ -30,6 +31,12 @@ public class GeomUtil {
     return new Vector2(wpilibTranslation2d.getX(), wpilibTranslation2d.getY());
   }
 
+  /**
+   * Converts a Velocity2d to a dyn4j Vector2
+   *
+   * @param velocity2d the Velocity2d to convert
+   * @return the equivalent Vector2
+   */
   public static Vector2 toDyn4jVector2(Velocity2d velocity2d) {
     return new Vector2(velocity2d.getVX(), velocity2d.getVY());
   }

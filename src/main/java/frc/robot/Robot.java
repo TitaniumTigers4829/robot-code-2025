@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private SimWorld simWorld;
+  private SimWorld simWorld = new SimWorld();
 
   public Robot() {
     // Record metadata
@@ -54,7 +54,6 @@ public class Robot extends LoggedRobot {
       case SIM_ROBOT:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
-        simWorld = new SimWorld();
         break;
 
       case DEV_ROBOT:
@@ -151,6 +150,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    // if (simWorld != null) {
     simWorld.update();
+    // }
   }
 }

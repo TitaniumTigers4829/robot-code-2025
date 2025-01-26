@@ -1,4 +1,4 @@
-package frc.robot.extras.util.utils;
+package frc.robot.extras.util;
 
 import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -12,8 +12,7 @@ import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.util.GeomUtil;
-import frc.robot.extras.util.utils.geometry.Velocity2d;
+import frc.robot.extras.util.geometry.Velocity2d;
 import org.dyn4j.dynamics.Body;
 
 public class FrcBody extends Body {

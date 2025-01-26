@@ -13,17 +13,15 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.SimMechanism.MechanismDynamics;
-import frc.robot.extras.sim.SimMechanism.MechanismInputs;
-import frc.robot.extras.sim.SimMechanism.MechanismOutputs;
+import frc.robot.extras.sim.SimMechanism.MechanismState;
+import frc.robot.extras.sim.SimMechanism.MechanismVariables;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
-import frc.robot.extras.util.utils.RuntimeLog;
-import frc.robot.extras.util.utils.geometry.Velocity2d;
-import frc.robot.extras.util.utils.mathutils.MeasureMath;
-import frc.robot.extras.util.utils.mathutils.MeasureMath.XY;
+import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.geometry.Velocity2d;
+import frc.robot.extras.util.mathutils.MeasureMath;
+import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 
 public class SimSwerveModule {
   private final SimRobot<SimSwerve> robot;
@@ -52,30 +50,25 @@ public class SimSwerveModule {
     translation = config.moduleTranslations[moduleId];
     driveMech =
         new SimMechanism(
-            "SwerveModuleDriveMotor" + moduleId,
+            "drive" + moduleId,
             moduleConfig.driveConfig.motor,
             driveController,
             moduleConfig.driveConfig.rotorInertia,
             moduleConfig.driveConfig.gearRatio,
             moduleConfig.driveConfig.friction,
-            new MechanismDynamics() {
-              @Override
-              public MomentOfInertia extraInertia() {
-                return rotorInertia.get();
-              }
-            },
+            moduleConfig.driveConfig.dynamics,
             moduleConfig.driveConfig.limits,
             moduleConfig.driveConfig.noise,
             timing);
     steerMech =
         new SimMechanism(
-            "SwerveModuleSteerMotor" + moduleId,
+            "drive" + moduleId,
             moduleConfig.steerConfig.motor,
             steerController,
             moduleConfig.steerConfig.rotorInertia,
             moduleConfig.steerConfig.gearRatio,
             moduleConfig.steerConfig.friction,
-            MechanismDynamics.zero(),
+            moduleConfig.steerConfig.dynamics,
             moduleConfig.steerConfig.limits,
             moduleConfig.steerConfig.noise,
             timing);
@@ -90,18 +83,18 @@ public class SimSwerveModule {
 
   public record ModuleMotorPair<T>(T drive, T steer) {}
 
-  public ModuleMotorPair<MechanismInputs> inputs() {
-    return new ModuleMotorPair<>(driveMech.inputs(), steerMech.inputs());
+  public ModuleMotorPair<MechanismVariables> inputs() {
+    return new ModuleMotorPair<>(driveMech.variables(), steerMech.variables());
   }
 
-  public ModuleMotorPair<MechanismOutputs> outputs() {
-    return new ModuleMotorPair<>(driveMech.outputs(), steerMech.outputs());
+  public ModuleMotorPair<MechanismState> outputs() {
+    return new ModuleMotorPair<>(driveMech.state(), steerMech.state());
   }
 
   public SwerveModuleState state() {
     return new SwerveModuleState(
-        driveMech.outputs().velocity().in(RadiansPerSecond) * wheelRadius.in(Meters),
-        new Rotation2d(steerMech.outputs().position()));
+        driveMech.state().velocity().in(RadiansPerSecond) * wheelRadius.in(Meters),
+        new Rotation2d(steerMech.state().position()));
   }
 
   protected void teardown() {
@@ -119,10 +112,9 @@ public class SimSwerveModule {
 
   protected XY<Force> force(final Rotation2d robotHeading) {
     final Rotation2d steerMechAngle =
-        new Rotation2d(steerMech.outputs().position()).plus(robotHeading);
-    Logger.recordOutput("worldAngle", steerMechAngle);
+        new Rotation2d(steerMech.state().position()).plus(robotHeading);
     final Force gripForce = gravityForce.times(wheelsCoefficientOfFriction);
-    final Force driveMechAppliedForce = driveMech.inputs().torque().div(wheelRadius);
+    final Force driveMechAppliedForce = driveMech.variables().torque().div(wheelRadius);
 
     final boolean isSkidding = MeasureMath.abs(driveMechAppliedForce).gt(gripForce);
     final Force propellingForce;
@@ -131,9 +123,6 @@ public class SimSwerveModule {
     } else {
       propellingForce = driveMechAppliedForce;
     }
-
-    Logger.recordOutput("isSkidding", isSkidding);
-    Logger.recordOutput("propellingForce", propellingForce);
 
     return new XY<Force>(
         propellingForce.times(steerMechAngle.getCos()),
@@ -156,12 +145,10 @@ public class SimSwerveModule {
         new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
     final Velocity2d moduleDriveVelocity =
         new Velocity2d(
-            driveMech.outputs().velocity().in(RadiansPerSecond) * wheelRadius.in(Meters),
-            new Rotation2d(steerMech.outputs().position()).plus(robotHeading));
+            driveMech.state().velocity().in(RadiansPerSecond) * wheelRadius.in(Meters),
+            new Rotation2d(steerMech.state().position()).plus(robotHeading));
     final Velocity2d unwantedVelocity =
         moduleWorldVelocity.plus(tangentialVelocityVector).minus(moduleDriveVelocity);
-
-    Logger.recordOutput("tangentialVelocity", tangentialVelocity);
 
     return new XY<Force>(
         gripForce.times(-Math.signum(unwantedVelocity.getVX())),

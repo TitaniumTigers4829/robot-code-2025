@@ -1,4 +1,4 @@
-package frc.robot.extras.util.utils.geometry;
+package frc.robot.extras.util.geometry;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 

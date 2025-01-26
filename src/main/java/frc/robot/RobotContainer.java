@@ -63,14 +63,19 @@ public class RobotContainer {
         swerveDrive =
             new SwerveDrive(
                 new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
-                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[0]),
-                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[1]),
-                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[2]),
-                new SimulatedModule(simWorld.robot().getDriveTrain().getModules()[3]));
+                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
 
         visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
+        simWorld
+            .robot()
+            .getDriveTrain()
+            .setChassisWorldPose(new Pose2d(2, 2, Rotation2d.kZero), false);
+        simWorld.arena().resetFieldForAuto();
       }
 
       default -> {

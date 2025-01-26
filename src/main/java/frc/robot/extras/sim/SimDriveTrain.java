@@ -8,11 +8,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
+import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.GeomUtil;
-import frc.robot.extras.util.utils.FrcBody;
+
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;
+import org.littletonrobotics.junction.Logger;
 
 /**
  *
@@ -137,7 +139,9 @@ public class SimDriveTrain {
    * the simulation.
    */
   protected void simTick() {
-    // logger.log("chassis", chassis.snapshot(), FrcBody.FrcBodySnapshot.struct);
+    Logger.recordOutput("SwerveStates/pose", chassis.snapshot().pose());
+    Logger.recordOutput("SwerveStates/velocity", chassis.snapshot().velocity());
+    Logger.recordOutput("SwerveStates/forces", chassis.snapshot().forces());
   }
 
   /**
