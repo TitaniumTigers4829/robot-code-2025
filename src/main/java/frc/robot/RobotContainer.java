@@ -34,6 +34,8 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
+  private final SimWorld simWorld = new SimWorld();
+
   public RobotContainer() {
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("Auto", null);
@@ -50,16 +52,18 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[2]),
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        // simWorld = null;
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
 
         visionSubsystem = null;
+        // simWorld = null;
       }
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        SimWorld simWorld = new SimWorld();
+        // simWorld = new SimWorld();
         swerveDrive =
             new SwerveDrive(
                 new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
@@ -71,11 +75,11 @@ public class RobotContainer {
         visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
-        simWorld
-            .robot()
-            .getDriveTrain()
-            .setChassisWorldPose(new Pose2d(2, 2, Rotation2d.kZero), false);
-        simWorld.arena().resetFieldForAuto();
+        // simWorld
+        //     .robot()
+        //     .getDriveTrain()
+        //     .setChassisWorldPose(new Pose2d(2, 2, Rotation2d.kZero), false);
+        // simWorld.arena().resetFieldForAuto();
       }
 
       default -> {
@@ -90,12 +94,14 @@ public class RobotContainer {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {});
+        // simWorld = null;
       }
     }
   }
 
   public void teleopInit() {
     configureButtonBindings();
+
     swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
@@ -142,6 +148,13 @@ public class RobotContainer {
     driverLeftDirectionPad.onTrue(
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+    driverController
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    swerveDrive.resetEstimatedPose(
+                        simWorld.robot().getDriveTrain().getChassisWorldPose())));
   }
 
   public Command getAutonomousCommand() {

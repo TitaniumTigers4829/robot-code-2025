@@ -10,10 +10,10 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerve;
 import frc.robot.extras.sim.simController.ClosedLoop;
-import frc.robot.extras.sim.simController.UnitSafeMotorController;
 import frc.robot.extras.sim.simController.UnitSafeControl.AngularPIDFeedback;
 import frc.robot.extras.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
 import frc.robot.extras.sim.simController.UnitSafeControl.FlywheelFeedforward;
+import frc.robot.extras.sim.simController.UnitSafeMotorController;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
