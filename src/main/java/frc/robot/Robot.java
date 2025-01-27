@@ -1,7 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.extras.simulation.field.SimulatedField;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -17,8 +23,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
+  private RobotContainer robotContainer;
+
 
   public Robot() {
     // Record metadata
@@ -68,8 +74,7 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
   }
 
   /** This function is called periodically during all modes. */
@@ -98,33 +103,19 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledPeriodic() {}
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-  }
-
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
+  @Override
+  public void autonomousInit() {
+    autoChooser.selectedCommandScheduler();
 
+  }
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-
-    m_robotContainer.teleopInit();
+    robotContainer.teleopInit();
+    
   }
 
   /** This function is called periodically during operator control. */
@@ -150,6 +141,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedField.getInstance().simulationPeriodic();
-    m_robotContainer.updateFieldSimAndDisplay();
+    robotContainer.updateFieldSimAndDisplay();
   }
 }
