@@ -121,8 +121,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight);
-    // !isTeleporting(limelight);.
+    return isValidPoseEstimate(limelight) && !isTeleporting(limelight);
     //  && isConfident(limelight);
   }
 

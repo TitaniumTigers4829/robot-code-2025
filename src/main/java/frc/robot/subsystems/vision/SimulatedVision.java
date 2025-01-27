@@ -16,6 +16,8 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 /**
+ *
+ *
  * <h3>Simulates the vision system.</h3>
  *
  * <p>SimulatedVision is a class that simulates the vision system and extends {@link
@@ -25,7 +27,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
  * <p><b>See</b>: <a
  * href="https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java">PhotonVision
  * example</a> for an example of odometry simulation using PhotonVision.
- * 
+ *
  * @author Ishan
  */
 public class SimulatedVision extends PhysicalVision {
