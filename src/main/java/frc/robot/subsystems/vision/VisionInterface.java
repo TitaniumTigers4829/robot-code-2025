@@ -71,7 +71,8 @@ public interface VisionInterface {
 
   /**
    * Gets the current ambiguity of the Limelight's pose calculation. This ambiguity is a measure of
-   * how confident the Limelight is in its pose calculation.
+   * how confident the Limelight is in its pose calculation. The range is from 0 to 1, where 0 is
+   * less ambiguous and 1 is more ambiguous.
    *
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current ambiguity of the Limelight
