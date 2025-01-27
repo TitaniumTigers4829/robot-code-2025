@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonCamera;
 
+// import org.photonvision.PhotonCamera;
+
 public final class VisionConstants {
   public enum Limelight {
     BACK(0, VisionConstants.BACK_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR), // We have one LL3G
@@ -77,6 +79,11 @@ public final class VisionConstants {
 
   public static final double MEGA_TAG_2_MAX_HEADING_RATE =
       180; // degrees/s // TODO: This can be tested more
+
+  public static final double MAX_TRANSLATION_DELTA_METERS = .5; // Adjust based on expected movement
+  public static final double MAX_ROTATION_DELTA_DEGREES = 20.0; // Adjust based on expected rotation
+  public static final double CLOSENESS_THRESHOLD = 0.5; // meters
+  public static final double MIN_CONFIDENCE_THRESHOLD = 0.8;
 
   public static final double MEGA_TAG_2_DISTANCE_THRESHOLD = 5; // TODO: Tune
 
