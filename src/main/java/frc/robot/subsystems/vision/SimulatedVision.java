@@ -26,6 +26,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
  * href="https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java">PhotonVision
  * example</a> for an example of odometry simulation using PhotonVision.
  * 
+ * @author Ishan
  */
 public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim shooterCameraSim;
