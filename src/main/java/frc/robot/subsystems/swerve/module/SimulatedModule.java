@@ -99,10 +99,4 @@ public class SimulatedModule implements ModuleInterface {
     moduleSimulation.requestDriveVoltageOut(Volts.of(0));
     moduleSimulation.requestTurnVoltageOut(Volts.of(0));
   }
-
-  @Override
-  public void setXStance(double desiredPositionDegrees) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setXStance'");
-  }
 }

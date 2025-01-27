@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import org.photonvision.PhotonCamera;
 
 // import org.photonvision.PhotonCamera;
 
@@ -58,11 +59,11 @@ public final class VisionConstants {
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
-  // public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
-  // public static final PhotonCamera FRONT_LEFT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  // public static final PhotonCamera FRONT_RIGHT_CAMERA =
-  //     new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
+  public static final PhotonCamera FRONT_LEFT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_LEFT.getName());
+  public static final PhotonCamera FRONT_RIGHT_CAMERA =
+      new PhotonCamera(Limelight.FRONT_RIGHT.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
@@ -78,6 +79,11 @@ public final class VisionConstants {
 
   public static final double MEGA_TAG_2_MAX_HEADING_RATE =
       180; // degrees/s // TODO: This can be tested more
+
+  public static final double MAX_TRANSLATION_DELTA_METERS = .5; // Adjust based on expected movement
+  public static final double MAX_ROTATION_DELTA_DEGREES = 20.0; // Adjust based on expected rotation
+  public static final double CLOSENESS_THRESHOLD = 0.5; // meters
+  public static final double MIN_CONFIDENCE_THRESHOLD = 0.8;
 
   public static final double MEGA_TAG_2_DISTANCE_THRESHOLD = 5; // TODO: Tune
 

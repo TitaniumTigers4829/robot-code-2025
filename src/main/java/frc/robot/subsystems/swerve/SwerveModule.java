@@ -102,10 +102,6 @@ public class SwerveModule {
     return inputs.turnVelocity;
   }
 
-  public void setXStance(double desiredPositionDegrees) {
-    io.setXStance(desiredPositionDegrees);
-  }
-
   /** Returns the current drive position of the module in meters. */
   public double getDrivePositionMeters() {
     return ModuleConstants.DRIVE_TO_METERS * inputs.drivePosition;
