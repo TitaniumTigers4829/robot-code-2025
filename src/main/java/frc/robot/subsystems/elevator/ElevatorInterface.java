@@ -14,7 +14,6 @@ public interface ElevatorInterface {
     public double followerMotorPosition = 0.0;
     public double leaderMotorVoltage = 0.0;
     public double followerMotorVoltage = 0.0;
-
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}

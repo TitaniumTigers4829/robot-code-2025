@@ -7,26 +7,29 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class SimulatedIntake implements IntakeInterface{
-    DCMotorSim simIntake = new DCMotorSim(LinearSystemId.createDCMotorSystem(
-        DCMotor.getFalcon500(1), 0.01, 1), 
-        DCMotor.getFalcon500(1), 0);
-    
-    private double intakeAppliedVolts = 0.0;
+public class SimulatedIntake implements IntakeInterface {
+  DCMotorSim simIntake =
+      new DCMotorSim(
+          LinearSystemId.createDCMotorSystem(DCMotor.getFalcon500(1), 0.01, 1),
+          DCMotor.getFalcon500(1),
+          0);
 
-    public SimulatedIntake(){}
+  private double intakeAppliedVolts = 0.0;
 
-    @Override
-    public void updateInputs(IntakeInputs intakeInputs){
-        simIntake.update(0.02);
+  public SimulatedIntake() {}
 
-        intakeInputs.intakeVelocity = RadiansPerSecond.of(simIntake.getAngularVelocityRadPerSec()).in(RotationsPerSecond);
-        intakeInputs.currentAmps = simIntake.getCurrentDrawAmps();
-        intakeInputs.appliedVolts = intakeAppliedVolts;
-    }
+  @Override
+  public void updateInputs(IntakeInputs intakeInputs) {
+    simIntake.update(0.02);
 
-    @Override
-    public double getIntakeSpeed(){
-        return RadiansPerSecond.of(simIntake.getAngularVelocityRadPerSec()).in(RotationsPerSecond);
-    }
+    intakeInputs.intakeVelocity =
+        RadiansPerSecond.of(simIntake.getAngularVelocityRadPerSec()).in(RotationsPerSecond);
+    intakeInputs.currentAmps = simIntake.getCurrentDrawAmps();
+    intakeInputs.appliedVolts = intakeAppliedVolts;
+  }
+
+  @Override
+  public double getIntakeSpeed() {
+    return RadiansPerSecond.of(simIntake.getAngularVelocityRadPerSec()).in(RotationsPerSecond);
+  }
 }
