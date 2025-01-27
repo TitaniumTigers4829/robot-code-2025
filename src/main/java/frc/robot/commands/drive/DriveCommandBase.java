@@ -1,5 +1,3 @@
-// TigerLib 2024
-
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,9 +42,9 @@ public abstract class DriveCommandBase extends Command {
         swerveDrive.getOdometryRotation2d().getDegrees(),
         swerveDrive.getGyroRate(),
         swerveDrive.getEstimatedPose());
-    calculatePoseFromLimelight(Limelight.BACK);
-    calculatePoseFromLimelight(Limelight.FRONT_LEFT);
-    calculatePoseFromLimelight(Limelight.FRONT_RIGHT);
+    addLimelightVisionMeasurement(Limelight.BACK);
+    addLimelightVisionMeasurement(Limelight.FRONT_LEFT);
+    addLimelightVisionMeasurement(Limelight.FRONT_RIGHT);
   }
 
   /**
@@ -54,7 +52,7 @@ public abstract class DriveCommandBase extends Command {
    *
    * @param limelight The limelight to calculate the pose from
    */
-  public void calculatePoseFromLimelight(Limelight limelight) {
+  public void addLimelightVisionMeasurement(Limelight limelight) {
     // Only do pose calculation if we can see the april tags
     if (vision.canSeeAprilTags(limelight)) {
       // Only do pose calculation if the measurement from the limelight is valid

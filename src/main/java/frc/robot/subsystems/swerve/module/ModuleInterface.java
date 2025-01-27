@@ -66,6 +66,4 @@ public interface ModuleInterface {
   default double getTurnRotations() {
     return 0.0;
   }
-
-  default void setXStance(double desiredPositionDegrees) {}
 }
