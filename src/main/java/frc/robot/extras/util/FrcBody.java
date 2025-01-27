@@ -14,7 +14,6 @@ import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.util.geometry.Velocity2d;
 import frc.robot.extras.util.mathutils.GeomUtil;
-
 import org.dyn4j.dynamics.Body;
 
 public class FrcBody extends Body {

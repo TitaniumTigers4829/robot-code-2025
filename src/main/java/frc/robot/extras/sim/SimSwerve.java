@@ -97,10 +97,12 @@ public class SimSwerve extends SimDriveTrain {
 
   @Override
   protected void simTick() {
+    RuntimeLog.debug("SimSwerve simTick called");
     simulateModulePropulsion();
     simulateModuleFriction();
     gyroSimulation.updateSimulationSubTick(
         this.getChassisWorldPose().getRotation().getMeasure(), this.getTickTwist());
+    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
     super.simTick();
   }
 
@@ -121,10 +123,9 @@ public class SimSwerve extends SimDriveTrain {
       yFrictionAccel = yFrictionAccel.plus(pack.getFirst().y());
       angularFrictionAccel = angularFrictionAccel.plus(pack.getSecond());
 
-      // Logger.recordOutput("Friction/module" + i + "/frictionForce", frictionForce, XY.struct);
-      // Logger.recordOutput("Friction/module" + i + "/xyFrictionAccel", pack.getFirst(),
-      // XY.struct);
-      // Logger.recordOutput("Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
+      Logger.recordOutput("Forces/Friction/module" + i + "/frictionForce", frictionForce);
+      Logger.recordOutput("Forces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
+      Logger.recordOutput("Forces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
     }
 
     // clamp the friction acceleration to prevent the robot from accelerating in the opposite
@@ -148,18 +149,18 @@ public class SimSwerve extends SimDriveTrain {
     final AngularAcceleration angularAccelNeededToStop =
         MeasureMath.negate(RadiansPerSecond.of(unwantedSpeeds.omegaRadiansPerSecond))
             .div(timing.dt());
-    Logger.recordOutput("Friction/xFrictionAccelPreClamp", xFrictionAccel);
-    Logger.recordOutput("Friction/yFrictionAccelPreClamp", yFrictionAccel);
+    Logger.recordOutput("Forces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
+    Logger.recordOutput("Forces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
     xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
     yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
     angularFrictionAccel = MeasureMath.clamp(angularFrictionAccel, angularAccelNeededToStop);
 
-    Logger.recordOutput("Friction/xAccelNeededToStop", xAccelNeededToStop);
-    Logger.recordOutput("Friction/yAccelNeededToStop", yAccelNeededToStop);
-    Logger.recordOutput("Friction/angularAccelNeededToStop", angularAccelNeededToStop);
-    Logger.recordOutput("Friction/xFrictionAccel", xFrictionAccel);
-    Logger.recordOutput("Friction/yFrictionAccel", yFrictionAccel);
-    Logger.recordOutput("Friction/angularFrictionAccel", angularFrictionAccel);
+    Logger.recordOutput("Forces/Friction/xAccelNeededToStop", xAccelNeededToStop);
+    Logger.recordOutput("Forces/Friction/yAccelNeededToStop", yAccelNeededToStop);
+    Logger.recordOutput("Forces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
+    Logger.recordOutput("Forces/Friction/xFrictionAccel", xFrictionAccel);
+    Logger.recordOutput("Forces/Friction/yFrictionAccel", yFrictionAccel);
+    Logger.recordOutput("Forces/Friction/angularFrictionAccel", angularFrictionAccel);
 
     // convert the friction acceleration to forces and torques and apply them to the chassis
     final Force xFrictionForce = chassisMass.forceDueToAcceleration(xFrictionAccel);
@@ -190,7 +191,7 @@ public class SimSwerve extends SimDriveTrain {
 
       // Logger.recordOutput("Propulsion/module" + module.id() + "/forces", pack.getFirst(),
       // XY.struct);
-      Logger.recordOutput("Propulsion/module" + module.id() + "/torque", pack.getSecond());
+      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
     }
 
     // The rotor inertia can very depending on how the modules are driving the chassis.
@@ -206,9 +207,9 @@ public class SimSwerve extends SimDriveTrain {
       final double yPropulsionRatio = propulsionForceYMag / propulsionForceTotalMag;
       final double translationRatio = Math.hypot(xPropulsionRatio, yPropulsionRatio);
 
-      Logger.recordOutput("RotorInertia/xPropulsionRatio", xPropulsionRatio);
-      Logger.recordOutput("RotorInertia/yPropulsionRatio", yPropulsionRatio);
-      Logger.recordOutput("RotorInertia/translationRatio", translationRatio);
+      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
+      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
+      Logger.recordOutput("Forces/RotorInertia/translationRatio", translationRatio);
 
       // Calculate the rotor inertia based on the propulsion ratios
       this.rotorInertia =
@@ -218,12 +219,12 @@ public class SimSwerve extends SimDriveTrain {
     } else {
       this.rotorInertia = rotorInertiaWhenTranslating;
 
-      Logger.recordOutput("RotorInertia/xPropulsionRatio", 0.0);
-      Logger.recordOutput("RotorInertia/yPropulsionRatio", 0.0);
-      Logger.recordOutput("RotorInertia/translationRatio", 0.0);
+      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/RotorInertia/translationRatio", 0.0);
     }
 
-    Logger.recordOutput("Propulsion/propulsionTorque", propulsionTorque);
+    Logger.recordOutput("Forces/Propulsion/propulsionTorque", propulsionTorque);
     // Logger.recordOutput("Propulsion/propulsionForce", new XY<>(propulsionForceX,
     // propulsionForceY), XY.struct);
 

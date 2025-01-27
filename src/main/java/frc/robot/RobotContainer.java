@@ -24,8 +24,6 @@ import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.Logger;
-
 public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
@@ -73,7 +71,6 @@ public class RobotContainer {
         visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
-        Logger.recordOutput("Odometry/ChassisPose", simWorld.robot().getDriveTrain().getChassisWorldPose());
         simWorld
             .robot()
             .getDriveTrain()

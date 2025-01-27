@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.IterativeRobotBase;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
-import frc.robot.extras.util.mathutils.GeomUtil;
 import frc.robot.extras.util.ProjectileUtil;
 import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.mathutils.GeomUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +77,6 @@ public abstract class SimArena {
     }
     FrcBodySnapshot[] obstacleSnapshot =
         obstaclesMap.obstacles.stream().map(FrcBody::snapshot).toArray(FrcBodySnapshot[]::new);
-    // logger.log("Obstacles", obstacleSnapshot, FrcBodySnapshot.struct);
   }
 
   void withWorld(Consumer<World<Body>> worldModifier) {
@@ -130,7 +129,7 @@ public abstract class SimArena {
   }
 
   private void simulationSubTick() {
-    for (final SimRobot<?> otherRobot : robots) otherRobot.simTick();
+    for (final SimRobot<?> robot : robots) robot.simTick();
 
     for (final SimGamePiece gamePiece : gamePieces) gamePiece.simulationSubTick();
 

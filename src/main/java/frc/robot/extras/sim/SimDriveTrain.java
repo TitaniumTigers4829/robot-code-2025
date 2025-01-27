@@ -9,8 +9,8 @@ import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.util.FrcBody;
+import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.GeomUtil;
-
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;
@@ -110,6 +110,7 @@ public class SimDriveTrain {
    * @return a {@link Pose2d} object yielding the current world pose of the robot in the simulation
    */
   public Pose2d getChassisWorldPose() {
+    RuntimeLog.debug("Successfully retrieved chassis world pose");
     return GeomUtil.toWpilibPose2d(chassis.getTransform());
   }
 

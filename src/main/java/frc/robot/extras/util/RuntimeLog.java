@@ -32,8 +32,4 @@ public class RuntimeLog {
     entry.set("[SIM] (ERROR) " + error);
     DriverStationJNI.sendError(true, 1, false, "[SIM] " + error, "", "", true);
   }
-
-  // public static DataLogger loggerFor(String subPath) {
-  //     return diagnostics.getSubLogger(subPath);
-  // }
 }

@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.sim.SimArena;
@@ -197,9 +199,6 @@ public class Reefscape {
     }
 
     @Override
-    public void competitionPeriodic() {}
-
-    @Override
     protected void placeGamePiecesOnField() {
       Translation2d[] bluePositions =
           new Translation2d[] {
@@ -216,6 +215,28 @@ public class Reefscape {
                           FieldConstants.FIELD_WIDTH_METERS - bluePosition.getX(),
                           bluePosition.getY()))
               .toArray(Translation2d[]::new);
+    }
+
+    private static final Translation3d BLUE_SOURCE_POSITION = new Translation3d(15.6, 0.8, 0.1);
+    private double previousThrowTimeSeconds = 0;
+
+    @Override
+    protected void competitionPeriodic() {
+      if (!DriverStation.isTeleopEnabled()) return;
+
+      if (Timer.getFPGATimestamp() - previousThrowTimeSeconds < 1) return;
+
+      //   final Translation3d sourcePosition = toCurrentAllianceTranslation(BLUE_SOURCE_POSITION);
+      //   /* if there is any game-piece 0.5 meters within the human player station, we don't throw
+      // a new note */
+      //   boolean gpNearSource =
+      //       gamePieces.stream()
+      //           .anyMatch(gp -> gp.pose().getTranslation().getDistance(sourcePosition) < 0.6);
+      //   if (gpNearSource) return;
+
+      //   /* otherwise, place a note */
+      //   super.createGamePiece(VARIANT).place(sourcePosition.toTranslation2d());
+      previousThrowTimeSeconds = Timer.getFPGATimestamp();
     }
   }
 }

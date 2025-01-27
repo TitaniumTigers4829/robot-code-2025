@@ -36,6 +36,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
+import org.littletonrobotics.junction.Logger;
 
 public class UnitSafeControl {
   /** A PD controller that uses units to ensure that the controller is used correctly. */
@@ -67,12 +68,12 @@ public class UnitSafeControl {
           new edu.wpi.first.math.controller.PIDController(kP.baseUnitMagnitude(), 0.0, 0.0);
     }
 
-    public void logGains(EpilogueBackend logger) {
-      logger.log("kP", internalController.getP());
-      logger.log("kI", internalController.getI());
-      logger.log("kD", internalController.getD());
-      logger.log("outputUnit", outputUnit.name());
-      logger.log("inputUnit", inputUnit.name());
+    public void logGains() {
+      Logger.recordOutput("Sim/kP", internalController.getP());
+      Logger.recordOutput("Sim/kI", internalController.getI());
+      Logger.recordOutput("Sim/kD", internalController.getD());
+      Logger.recordOutput("Sim/outputUnit", outputUnit.name());
+      Logger.recordOutput("Sim/inputUnit", inputUnit.name());
     }
 
     @SuppressWarnings("unchecked")
@@ -239,7 +240,7 @@ public class UnitSafeControl {
 
   public sealed interface Feedforward<O extends Unit, Q extends Unit>
       permits FlywheelFeedforward, ElevatorFeedforward, ArmFeedforward {
-    public void logGains(EpilogueBackend logger);
+    public void logGains();
   }
 
   public static final class FlywheelFeedforward<O extends Unit>
@@ -272,17 +273,17 @@ public class UnitSafeControl {
     }
 
     @Override
-    public void logGains(EpilogueBackend logger) {
-      logger.log("kS", kS.baseUnitMagnitude());
+    public void logGains() {
+      Logger.recordOutput("Sim/kS", kS.baseUnitMagnitude());
       if (kV != null) {
-        logger.log("kV", kV.baseUnitMagnitude());
+        Logger.recordOutput("Sim/kV", kV.baseUnitMagnitude());
       }
       if (kA != null) {
-        logger.log("kA", kA.baseUnitMagnitude());
+        Logger.recordOutput("Sim/kA", kA.baseUnitMagnitude());
       }
-      logger.log("outputUnit", outputUnit.name());
-      logger.log("inputUnit", Radian.name());
-      logger.log("feedforwardType", "Flywheel");
+      Logger.recordOutput("Sim/outputUnit", outputUnit.name());
+      Logger.recordOutput("Sim/inputUnit", Radian.name());
+      Logger.recordOutput("Sim/feedforwardType", "Flywheel");
     }
 
     @SuppressWarnings({"unchecked", "removal"})
@@ -330,13 +331,13 @@ public class UnitSafeControl {
     }
 
     @Override
-    public void logGains(EpilogueBackend logger) {
-      logger.log("kS", kS.baseUnitMagnitude());
-      logger.log("kV", kV.baseUnitMagnitude());
-      logger.log("kA", kA.baseUnitMagnitude());
-      logger.log("outputUnit", outputUnit.name());
-      logger.log("inputUnit", Meters.name());
-      logger.log("feedforwardType", "Elevator");
+    public void logGains() {
+      Logger.recordOutput("Sim/kS", kS.baseUnitMagnitude());
+      Logger.recordOutput("Sim/kV", kV.baseUnitMagnitude());
+      Logger.recordOutput("Sim/kA", kA.baseUnitMagnitude());
+      Logger.recordOutput("Sim/outputUnit", outputUnit.name());
+      Logger.recordOutput("Sim/inputUnit", Meters.name());
+      Logger.recordOutput("Sim/feedforwardType", "Elevator");
     }
 
     @SuppressWarnings({"unchecked", "removal"})
@@ -380,17 +381,7 @@ public class UnitSafeControl {
       this.kA = kA;
     }
 
-    @Override
-    public void logGains(EpilogueBackend logger) {
-      logger.log("kS", kS.baseUnitMagnitude());
-      logger.log("kV", kV.baseUnitMagnitude());
-      logger.log("kA", kA.baseUnitMagnitude());
-      logger.log("outputUnit", outputUnit.name());
-      logger.log("inputUnit", Radian.name());
-      logger.log("feedforwardType", "Arm");
-    }
-
-    @SuppressWarnings({"unchecked", "removal"})
+    @SuppressWarnings("unchecked")
     public Measure<O> calculate(
         Angle currentAngle, AngularVelocity goalRate, AngularAcceleration goalRateRate) {
       return (Measure<O>)
@@ -418,6 +409,13 @@ public class UnitSafeControl {
           outputUnit.of(
               internalFeedforward.calculate(
                   currentAngle.baseUnitMagnitude(), goalRate.baseUnitMagnitude()));
+    }
+
+    // TODO: Fill in.
+    @Override
+    public void logGains() {
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'logGains'");
     }
   }
 
