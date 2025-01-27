@@ -283,7 +283,6 @@ public class PhysicalVision implements VisionInterface {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
-  }
 
   /**
    * Sets the AtomicBoolean 'runningThreads' to false for the specified limelight. Stops the thread
