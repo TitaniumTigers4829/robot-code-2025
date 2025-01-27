@@ -222,7 +222,7 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks if the MT1 and MT2 pose estimate exists and whether it is within the field
+   * Checks if the pose estimate exists and whether it is within the field
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return True if the pose estimate exists within the field and the pose estimate is not null
