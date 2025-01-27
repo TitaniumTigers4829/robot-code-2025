@@ -233,10 +233,9 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks whether the pose estimate for MT1 or MT2 is within the field
+   * Checks whether the pose estimate is within the field
    *
-   * @param megaTag1Estimate the MT1 pose estimate to check
-   * @param megaTag2Estimate the MT2 pose estimate to check
+   * @param poseEstimate The pose estimate to check
    */
   private boolean isWithinFieldBounds(Pose2d poseEstimate) {
     return ((poseEstimate.getX() > 0 && poseEstimate.getX() <= FieldConstants.FIELD_LENGTH_METERS)
