@@ -79,8 +79,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public Pose2d getPoseFromAprilTags(Limelight limelight) {
-    Pose2d currentPose = limelightEstimates.get(limelight.getId()).fieldToCamera;
-    return currentPose != null ? currentPose : odometryPose;
+    return limelightEstimates.get(limelight.getId()).fieldToCamera;
   }
 
   @Override
@@ -120,9 +119,15 @@ public class PhysicalVision implements VisionInterface {
     this.odometryPose = odometryPose;
   }
 
+  @Override
+  public boolean isValidMeasurement(Limelight limelight) {
+    return isValidPoseEstimate(limelight);
+    // !isTeleporting(limelight);.
+    //  && isConfident(limelight);
+  }
+
   /**
-   * Gets the JSON dump from the specified limelight and puts it into a PoseEstimate object, which
-   * is then placed into its corresponding spot in the limelightEstimates array.
+   * Gets the pose update of the specified limelight while the robot is enabled.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
@@ -131,6 +136,13 @@ public class PhysicalVision implements VisionInterface {
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
     if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
         && isWithinFieldBounds(megatag2Estimate.pose)) {
+      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose. This
+      // creates a much more stable and accurate pose when translating, but when rotating but the
+      // pose will not
+      // be consistent due to latency between receiving and sending measurements. The parameters are
+      // limelightName, yaw,
+      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
+      // roll in our pose estimate, so we don't send those values to the limelight (hence the 0's).
       LimelightHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
       limelightEstimates.set(
@@ -239,13 +251,6 @@ public class PhysicalVision implements VisionInterface {
    */
   public boolean isLimelightConnected(Limelight limelight) {
     return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
-  }
-
-  @Override
-  public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight);
-    // !isTeleporting(limelight);.
-    //  && isConfident(limelight);
   }
 
   /**
