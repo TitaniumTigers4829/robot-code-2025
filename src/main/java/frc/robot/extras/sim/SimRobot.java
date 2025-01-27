@@ -6,13 +6,13 @@ import edu.wpi.first.math.geometry.Rectangle2d;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
-import frc.robot.extras.util.GeomUtil;
 import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.mathutils.GeomUtil;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Represents a robot in the sham environment.
+ * Represents a robot in the sim environment.
  *
  * <p>A robot is composed of:
  *
@@ -36,7 +36,6 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(
       SimArena arena, String name, C drivetrainConfig, int gamePieceStorageCapacity) {
     this.arena = arena;
-    // logger = arena.logger.getSubLogger(name + "Robot");
     arena.robots.add(this);
     this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
     arena.withWorld(world -> world.addBody(driveTrain.chassis));

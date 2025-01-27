@@ -24,8 +24,8 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
 import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
-import frc.robot.extras.util.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.util.mathutils.MeasureMath;
 import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class SimSwerve extends SimDriveTrain {
   private final SwerveDriveKinematics kinematics;
 
   private MomentOfInertia rotorInertia;
-  ;
+
   private final MomentOfInertia rotorInertiaWhenTranslating;
   private final MomentOfInertia rotorInertiaWhenRotating;
 

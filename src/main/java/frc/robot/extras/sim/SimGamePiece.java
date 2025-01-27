@@ -12,11 +12,12 @@ import edu.wpi.first.math.geometry.Twist3d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.util.GeomUtil;
-import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.ProjectileUtil.ProjectileDynamics;
+import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.geometry.Velocity2d;
 import frc.robot.extras.util.geometry.Velocity3d;
+import frc.robot.extras.util.mathutils.GeomUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

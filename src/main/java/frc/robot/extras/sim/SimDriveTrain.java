@@ -9,7 +9,7 @@ import frc.robot.extras.sim.SimArena.SimEnvTiming;
 import frc.robot.extras.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.sim.configs.SimSwerveConfig;
 import frc.robot.extras.util.FrcBody;
-import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.mathutils.GeomUtil;
 
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
@@ -84,6 +84,7 @@ public class SimDriveTrain {
       chassis.setLinearVelocity(0, 0);
       chassis.setAngularVelocity(0);
     }
+    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
   }
 
   /**

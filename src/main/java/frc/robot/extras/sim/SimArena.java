@@ -13,11 +13,10 @@ import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.util.FrcBody;
-import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
+import frc.robot.extras.util.mathutils.GeomUtil;
 import frc.robot.extras.util.ProjectileUtil;
 import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -128,7 +127,6 @@ public abstract class SimArena {
     for (int i = 0; i < timing.ticksPerPeriod; i++) {
       simulationSubTick();
     }
-
   }
 
   private void simulationSubTick() {

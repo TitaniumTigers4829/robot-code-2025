@@ -1,4 +1,4 @@
-package frc.robot.extras.util;
+package frc.robot.extras.util.mathutils;
 
 import static edu.wpi.first.units.Units.*;
 
