@@ -15,10 +15,18 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-// Simulate the vision system.
-// Please see the following link for example code
-//
-// https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java
+/**
+ * <h3>Simulates the vision system.</h3>
+ *
+ * <p>SimulatedVision is a class that simulates the vision system and extends {@link
+ * PhysicalVision}. It uses the PhotonVision library to send simulated NetworkTables data to the
+ * limelight tables.
+ *
+ * <p><b>See</b>: <a
+ * href="https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java">PhotonVision
+ * example</a> for an example of odometry simulation using PhotonVision.
+ * 
+ */
 public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim shooterCameraSim;
   PhotonCameraSim frontLeftCameraSim;
