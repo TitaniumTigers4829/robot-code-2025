@@ -10,7 +10,7 @@ import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.sim.SimSwerve;
 import frc.robot.extras.sim.simController.ClosedLoop;
-import frc.robot.extras.sim.simController.SimulatedController;
+import frc.robot.extras.sim.simController.UnitSafeMotorController;
 import frc.robot.extras.sim.simController.UnitSafeControl.AngularPIDFeedback;
 import frc.robot.extras.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
 import frc.robot.extras.sim.simController.UnitSafeControl.FlywheelFeedforward;
@@ -18,14 +18,14 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
 public class SimulatedModule implements ModuleInterface {
-  private final SimulatedController driveMotor;
-  private final SimulatedController steerMotor;
+  private final UnitSafeMotorController driveMotor;
+  private final UnitSafeMotorController steerMotor;
   private final ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> driveLoop;
   private final ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> steerLoop;
 
   public SimulatedModule(int moduleId, SimSwerve simSwerve) {
-    driveMotor = new SimulatedController();
-    steerMotor = new SimulatedController();
+    driveMotor = new UnitSafeMotorController();
+    steerMotor = new UnitSafeMotorController();
 
     driveLoop =
         ClosedLoop.forVoltageAngularVelocity(

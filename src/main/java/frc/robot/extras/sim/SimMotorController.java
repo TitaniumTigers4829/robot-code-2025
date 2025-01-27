@@ -13,7 +13,7 @@ import frc.robot.extras.util.ProceduralStructGenerator;
 
 /**
  * An interface to represent a motor controller in the simulation. This can be used to allow
- * CTRE/REV sim to work with the sham library.
+ * CTRE/REV sim to work with the sim library.
  */
 public interface SimMotorController {
   public sealed interface ControllerOutput {

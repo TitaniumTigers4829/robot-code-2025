@@ -33,7 +33,7 @@ import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
 import java.util.Optional;
 
-public class SimulatedController implements SimMotorController {
+public class UnitSafeMotorController implements SimMotorController {
   private static final VelocityUnit<AngleUnit> VU = VelocityUnit.combine(Radians, Seconds);
   private static final VelocityUnit<AngularVelocityUnit> AU =
       VelocityUnit.combine(RadiansPerSecond, Seconds);
@@ -146,20 +146,20 @@ public class SimulatedController implements SimMotorController {
   private Voltage lastVoltage = Volts.of(0.0);
   private MechanismState lastState = MechanismState.zero();
 
-  public SimulatedController() {}
+  public UnitSafeMotorController() {}
 
-  public SimulatedController configureCurrentLimit(CurrentLimits currentLimit) {
+  public UnitSafeMotorController configureCurrentLimit(CurrentLimits currentLimit) {
     this.currentLimits = currentLimit;
     return this;
   }
 
-  public SimulatedController configureSoftLimits(Angle forwardLimit, Angle reverseLimit) {
+  public UnitSafeMotorController configureSoftLimits(Angle forwardLimit, Angle reverseLimit) {
     this.forwardSoftLimit = forwardLimit;
     this.reverseSoftLimit = reverseLimit;
     return this;
   }
 
-  public SimulatedController configSensorToMechanismRatio(double ratio) {
+  public UnitSafeMotorController configSensorToMechanismRatio(double ratio) {
     this.sensorToMechanismRatio = ratio;
     return this;
   }
