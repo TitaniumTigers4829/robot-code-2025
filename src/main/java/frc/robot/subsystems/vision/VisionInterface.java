@@ -65,7 +65,7 @@ public interface VisionInterface {
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current timestamp of the Limelight
    */
-  default double getTimeStampSeconds(Limelight limelight) {
+  default double getTimestampSeconds(Limelight limelight) {
     return 0.0;
   }
 

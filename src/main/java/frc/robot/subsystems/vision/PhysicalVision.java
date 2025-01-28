@@ -63,7 +63,7 @@ public class PhysicalVision implements VisionInterface {
       inputs.limelightLatencies[limelight.getId()] = getLatencySeconds(limelight);
       inputs.limelightAprilTagDistances[limelight.getId()] =
           getLimelightAprilTagDistance(limelight);
-      inputs.limelightTimestamps[limelight.getId()] = getTimeStampSeconds(limelight);
+      inputs.limelightTimestamps[limelight.getId()] = getTimestampSeconds(limelight);
       inputs.limelightAmbiguities[limelight.getId()] = getAmbiguity(limelight);
 
       inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
@@ -92,8 +92,8 @@ public class PhysicalVision implements VisionInterface {
   }
 
   @Override
-  public double getTimeStampSeconds(Limelight limelight) {
-    return limelightEstimates.get(limelight.getId()).timestampSeconds / 1000.0;
+  public double getTimestampSeconds(Limelight limelight) {
+    return limelightEstimates.get(limelight.getId()).timestampSeconds;
   }
 
   @Override
