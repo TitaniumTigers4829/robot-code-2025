@@ -288,8 +288,7 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Sets the AtomicBoolean 'runningThreads' to false for the specified limelight. Stops the thread
-   * for the specified limelight.
+   * Stops the thread for the specified limelight.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
