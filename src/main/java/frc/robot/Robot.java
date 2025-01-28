@@ -149,7 +149,6 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
-    simWorld.robot().getDriveTrain().setChassisWorldPose(new Pose2d(2, 2, Rotation2d.kZero), false);
   }
 
   /** This function is called periodically whilst in simulation. */
@@ -157,7 +156,7 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     if (simWorld != null) {
       RuntimeLog.debug("Updating sim world");
-      simWorld.update(() -> simWorld.robot().getDriveTrain().getChassisWorldPose());
+      m_robotContainer.simulationPeriodic();
     }
   }
 }

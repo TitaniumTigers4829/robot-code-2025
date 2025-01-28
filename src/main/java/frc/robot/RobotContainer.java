@@ -75,7 +75,6 @@ public class RobotContainer {
         visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
-        simWorld.update(() -> swerveDrive.getEstimatedPose());
       }
 
       default -> {
@@ -162,5 +161,11 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     return autoChooser.getSelected();
+  }
+
+  public void simulationPeriodic() {
+    if (Robot.isSimulation()) {
+      simWorld.update(() -> swerveDrive.getEstimatedPose());
+    }
   }
 }
