@@ -26,6 +26,7 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
+
   private Debouncer teleportationDebouncer = new Debouncer(0.4, DebounceType.kRising);
 
   /**
@@ -152,6 +153,8 @@ public class PhysicalVision implements VisionInterface {
     } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
+    } else {
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
 
