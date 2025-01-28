@@ -139,8 +139,8 @@ public class SimSwerve extends SimDriveTrain {
         ChassisSpeeds.fromRobotRelativeSpeeds(wheelSpeeds, chassisRotation);
     final ChassisSpeeds unwantedSpeeds = newWheelSpeeds.minus(chassisSpeeds);
 
-    // Logger.recordOutput("Friction/wheelSpeeds", wheelSpeeds, ChassisSpeeds.struct);
-    // Logger.recordOutput("Friction/unwantedSpeeds", unwantedSpeeds, ChassisSpeeds.struct);
+    Logger.recordOutput("Friction/wheelSpeeds", wheelSpeeds);
+    Logger.recordOutput("Friction/unwantedSpeeds", unwantedSpeeds);
 
     final LinearAcceleration xAccelNeededToStop =
         MeasureMath.negate(MetersPerSecond.of(unwantedSpeeds.vxMetersPerSecond)).div(timing.dt());
@@ -189,8 +189,7 @@ public class SimSwerve extends SimDriveTrain {
       propulsionForceY = propulsionForceY.plus(pack.getFirst().y());
       propulsionTorque = propulsionTorque.plus(pack.getSecond());
 
-      // Logger.recordOutput("Propulsion/module" + module.id() + "/forces", pack.getFirst(),
-      // XY.struct);
+      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
       Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
     }
 
@@ -225,8 +224,8 @@ public class SimSwerve extends SimDriveTrain {
     }
 
     Logger.recordOutput("Forces/Propulsion/propulsionTorque", propulsionTorque);
-    // Logger.recordOutput("Propulsion/propulsionForce", new XY<>(propulsionForceX,
-    // propulsionForceY), XY.struct);
+    Logger.recordOutput(
+        "Forces/Propulsion/propulsionForce", new XY<>(propulsionForceX, propulsionForceY));
 
     chassis.applyForce(new Vector2(propulsionForceX.in(Newtons), propulsionForceY.in(Newtons)));
     chassis.applyTorque(propulsionTorque.in(NewtonMeters));
