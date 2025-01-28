@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
@@ -24,6 +26,7 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
+  private Debouncer teleportationDebouncer = new Debouncer(0.4, DebounceType.kRising);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -121,7 +124,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight) && !isTeleporting(limelight);
+    return isValidPoseEstimate(limelight) && teleportationDebouncer.calculate(!isTeleporting(limelight));
     //  && isConfident(limelight);
   }
 
@@ -176,24 +179,6 @@ public class PhysicalVision implements VisionInterface {
     } else {
       disabledPoseUpdate(limelight);
     }
-  }
-
-  /**
-   * Checks if there is a large discrepancy between the MegaTag1 and MegaTag2 estimates.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the discrepancy is larger than the defined threshold, false otherwise
-   */
-  public boolean isLargeDiscrepancyBetweenMegaTag1And2(
-      Limelight limelight, PoseEstimate mt1, PoseEstimate mt2) {
-    return !GeomUtil.areTranslationsWithinThreshold(
-            VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-            mt1.pose.getTranslation(),
-            mt2.pose.getTranslation())
-        || !GeomUtil.areRotationsWithinThreshold(
-            VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-            mt1.pose.getRotation(),
-            mt2.pose.getRotation());
   }
 
   /**
@@ -258,10 +243,11 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the robot is teleporting, false otherwise
    */
   private boolean isTeleporting(Limelight limelight) {
-    return GeomUtil.arePosesWithinThreshold(
+    return !GeomUtil.arePosesWithinThreshold(
         VisionConstants.MAX_TRANSLATION_DELTA_METERS,
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        getPoseFromAprilTags(limelight));
+        getPoseFromAprilTags(limelight), 
+        odometryPose);
   }
 
   /**
