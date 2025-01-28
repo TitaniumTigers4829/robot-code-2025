@@ -10,6 +10,7 @@ import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -225,8 +226,12 @@ public class PhysicalVision implements VisionInterface {
    * @param poseEstimate The pose estimate to check
    */
   private boolean isWithinFieldBounds(Pose2d poseEstimate) {
-    return ((poseEstimate.getX() > 0 && poseEstimate.getX() <= FieldConstants.FIELD_LENGTH_METERS)
-        && (poseEstimate.getY() > 0 && poseEstimate.getY() <= FieldConstants.FIELD_WIDTH_METERS));
+    double minX = DriveConstants.TRACK_WIDTH / 2.0;
+    double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
+    double minY = DriveConstants.WHEEL_BASE / 2.0;
+    double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
+    return ((poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
+        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY));
   }
 
   /**
