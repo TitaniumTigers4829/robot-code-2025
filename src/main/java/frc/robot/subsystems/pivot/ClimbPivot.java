@@ -20,31 +20,19 @@ public class ClimbPivot extends SubsystemBase {
     config.Slot0.kP = 0.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.MotionMagic.MotionMagicCruiseVelocity = 15000;
-    config.MotionMagic.MotionMagicAcceleration = 6000;
-    climbPivotMotor.getConfigurator().apply(new TalonFXConfiguration());
     climbPivotMotor.getConfigurator().apply(config);
   }
 
-  public void setPivotPosition(double degrees) {
-    double ticks = degreesToTicks(degrees);
-    climbPivotMotor.set(ticks);
-  }
-
-  private double ticksToDegrees(double ticks) {
-    return ticks / (TICKS_PER_ROTATION * GEAR_RATIO) * 360.0;
+  public void setPivotPosition(double angle) {
+    climbPivotMotor.set(angle);
   }
 
   public double getCurrentPosition() {
     return climbPivotMotor.getPosition().getValueAsDouble();
   }
 
-  public void stop() {
-    climbPivotMotor.set(0);
-  }
-
-  private double degreesToTicks(double degrees) {
-    return degrees / 360.0 * TICKS_PER_ROTATION * GEAR_RATIO;
+  public void stop(double endAngle) {
+    climbPivotMotor.set(endAngle);
   }
 
   public void periodic() {}
