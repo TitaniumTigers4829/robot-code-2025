@@ -227,8 +227,8 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the pose estimate exists within the field and the pose estimate is not null
    */
   public boolean isValidPoseEstimate(Limelight limelight) {
-    return limelightEstimates.get(limelight.getId()).fieldToCamera != null
-        && isWithinFieldBounds(limelightEstimates.get(limelight.getId()).fieldToCamera);
+    return getPoseFromAprilTags(limelight) != null
+        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
   }
 
   /**
@@ -271,7 +271,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight is confident in its pose estimate, false otherwise
    */
   private boolean isConfident(Limelight limelight) {
-    return getAmbiguity(limelight) >= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
+    return getAmbiguity(limelight) <= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
   }
 
   /**
