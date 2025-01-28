@@ -2,6 +2,7 @@ package frc.robot.extras.sim;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.HardwareConstants;
@@ -15,6 +16,8 @@ import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 public class SimWorld {
 
@@ -71,7 +74,9 @@ public class SimWorld {
   }
 
   /** Updates the simulation. */
-  public void update() {
+  public void update(Supplier<Pose2d> poseSupplier) {
+    robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
+    Logger.recordOutput("Odometry/ChassisPose", robot().getDriveTrain().getChassisWorldPose());
   }
 }

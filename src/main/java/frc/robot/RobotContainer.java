@@ -71,11 +71,7 @@ public class RobotContainer {
         visionSubsystem =
             new VisionSubsystem(
                 new SimulatedVision(() -> simWorld.robot().getDriveTrain().getChassisWorldPose()));
-        simWorld
-            .robot()
-            .getDriveTrain()
-            .setChassisWorldPose(new Pose2d(2, 2, Rotation2d.kZero), false);
-        simWorld.arena().resetFieldForAuto();
+        simWorld.update(() -> swerveDrive.getEstimatedPose());
       }
 
       default -> {

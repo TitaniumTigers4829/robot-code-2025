@@ -54,7 +54,4 @@ public class SimGyroConfig implements StructSerializable {
   public static SimGyroConfig ofNavX2() {
     return new SimGyroConfig(2, 0.04);
   }
-
-  // public static final Struct<SimGyroConfig> struct =
-  // ProceduralStructGenerator.genObjectNoUnpack(SimGyroConfig.class);
 }

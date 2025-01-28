@@ -153,7 +153,7 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     if (simWorld != null) {
       RuntimeLog.debug("Updating sim world");
-      simWorld.update();
+      simWorld.update(() -> simWorld.robot().getDriveTrain().getChassisWorldPose());
     }
   }
 }
