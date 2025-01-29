@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
@@ -28,7 +27,7 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Debouncer teleportationDebouncer = new Debouncer(0.05, DebounceType.kRising);
+  LinearFilter movingAverage = LinearFilter.movingAverage(5);
 
   private boolean[] isUsingMegatag2 = new boolean[Limelight.values().length];
 
@@ -133,9 +132,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight)
-        && isConfident(limelight)
-        && teleportationDebouncer.calculate(!isTeleporting(limelight));
+    return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
   /**
@@ -147,11 +144,12 @@ public class PhysicalVision implements VisionInterface {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
     if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-        && GeomUtil.arePosesWithinThreshold(
-            VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-            VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-            getMegaTag1PoseEstimate(limelight).pose,
-            getMegaTag2PoseEstimate(limelight).pose)) {
+        && (GeomUtil.arePosesWithinThreshold(
+                VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+                VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+                getMegaTag1PoseEstimate(limelight).pose,
+                getMegaTag2PoseEstimate(limelight).pose)
+            || getLimelightAprilTagDistance(limelight) > 1.5)) {
 
       // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
       // This

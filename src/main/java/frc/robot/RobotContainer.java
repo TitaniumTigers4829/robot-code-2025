@@ -152,7 +152,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     configureButtonBindings();
-    // swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
+    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
   private void configureButtonBindings() {
