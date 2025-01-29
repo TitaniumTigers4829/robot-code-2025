@@ -28,7 +28,9 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Debouncer teleportationDebouncer = new Debouncer(0.04, DebounceType.kRising);
+  private Debouncer teleportationDebouncer = new Debouncer(0.05, DebounceType.kRising);
+
+  private boolean[] isUsingMegatag2 = new boolean[Limelight.values().length];
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -70,6 +72,9 @@ public class PhysicalVision implements VisionInterface {
       inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
+      inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+
+      inputs.isUsingMegatag2[limelight.getId()] = isUsingMegatag2[limelight.getId()];
     }
   }
 
@@ -128,7 +133,9 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight) && isConfident(limelight) && teleportationDebouncer.calculate(!isTeleporting(limelight));
+    return isValidPoseEstimate(limelight)
+        && isConfident(limelight)
+        && teleportationDebouncer.calculate(!isTeleporting(limelight));
   }
 
   /**
@@ -139,29 +146,37 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-    //     && isWithinFieldBounds(megatag2Estimate.pose)) {
+    if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+        && GeomUtil.arePosesWithinThreshold(
+            VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+            VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+            getMegaTag1PoseEstimate(limelight).pose,
+            getMegaTag2PoseEstimate(limelight).pose)) {
 
-    //   // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-    // This
-    //   // creates a much more stable and accurate pose when translating, but when rotating but the
-    //   // pose will not
-    //   // be consistent due to latency between receiving and sending measurements. The parameters
-    // are
-    //   // limelightName, yaw,
-    //   // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
-    //   // roll in our pose estimate, so we don't send those values to the limelight (hence the
-    // 0's).
+      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
+      // This
+      // creates a much more stable and accurate pose when translating, but when rotating but
+      // the
+      // pose will not
+      // be consistent due to latency between receiving and sending measurements. The
+      // parameters
+      // are
+      // limelightName, yaw,
+      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
+      // roll in our pose estimate, so we don't send those values to the limelight (hence the
+      // 0's).
+      limelightEstimates.set(
+          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+      isUsingMegatag2[limelight.getId()] = true;
+    } else if (isWithinFieldBounds(megatag1Estimate.pose)
+    // && teleportationDebouncer.calculate(!isTeleporting(limelight, megatag1Estimate.pose))
+    ) {
+      isUsingMegatag2[limelight.getId()] = false;
 
-    //   LimelightHelpers.SetRobotOrientation(
-    //       limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-
-    //   limelightEstimates.set(
-    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
+      isUsingMegatag2[limelight.getId()] = false;
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
@@ -174,6 +189,8 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
+    isUsingMegatag2[limelight.getId()] = false;
+
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
@@ -261,7 +278,7 @@ public class PhysicalVision implements VisionInterface {
     return !GeomUtil.arePosesWithinThreshold(
         VisionConstants.MAX_TRANSLATION_DELTA_METERS,
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        getMegaTag1PoseEstimate(limelight).pose,
+        getPoseFromAprilTags(limelight),
         odometryPose);
   }
 
@@ -282,8 +299,13 @@ public class PhysicalVision implements VisionInterface {
    */
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
+
+      LimelightHelpers.SetRobotOrientation(
+          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+
       updatePoseEstimate(limelight);
     } else {
+      isUsingMegatag2[limelight.getId()] = false;
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
