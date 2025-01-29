@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.pivot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.subsystems.pivot.PivotConstants;
-import frc.robot.subsystems.pivot.ClimbPivotInterface.ClimbPivotInputs;
+import frc.robot.subsystems.pivot.ClimbPivotInterface.ClimbPivot.ClimbPivotInputs;
 
-/** Add your docs here. */
 public class SimulatedClimbPivot {
-    private ClimbPivotSim simulatedClimbPivot = new ClimbPivotSim(null, DCMotor.getFalcon500(2), 0);
+    private SingleJointedArmSim simulatedClimbPivot = new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0, 0.001);
   private PIDController simPID;
   private double currentVolts;
 
@@ -30,6 +32,6 @@ public class SimulatedClimbPivot {
   }
 
   public double getClimbPivotPosition() {
-    return simulatedClimbPivot.getClimbPivotPosition();
+    return simulatedClimbPivot.getAngleRads();
   }
 }

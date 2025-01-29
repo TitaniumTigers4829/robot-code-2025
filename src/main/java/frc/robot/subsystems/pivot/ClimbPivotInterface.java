@@ -6,8 +6,7 @@ package frc.robot.subsystems.pivot;
 
 /** Add your docs here. */
 public class ClimbPivotInterface {
-  public interface ClimbPivotInterface {
-    @AutoLog
+  public interface ClimbPivot {
     public static class ClimbPivotInputs {
       public double position = 0.0;
     }

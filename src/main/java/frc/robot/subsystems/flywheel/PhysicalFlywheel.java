@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.flywheel;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
 import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
 
 /** Add your docs here. */
 public class PhysicalFlywheel {
   private PhysicalFlywheel physicalFlywheel =
-      new PhysicalFlywheel(null, DCMotor.getFalcon500(2), 0);
+      new PhysicalFlywheel();
   private PIDController PID;
   private double currentVolts;
 
@@ -31,12 +33,12 @@ public class PhysicalFlywheel {
   }
 
   public double getFlywheelSpeed() {
-    return physicalFlywheel.getAngularVelocityRPM();
+    return physicalFlywheel.getFlywheelSpeed();
   }
 
   public void setVolts(double volts) {
     currentVolts = PID.calculate(volts);
-    physicalFlywheel.setInputVoltage(currentVolts);
+    physicalFlywheel.setVolts(currentVolts);
   }
 
   public double getVolts() {
