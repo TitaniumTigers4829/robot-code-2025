@@ -78,12 +78,12 @@ public abstract class DriveCommandBase extends Command {
           swerveDrive.setPoseEstimatorVisionConfidence(
               standardDeviations[0], standardDeviations[1], standardDeviations[2]);
         }
+
+        // Adds the timestamped pose gotten from the limelights to our pose estimation
+        swerveDrive.addPoseEstimatorVisionMeasurement(
+            vision.getPoseFromAprilTags(limelight),
+            TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
       }
-      // Adds the timestamped pose gotten from the limelights to our pose estimation
-      swerveDrive.addPoseEstimatorVisionMeasurement(
-          vision.getPoseFromAprilTags(limelight),
-          TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
-      // }
     }
   }
 }

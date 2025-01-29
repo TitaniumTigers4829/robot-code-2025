@@ -73,9 +73,8 @@ public final class VisionConstants {
   public static final double VISION_Y_POS_TRUST = 0.5; // meters
   public static final double VISION_ANGLE_TRUST = Units.degreesToRadians(50); // radians
 
-  public static final int FRAMES_BEFORE_ADDING_VISION_MEASUREMENT = 2;
-  public static final double LL3_FOV_MARGIN_OF_ERROR = 27;
-  public static final double LL3G_FOV_MARGIN_OF_ERROR = 38;
+  public static final double LL3_FOV_MARGIN_OF_ERROR = 26.5;
+  public static final double LL3G_FOV_MARGIN_OF_ERROR = 37;
 
   public static final double MEGA_TAG_2_MAX_HEADING_RATE =
       180; // degrees/s // TODO: This can be tested more
@@ -83,7 +82,7 @@ public final class VisionConstants {
   public static final double MAX_TRANSLATION_DELTA_METERS = .5; // Adjust based on expected movement
   public static final double MAX_ROTATION_DELTA_DEGREES = 20.0; // Adjust based on expected rotation
   public static final double CLOSENESS_THRESHOLD = 0.5; // meters
-  public static final double MIN_CONFIDENCE_THRESHOLD = 0.8;
+  public static final double MAX_AMBIGUITY_THRESHOLD = 0.45;
 
   public static final double MEGA_TAG_2_DISTANCE_THRESHOLD = 5; // TODO: Tune
 

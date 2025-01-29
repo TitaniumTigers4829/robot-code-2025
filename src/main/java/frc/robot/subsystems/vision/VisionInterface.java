@@ -38,6 +38,8 @@ public interface VisionInterface {
 
     /** This array stores the poses calculated from the April Tags seen by each Limelight. */
     public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
+
+    public Pose2d[] megatag1PoseEstimates = new Pose2d[Limelight.values().length];
   }
 
   /**

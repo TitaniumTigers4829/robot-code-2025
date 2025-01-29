@@ -42,7 +42,7 @@ public class CompModule implements ModuleInterface {
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
-  private final BaseStatusSignal[] periodicallyRefreshedSignals;
+  // private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
   public CompModule(ModuleConfig moduleConfig) {
     driveMotor =
@@ -105,32 +105,20 @@ public class CompModule implements ModuleInterface {
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
 
-    periodicallyRefreshedSignals =
-        new BaseStatusSignal[] {
-          drivePosition,
-          driveVelocity,
-          driveMotorAppliedVoltage,
-          driveMotorCurrent,
-          turnEncoderAbsolutePosition,
-          turnEncoderVelocity,
-          turnMotorAppliedVolts,
-          turnMotorCurrent
-        };
-
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        250.0, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.isConnected = BaseStatusSignal.isAllGood(periodicallyRefreshedSignals);
-
+    BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
-    inputs.drivePosition = drivePosition.getValueAsDouble();
+    inputs.drivePosition = -drivePosition.getValueAsDouble();
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
@@ -145,6 +133,12 @@ public class CompModule implements ModuleInterface {
   @Override
   public void setTurnVoltage(Voltage volts) {
     turnMotor.setControl(voltageOut.withOutput(volts));
+  }
+
+  @Override
+  public double getDrivePosition() {
+    drivePosition.refresh();
+    return drivePosition.getValueAsDouble();
   }
 
   @Override

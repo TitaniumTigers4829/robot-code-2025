@@ -28,7 +28,7 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Debouncer teleportationDebouncer = new Debouncer(0.4, DebounceType.kRising);
+  private Debouncer teleportationDebouncer = new Debouncer(0.04, DebounceType.kRising);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -68,6 +68,8 @@ public class PhysicalVision implements VisionInterface {
       inputs.limelightAmbiguities[limelight.getId()] = getAmbiguity(limelight);
 
       inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
+
+      inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
     }
   }
 
@@ -126,8 +128,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight) && teleportationDebouncer.calculate(!isTeleporting(limelight));
-    //  && isConfident(limelight);
+    return isValidPoseEstimate(limelight) && isConfident(limelight) && teleportationDebouncer.calculate(!isTeleporting(limelight));
   }
 
   /**
@@ -138,20 +139,26 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-        && isWithinFieldBounds(megatag2Estimate.pose)) {
-      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose. This
-      // creates a much more stable and accurate pose when translating, but when rotating but the
-      // pose will not
-      // be consistent due to latency between receiving and sending measurements. The parameters are
-      // limelightName, yaw,
-      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
-      // roll in our pose estimate, so we don't send those values to the limelight (hence the 0's).
-      LimelightHelpers.SetRobotOrientation(
-          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-      limelightEstimates.set(
-          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    // if (headingRateDegreesPerSecond < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+    //     && isWithinFieldBounds(megatag2Estimate.pose)) {
+
+    //   // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
+    // This
+    //   // creates a much more stable and accurate pose when translating, but when rotating but the
+    //   // pose will not
+    //   // be consistent due to latency between receiving and sending measurements. The parameters
+    // are
+    //   // limelightName, yaw,
+    //   // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
+    //   // roll in our pose estimate, so we don't send those values to the limelight (hence the
+    // 0's).
+
+    //   LimelightHelpers.SetRobotOrientation(
+    //       limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+
+    //   limelightEstimates.set(
+    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
@@ -254,7 +261,7 @@ public class PhysicalVision implements VisionInterface {
     return !GeomUtil.arePosesWithinThreshold(
         VisionConstants.MAX_TRANSLATION_DELTA_METERS,
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        getPoseFromAprilTags(limelight), 
+        getMegaTag1PoseEstimate(limelight).pose,
         odometryPose);
   }
 
@@ -265,7 +272,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight is confident in its pose estimate, false otherwise
    */
   private boolean isConfident(Limelight limelight) {
-    return getAmbiguity(limelight) <= VisionConstants.MIN_CONFIDENCE_THRESHOLD;
+    return getAmbiguity(limelight) <= VisionConstants.MAX_AMBIGUITY_THRESHOLD;
   }
 
   /**
