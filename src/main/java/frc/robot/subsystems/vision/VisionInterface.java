@@ -41,8 +41,6 @@ public interface VisionInterface {
 
     public Pose2d[] megatag1PoseEstimates = new Pose2d[Limelight.values().length];
     public Pose2d[] megatag2PoseEstimates = new Pose2d[Limelight.values().length];
-
-    public boolean[] isUsingMegatag2 = new boolean[Limelight.values().length];
   }
 
   /**

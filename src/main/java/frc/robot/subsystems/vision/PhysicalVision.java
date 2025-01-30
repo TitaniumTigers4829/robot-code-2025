@@ -27,10 +27,6 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  LinearFilter movingAverage = LinearFilter.movingAverage(5);
-
-  private boolean[] isUsingMegatag2 = new boolean[Limelight.values().length];
-
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
@@ -72,8 +68,6 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
-
-      inputs.isUsingMegatag2[limelight.getId()] = isUsingMegatag2[limelight.getId()];
     }
   }
 
@@ -165,16 +159,10 @@ public class PhysicalVision implements VisionInterface {
       // 0's).
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-      isUsingMegatag2[limelight.getId()] = true;
-    } else if (isWithinFieldBounds(megatag1Estimate.pose)
-    // && teleportationDebouncer.calculate(!isTeleporting(limelight, megatag1Estimate.pose))
-    ) {
-      isUsingMegatag2[limelight.getId()] = false;
-
+    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
-      isUsingMegatag2[limelight.getId()] = false;
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
@@ -187,8 +175,6 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
-    isUsingMegatag2[limelight.getId()] = false;
-
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
@@ -303,7 +289,6 @@ public class PhysicalVision implements VisionInterface {
 
       updatePoseEstimate(limelight);
     } else {
-      isUsingMegatag2[limelight.getId()] = false;
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
