@@ -338,8 +338,8 @@ public final class Constants {
             Units.inchesToMeters(86.50),
             new Rotation2d(Units.degreesToRadians(180)));
 
-    public static final double RED_REEF_PLACE_X = 0;
-    public static final double RED_REEF_PLACE_Y = 0;
+    public static final double RED_REEF_PLACE_X = 2;
+    public static final double RED_REEF_PLACE_Y = 2;
     public static final Rotation2d RED_REEF_ROTATION = Rotation2d.fromDegrees(-90);
 
     public static final double RED_PROCESSOR_PLACE_X = 0;

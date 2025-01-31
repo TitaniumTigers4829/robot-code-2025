@@ -163,10 +163,11 @@ public class SwerveConstants {
     public static final double Y_TOLERANCE = 0.02;
     public static final double THETA_TOLERANCE = 1.25;
 
-    public static final double AUTO_LINEUP_REEF_ROTATION_P = 0;
+    public static final double AUTO_LINEUP_REEF_ROTATION_P = 5;
     public static final double AUTO_LINEUP_REEF_ROTATION_I = 0;
     public static final double AUTO_LINEUP_REEF_ROTATION_D = 0;
-    public static final Constraints AUTO_LINEUP_REEF_ROTATION_CONSTRAINTS = new Constraints(0, 0);
+    public static final Constraints AUTO_LINEUP_REEF_ROTATION_CONSTRAINTS =
+        new Constraints(4 * Math.PI, 6 * Math.PI);
 
     public static final double AUTO_LINEUP_PROCESSOR_ROTATION_P = 0;
     public static final double AUTO_LINEUP_PROCESSOR_ROTATION_I = 0;
@@ -182,11 +183,11 @@ public class SwerveConstants {
         new Constraints(0, 0);
     ;
 
-    public static final double AUTO_LINEUP_REEF_TRANSLATION_P = 0;
+    public static final double AUTO_LINEUP_REEF_TRANSLATION_P = 4.0;
     public static final double AUTO_LINEUP_REEF_TRANSLATION_I = 0;
     public static final double AUTO_LINEUP_REEF_TRANSLATION_D = 0;
     public static final Constraints AUTO_LINEUP_REEF_TRANSLATION_CONSTRAINTS =
-        new Constraints(0, 0);
+        new Constraints(3, 4);
 
     public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_P = 0;
     public static final double AUTO_LINEUP_PROCESSOR_TRANSLATION_I = 0;

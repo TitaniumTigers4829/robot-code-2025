@@ -7,15 +7,18 @@ package frc.robot.commands.autodrive;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoAlignWithReef extends Command {
+public class AutoAlignWithReef extends DriveCommandBase {
 
   private final SwerveDrive swerveDrive;
+  private final VisionSubsystem visionSubsystem;
+
   private Pose2d reefPose;
   private final ProfiledPIDController turnControllerReef =
       new ProfiledPIDController(
@@ -39,23 +42,27 @@ public class AutoAlignWithReef extends Command {
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_TRANSLATION_CONSTRAINTS);
 
   /** Creates a new AutoAlign. */
-  public AutoAlignWithReef(SwerveDrive swerveDrive) {
+  public AutoAlignWithReef(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem) {
+    super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
-    addRequirements(swerveDrive);
+    this.visionSubsystem = visionSubsystem;
+    addRequirements(swerveDrive, visionSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    new Pose2d(
-        FieldConstants.RED_REEF_PLACE_X,
-        FieldConstants.RED_REEF_PLACE_Y,
-        FieldConstants.RED_REEF_ROTATION);
+    this.reefPose =
+        new Pose2d(
+            FieldConstants.RED_REEF_PLACE_X,
+            FieldConstants.RED_REEF_PLACE_Y,
+            FieldConstants.RED_REEF_ROTATION);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    super.execute();
     // Gets the error between the desired pos (the reef) and the current pos of the robot
     Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = reefPose.getX() - drivePose.getX();
