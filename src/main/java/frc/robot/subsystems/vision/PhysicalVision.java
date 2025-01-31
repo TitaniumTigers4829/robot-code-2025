@@ -137,11 +137,12 @@ public class PhysicalVision implements VisionInterface {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
     if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-        && (GeomUtil.arePosesWithinThreshold(
+        && (!isLargeDiscrepancyBetweenTwoPoses(
+                limelight,
                 VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
                 VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-                getMegaTag1PoseEstimate(limelight).pose,
-                getMegaTag2PoseEstimate(limelight).pose)
+                megatag1Estimate.pose,
+                megatag2Estimate.pose)
             || getLimelightAprilTagDistance(limelight)
                 > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
       limelightEstimates.set(
@@ -213,6 +214,28 @@ public class PhysicalVision implements VisionInterface {
   public boolean isValidPoseEstimate(Limelight limelight) {
     return getPoseFromAprilTags(limelight) != null
         && isWithinFieldBounds(getPoseFromAprilTags(limelight));
+  }
+
+  /**
+   * Checks if there is a large discrepancy between two poses.
+   * This is used to determine if the estimated megatag 1 and 2 pose are within a certain threshold, 
+   * whether or not they are within this threshold helps determine which pose to use.
+   * 
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @param translationThresholdMeters The translation threshold in meters.
+   * @param rotationThresholdDegrees The rotation threshold in degrees.
+   * @param pose1 The first pose to compare.
+   * @param pose2 The second pose to compare.
+   * @return True if the discrepancy between the two poses is greater than the threshold, false.
+   */
+  public boolean isLargeDiscrepancyBetweenTwoPoses(
+      Limelight limelight,
+      double translationThresholdMeters,
+      double rotationThresholdDegrees,
+      Pose2d pose1,
+      Pose2d pose2) {
+    return !GeomUtil.arePosesWithinThreshold(
+        translationThresholdMeters, rotationThresholdDegrees, pose1, pose2);
   }
 
   /**
