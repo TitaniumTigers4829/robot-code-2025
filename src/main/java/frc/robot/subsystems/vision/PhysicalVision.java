@@ -142,7 +142,8 @@ public class PhysicalVision implements VisionInterface {
                 VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
                 getMegaTag1PoseEstimate(limelight).pose,
                 getMegaTag2PoseEstimate(limelight).pose)
-            || getLimelightAprilTagDistance(limelight) > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+            || getLimelightAprilTagDistance(limelight)
+                > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
     } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
