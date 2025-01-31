@@ -224,8 +224,8 @@ public class PhysicalVision implements VisionInterface {
     double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
     double minY = DriveConstants.WHEEL_BASE / 2.0;
     double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
-    return ((poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
-        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY));
+    return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
+        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
   }
 
   /**
