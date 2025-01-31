@@ -3,10 +3,14 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.extras.interpolators.MultiLinearInterpolator;
 import frc.robot.extras.util.TimeUtil;
+import frc.robot.extras.vision.GtsamInterface;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
+import java.util.Arrays;
+
 import org.littletonrobotics.junction.Logger;
 
 public abstract class DriveCommandBase extends Command {
@@ -18,6 +22,7 @@ public abstract class DriveCommandBase extends Command {
 
   private final VisionSubsystem vision;
   private final SwerveDrive swerveDrive;
+  private final GtsamInterface gtsamInterface = new GtsamInterface(Arrays.asList(Limelight.FRONT_LEFT.getName(), Limelight.FRONT_RIGHT.getName(), Limelight.BACK.getName()));
 
   /**
    * An abstract class that handles pose estimation while driving.
@@ -35,6 +40,7 @@ public abstract class DriveCommandBase extends Command {
 
   @Override
   public void execute() {
+    gtsamInterface.sendOdomUpdate(0, null, null);
     swerveDrive.addPoseEstimatorSwerveMeasurement();
 
     // Update the odometry information for the vision subsystem to use while filtering the vision
