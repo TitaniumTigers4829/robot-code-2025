@@ -13,28 +13,26 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
-import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInputsAutoLogged;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveDrive extends SubsystemBase {
+
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
-  private final OdometryThreadInputsAutoLogged odometryThreadInputs;
   private final SwerveModule[] swerveModules;
 
   private Rotation2d rawGyroRotation;
@@ -54,12 +52,18 @@ public class SwerveDrive extends SubsystemBase {
           0.0);
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
-  private final OdometryThread odometryThread;
-
   private Optional<DriverStation.Alliance> alliance;
 
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
+
+  private final Timer inactiveTimer = new Timer();
+
+  private boolean isMoving; // Tracks if the robot is moving
+
+  private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
+
+  private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
 
   public SwerveDrive(
       GyroInterface gyroIO,
@@ -99,11 +103,38 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    this.odometryThread = OdometryThread.createInstance(DeviceCANBus.RIO);
-    this.odometryThreadInputs = new OdometryThreadInputsAutoLogged();
-    this.odometryThread.start();
-
     gyroDisconnectedAlert.set(false);
+  }
+
+  @Override
+  public void periodic() {
+    final double t0 = TimeUtil.getRealTimeSeconds();
+    updateSwerveInputs();
+    Logger.recordOutput(
+        "SystemPerformance/OdometryFetchingTimeMS", (TimeUtil.getRealTimeSeconds() - t0) * 1000);
+    // Runs the SwerveModules periodic methods
+    for (SwerveModule module : swerveModules) module.periodic();
+  }
+
+  /**
+   * Drives the robot using the joysticks.
+   *
+   * @param xSpeed Speed of the robot in the x direction, positive being forwards.
+   * @param ySpeed Speed of the robot in the y direction, positive being left.
+   * @param rotationSpeed Angular rate of the robot in radians per second.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   */
+  public void drive(double xSpeed, double ySpeed, double rotationSpeed, boolean fieldRelative) {
+    ChassisSpeeds desiredSpeeds =
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(
+                xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
+            : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
+
+    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
+
+    setModuleStates(setpoint.moduleStates());
+    Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
   }
 
   /*
@@ -133,15 +164,6 @@ public class SwerveDrive extends SubsystemBase {
         VecBuilder.fill(xStandardDeviation, yStandardDeviation, thetaStandardDeviation));
   }
 
-  @Override
-  public void periodic() {
-    final double t0 = TimeUtil.getRealTimeSeconds();
-    fetchOdometryInputs();
-    Logger.recordOutput(
-        "SystemPerformance/OdometryFetchingTimeMS", (TimeUtil.getRealTimeSeconds() - t0) * 1000);
-    modulesPeriodic();
-  }
-
   /**
    * Runs characterization on voltage
    *
@@ -153,7 +175,11 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  /** Returns the average drive velocity in rotations/sec. */
+  /**
+   * Gets the total characterization velocity of the modules.
+   *
+   * @return the summed characterization velocity of the modules
+   */
   public double getCharacterizationVelocity() {
     double velocity = 0.0;
     for (SwerveModule module : swerveModules) {
@@ -162,45 +188,19 @@ public class SwerveDrive extends SubsystemBase {
     return velocity;
   }
 
-  /** Processes odometry inputs */
-  private void fetchOdometryInputs() {
-    odometryThread.lockOdometry();
-    odometryThread.updateInputs(odometryThreadInputs);
-    Logger.processInputs("Drive/OdometryThread", odometryThreadInputs);
-
+  /** Updates and logs the inputs for the odometry thread, gyro, and swerve modules. */
+  private void updateSwerveInputs() {
     for (SwerveModule module : swerveModules) module.updateOdometryInputs();
 
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
-
-    odometryThread.unlockOdometry();
   }
 
-  /** Runs the SwerveModules periodic methods */
-  private void modulesPeriodic() {
-    for (SwerveModule module : swerveModules) module.periodic();
-  }
-
-  /**
-   * Drives the robot using the joysticks.
-   *
-   * @param xSpeed Speed of the robot in the x direction, positive being forwards.
-   * @param ySpeed Speed of the robot in the y direction, positive being left.
-   * @param rotationSpeed Angular rate of the robot in radians per second.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-   */
-  public void drive(double xSpeed, double ySpeed, double rotationSpeed, boolean fieldRelative) {
-    ChassisSpeeds desiredSpeeds =
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
-            : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
-
-    setpoint = setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, 0.02);
-
-    setModuleStates(setpoint.moduleStates());
-    Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
+  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
+    return speeds.vxMetersPerSecond == 0
+        && speeds.vyMetersPerSecond == 0
+        && speeds.omegaRadiansPerSecond == 0;
   }
 
   /**
@@ -213,97 +213,154 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Gets the rate of rotation of the NavX.
+   * Gets the rate of rotation of the robot.
    *
    * @return The current rate in degrees per second.
    */
   public double getGyroRate() {
-    return gyroInputs.yawVelocity;
+    return gyroInputs.yawVelocityDegreesPerSecond;
   }
 
-  /** Returns a Rotation2d for the heading of the robot. */
+  /**
+   * Gets the rotation of the robot represented as a Rotation2d.
+   *
+   * @return a Rotation2d for the heading of the robot.
+   */
   public Rotation2d getGyroRotation2d() {
     return Rotation2d.fromDegrees(getHeading());
   }
 
-  /** Returns a Rotation2d for the heading of the robot. */
+  /**
+   * Gets the rotation of the robot relative to the field from the driver's perspective. This means
+   * that if the driver is on the red alliance and this method says the robot is facing 0 degrees,
+   * the robot is actually facing 180 degrees and facing the blue alliance wall.
+   *
+   * @return a Rotation2d for the heading of the robot relative to the field from the driver's
+   *     perspective.
+   */
   public Rotation2d getGyroFieldRelativeRotation2d() {
     return Rotation2d.fromDegrees(getHeading() + getAllianceAngleOffset());
   }
 
-  /** Returns 0 degrees if the robot is on the blue alliance, 180 if on the red alliance. */
+  /**
+   * Gets the angle offset of the robot based on the alliance color.
+   *
+   * @return 0 degrees if the robot is on the blue alliance, 180 if on the red alliance.
+   */
   public double getAllianceAngleOffset() {
     alliance = DriverStation.getAlliance();
-    double offset =
-        alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red ? 180.0 : 0.0;
-    return offset;
+    // If theres a glitch in the FMS and for some reason we don't know if we're red or blue, just
+    // assume we're blue
+    // This should NEVER happen
+    return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red ? 180.0 : 0.0;
   }
 
-  /** Zeroes the heading of the robot. */
+  /**
+   * Resets the gyro heading to zero. When this is called, the robot's current heading will be
+   * considered foward.
+   */
   public void zeroHeading() {
     gyroIO.reset();
   }
 
   /**
-   * Returns the estimated field-relative pose of the robot. Positive x being forward, positive y
-   * being left.
+   * Gets the estimated field-relative pose of the robot. Positive x being forward, positive y being
+   * left. We estimate the robot's pose using the swerve modules, gyro, and vision.
+   *
+   * @return the estimated pose of the robot
    */
   @AutoLogOutput(key = "Odometry/Odometry")
-  public Pose2d getPose() {
+  public Pose2d getEstimatedPose() {
     return poseEstimator.getEstimatedPosition();
   }
 
-  /** Returns a Rotation2d for the heading of the robot */
+  /**
+   * Gets the rotation of the robot from the odometry. This value is only influenced by the gyro as
+   * we have set the standard deviations of the rotation from the vision measurements to a very high
+   * number (this means we have very low confidence in the rotation from vision measurements). The
+   * gyro only drifts a very small amount over time, so this value is very accurate.
+   *
+   * <p>For pretty much everything, use this method to get the rotation of the robot. This value can
+   * differ from the gyro rotation for multiple reasons, but this is the value used by anything
+   * autonomous.
+   *
+   * @return a Rotation2d for the heading of the robot.
+   */
   public Rotation2d getOdometryRotation2d() {
-    return getPose().getRotation();
+    return getEstimatedPose().getRotation();
   }
 
   /**
-   * Returns a Rotation2d for the heading of the robot relative to the field from the driver's
+   * Gets the Rotation2d for the heading of the robot relative to the field from the driver's
    * perspective. This method is needed so that the drive command and poseEstimator don't fight each
    * other. It uses odometry rotation.
+   *
+   * @return a Rotation2d for the heading of the robot relative to the field from the driver's
+   *     perspective.
    */
   public Rotation2d getOdometryAllianceRelativeRotation2d() {
-    return getPose().getRotation().plus(Rotation2d.fromDegrees(getAllianceAngleOffset()));
+    return getEstimatedPose().getRotation().plus(Rotation2d.fromDegrees(getAllianceAngleOffset()));
   }
 
   /**
-   * Sets the modules to the specified states.
+   * Sets the modules to the specified states. This is what actually tells the modules what to do,
+   * so setting their rotation and speeds.
    *
    * @param desiredStates The desired states for the swerve modules. The order is: frontLeft,
    *     frontRight, backLeft, backRight (should be the same as the kinematics).
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     for (int i = 0; i < 4; i++) {
-      swerveModules[i].runSetPoint((desiredStates[i]));
+      swerveModules[i].setOptimizedDesiredState((desiredStates[i]));
+    }
+  }
+
+  // Check if the robot has been inactive for 3 seconds
+  public boolean isThreeSecsInactive() {
+    if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
+      return true; // 3 seconds of inactivity
+    }
+    return false; // Still moving or not enough time passed
+  }
+
+  public void setXStance() {
+    Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
+    for (int i = 0; i < 4; i++) {
+      swerveHeadings[i] = Rotation2d.fromDegrees(45);
+    }
+    DriveConstants.DRIVE_KINEMATICS.resetHeadings(swerveHeadings);
+    for (int i = 0; i < 4; i++) {
+      swerveModules[i].stopModule();
     }
   }
 
   /**
-   * Updates the pose estimator with the pose calculated from the swerve modules.
-   *
-   * @param timestampIndex index of the timestamp to sample the pose at
+   * Updates the pose estimator with the pose calculated from the swerve modules. This works because
+   * if you know the circumference of the wheel and the angle of the wheel, you can calculate the
+   * distance the wheel has traveled. This is done for all the wheels and then the pose estimator is
+   * updated with this information.
    */
-  public void addPoseEstimatorSwerveMeasurement() { // int timestampIndex
+  public void addPoseEstimatorSwerveMeasurement() {
     final SwerveModulePosition[] modulePositions = getModulePositions(),
         moduleDeltas = getModulesDelta(modulePositions);
 
+    // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the
+    // modules.
     if (gyroInputs.isConnected) {
-      // rawGyroRotation = gyroInputs.odometryYawPositions[timestampIndex];
       rawGyroRotation = getGyroRotation2d();
     } else {
       Twist2d twist = DriveConstants.DRIVE_KINEMATICS.toTwist2d(moduleDeltas);
       rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
 
-    poseEstimator.updateWithTime(
-        // odometryThreadInputs.measurementTimeStamps[timestampIndex],
-        Logger.getTimestamp(), rawGyroRotation, modulePositions);
+    poseEstimator.update(rawGyroRotation, modulePositions);
   }
 
   /**
+   * Gets the change in the module positions between the current and last update.
+   *
    * @param freshModulesPosition Latest module positions
-   * @return The change of the module positions between the current and last update
+   * @return The change of the module distances and angles since the last update.
    */
   private SwerveModulePosition[] getModulesDelta(SwerveModulePosition[] freshModulesPosition) {
     SwerveModulePosition[] deltas = new SwerveModulePosition[swerveModules.length];
@@ -318,7 +375,12 @@ public class SwerveDrive extends SubsystemBase {
     return deltas;
   }
 
-  /** Returns the module states (turn angles and drive velocities) for all the modules. */
+  /**
+   * Gets the module states (speed and angle) for all the modules.
+   *
+   * @return The module states for all the modules in the order: frontLeft, frontRight, backLeft,
+   *     backRight.
+   */
   @AutoLogOutput(key = "SwerveStates/Measured")
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[swerveModules.length];
@@ -326,7 +388,12 @@ public class SwerveDrive extends SubsystemBase {
     return states;
   }
 
-  /** Returns the module positions (turn angles and drive positions) for all the modules. */
+  /**
+   * Gets the module positions (distance and angle) for all the modules.
+   *
+   * @return The module positions for all the modules in the order: frontLeft, frontRight, backLeft,
+   *     backRight.
+   */
   private SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[swerveModules.length];
     for (int i = 0; i < positions.length; i++) positions[i] = swerveModules[i].getPosition();
@@ -334,11 +401,12 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Sets the pose
+   * Resets the estimated pose of the robot. The gyro does not need to be reset as the pose
+   * estimator will take care of that.
    *
-   * @param pose pose to set
+   * @param pose the new pose to set the robot to
    */
-  public void setPose(Pose2d pose) {
+  public void resetEstimatedPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 }

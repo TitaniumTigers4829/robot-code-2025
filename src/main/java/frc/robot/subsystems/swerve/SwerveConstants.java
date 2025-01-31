@@ -131,6 +131,14 @@ public class SwerveConstants {
         0.32 * WHEEL_CIRCUMFERENCE_METERS / DRIVE_GEAR_RATIO; // = 0.02225 V*s^2/m
   }
 
+  public static final class OdometryThreadConstants {
+    public static final double SIGNAL_FREQUENCY = 250;
+
+    public static final int QUEUE_SIZE = 10;
+
+    public static final String THREAD_NAME = "OdometryThread";
+  }
+
   public static final class TrajectoryConstants {
 
     public static final double DRIVE_BASE_DIAMETER =

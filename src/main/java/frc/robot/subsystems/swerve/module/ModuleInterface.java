@@ -6,9 +6,9 @@ import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ModuleInterface {
+
   @AutoLog
   class ModuleInputs {
-
     public boolean isConnected = false;
 
     public double driveVelocity = 0.0;
@@ -41,13 +41,33 @@ public interface ModuleInterface {
    */
   default void setDesiredState(SwerveModuleState desiredState) {}
 
+  /**
+   * Sets voltage of the drive motor for the module.
+   *
+   * @param voltage Voltage to set the drive motor to.
+   */
   default void setDriveVoltage(Voltage voltage) {}
 
+  /**
+   * Sets voltage of the turn motor for the module.
+   *
+   * @param voltage Voltage to set the turn motor to.
+   */
   default void setTurnVoltage(Voltage voltage) {}
 
+  /** Stops the motors in the module. */
   default void stopModule() {}
 
+  /**
+   * Gets the current turn position of the module.
+   *
+   * @return The current turn position of the module.
+   */
   default double getTurnRotations() {
+    return 0.0;
+  }
+
+  default double getDrivePosition() {
     return 0.0;
   }
 }
