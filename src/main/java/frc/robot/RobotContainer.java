@@ -52,7 +52,7 @@ public class RobotContainer {
     autoChooser = new SendableChooser<Command>();
     autoChooser.setDefaultOption("Auto", null);
 
-    switch (Constants.CURRENT_MODE) {
+    switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
 
@@ -113,8 +113,6 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
         visionSubsystem = null;
-        //     new VisionSubsystem(
-        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
 
         SimulatedField.getInstance().resetFieldForAuto();
         resetFieldAndOdometryForAuto(
@@ -154,6 +152,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     configureButtonBindings();
+    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
   private void configureButtonBindings() {
@@ -193,13 +192,13 @@ public class RobotContainer {
                         swerveDrive.getEstimatedPose().getX(),
                         swerveDrive.getEstimatedPose().getY(),
                         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    swerveDrive.resetEstimatedPose(
-                        swerveDriveSimulation.getSimulatedDriveTrainPose())));
+    // driverController
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 swerveDrive.resetEstimatedPose(
+    //                     swerveDriveSimulation.getSimulatedDriveTrainPose())));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
