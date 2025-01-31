@@ -2,11 +2,15 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -17,8 +21,8 @@ import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
-import frc.robot.extras.util.JoystickUtil;
 import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -40,7 +44,7 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
-
+  private final ExampleSubsystem exampleSubsystem;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -49,7 +53,7 @@ public class RobotContainer {
   private final SwerveDriveSimulation swerveDriveSimulation;
   private final GyroSimulation gyroSimulation;
 
-  private AutoFactory autoFactory;
+  public AutoFactory autoFactory;
   public AutoChooser autoChooser;
 
   public RobotContainer() {
@@ -59,14 +63,8 @@ public class RobotContainer {
     SmartDashboard.putData(autoChooser);
 
     switch (Constants.CURRENT_MODE) {
-       // this will put our autonomous chooser on the dashboard.
-      autoChooser = new AutoChooser();
-      autoChooser.addRoutine("Example routine", this::exampleAutoRoutine);
-      SmartDashboard.putData(autoChooser);
-
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
-
         /* Disable Simulations */
         // this.simulatedArena = null;
         this.gyroSimulation = null;
@@ -80,36 +78,12 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[2]),
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
-        exampleSubsystem = new ExampleSubsystem();
-
-         // this sets up the auto factory
-    autoFactory =
-        new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            // provided Pose2d
-            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
-            swerveDrive); // The drive subsystem
-
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
         gyroSimulation = null;
         swerveDriveSimulation = null;
         visionSubsystem = null;
-        exampleSubsystem = new ExampleSubsystem();
-
-         // this sets up the auto factory
-    autoFactory =
-        new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            // provided Pose2d
-            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
-            swerveDrive); // The drive subsystem
-
       }
 
       case SIM_ROBOT -> {
@@ -148,17 +122,6 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
         visionSubsystem = null;
-        exampleSubsystem = new ExampleSubsystem();
-
-         // this sets up the auto factory
-    autoFactory =
-        new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            // provided Pose2d
-            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
-            swerveDrive); // The drive subsystem
 
         //     new VisionSubsystem(
         //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
@@ -183,9 +146,12 @@ public class RobotContainer {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {});
-        exampleSubsystem = new ExampleSubsystem();
+      }
+    }
 
-         // this sets up the auto factory
+    exampleSubsystem = new ExampleSubsystem();
+
+    // this sets up the auto factory
     autoFactory =
         new AutoFactory(
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
@@ -194,9 +160,6 @@ public class RobotContainer {
             swerveDrive::followTrajectory, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
-
-      }
-    }
   }
 
   public AutoRoutine exampleAutoRoutine() {
@@ -308,7 +271,8 @@ public class RobotContainer {
         new Pose2d(
             swerveDrive.getEstimatedPose().getX(),
             swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));  
+            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    return autoChooser.selectedCommand();
   }
 
   public void updateFieldSimAndDisplay() {

@@ -17,8 +17,7 @@ public class ExampleSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem() {}
 
-  // this is the interface for the subsystem
-  // code for motors and such would go here
+  // this is the skeleton for the subsystem
 
   @Override
   public void periodic() {

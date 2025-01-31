@@ -1,13 +1,6 @@
 package frc.robot;
 
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.extras.simulation.field.SimulatedField;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -24,7 +17,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
-
 
   public Robot() {
     // Record metadata
@@ -106,16 +98,16 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
+
   @Override
   public void autonomousInit() {
-    autoChooser.selectedCommandScheduler();
-
+    robotContainer.getAutonomousCommand();
   }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
     robotContainer.teleopInit();
-    
   }
 
   /** This function is called periodically during operator control. */
