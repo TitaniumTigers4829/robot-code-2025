@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
@@ -143,20 +142,7 @@ public class PhysicalVision implements VisionInterface {
                 VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
                 getMegaTag1PoseEstimate(limelight).pose,
                 getMegaTag2PoseEstimate(limelight).pose)
-            || getLimelightAprilTagDistance(limelight) > 1.5)) {
-
-      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-      // This
-      // creates a much more stable and accurate pose when translating, but when rotating but
-      // the
-      // pose will not
-      // be consistent due to latency between receiving and sending measurements. The
-      // parameters
-      // are
-      // limelightName, yaw,
-      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
-      // roll in our pose estimate, so we don't send those values to the limelight (hence the
-      // 0's).
+            || getLimelightAprilTagDistance(limelight) > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
     } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
@@ -283,10 +269,20 @@ public class PhysicalVision implements VisionInterface {
    */
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
-
+      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
+      // This
+      // creates a much more stable and accurate pose when translating, but when rotating but
+      // the
+      // pose will not
+      // be consistent due to latency between receiving and sending measurements. The
+      // parameters
+      // are
+      // limelightName, yaw,
+      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
+      // roll in our pose estimate, so we don't send those values to the limelight (hence the
+      // 0's).
       LimelightHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-
       updatePoseEstimate(limelight);
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
