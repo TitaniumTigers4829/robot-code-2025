@@ -4,7 +4,6 @@
 
 package frc.robot.commands.autodrive;
 
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -18,7 +17,7 @@ public class AutoAlignWithReef extends Command {
 
   private final SwerveDrive swerveDrive;
   private Pose2d reefPose;
-   private final ProfiledPIDController turnControllerReef =
+  private final ProfiledPIDController turnControllerReef =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_ROTATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_ROTATION_I,
@@ -38,7 +37,7 @@ public class AutoAlignWithReef extends Command {
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_TRANSLATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_TRANSLATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_TRANSLATION_CONSTRAINTS);
-        
+
   /** Creates a new AutoAlign. */
   public AutoAlignWithReef(SwerveDrive swerveDrive) {
     this.swerveDrive = swerveDrive;
@@ -48,7 +47,7 @@ public class AutoAlignWithReef extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-     new Pose2d(
+    new Pose2d(
         FieldConstants.RED_REEF_PLACE_X,
         FieldConstants.RED_REEF_PLACE_Y,
         FieldConstants.RED_REEF_ROTATION);
@@ -57,8 +56,8 @@ public class AutoAlignWithReef extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-     // Gets the error between the desired pos (the reef) and the current pos of the robot
-    Pose2d drivePose = swerveDrive.getPose();
+    // Gets the error between the desired pos (the reef) and the current pos of the robot
+    Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = reefPose.getX() - drivePose.getX();
     double yPoseError = reefPose.getY() - drivePose.getY();
     double thetaPoseError =

@@ -17,21 +17,21 @@ public class AutoAlignWithFeederStation extends Command {
 
   private final SwerveDrive swerveDrive;
   private Pose2d feederStationPose;
-    private final ProfiledPIDController turnControllerFeederStation =
+  private final ProfiledPIDController turnControllerFeederStation =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_ROTATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_ROTATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_ROTATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_ROTATION_CONSTRAINTS);
 
-    private final ProfiledPIDController xTranslationControllerFeederStation =
+  private final ProfiledPIDController xTranslationControllerFeederStation =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_CONSTRAINTS);
 
-    private final ProfiledPIDController yTranslationControllerFeederStation =
+  private final ProfiledPIDController yTranslationControllerFeederStation =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_FEEDER_STATION_TRANSLATION_I,
@@ -58,7 +58,7 @@ public class AutoAlignWithFeederStation extends Command {
   @Override
   public void execute() {
     // Gets the error between the desired pos (the reef) and the current pos of the robot
-    Pose2d drivePose = swerveDrive.getPose();
+    Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = feederStationPose.getX() - drivePose.getX();
     double yPoseError = feederStationPose.getY() - drivePose.getY();
     double thetaPoseError =
@@ -86,7 +86,6 @@ public class AutoAlignWithFeederStation extends Command {
   @Override
   public void end(boolean interrupted) {
     swerveDrive.drive(0, 0, 0, false);
-
   }
 
   // Method to apply deadband to a value

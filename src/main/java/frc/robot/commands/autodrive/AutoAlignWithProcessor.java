@@ -15,30 +15,30 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoAlignWithProcessor extends Command {
   /** Creates a new AutoAlignWithProcessor. */
-
   private final SwerveDrive swerveDrive;
+
   private Pose2d processorPose;
-    private final ProfiledPIDController turnControllerProcessor =
+  private final ProfiledPIDController turnControllerProcessor =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_ROTATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_ROTATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_ROTATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_ROTATION_CONSTRAINTS);
 
-    private final ProfiledPIDController xTranslationControllerProcessor =
+  private final ProfiledPIDController xTranslationControllerProcessor =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_CONSTRAINTS);
 
-    private final ProfiledPIDController yTranslationControllerProcessor =
+  private final ProfiledPIDController yTranslationControllerProcessor =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_P,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_I,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_D,
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_PROCESSOR_TRANSLATION_CONSTRAINTS);
-  
+
   public AutoAlignWithProcessor(SwerveDrive swerveDrive) {
     this.swerveDrive = swerveDrive;
     addRequirements(swerveDrive);
@@ -57,7 +57,7 @@ public class AutoAlignWithProcessor extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Pose2d drivePose = swerveDrive.getPose();
+    Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = processorPose.getX() - drivePose.getX();
     double yPoseError = processorPose.getY() - drivePose.getY();
     double thetaPoseError =
@@ -85,7 +85,6 @@ public class AutoAlignWithProcessor extends Command {
   @Override
   public void end(boolean interrupted) {
     swerveDrive.drive(0, 0, 0, false);
-
   }
 
   private double deadband(double value) {

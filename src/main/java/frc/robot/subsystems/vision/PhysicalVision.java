@@ -217,10 +217,10 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks if there is a large discrepancy between two poses.
-   * This is used to determine if the estimated megatag 1 and 2 pose are within a certain threshold, 
-   * whether or not they are within this threshold helps determine which pose to use.
-   * 
+   * Checks if there is a large discrepancy between two poses. This is used to determine if the
+   * estimated megatag 1 and 2 pose are within a certain threshold, whether or not they are within
+   * this threshold helps determine which pose to use.
+   *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @param translationThresholdMeters The translation threshold in meters.
    * @param rotationThresholdDegrees The rotation threshold in degrees.
