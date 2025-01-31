@@ -19,7 +19,11 @@ public class AutoAlignWithReef extends DriveCommandBase {
   private final SwerveDrive swerveDrive;
   private final VisionSubsystem visionSubsystem;
 
-  private Pose2d reefPose;
+  private Pose2d reefPose = new Pose2d(
+    FieldConstants.RED_REEF_PLACE_X,
+    FieldConstants.RED_REEF_PLACE_Y,
+    FieldConstants.RED_REEF_ROTATION);
+
   private final ProfiledPIDController turnControllerReef =
       new ProfiledPIDController(
           SwerveConstants.TrajectoryConstants.AUTO_LINEUP_REEF_ROTATION_P,
@@ -47,16 +51,6 @@ public class AutoAlignWithReef extends DriveCommandBase {
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
     addRequirements(swerveDrive, visionSubsystem);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    this.reefPose =
-        new Pose2d(
-            FieldConstants.RED_REEF_PLACE_X,
-            FieldConstants.RED_REEF_PLACE_Y,
-            FieldConstants.RED_REEF_ROTATION);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
