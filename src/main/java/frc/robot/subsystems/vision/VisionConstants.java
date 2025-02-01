@@ -74,7 +74,7 @@ public final class VisionConstants {
   public static final double VISION_ANGLE_TRUST = Units.degreesToRadians(50); // radians
 
   public static final double LL3_FOV_MARGIN_OF_ERROR = 27;
-  public static final double LL3G_FOV_MARGIN_OF_ERROR = 38;
+  public static final double LL3G_FOV_MARGIN_OF_ERROR = 35;
 
   public static final double MEGA_TAG_2_MAX_HEADING_RATE = 30; // degrees/s
 
