@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
@@ -25,6 +27,8 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
+
+  private Debouncer teleportationDebouncer = new Debouncer(0.4, DebounceType.kBoth);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -125,7 +129,9 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
+    return isValidPoseEstimate(limelight)
+        && isConfident(limelight)
+        && teleportationDebouncer.calculate(!isTeleporting(limelight));
   }
 
   /**

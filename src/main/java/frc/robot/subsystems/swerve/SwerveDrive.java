@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
+import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -38,6 +39,8 @@ public class SwerveDrive extends SubsystemBase {
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
   private final SwerveDrivePoseEstimator poseEstimator;
+
+  private final Pose2dMovingAverageFilter poseFilter = new Pose2dMovingAverageFilter(10);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -271,7 +274,7 @@ public class SwerveDrive extends SubsystemBase {
    */
   @AutoLogOutput(key = "Odometry/Odometry")
   public Pose2d getEstimatedPose() {
-    return poseEstimator.getEstimatedPosition();
+    return poseFilter.calculate(poseEstimator.getEstimatedPosition());
   }
 
   /**
@@ -353,7 +356,7 @@ public class SwerveDrive extends SubsystemBase {
       rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
 
-    poseEstimator.update(rawGyroRotation, modulePositions);
+    poseEstimator.updateWithTime(TimeUtil.getLogTimeSeconds(), rawGyroRotation, modulePositions);
   }
 
   /**
