@@ -28,7 +28,7 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Debouncer teleportationDebouncer = new Debouncer(0.4, DebounceType.kBoth);
+  private Debouncer teleportationDebouncer = new Debouncer(0.25, DebounceType.kBoth);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
