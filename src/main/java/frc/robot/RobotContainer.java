@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
-import frc.robot.commands.autodrive.AutoAlignWithReef;
+import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.simulation.field.SimulatedField;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
@@ -31,9 +31,11 @@ import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
+import java.lang.reflect.Field;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
-
+import frc.robot.Constants.FieldConstants;
 public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
@@ -206,8 +208,9 @@ public class RobotContainer {
     driverLeftDirectionPad.onTrue(
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
-
-    driverController.a().whileTrue(new AutoAlignWithReef(swerveDrive, visionSubsystem));
+   
+    //FieldConstants has all reef poses
+    driverController.a().whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
   }
 
   public Command getAutonomousCommand() {
