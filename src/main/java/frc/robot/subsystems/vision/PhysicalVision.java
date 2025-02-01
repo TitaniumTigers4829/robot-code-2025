@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
@@ -28,7 +29,7 @@ public class PhysicalVision implements VisionInterface {
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
 
-  private Debouncer teleportationDebouncer = new Debouncer(0.25, DebounceType.kBoth);
+  private Pose2dMovingAverageFilter pose2dMovingAverageFilter = new Pose2dMovingAverageFilter(50);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -129,9 +130,7 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
-    return isValidPoseEstimate(limelight)
-        && isConfident(limelight)
-        && teleportationDebouncer.calculate(!isTeleporting(limelight));
+    return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
   /**
@@ -279,7 +278,7 @@ public class PhysicalVision implements VisionInterface {
         VisionConstants.MAX_TRANSLATION_DELTA_METERS,
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
         getPoseFromAprilTags(limelight),
-        odometryPose);
+        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
   }
 
   /**
