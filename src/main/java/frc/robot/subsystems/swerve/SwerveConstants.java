@@ -172,8 +172,7 @@ public class SwerveConstants {
     public static final double AUTO_LINEUP_TRANSLATION_P = 4.0;
     public static final double AUTO_LINEUP_TRANSLATION_I = 0;
     public static final double AUTO_LINEUP_TRANSLATION_D = 0;
-    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS =
-        new Constraints(3, 4);
+    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
   }
 
   public static final ModuleConfig[] moduleConfigs =
