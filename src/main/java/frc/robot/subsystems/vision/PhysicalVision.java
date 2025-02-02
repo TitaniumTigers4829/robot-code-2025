@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
+import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.LimelightHelpers;
 import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
@@ -25,6 +26,9 @@ public class PhysicalVision implements VisionInterface {
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
+
+  private Pose2dMovingAverageFilter pose2dMovingAverageFilter =
+      new Pose2dMovingAverageFilter(VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -268,12 +272,12 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return True if the robot is teleporting, false otherwise
    */
-  private boolean isTeleporting(Limelight limelight) {
+  private synchronized boolean isTeleporting(Limelight limelight) {
     return !GeomUtil.arePosesWithinThreshold(
         VisionConstants.MAX_TRANSLATION_DELTA_METERS,
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
         getPoseFromAprilTags(limelight),
-        odometryPose);
+        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
   }
 
   /**
@@ -294,17 +298,11 @@ public class PhysicalVision implements VisionInterface {
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
       // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-      // This
-      // creates a much more stable and accurate pose when translating, but when rotating but
-      // the
-      // pose will not
-      // be consistent due to latency between receiving and sending measurements. The
-      // parameters
-      // are
-      // limelightName, yaw,
-      // yawRate, pitch, pitchRate, roll, and rollRate. Generally we don't need to use pitch or
-      // roll in our pose estimate, so we don't send those values to the limelight (hence the
-      // 0's).
+      // This creates a much more stable and accurate pose when translating, but when rotating
+      // but the pose will not be consistent due to latency between receiving and sending
+      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
+      // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
+      // we don't send those values to the limelight (hence the 0's).
       LimelightHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
       updatePoseEstimate(limelight);
