@@ -38,6 +38,9 @@ public interface VisionInterface {
 
     /** This array stores the poses calculated from the April Tags seen by each Limelight. */
     public Pose2d[] limelightCalculatedPoses = new Pose2d[Limelight.values().length];
+
+    public Pose2d[] megatag1PoseEstimates = new Pose2d[Limelight.values().length];
+    public Pose2d[] megatag2PoseEstimates = new Pose2d[Limelight.values().length];
   }
 
   /**
@@ -65,13 +68,14 @@ public interface VisionInterface {
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current timestamp of the Limelight
    */
-  default double getTimeStampSeconds(Limelight limelight) {
+  default double getTimestampSeconds(Limelight limelight) {
     return 0.0;
   }
 
   /**
    * Gets the current ambiguity of the Limelight's pose calculation. This ambiguity is a measure of
-   * how confident the Limelight is in its pose calculation.
+   * how confident the Limelight is in its pose calculation. The range is from 0 to 1, where 0 is
+   * less ambiguous and 1 is more ambiguous.
    *
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The current ambiguity of the Limelight

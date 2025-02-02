@@ -1,5 +1,3 @@
-// TigerLib 2024
-
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -9,6 +7,7 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 public abstract class DriveCommandBase extends Command {
 
@@ -56,7 +55,9 @@ public abstract class DriveCommandBase extends Command {
    */
   public void addLimelightVisionMeasurement(Limelight limelight) {
     // Only do pose calculation if we can see the april tags
-    if (vision.canSeeAprilTags(limelight)) {
+    if (vision.canSeeAprilTags(limelight) && vision.isValidMeasurement(limelight)) {
+      Logger.recordOutput(
+          "Vision/valid measurement" + limelight.getId(), vision.isValidMeasurement(limelight));
       // Only do pose calculation if the measurement from the limelight is valid
       double distanceFromClosestAprilTag = vision.getLimelightAprilTagDistance(limelight);
 
@@ -79,11 +80,13 @@ public abstract class DriveCommandBase extends Command {
         swerveDrive.setPoseEstimatorVisionConfidence(
             standardDeviations[0], standardDeviations[1], standardDeviations[2]);
       }
+
       // Adds the timestamped pose gotten from the limelights to our pose estimation
       swerveDrive.addPoseEstimatorVisionMeasurement(
           vision.getPoseFromAprilTags(limelight),
           TimeUtil.getLogTimeSeconds() - vision.getLatencySeconds(limelight));
-      // }
     }
+    Logger.recordOutput(
+        "Vision/valid measurement" + limelight.getId(), vision.isValidMeasurement(limelight));
   }
 }

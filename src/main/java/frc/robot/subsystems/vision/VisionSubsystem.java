@@ -111,7 +111,7 @@ public class VisionSubsystem extends SubsystemBase {
    * @return The last seen pose of the robot.
    */
   public Pose2d getLastSeenPose() {
-    for (Pose2d pose : inputs.limelightCalculatedPoses) {
+    for (Pose2d pose : inputs.megatag1PoseEstimates) {
       if (pose != null && !pose.equals(new Pose2d())) {
         lastSeenPose = pose;
       }
