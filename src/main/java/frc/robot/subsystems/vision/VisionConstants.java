@@ -67,6 +67,8 @@ public final class VisionConstants {
 
   public static final int THREAD_SLEEP_MS = 20;
 
+  public static final int POSE_MOVING_AVERAGE_WINDOW_SIZE = 50;
+
   public static final AprilTagFieldLayout FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
   public static final double VISION_X_POS_TRUST = 0.5; // meters
