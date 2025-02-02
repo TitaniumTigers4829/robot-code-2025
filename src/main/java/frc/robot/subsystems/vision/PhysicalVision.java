@@ -28,7 +28,7 @@ public class PhysicalVision implements VisionInterface {
   private double headingRateDegreesPerSecond = 0;
 
   private Pose2dMovingAverageFilter pose2dMovingAverageFilter =
-   new Pose2dMovingAverageFilter(VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE);
+      new Pose2dMovingAverageFilter(VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE);
 
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
@@ -298,10 +298,10 @@ public class PhysicalVision implements VisionInterface {
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
       // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-      // This creates a much more stable and accurate pose when translating, but when rotating 
-      // but the pose will not be consistent due to latency between receiving and sending 
-      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll, 
-      // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so 
+      // This creates a much more stable and accurate pose when translating, but when rotating
+      // but the pose will not be consistent due to latency between receiving and sending
+      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
+      // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
       // we don't send those values to the limelight (hence the 0's).
       LimelightHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);

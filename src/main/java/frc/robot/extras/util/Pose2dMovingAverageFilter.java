@@ -5,8 +5,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 /**
- * A moving average filter for smoothing Pose2d values.
- * This filter averages the X, Y, and rotation components separately over a given window size.
+ * A moving average filter for smoothing Pose2d values. This filter averages the X, Y, and rotation
+ * components separately over a given window size.
  */
 public class Pose2dMovingAverageFilter {
   private final LinearFilter xFilter;
