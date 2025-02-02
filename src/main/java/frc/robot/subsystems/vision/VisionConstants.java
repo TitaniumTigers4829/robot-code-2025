@@ -53,11 +53,10 @@ public final class VisionConstants {
           new Translation3d(-0.3119324724, 0.0, 0.1865472012), new Rotation3d(0.0, 35, 180.0));
   public static final Transform3d FRONT_LEFT_TRANSFORM =
       new Transform3d(
-          new Translation3d(0.2749477356, -0.269958439, 0.2318054546),
-          new Rotation3d(0.0, 25, -35));
+          new Translation3d(0.2749477356, 0.269958439, 0.2318054546), new Rotation3d(0.0, 25, -35));
   public static final Transform3d FRONT_RIGHT_TRANSFORM =
       new Transform3d(
-          new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
+          new Translation3d(0.2816630892, -0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
 
   public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
   public static final PhotonCamera FRONT_LEFT_CAMERA =

@@ -54,11 +54,11 @@ public class SimulatedVision extends PhysicalVision {
     // Create simulated camera properties. These can be set to mimic your actual
     // camera.
     var cameraProperties = new SimCameraProperties();
-    cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
-    cameraProperties.setCalibError(0.35, 0.10);
-    cameraProperties.setFPS(15);
-    cameraProperties.setAvgLatencyMs(20);
-    cameraProperties.setLatencyStdDevMs(5);
+    // cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
+    // cameraProperties.setCalibError(0.35, 0.10);
+    // cameraProperties.setFPS(15);
+    // cameraProperties.setAvgLatencyMs(20);
+    // cameraProperties.setLatencyStdDevMs(5);
 
     // Create a PhotonCameraSim which will update the linked PhotonCamera's values
     // with visible
