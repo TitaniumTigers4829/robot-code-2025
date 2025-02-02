@@ -43,7 +43,7 @@ public class SimGyro {
         Degrees.of(gyroConfig.averageDriftingIn30SecsMotionlessDeg).div(Seconds.of(30.0));
     this.veloStdDev = gyroConfig.velocityMeasurementStandardDeviationPercent;
 
-    RuntimeLog.debug("Created a swerve module simulation");
+    RuntimeLog.debug("Created a gyro simulation");
   }
 
   public void setUpdateConsumer(

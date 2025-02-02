@@ -13,8 +13,8 @@ public class SimulatedGyro implements GyroInterface {
   public SimulatedGyro(SimGyro simGyro) {
     simGyro.setUpdateConsumer(
         (yawPair, accelVector) -> {
-          this.yawRads = yawPair.getFirst().in(Degrees);
-          this.yawVelRadsPerSec = yawPair.getSecond().in(DegreesPerSecond);
+          this.yawRads = -yawPair.getFirst().in(Degrees);
+          this.yawVelRadsPerSec = -yawPair.getSecond().in(DegreesPerSecond);
           this.accelX = accelVector.x().in(MetersPerSecondPerSecond);
           this.accelY = accelVector.y().in(MetersPerSecondPerSecond);
         });
@@ -22,9 +22,9 @@ public class SimulatedGyro implements GyroInterface {
 
   @Override
   public void updateInputs(GyroInputs inputs) {
-    inputs.isConnected = true;
-    inputs.yawDegrees = yawRads;
-    inputs.yawVelocityDegreesPerSecond = yawVelRadsPerSec;
+    inputs.isConnected = false;
+    inputs.yawDegrees = -yawRads;
+    inputs.yawVelocityDegreesPerSecond = -yawVelRadsPerSec;
     inputs.accelX = accelX;
     inputs.accelY = accelY;
   }

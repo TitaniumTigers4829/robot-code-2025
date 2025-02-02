@@ -52,6 +52,6 @@ public class SimGyroConfig implements StructSerializable {
    * @return a gyro simulation factory configured for the navX2-MXP IMU
    */
   public static SimGyroConfig ofNavX2() {
-    return new SimGyroConfig(2, 0.04);
+    return new SimGyroConfig(.002, 0.004);
   }
 }

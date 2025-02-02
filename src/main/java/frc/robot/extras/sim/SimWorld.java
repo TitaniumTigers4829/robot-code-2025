@@ -16,13 +16,17 @@ import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+import frc.robot.subsystems.vision.VisionConstants;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.simulation.VisionSystemSim;
 
 public class SimWorld {
 
   private final SimArena arena;
   private final SimRobot<SimSwerve> simRobot;
+
+  private final VisionSystemSim aprilTagSim;
 
   private final SimMechanismConfig driveMotorCfg =
       new SimMechanismConfig(new DCMotorExt(DCMotor.getKrakenX60Foc(1), 1))
@@ -55,6 +59,9 @@ public class SimWorld {
   public SimWorld() {
     arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.TIMEOUT_S), 5);
     simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
+
+    aprilTagSim = new VisionSystemSim("AprilTags");
+    aprilTagSim.addAprilTags(VisionConstants.FIELD_LAYOUT);
   }
 
   /**
@@ -73,10 +80,17 @@ public class SimWorld {
     return simRobot;
   }
 
+  public VisionSystemSim aprilTagSim() {
+    return aprilTagSim;
+  }
+
   /** Updates the simulation. */
   public void update(Supplier<Pose2d> poseSupplier) {
     robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
+
+    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose();
+    aprilTagSim.update(robotPose);
     Logger.recordOutput("Odometry/ChassisPose", robot().getDriveTrain().getChassisWorldPose());
   }
 }

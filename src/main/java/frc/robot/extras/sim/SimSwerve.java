@@ -56,8 +56,9 @@ public class SimSwerve extends SimDriveTrain {
    * @param config a {@link SimSwerveConfig} instance containing the configurations of * this
    *     drivetrain
    */
-  SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
+  public SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
     super(config, robot.timing());
+    RuntimeLog.debug("initializing sim swerve");
     this.robot = robot;
     this.timing = robot.timing();
     this.config = config;
@@ -65,6 +66,7 @@ public class SimSwerve extends SimDriveTrain {
     final Force gravityForceOnEachModule =
         Newtons.of(config.robotMassKg * 9.8).div(moduleSimulations.length);
     for (int i = 0; i < moduleSimulations.length; i++) {
+      RuntimeLog.debug("initializing module simulation " + i);
       moduleSimulations[i] =
           new SimSwerveModule(
               robot,
@@ -75,6 +77,8 @@ public class SimSwerve extends SimDriveTrain {
               SimMotorController.none(),
               SimMotorController.none());
     }
+
+    RuntimeLog.debug("initializing gyro sim");
     this.gyroSimulation = new SimGyro(timing, config.gyroConfig);
 
     this.chassisMass =
@@ -83,6 +87,7 @@ public class SimSwerve extends SimDriveTrain {
 
     // pre-calculate the rotor inertia for the chassis when translating and rotating
     // to interpolate between them based on the propulsion forces
+    RuntimeLog.debug("calculating robot values");
     final Distance wheelRadius = Meters.of(config.swerveModuleConfig.wheelsRadiusMeters);
     final Distance wheelBase = XY.of(config.moduleTranslations[0]).magnitude();
     final Mass rotationalMass =
@@ -97,7 +102,6 @@ public class SimSwerve extends SimDriveTrain {
 
   @Override
   protected void simTick() {
-    RuntimeLog.debug("SimSwerve simTick called");
     simulateModulePropulsion();
     simulateModuleFriction();
     gyroSimulation.updateSimulationSubTick(
