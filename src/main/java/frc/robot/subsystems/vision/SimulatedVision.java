@@ -95,19 +95,13 @@ public class SimulatedVision extends PhysicalVision {
   public void updateInputs(VisionInputs inputs) {
     // Abuse the updateInputs periodic call to update the sim
 
-    // Move the vision sim robot on the field
-    // if (robotSimulationPose.get() != null) {
-    //   visionSim.update(robotSimulationPose.get());
-    //   Logger.recordOutput("Vision/SimIO/updateSimPose", robotSimulationPose.get());
-    // }
-    super.updateInputs(inputs);
-
     for (Limelight limelight : Limelight.values()) {
       writeToTable(
           getSimulationCamera(limelight).getAllUnreadResults(),
           getLimelightTable(limelight),
           limelight);
     }
+    super.updateInputs(inputs);
   }
 
   /**
@@ -145,10 +139,10 @@ public class SimulatedVision extends PhysicalVision {
           pose_data.add((double) target.getFiducialId()); // 0: id
           pose_data.add(target.getYaw()); // 1: txnc
           pose_data.add(target.getPitch()); // 2: tync
-          pose_data.add(0.0); // 3: ta
+          pose_data.add(target.getArea()); // 3: ta
           pose_data.add(0.0); // 4: distToCamera
           pose_data.add(0.0); // 5: distToRobot
-          pose_data.add(0.5); // 6: ambiguity
+          pose_data.add(target.getPoseAmbiguity()); // 6: ambiguity
         }
 
         table
