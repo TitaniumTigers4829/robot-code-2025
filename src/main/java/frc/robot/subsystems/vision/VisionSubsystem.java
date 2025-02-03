@@ -32,7 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
-    Tracer.traceFunc("Vision/", ()->visionInterface.updateInputs(inputs));
+    Tracer.traceFunc("Vision/", () -> visionInterface.updateInputs(inputs));
   }
 
   /**

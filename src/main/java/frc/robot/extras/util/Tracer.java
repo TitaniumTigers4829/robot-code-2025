@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.littletonrobotics.junction.Logger;
-
 /**
  * A Utility class for tracing code execution time. Will put info to NetworkTables under the
  * "Tracer" table.
