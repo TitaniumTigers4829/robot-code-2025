@@ -3,14 +3,12 @@ package frc.robot;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
-import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -38,13 +36,14 @@ import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
-  private final ExampleSubsystem exampleSubsystem;
+  public final ExampleSubsystem exampleSubsystem;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -55,13 +54,12 @@ public class RobotContainer {
 
   public AutoFactory autoFactory;
   public AutoChooser autoChooser;
+  public Autos autos;
 
   public RobotContainer() {
     // this will put our autonomous chooser on the dashboard.
     autoChooser = new AutoChooser();
-    autoChooser.addRoutine("Example routine", this::exampleAutoRoutine);
-    SmartDashboard.putData(autoChooser);
-
+  
     switch (Constants.CURRENT_MODE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
@@ -151,6 +149,14 @@ public class RobotContainer {
 
     exampleSubsystem = new ExampleSubsystem();
 
+    autos = new Autos();
+    // this adds an auto routine to the auto chooser
+    autoChooser.addRoutine(
+        "Example routine", (Supplier<AutoRoutine>) autos.exampleAutoRoutine(exampleSubsystem));
+
+    // this updates the auto chooser
+    SmartDashboard.putData(autoChooser);
+
     // this sets up the auto factory
     autoFactory =
         new AutoFactory(
@@ -160,40 +166,6 @@ public class RobotContainer {
             swerveDrive::followTrajectory, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
-  }
-
-  public AutoRoutine exampleAutoRoutine() {
-
-    AutoRoutine routine = autoFactory.newRoutine("exampleAutoRoutine");
-
-    AutoTrajectory startToETraj = routine.trajectory("startToE");
-    AutoTrajectory eToPickupTraj = routine.trajectory("eToPickup");
-    AutoTrajectory cToPickupTraj = routine.trajectory("cToPickup");
-    AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
-
-    // reset odometry and start first trajectory
-    routine.active().onTrue(Commands.sequence(startToETraj.resetOdometry(), startToETraj.cmd()));
-
-    startToETraj
-        .active()
-        .onTrue(
-            exampleSubsystem
-                .exampleFunctionalCommand()); // TODO: replace with elevator to L4 command
-    startToETraj
-        .atTime("score")
-        .onTrue(
-            exampleSubsystem.exampleFunctionalCommand()); // TODO: replace with command for rollers
-    startToETraj
-        .done()
-        .onTrue(
-            eToPickupTraj
-                .cmd()
-                .alongWith(
-                    exampleSubsystem
-                        .exampleFunctionalCommand())); // TODO: replace with elevator to intake
-    // command
-
-    return routine;
   }
 
   private void resetFieldAndOdometryForAuto(Pose2d robotStartingPoseAtBlueAlliance) {
