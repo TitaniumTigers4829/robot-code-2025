@@ -7,10 +7,7 @@ package frc.robot.commands.autodrive;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -25,37 +22,34 @@ public class AutoAlign extends DriveCommandBase {
   private Pose2d Pose;
 
   private final ProfiledPIDController rotationController =
-  new ProfiledPIDController(
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_P,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_I,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_D,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_CONSTRAINTS);
-
+      new ProfiledPIDController(
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_P,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_I,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_D,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_ROTATION_CONSTRAINTS);
 
   private final ProfiledPIDController xTranslationController =
-  new ProfiledPIDController(
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_P,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_I,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_D,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
+      new ProfiledPIDController(
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_P,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_I,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_D,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
 
   private final ProfiledPIDController yTranslationController =
-  new ProfiledPIDController(
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_P,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_I,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_D,
-      SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
+      new ProfiledPIDController(
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_P,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_I,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_D,
+          SwerveConstants.TrajectoryConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
 
-
-  /** Creates a new AutoAlign. 
-   * @param visionSubsystem The subsystem for vision 
+  /**
+   * Creates a new AutoAlign.
+   *
+   * @param visionSubsystem The subsystem for vision
    * @param swerveDrive The subsystem for the swerve drive
    * @param targetPose The target pose for the robot to align to
-  */
-  public AutoAlign(
-    SwerveDrive swerveDrive,
-    VisionSubsystem visionSubsystem,
-    Pose2d targetPose) {
+   */
+  public AutoAlign(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, Pose2d targetPose) {
     super(swerveDrive, visionSubsystem);
     this.Pose = targetPose;
     this.swerveDrive = swerveDrive;
@@ -63,7 +57,7 @@ public class AutoAlign extends DriveCommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDrive, visionSubsystem);
   }
-  
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -72,16 +66,16 @@ public class AutoAlign extends DriveCommandBase {
     Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = Pose.getX() - drivePose.getX();
     double yPoseError = Pose.getY() - drivePose.getY();
-    double thetaPoseError =
-        Pose.getRotation().getRadians() - drivePose.getRotation().getRadians();
+    double thetaPoseError = Pose.getRotation().getRadians() - drivePose.getRotation().getRadians();
 
     // Uses the PID controllers to calculate the drive output
     double xOutput = MathUtil.applyDeadband(xTranslationController.calculate(xPoseError, 0), 0.05);
     double yOutput = MathUtil.applyDeadband(yTranslationController.calculate(yPoseError, 0), 0.05);
-    double turnOutput = MathUtil.applyDeadband(rotationController.calculate(thetaPoseError, 0), 0.05);
+    double turnOutput =
+        MathUtil.applyDeadband(rotationController.calculate(thetaPoseError, 0), 0.05);
 
     // Enables continuous input for the rotation controller
-    rotationController.enableContinuousInput(0,2*Math.PI);
+    rotationController.enableContinuousInput(0, 2 * Math.PI);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
