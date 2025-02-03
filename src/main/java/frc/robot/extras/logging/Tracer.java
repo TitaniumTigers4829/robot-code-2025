@@ -1,5 +1,4 @@
-
-package frc.robot.extras.util;
+package frc.robot.extras.logging;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
