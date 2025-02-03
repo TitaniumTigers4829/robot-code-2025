@@ -57,10 +57,10 @@ public class RobotContainer {
   public Autos autos;
 
   public RobotContainer() {
-    // this will put our autonomous chooser on the dashboard.
-    autoChooser = new AutoChooser();
-  
-    switch (Constants.CURRENT_MODE) {
+    autoChooser = new SendableChooser<Command>();
+    autoChooser.setDefaultOption("Auto", null);
+
+    switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         /* Disable Simulations */
@@ -121,9 +121,6 @@ public class RobotContainer {
 
         visionSubsystem = null;
 
-        //     new VisionSubsystem(
-        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
-
         SimulatedField.getInstance().resetFieldForAuto();
         resetFieldAndOdometryForAuto(
             new Pose2d(1.3980597257614136, 5.493067741394043, Rotation2d.fromRadians(3.1415)));
@@ -182,6 +179,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     configureButtonBindings();
+    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
   private void configureButtonBindings() {
@@ -221,13 +219,13 @@ public class RobotContainer {
                         swerveDrive.getEstimatedPose().getX(),
                         swerveDrive.getEstimatedPose().getY(),
                         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () ->
-                    swerveDrive.resetEstimatedPose(
-                        swerveDriveSimulation.getSimulatedDriveTrainPose())));
+    // driverController
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () ->
+    //                 swerveDrive.resetEstimatedPose(
+    //                     swerveDriveSimulation.getSimulatedDriveTrainPose())));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag

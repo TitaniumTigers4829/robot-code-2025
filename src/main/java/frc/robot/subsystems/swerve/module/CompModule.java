@@ -20,11 +20,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import java.util.Queue;
 
 public class CompModule implements ModuleInterface {
   private final TalonFX driveMotor;
@@ -35,22 +32,25 @@ public class CompModule implements ModuleInterface {
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
 
-  private final Queue<Angle> drivePosition;
+  private final StatusSignal<Angle> drivePosition;
   private final StatusSignal<AngularVelocity> driveVelocity;
   private final StatusSignal<Voltage> driveMotorAppliedVoltage;
   private final StatusSignal<Current> driveMotorCurrent;
 
-  private final Queue<Angle> turnEncoderAbsolutePosition;
+  private final StatusSignal<Angle> turnEncoderAbsolutePosition;
   private final StatusSignal<AngularVelocity> turnEncoderVelocity;
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
-  private final BaseStatusSignal[] periodicallyRefreshedSignals;
+  // private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
   public CompModule(ModuleConfig moduleConfig) {
-    driveMotor = new TalonFX(moduleConfig.driveMotorChannel(), DeviceCANBus.CANIVORE.name);
-    turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), DeviceCANBus.CANIVORE.name);
-    turnEncoder = new CANcoder(moduleConfig.turnEncoderChannel(), DeviceCANBus.CANIVORE.name);
+    driveMotor =
+        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+    turnMotor =
+        new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+    turnEncoder =
+        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
 
     CANcoderConfiguration turnEncoderConfig = new CANcoderConfiguration();
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
@@ -95,67 +95,34 @@ public class CompModule implements ModuleInterface {
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.TIMEOUT_S);
 
-    drivePosition = OdometryThread.registerSignalInput(driveMotor.getPosition());
+    drivePosition = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();
     driveMotorAppliedVoltage = driveMotor.getMotorVoltage();
     driveMotorCurrent = driveMotor.getSupplyCurrent();
 
-    turnEncoderAbsolutePosition =
-        OdometryThread.registerSignalInput(turnEncoder.getAbsolutePosition());
+    turnEncoderAbsolutePosition = turnEncoder.getAbsolutePosition();
     turnEncoderVelocity = turnEncoder.getVelocity();
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
 
-    periodicallyRefreshedSignals =
-        new BaseStatusSignal[] {
-          driveVelocity,
-          driveMotorAppliedVoltage,
-          driveMotorCurrent,
-          turnEncoderVelocity,
-          turnMotorAppliedVolts,
-          turnMotorCurrent
-        };
-
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        250.0, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.isConnected = BaseStatusSignal.isAllGood(periodicallyRefreshedSignals);
-
+    BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
+    inputs.drivePosition = -drivePosition.getValueAsDouble();
 
-    // Handle drive positions
-    if (!drivePosition.isEmpty()) {
-      Angle driveRelativePosition = Rotations.zero();
-      for (Angle angle : drivePosition) {
-        driveRelativePosition = angle;
-      }
-      inputs.drivePosition = driveRelativePosition.in(Rotations);
-      drivePosition.clear();
-    }
-
-    // Handle turn absolute positions
-    if (!turnEncoderAbsolutePosition.isEmpty()) {
-      Rotation2d turnPosition = new Rotation2d();
-      for (Angle angle : turnEncoderAbsolutePosition) {
-        turnPosition = Rotation2d.fromRotations(angle.in(Rotations));
-      }
-      inputs.turnAbsolutePosition = turnPosition;
-      turnEncoderAbsolutePosition.clear();
-    }
-
-    inputs.driveAppliedVolts = driveMotorAppliedVoltage.getValueAsDouble();
-    inputs.driveCurrentAmps = driveMotorCurrent.getValueAsDouble();
-
+    inputs.turnAbsolutePosition =
+        Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
     inputs.turnVelocity = turnEncoderVelocity.getValueAsDouble();
-    inputs.turnAppliedVolts = turnMotorAppliedVolts.getValueAsDouble();
-    inputs.turnCurrentAmps = turnMotorCurrent.getValueAsDouble();
   }
 
   @Override
@@ -166,6 +133,12 @@ public class CompModule implements ModuleInterface {
   @Override
   public void setTurnVoltage(Voltage volts) {
     turnMotor.setControl(voltageOut.withOutput(volts));
+  }
+
+  @Override
+  public double getDrivePosition() {
+    drivePosition.refresh();
+    return drivePosition.getValueAsDouble();
   }
 
   @Override
@@ -191,11 +164,5 @@ public class CompModule implements ModuleInterface {
   public void stopModule() {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
-  }
-
-  @Override
-  public void setXStance(double desiredPositionDegrees) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'setXStance'");
   }
 }

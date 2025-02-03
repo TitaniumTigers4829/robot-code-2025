@@ -67,5 +67,7 @@ public interface ModuleInterface {
     return 0.0;
   }
 
-  default void setXStance(double desiredPositionDegrees) {}
+  default double getDrivePosition() {
+    return 0.0;
+  }
 }

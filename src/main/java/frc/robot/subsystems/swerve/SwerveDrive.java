@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
-import frc.robot.extras.util.DeviceCANBus;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -28,8 +27,6 @@ import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThread;
-import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInputsAutoLogged;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -39,7 +36,6 @@ public class SwerveDrive extends SubsystemBase {
 
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
-  private final OdometryThreadInputsAutoLogged odometryThreadInputs;
   private final SwerveModule[] swerveModules;
   private final PIDController xController =
       new PIDController(
@@ -72,10 +68,7 @@ public class SwerveDrive extends SubsystemBase {
           ModuleConstants.WHEEL_DIAMETER_METERS,
           WHEEL_GRIP.TIRE_WHEEL.cof,
           0.0);
-
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
-
-  private final OdometryThread odometryThread;
 
   private Optional<DriverStation.Alliance> alliance;
 
@@ -128,10 +121,6 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    this.odometryThread = OdometryThread.createInstance(DeviceCANBus.RIO);
-    this.odometryThreadInputs = new OdometryThreadInputsAutoLogged();
-    this.odometryThread.start();
-
     gyroDisconnectedAlert.set(false);
   }
 
@@ -160,7 +149,7 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-    setpoint = setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, 0.02);
+    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -219,10 +208,6 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Updates and logs the inputs for the odometry thread, gyro, and swerve modules. */
   private void updateSwerveInputs() {
-    odometryThread.lockOdometry();
-    odometryThread.updateInputs(odometryThreadInputs);
-    Logger.processInputs("Drive/OdometryThread", odometryThreadInputs);
-
     for (SwerveModule module : swerveModules) module.updateOdometryInputs();
 
     gyroIO.updateInputs(gyroInputs);
@@ -251,7 +236,7 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule module : swerveModules) module.periodic();
   }
 
-  public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
+  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
         && speeds.omegaRadiansPerSecond == 0;
