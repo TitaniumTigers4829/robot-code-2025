@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
@@ -43,6 +44,11 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
+
+      int portOffset = 10 * limelight.getId();
+      for (int port = 5800; port <= 5809; port++) {
+        PortForwarder.add(port + portOffset, limelight.getName() + ".local", port);
+      }
       // Start a vision input task for each Limelight
       threadManager.startTask(
           limelight.getName(),
