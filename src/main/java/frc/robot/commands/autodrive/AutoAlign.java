@@ -11,15 +11,16 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/* Auto Align takes in Pose2d and moves robot to it */
 public class AutoAlign extends DriveCommandBase {
 
   private final SwerveDrive swerveDrive;
   private final VisionSubsystem visionSubsystem;
 
-  private Pose2d Pose;
+  private Pose2d targetPose;
 
   private final ProfiledPIDController rotationController =
       new ProfiledPIDController(
@@ -51,11 +52,13 @@ public class AutoAlign extends DriveCommandBase {
    */
   public AutoAlign(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, Pose2d targetPose) {
     super(swerveDrive, visionSubsystem);
-    this.Pose = targetPose;
+    this.targetPose = targetPose;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDrive, visionSubsystem);
+    // Enables continuous input for the rotation controller
+    rotationController.enableContinuousInput(-2* Math.PI, 2 * Math.PI);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -64,25 +67,22 @@ public class AutoAlign extends DriveCommandBase {
     super.execute();
     // Gets the error between the desired pos (the target) and the current pos of the robot
     Pose2d drivePose = swerveDrive.getEstimatedPose();
-    double xPoseError = Pose.getX() - drivePose.getX();
-    double yPoseError = Pose.getY() - drivePose.getY();
-    double thetaPoseError = Pose.getRotation().getRadians() - drivePose.getRotation().getRadians();
+    double xPoseError = targetPose.getX() - drivePose.getX();
+    double yPoseError = targetPose.getY() - drivePose.getY();
+    double thetaPoseError = targetPose.getRotation().getRadians() - drivePose.getRotation().getRadians();
 
     // Uses the PID controllers to calculate the drive output
-    double xOutput = MathUtil.applyDeadband(xTranslationController.calculate(xPoseError, 0), 0.05);
-    double yOutput = MathUtil.applyDeadband(yTranslationController.calculate(yPoseError, 0), 0.05);
+    double xOutput = MathUtil.applyDeadband(xTranslationController.calculate(xPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
+    double yOutput = MathUtil.applyDeadband(yTranslationController.calculate(yPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
     double turnOutput =
-        MathUtil.applyDeadband(rotationController.calculate(thetaPoseError, 0), 0.05);
-
-    // Enables continuous input for the rotation controller
-    rotationController.enableContinuousInput(0, 2 * Math.PI);
+        MathUtil.applyDeadband(rotationController.calculate(thetaPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xOutput, yOutput, turnOutput, swerveDrive.getOdometryRotation2d());
 
-    // Drives the robot towards the amp
+    // Drives the robot towards the target pose
     swerveDrive.drive(
         chassisSpeeds.vxMetersPerSecond,
         chassisSpeeds.vyMetersPerSecond,

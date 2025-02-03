@@ -138,6 +138,7 @@ public class SwerveConstants {
 
   public static final class TrajectoryConstants {
 
+    public static final double DEADBAND_AMOUNT = 0.02;
     public static final double DRIVE_BASE_DIAMETER =
         Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
 
