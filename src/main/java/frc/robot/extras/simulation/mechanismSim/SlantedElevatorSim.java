@@ -16,7 +16,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.LinearSystemSim;
 
-/** Represents a simulated elevator mechanism. */
+/** Represents a simulated slanted elevator mechanism. */
 public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
   // Gearbox for the elevator.
   private final DCMotor m_gearbox;
@@ -34,7 +34,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
   private final double m_inclineAngleRadians;
 
   /**
-   * Creates a simulated elevator mechanism.
+   * Creates a simulated slanted elevator mechanism.
    *
    * @param plant The linear system that represents the elevator. This system can be created with
    *     {@link edu.wpi.first.math.system.plant.LinearSystemId#createElevatorSystem(DCMotor, double,
@@ -43,6 +43,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param inclineAngleRadians The angle of the elevator in radians.
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
@@ -68,7 +69,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Creates a simulated elevator mechanism.
+   * Creates a simulated slanted elevator mechanism.
    *
    * @param kV The velocity gain.
    * @param kA The acceleration gain.
@@ -76,6 +77,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param inclineAngleRadians The angle of the elevator in radians.
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
@@ -102,7 +104,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Creates a simulated elevator mechanism.
+   * Creates a simulated slanted elevator mechanism.
    *
    * @param gearbox The type of and number of motors in the elevator gearbox.
    * @param gearing The gearing of the elevator (numbers greater than 1 represent reductions).
@@ -111,6 +113,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
    * @param minHeightMeters The min allowable height of the elevator.
    * @param maxHeightMeters The max allowable height of the elevator.
    * @param simulateGravity Whether gravity should be simulated or not.
+   * @param inclineAngleRadians The angle of the elevator in radians.
    * @param startingHeightMeters The starting height of the elevator.
    * @param measurementStdDevs The standard deviations of the measurements. Can be omitted if no
    *     noise is desired. If present must have 1 element for position.
