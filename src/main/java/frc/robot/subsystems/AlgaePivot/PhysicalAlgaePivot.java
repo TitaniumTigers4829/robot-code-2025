@@ -1,11 +1,14 @@
 package frc.robot.subsystems.AlgaePivot;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -27,7 +30,8 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface{
     private final StatusSignal<Current> algaeSupplyCurrent;
     private final StatusSignal<Current> algaeStatorCurrent;
     private final MotionMagicVoltage mmPositionRequest;
-    private double algaeTargetAngle; 
+    private double algaeTargetAngle;
+    private final VoltageOut voltageOut;
 
     public PhysicalAlgaePivot(){
         algaeMotor = new TalonFX(AlgaeConstants.ALGAE_PIVOT_MOTOR_ID);
@@ -41,6 +45,7 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface{
         algaeAngle = algaeEncoder.getAbsolutePosition();
         algaeSupplyCurrent = algaeMotor.getSupplyCurrent();
         algaeStatorCurrent = algaeMotor.getStatorCurrent();
+        voltageOut = new VoltageOut(0);
         
         algaeEncoderConfig.MagnetSensor.MagnetOffset = -AlgaeConstants.ANGLE_ZERO;
         algaeEncoderConfig.MagnetSensor.SensorDirection = AlgaeConstants.ALGAE_ENCODER_REVERSED;
@@ -56,7 +61,26 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface{
         algaeMotorConfig.Slot0.kG = AlgaeConstants.PIVOT_G;
         algaeMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
-        algaeMotorConfig.MotionMagic.MotionMagicAcceleration = 
+        algaeMotorConfig.MotionMagic.MotionMagicAcceleration = AlgaeConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;
+        algaeMotorConfig.MotionMagic.MotionMagicCruiseVelocity = AlgaeConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
+        
+        algaeMotorConfig.ClosedLoopGeneral.ContinuousWrap = true;
+
+        algaeMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        algaeMotorConfig.Feedback.FeedbackRemoteSensorID = algaeEncoder.getDeviceID();
+
+        algaeMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaeConstants.MAX_ANGLE;
+        algaeMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = AlgaeConstants.MIN_ANGLE;
+        algaeMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        algaeMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            100.0, 
+            algaeAngle, 
+            algaeVelocity, 
+            algaeVoltage, 
+            algaeSupplyCurrent, 
+            algaeStatorCurrent);
         }
 
     @Override
@@ -79,7 +103,7 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface{
 
     @Override
     public void setVoltage(double voltage){
-
+        algaeMotor.setControl(voltageOut.withOutput(voltage));
     }
 
     @Override

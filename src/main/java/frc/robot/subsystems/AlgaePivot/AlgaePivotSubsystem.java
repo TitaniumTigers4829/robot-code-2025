@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.AlgaePivot.AlgaePivotInterface.AlgaePivotInputs;
 
 public class AlgaePivotSubsystem extends SubsystemBase{
-    private AlgaePivotInterface algaePivotInterface;
-    private AlgaePivotInputsAutoLogged inputs = AlgaePivotInputsAutoLogged();
+    private final AlgaePivotInterface algaePivotInterface;
+    private final AlgaePivotInputsAutoLogged inputs = new AlgaePivotInputsAutoLogged();
 
     public AlgaePivotSubsystem(AlgaePivotInterface algaePivotInterface){
         this.algaePivotInterface = algaePivotInterface;
