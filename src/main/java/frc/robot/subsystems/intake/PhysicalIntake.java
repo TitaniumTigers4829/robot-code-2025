@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalIntake implements IntakeInterface {
-  private final TalonFX motor = new TalonFX(IntakeConstants.intakeMotorID);
+  private final TalonFX motor = new TalonFX(IntakeConstants.INTAKE_MOTOR_ID);
   private final StatusSignal<AngularVelocity> intakeVelocity = motor.getVelocity();
   private final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
@@ -18,10 +18,10 @@ public class PhysicalIntake implements IntakeInterface {
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
 
-    intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.IntakeStatorLimit;
-    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.IntakeStatorLimitEnable;
-    intakeConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.IntakeSupplyLimit;
-    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.IntakeSupplyLimitEnable;
+    intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.INTAKE_STATOR_LIMIT;
+    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
+    intakeConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.INTAKE_SUPPLY_LIMIT;
+    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
     motor.getConfigurator().apply(intakeConfig);
   }
