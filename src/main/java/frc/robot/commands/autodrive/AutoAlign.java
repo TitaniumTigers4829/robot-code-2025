@@ -58,7 +58,7 @@ public class AutoAlign extends DriveCommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDrive, visionSubsystem);
     // Enables continuous input for the rotation controller
-    rotationController.enableContinuousInput(-2* Math.PI, 2 * Math.PI);
+    rotationController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
