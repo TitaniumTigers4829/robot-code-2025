@@ -1,4 +1,4 @@
-package frc.robot.extras.logging;
+package frc.robot.extras.util;
 
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 /**
  * A Utility class for tracing code execution time. Will put info to NetworkTables under the
@@ -31,7 +33,7 @@ import java.util.function.Supplier;
  * <p>Example inside a {@code Drive Subsystem}
  *
  * <pre><code>
- * // Subsystem periodics are automaticall traced
+ * // Subsystem periodics are automatically traced
  * public void periodic() {
  *   for (var module : modules) {
  *     Tracer.traceFunc("Module" + module.getName(), module::update);
