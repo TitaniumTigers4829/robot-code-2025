@@ -12,11 +12,11 @@ import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
 public class PhysicalFlywheel {
   private PhysicalFlywheel physicalFlywheel =
       new PhysicalFlywheel();
-  private PIDController PID;
+  private PIDController flywheelPID;
   private double currentVolts;
 
   public PhysicalFlywheel() {
-    PID =
+    flywheelPID =
         new PIDController(
             FlywheelConstants.FLYWHEEL_P,
             FlywheelConstants.FLYWHEEL_I,
@@ -24,12 +24,12 @@ public class PhysicalFlywheel {
   }
 
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.leaderMotorPosition = getFlywheelSpeed();
-    inputs.followerMotorPosition = getFlywheelSpeed();
+    inputs.flywheelMotorPosition = getFlywheelSpeed();
+    inputs.flywheelVelocity = getFlywheelVelocity();
   }
 
   public void setFlywheelSpeed(double speed) {
-    setVolts(PID.calculate(getFlywheelSpeed(), speed));
+    setVolts(flywheelPID.calculate(getFlywheelSpeed(), speed));
   }
 
   public double getFlywheelSpeed() {
@@ -37,7 +37,7 @@ public class PhysicalFlywheel {
   }
 
   public void setVolts(double volts) {
-    currentVolts = PID.calculate(volts);
+    currentVolts = flywheelPID.calculate(volts);
     physicalFlywheel.setVolts(currentVolts);
   }
 

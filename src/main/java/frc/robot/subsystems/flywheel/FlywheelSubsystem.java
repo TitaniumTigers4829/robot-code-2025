@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.flywheel;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
 import java.util.logging.Logger;
@@ -36,7 +37,10 @@ public class FlywheelSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     flywheelInterface.updateInputs(inputs);
-    Logger.getLogger(FlywheelSubsystem.class.getName())
-        .info("Flywheel/ inputs: " + inputs.toString());
+    Logger.processInputs("Flywheel/", inputs);
+  }
+
+  public Command setFlyhweelSpeed(double speed) {
+    return this.runOnce(()->setFlyhweelSpeed(speed));
   }
 }

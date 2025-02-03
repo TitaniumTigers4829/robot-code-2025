@@ -10,9 +10,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface FlywheelInterface {
   @AutoLog
   public static class FlywheelInputs {
-    public double leaderMotorPosition = 0.0;
-    public double followerMotorPosition = 0.0;
+    public double flywheelVelocity = 0.0;
+    public double flywheelMotorPosition = 0.0;
   }
+
+// are these docs strings?? ishan said to get the velocity but idk how :(
 
   public default void updateInputs(FlywheelInputs inputs) {}
 
