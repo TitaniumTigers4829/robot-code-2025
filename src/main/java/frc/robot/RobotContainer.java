@@ -57,8 +57,6 @@ public class RobotContainer {
   public Autos autos;
 
   public RobotContainer() {
-    autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("Auto", null);
 
     switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {

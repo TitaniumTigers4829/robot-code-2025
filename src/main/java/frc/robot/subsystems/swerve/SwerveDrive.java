@@ -213,8 +213,6 @@ public class SwerveDrive extends SubsystemBase {
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
-
-    odometryThread.unlockOdometry();
   }
 
   /**
@@ -236,7 +234,7 @@ public class SwerveDrive extends SubsystemBase {
     for (SwerveModule module : swerveModules) module.periodic();
   }
 
-  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
+  public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
         && speeds.omegaRadiansPerSecond == 0;
