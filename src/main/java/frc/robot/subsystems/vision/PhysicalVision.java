@@ -162,18 +162,19 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-        && (!isLargeDiscrepancyBetweenTwoPoses(
-                limelight,
-                VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-                VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-                megatag1Estimate.pose,
-                megatag2Estimate.pose)
-            || getLimelightAprilTagDistance(limelight)
-                > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
-      limelightEstimates.set(
-          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    // if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+    //     && (!isLargeDiscrepancyBetweenTwoPoses(
+    //             limelight,
+    //             VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+    //             VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+    //             megatag1Estimate.pose,
+    //             megatag2Estimate.pose)
+    //         || getLimelightAprilTagDistance(limelight)
+    //             > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+    //   limelightEstimates.set(
+    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    // } else
+    if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
