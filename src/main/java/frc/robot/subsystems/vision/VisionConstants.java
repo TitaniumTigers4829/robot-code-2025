@@ -76,7 +76,7 @@ public final class VisionConstants {
   public static final double VISION_ANGLE_TRUST = Units.degreesToRadians(50); // radians
 
   public static final double LL3_FOV_MARGIN_OF_ERROR = 26;
-  public static final double LL3G_FOV_MARGIN_OF_ERROR = 33;
+  public static final double LL3G_FOV_MARGIN_OF_ERROR = 36;
 
   public static final double MEGA_TAG_2_MAX_HEADING_RATE = 38; // degrees/s
 
@@ -99,11 +99,11 @@ public final class VisionConstants {
 
   public static final double[][] ONE_APRIL_TAG_LOOKUP_TABLE = {
     // {distance in meters, x std deviation, y std deviation, r (in degrees) std deviation}
-    {0, 0.01, 0.01, Units.degreesToRadians(180000)}, // 2
-    {1.5, 0.02, 0.02, Units.degreesToRadians(180000)}, // 5
-    {3, 1.2, 1.2, Units.degreesToRadians(180000)}, // 25
-    {4.5, 5.5, 5.5, Units.degreesToRadians(180000)}, // 90
-    {8, 10.0, 10.0, Units.degreesToRadians(180000)} // 180
+    {0, 0.02, 0.02, Units.degreesToRadians(180000)}, // 2
+    {1.5, 0.1, 0.1, Units.degreesToRadians(180000)}, // 5
+    {3, 4.0, 4.0, Units.degreesToRadians(180000)}, // 25
+    {4.5, 8.0, 6.0, Units.degreesToRadians(180000)}, // 90
+    {8, 10.5, 10.5, Units.degreesToRadians(180000)} // 180
   };
 
   public static final double[][] TWO_APRIL_TAG_LOOKUP_TABLE = {

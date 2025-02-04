@@ -19,6 +19,7 @@ import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.TimeUtil;
+import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
@@ -194,6 +195,7 @@ public class SwerveDrive extends SubsystemBase {
 
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
+    Tracer.traceFunc("Gyro", () -> gyroIO.updateInputs(gyroInputs));
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
   }
 
