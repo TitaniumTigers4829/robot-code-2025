@@ -2,7 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowChoreoTrajectory;
 import frc.robot.extras.simulation.field.SimulatedField;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
@@ -36,7 +37,6 @@ import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -147,7 +147,7 @@ public class RobotContainer {
     autos = new Autos();
     // this adds an auto routine to the auto chooser
     autoChooser.addRoutine(
-        "Example routine", (Supplier<AutoRoutine>) autos.exampleAutoRoutine(exampleSubsystem));
+        "Example routine", () -> autos.exampleAutoRoutine(exampleSubsystem, swerveDrive));
 
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
@@ -158,7 +158,11 @@ public class RobotContainer {
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
             // provided Pose2d
-            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
+            (SwerveSample sample) -> {
+              FollowChoreoTrajectory command =
+                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
+              command.execute();
+            }, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
   }

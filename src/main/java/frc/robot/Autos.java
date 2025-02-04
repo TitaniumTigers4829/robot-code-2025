@@ -5,6 +5,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.example.ExampleSubsystem;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class Autos {
   public AutoFactory autoFactory;
