@@ -150,7 +150,8 @@ public class PhysicalVision implements VisionInterface {
     for (int port = VisionConstants.BASE_PORT;
         port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
         port++) {
-      PortForwarder.add(port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
+      PortForwarder.add(
+          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
     }
   }
 
