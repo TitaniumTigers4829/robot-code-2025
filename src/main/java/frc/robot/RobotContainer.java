@@ -43,7 +43,7 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
-  public final ExampleSubsystem exampleSubsystem;
+  private final ExampleSubsystem exampleSubsystem;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -144,14 +144,7 @@ public class RobotContainer {
 
     exampleSubsystem = new ExampleSubsystem();
 
-    autos = new Autos();
-    // this adds an auto routine to the auto chooser
-    autoChooser.addRoutine(
-        "Example routine", () -> autos.exampleAutoRoutine(exampleSubsystem, swerveDrive));
-
-    // this updates the auto chooser
-    SmartDashboard.putData(autoChooser);
-
+    this.autoChooser = autoChooser;
     // this sets up the auto factory
     autoFactory =
         new AutoFactory(
@@ -165,6 +158,14 @@ public class RobotContainer {
             }, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
+    
+    autos = new Autos(autoFactory, exampleSubsystem, swerveDrive);
+    // this adds an auto routine to the auto chooser
+    autoChooser.addRoutine(
+        "Example routine", () -> autos.exampleAutoRoutine());
+    // this updates the auto chooser
+    SmartDashboard.putData(autoChooser);
+
   }
 
   private void resetFieldAndOdometryForAuto(Pose2d robotStartingPoseAtBlueAlliance) {
