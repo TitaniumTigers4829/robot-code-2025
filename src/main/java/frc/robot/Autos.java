@@ -20,8 +20,8 @@ public class Autos {
     AutoTrajectory cToPickupTraj = routine.trajectory("cToPickup");
     AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
 
-    // reset odometry with vision and start first trajectory
-    routine.active().onTrue(Commands.sequence(swerveDrive.getEstimatedPose(), startToETraj.cmd()));
+    // reset odometry and start first trajectory
+    routine.active().onTrue(Commands.sequence(startToETraj.resetEstimatedPose(), startToETraj.cmd()));
 
     startToETraj
         .active()
