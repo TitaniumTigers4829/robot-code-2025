@@ -160,8 +160,8 @@ public class RobotContainer {
             // provided Pose2d
             (SwerveSample sample) -> {
               FollowChoreoTrajectory command =
-                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem);
-              command.setSample(sample);
+                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
+              command.execute();
             }, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem

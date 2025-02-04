@@ -9,23 +9,13 @@ public class FollowChoreoTrajectory extends DriveCommandBase {
   private SwerveSample sample;
 
   // Constructor without TrajectorySample for AutoFactory
-  public FollowChoreoTrajectory(SwerveDrive swerveDrive, VisionSubsystem vision) {
-    super(swerveDrive, vision);
-    this.swerveDrive = swerveDrive;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveDrive, vision);
-  }
-
-  // Constructor with TrajectorySample
   public FollowChoreoTrajectory(
       SwerveDrive swerveDrive, VisionSubsystem vision, SwerveSample sample) {
-    this(swerveDrive, vision);
+    super(swerveDrive, vision);
+    this.swerveDrive = swerveDrive;
     this.sample = sample;
-  }
-
-  // Method to set the TrajectorySample
-  public void setSample(SwerveSample sample) {
-    this.sample = sample;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(swerveDrive, vision);
   }
 
   // Called when the command is initially scheduled.
