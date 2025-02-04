@@ -3,6 +3,8 @@ package frc.robot;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowChoreoTrajectory;
 import frc.robot.extras.simulation.field.SimulatedField;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
@@ -147,7 +150,7 @@ public class RobotContainer {
     autos = new Autos();
     // this adds an auto routine to the auto chooser
     autoChooser.addRoutine(
-        "Example routine", (Supplier<AutoRoutine>) autos.exampleAutoRoutine(exampleSubsystem));
+        "Example routine", ()-> autos.exampleAutoRoutine(exampleSubsystem, swerveDrive));
 
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
@@ -158,7 +161,10 @@ public class RobotContainer {
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
             // provided Pose2d
-            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
+            (SwerveSample sample) -> {
+        FollowChoreoTrajectory command = new FollowChoreoTrajectory(swerveDrive, visionSubsystem);
+        command.setSample(sample);
+    }, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
   }

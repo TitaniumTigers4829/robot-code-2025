@@ -131,7 +131,7 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput(
         "SystemPerformance/OdometryFetchingTimeMS", (TimeUtil.getRealTimeSeconds() - t0) * 1000);
     // Runs the SwerveModules periodic methods
-    for (SwerveModule module : swerveModules) module.periodic();
+    modulesPeriodic();
   }
 
   /**
