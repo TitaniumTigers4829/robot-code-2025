@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
+import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
@@ -32,6 +33,7 @@ public class SwerveModule {
   public void updateOdometryInputs() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module-" + name, inputs);
+    Tracer.traceFunc("Module-" + name, () -> io.updateInputs(inputs));
     this.hardwareFaultAlert.set(!inputs.isConnected);
   }
 
