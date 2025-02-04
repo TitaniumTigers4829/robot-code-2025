@@ -10,8 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 /* Auto Align takes in Pose2d and moves robot to it */
@@ -69,13 +69,19 @@ public class AutoAlign extends DriveCommandBase {
     Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = targetPose.getX() - drivePose.getX();
     double yPoseError = targetPose.getY() - drivePose.getY();
-    double thetaPoseError = targetPose.getRotation().getRadians() - drivePose.getRotation().getRadians();
+    double thetaPoseError =
+        targetPose.getRotation().getRadians() - drivePose.getRotation().getRadians();
 
     // Uses the PID controllers to calculate the drive output
-    double xOutput = MathUtil.applyDeadband(xTranslationController.calculate(xPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
-    double yOutput = MathUtil.applyDeadband(yTranslationController.calculate(yPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
+    double xOutput =
+        MathUtil.applyDeadband(
+            xTranslationController.calculate(xPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
+    double yOutput =
+        MathUtil.applyDeadband(
+            yTranslationController.calculate(yPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
     double turnOutput =
-        MathUtil.applyDeadband(rotationController.calculate(thetaPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
+        MathUtil.applyDeadband(
+            rotationController.calculate(thetaPoseError, 0), TrajectoryConstants.DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
