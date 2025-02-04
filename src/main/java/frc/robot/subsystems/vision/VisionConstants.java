@@ -108,11 +108,11 @@ public final class VisionConstants {
 
   public static final double[][] TWO_APRIL_TAG_LOOKUP_TABLE = {
     // {distance in meters, x std deviation, y std deviation, r (in degrees) std deviation}
-    {0, 0.02, 0.02, Units.degreesToRadians(180000)}, // 0.5
-    {1.5, 0.04, 0.04, Units.degreesToRadians(180000)}, // 0.7
-    {3, 0.05, 0.05, Units.degreesToRadians(180000)}, // 4
-    {4.5, 0.08, 0.08, Units.degreesToRadians(180000)}, // 30
-    {8, 1.0, 1.0, Units.degreesToRadians(180000)}, // 90
-    {10, 12.0, 12.0, Units.degreesToRadians(180000)} // 90
+    {0, 0.01, 0.01, Units.degreesToRadians(180000)}, // 0.5
+    {1.5, 0.01, 0.01, Units.degreesToRadians(180000)}, // 0.7
+    {3, 0.03, 0.03, Units.degreesToRadians(180000)}, // 4
+    {4.5, 0.06, 0.06, Units.degreesToRadians(180000)}, // 30
+    {8, 0.5, 0.5, Units.degreesToRadians(180000)}, // 90
+    {10, 10.0, 10.0, Units.degreesToRadians(180000)} // 90
   };
 }
