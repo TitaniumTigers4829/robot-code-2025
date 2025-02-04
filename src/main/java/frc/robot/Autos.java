@@ -9,7 +9,8 @@ import frc.robot.subsystems.example.ExampleSubsystem;
 public class Autos {
   public AutoFactory autoFactory;
 
-  public AutoRoutine exampleAutoRoutine(ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
+  public AutoRoutine exampleAutoRoutine(
+      ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
 
     AutoRoutine routine = autoFactory.newRoutine("exampleAutoRoutine");
 
