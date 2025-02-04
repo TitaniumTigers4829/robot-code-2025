@@ -216,7 +216,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * follow Trajectory
+   * Follows a Choreo Trajectory
    *
    * @param sample trajectory
    */

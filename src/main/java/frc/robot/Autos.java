@@ -9,7 +9,7 @@ import frc.robot.subsystems.example.ExampleSubsystem;
 public class Autos {
   public AutoFactory autoFactory;
 
-  public AutoRoutine exampleAutoRoutine(ExampleSubsystem exampleSubsystem) {
+  public AutoRoutine exampleAutoRoutine(ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
 
     AutoRoutine routine = autoFactory.newRoutine("exampleAutoRoutine");
 
@@ -18,8 +18,8 @@ public class Autos {
     AutoTrajectory cToPickupTraj = routine.trajectory("cToPickup");
     AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
 
-    // reset odometry and start first trajectory
-    routine.active().onTrue(Commands.sequence(startToETraj.resetOdometry(), startToETraj.cmd()));
+    // reset odometry with vision and start first trajectory
+    routine.active().onTrue(Commands.sequence(swerveDrive.getEstimatedPose(), startToETraj.cmd()));
 
     startToETraj
         .active()
