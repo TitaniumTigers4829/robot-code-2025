@@ -2,9 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
 import choreo.trajectory.SwerveSample;
-import choreo.trajectory.TrajectorySample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -39,7 +37,6 @@ import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
@@ -150,7 +147,7 @@ public class RobotContainer {
     autos = new Autos();
     // this adds an auto routine to the auto chooser
     autoChooser.addRoutine(
-        "Example routine", ()-> autos.exampleAutoRoutine(exampleSubsystem, swerveDrive));
+        "Example routine", () -> autos.exampleAutoRoutine(exampleSubsystem, swerveDrive));
 
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
@@ -162,9 +159,10 @@ public class RobotContainer {
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
             // provided Pose2d
             (SwerveSample sample) -> {
-        FollowChoreoTrajectory command = new FollowChoreoTrajectory(swerveDrive, visionSubsystem);
-        command.setSample(sample);
-    }, // The drive subsystem trajectory follower
+              FollowChoreoTrajectory command =
+                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem);
+              command.setSample(sample);
+            }, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
   }

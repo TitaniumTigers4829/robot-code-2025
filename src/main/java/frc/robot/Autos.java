@@ -3,7 +3,6 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import choreo.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
