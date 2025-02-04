@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.GeomUtil;
@@ -43,7 +44,9 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
-      // Start a vision input task for each Limelight
+      // Setupt port forwarding for each limelight
+      setupPortForwarding(limelight);
+      // Start a threaded task to check and update the pose for each Limelight
       threadManager.startTask(
           limelight.getName(),
           () -> checkAndUpdatePose(limelight),
@@ -130,6 +133,26 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
+  }
+
+  /**
+   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
+   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
+   *
+   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
+   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
+   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
+   *
+   * @param limelight The Limelight for which to set up port forwarding.
+   */
+  private void setupPortForwarding(Limelight limelight) {
+    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
+    for (int port = VisionConstants.BASE_PORT;
+        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
+        port++) {
+      PortForwarder.add(
+          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
+    }
   }
 
   /**

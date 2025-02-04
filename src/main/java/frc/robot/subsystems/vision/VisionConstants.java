@@ -97,6 +97,12 @@ public final class VisionConstants {
   public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
   public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 2;
 
+  // Constants for port forwarding
+  public static final int BASE_PORT = 5800;
+  public static final int PORT_RANGE = 10;
+  public static final int PORT_OFFSET = 10;
+  public static final String LIMELIGHT_DOMAIN = ".local";
+
   public static final double[][] ONE_APRIL_TAG_LOOKUP_TABLE = {
     // {distance in meters, x std deviation, y std deviation, r (in degrees) std deviation}
     {0, 0.02, 0.02, Units.degreesToRadians(180000)}, // 2
