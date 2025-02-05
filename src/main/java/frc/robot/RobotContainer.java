@@ -22,7 +22,6 @@ import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
-import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -43,7 +42,6 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
-  private final ExampleSubsystem exampleSubsystem;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
 
@@ -142,7 +140,6 @@ public class RobotContainer {
       }
     }
 
-    exampleSubsystem = new ExampleSubsystem();
 
     this.autoChooser = autoChooser;
     // this sets up the auto factory
@@ -159,7 +156,7 @@ public class RobotContainer {
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
 
-    autos = new Autos(autoFactory, exampleSubsystem, swerveDrive);
+    autos = new Autos(autoFactory, swerveDrive);
     // this adds an auto routine to the auto chooser
     autoChooser.addRoutine("Example routine", () -> autos.exampleAutoRoutine());
     // this updates the auto chooser

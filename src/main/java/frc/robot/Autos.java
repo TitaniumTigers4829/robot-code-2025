@@ -4,19 +4,16 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants.AutoConstants;
 
 public class Autos {
   private final AutoFactory autoFactory;
-  private final ExampleSubsystem exampleSubsystem;
   private final SwerveDrive swerveDrive;
 
   public Autos(
-      AutoFactory autoFactory, ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
+      AutoFactory autoFactory, SwerveDrive swerveDrive) {
     this.autoFactory = autoFactory;
-    this.exampleSubsystem = exampleSubsystem;
     this.swerveDrive = swerveDrive;
   }
 
@@ -37,21 +34,15 @@ public class Autos {
 
     startToETraj
         .active()
-        .onTrue(
-            exampleSubsystem
-                .exampleFunctionalCommand()); // TODO: replace with elevator to L4 command
+        .onTrue(); // TODO: replace with elevator to L4 command
     startToETraj
         .atTime("score")
         .onTrue(
-            exampleSubsystem.exampleFunctionalCommand()); // TODO: replace with command for rollers
     startToETraj
         .done()
         .onTrue(
             eToPickupTraj
-                .cmd()
-                .alongWith(
-                    exampleSubsystem
-                        .exampleFunctionalCommand())); // TODO: replace with elevator to intake
+                .cmd()));
     // command
 
     return routine;
