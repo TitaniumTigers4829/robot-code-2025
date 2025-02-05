@@ -82,7 +82,17 @@ public class RobotContainer {
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        elevatorSim = new SlantedElevatorSim(edu.wpi.first.math.system.plant.LinearSystemId.createElevatorSystem(DCMotor.getKrakenX60(2), 3.0,3.0,3.0), null, 0, 0, false, 0, 0, null);
+        elevatorSim =
+            new SlantedElevatorSim(
+                edu.wpi.first.math.system.plant.LinearSystemId.createElevatorSystem(
+                    DCMotor.getKrakenX60(2), 3.0, 3.0, 3.0),
+                null,
+                0,
+                0,
+                false,
+                0,
+                0,
+                null);
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
         this.gyroSimulation = GyroSimulation.createNavX2();
