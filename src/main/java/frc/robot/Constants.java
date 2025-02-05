@@ -54,53 +54,53 @@ public final class Constants {
     //  Right     \-----------------------|
 
     // Right Start
-    public static final String RIGHT_START_TO_E_TRAJECTORY = "Right-Start-to-E";
-    public static final String RIGHT_START_TO_F_TRAJECTORY = "Right-Start-to-F";
-    public static final String RIGHT_START_TO_G_TRAJECTORY = "Right-Start-to-G";
+    public static final String RIGHT_START_TO_E_TRAJECTORY = "Trajectories/Right-Start-to-E";
+    public static final String RIGHT_START_TO_F_TRAJECTORY = "Trajectories/Right-Start-to-F";
+    public static final String RIGHT_START_TO_G_TRAJECTORY = "Trajectories/Right-Start-to-G";
     // Mid Start
-    public static final String MID_START_TO_E_TRAJECTORY = "Mid-Start-to-E";
-    public static final String MID_START_TO_F_TRAJECTORY = "Mid-Start-to-F";
-    public static final String MID_START_TO_G_TRAJECTORY = "Mid-Start-to-G";
-    public static final String MID_START_TO_H_TRAJECTORY = "Mid-Start-to-H";
-    public static final String MID_START_TO_I_TRAJECTORY = "Mid-Start-to-I";
-    public static final String MID_START_TO_J_TRAJECTORY = "Mid-Start-to-J";
+    public static final String MID_START_TO_E_TRAJECTORY = "Trajectories/Mid-Start-to-E";
+    public static final String MID_START_TO_F_TRAJECTORY = "Trajectories/Mid-Start-to-F";
+    public static final String MID_START_TO_G_TRAJECTORY = "Trajectories/Mid-Start-to-G";
+    public static final String MID_START_TO_H_TRAJECTORY = "Trajectories/Mid-Start-to-H";
+    public static final String MID_START_TO_I_TRAJECTORY = "Trajectories/Mid-Start-to-I";
+    public static final String MID_START_TO_J_TRAJECTORY = "Trajectories/Mid-Start-to-J";
     // Left Start
-    public static final String LEFT_START_TO_I_TRAJECTORY = "Left-Start-to-I";
-    public static final String LEFT_START_TO_H_TRAJECTORY = "Left-Start-to-H";
-    public static final String LEFT_START_TO_J_TRAJECTORY = "Left-Start-to-J";
+    public static final String LEFT_START_TO_I_TRAJECTORY = "Trajectories/Left-Start-to-I";
+    public static final String LEFT_START_TO_H_TRAJECTORY = "Trajectories/Left-Start-to-H";
+    public static final String LEFT_START_TO_J_TRAJECTORY = "Trajectories/Left-Start-to-J";
 
     // Reef to Right Pickup
-    public static final String A_TO_RIGHT_PICKUP_TRAJECTORY = "A-to-Right-Pickup";
-    public static final String B_TO_RIGHT_PICKUP_TRAJECTORY = "B-to-Right-Pickup";
-    public static final String C_TO_RIGHT_PICKUP_TRAJECTORY = "C-to-Right-Pickup";
-    public static final String D_TO_RIGHT_PICKUP_TRAJECTORY = "D-to-Right-Pickup";
-    public static final String E_TO_RIGHT_PICKUP_TRAJECTORY = "E-to-Right-Pickup";
-    public static final String F_TO_RIGHT_PICKUP_TRAJECTORY = "F-to-Right-Pickup";
-    public static final String G_TO_RIGHT_PICKUP_TRAJECTORY = "G-to-Right-Pickup";
+    public static final String A_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/A-to-Right-Pickup";
+    public static final String B_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/B-to-Right-Pickup";
+    public static final String C_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/C-to-Right-Pickup";
+    public static final String D_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/D-to-Right-Pickup";
+    public static final String E_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/E-to-Right-Pickup";
+    public static final String F_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/F-to-Right-Pickup";
+    public static final String G_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/G-to-Right-Pickup";
     // Reef to Left Pickup
-    public static final String H_TO_LEFT_PICKUP_TRAJECTORY = "H-to-Left-Pickup";
-    public static final String I_TO_LEFT_PICKUP_TRAJECTORY = "I-to-Left-Pickup";
-    public static final String J_TO_LEFT_PICKUP_TRAJECTORY = "J-to-Left-Pickup";
-    public static final String K_TO_LEFT_PICKUP_TRAJECTORY = "K-to-Left-Pickup";
-    public static final String L_TO_LEFT_PICKUP_TRAJECTORY = "L-to-Left-Pickup";
-    public static final String A_TO_LEFT_PICKUP_TRAJECTORY = "A-to-Left-Pickup";
-    public static final String B_TO_LEFT_PICKUP_TRAJECTORY = "B-to-Left-Pickup";
+    public static final String H_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/H-to-Left-Pickup";
+    public static final String I_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/I-to-Left-Pickup";
+    public static final String J_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/J-to-Left-Pickup";
+    public static final String K_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/K-to-Left-Pickup";
+    public static final String L_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/L-to-Left-Pickup";
+    public static final String A_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/A-to-Left-Pickup";
+    public static final String B_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/B-to-Left-Pickup";
     // Right Pickup to Reef
-    public static final String RIGHT_PICKUP_TO_A_TRAJECTORY = "Right-Pickup-to-A";
-    public static final String RIGHT_PICKUP_TO_B_TRAJECTORY = "Right-Pickup-to-B";
-    public static final String RIGHT_PICKUP_TO_C_TRAJECTORY = "Right-Pickup-to-C";
-    public static final String RIGHT_PICKUP_TO_D_TRAJECTORY = "Right-Pickup-to-D";
-    public static final String RIGHT_PICKUP_TO_E_TRAJECTORY = "Right-Pickup-to-E";
-    public static final String RIGHT_PICKUP_TO_F_TRAJECTORY = "Right-Pickup-to-F";
-    public static final String RIGHT_PICKUP_TO_G_TRAJECTORY = "Right-Pickup-to-G";
+    public static final String RIGHT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Right-Pickup-to-A";
+    public static final String RIGHT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Right-Pickup-to-B";
+    public static final String RIGHT_PICKUP_TO_C_TRAJECTORY = "Trajectories/Right-Pickup-to-C";
+    public static final String RIGHT_PICKUP_TO_D_TRAJECTORY = "Trajectories/Right-Pickup-to-D";
+    public static final String RIGHT_PICKUP_TO_E_TRAJECTORY = "Trajectories/Right-Pickup-to-E";
+    public static final String RIGHT_PICKUP_TO_F_TRAJECTORY = "Trajectories/Right-Pickup-to-F";
+    public static final String RIGHT_PICKUP_TO_G_TRAJECTORY = "Trajectories/Right-Pickup-to-G";
     // Left Pickup to Reef
-    public static final String LEFT_PICKUP_TO_H_TRAJECTORY = "Left-Pickup-to-H";
-    public static final String LEFT_PICKUP_TO_I_TRAJECTORY = "Left-Pickup-to-I";
-    public static final String LEFT_PICKUP_TO_J_TRAJECTORY = "Left-Pickup-to-J";
-    public static final String LEFT_PICKUP_TO_K_TRAJECTORY = "Left-Pickup-to-K";
-    public static final String LEFT_PICKUP_TO_L_TRAJECTORY = "Left-Pickup-to-L";
-    public static final String LEFT_PICKUP_TO_A_TRAJECTORY = "Left-Pickup-to-A";
-    public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Left-Pickup-to-B";
+    public static final String LEFT_PICKUP_TO_H_TRAJECTORY = "Trajectories/Left-Pickup-to-H";
+    public static final String LEFT_PICKUP_TO_I_TRAJECTORY = "Trajectories/Left-Pickup-to-I";
+    public static final String LEFT_PICKUP_TO_J_TRAJECTORY = "Trajectories/Left-Pickup-to-J";
+    public static final String LEFT_PICKUP_TO_K_TRAJECTORY = "Trajectories/Left-Pickup-to-K";
+    public static final String LEFT_PICKUP_TO_L_TRAJECTORY = "Trajectories/Left-Pickup-to-L";
+    public static final String LEFT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Left-Pickup-to-A";
+    public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
 
     // These used to be in Trajectory Constants
     public static final double DRIVE_BASE_DIAMETER =
