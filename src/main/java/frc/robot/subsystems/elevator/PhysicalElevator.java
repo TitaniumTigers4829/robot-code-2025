@@ -6,7 +6,10 @@ package frc.robot.subsystems.elevator;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -15,23 +18,21 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalElevator implements ElevatorInterface {
-
-  /** Creates a new ElevatorHardware. */
   private final TalonFX leaderMotor = new TalonFX(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID);
-
   private final TalonFX followerMotor = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID);
 
-  StatusSignal<Angle> leaderPosition;
-  StatusSignal<Angle> followerPosition;
-  StatusSignal<Voltage> leaderAppliedVoltage;
-  StatusSignal<Voltage> followerAppliedVoltage;
+  private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
+  private final Follower followerRequest = new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
 
+  private final StatusSignal<Angle> leaderPosition;
+  private final StatusSignal<Angle> followerPosition;
+  private final StatusSignal<Voltage> leaderAppliedVoltage;
+  private final StatusSignal<Voltage> followerAppliedVoltage;
+  private final StatusSignal<Double> followerDutyCycle;
+  private final StatusSignal<Double> leaderDutyCycle;
+
+  /** Creates a new PhysicalElevator. */
   public PhysicalElevator() {
-    leaderPosition = leaderMotor.getRotorPosition();
-    leaderAppliedVoltage = leaderMotor.getMotorVoltage();
-    followerPosition = followerMotor.getRotorPosition();
-    followerAppliedVoltage = followerMotor.getMotorVoltage();
-
     TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
 
     elevatorConfig.Slot0.kP = ElevatorConstants.ELEVATOR_P;
@@ -51,25 +52,43 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable =
         ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
 
-    leaderMotor.getConfigurator().apply(elevatorConfig);
+    //configuration
+    elevatorConfig.MotionMagic.MotionMagicAcceleration = ElevatorConstants.MOTION_MAGIC_MAX_ACCELERATION;
+    elevatorConfig.MotionMagic.MotionMagicCruiseVelocity = ElevatorConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    //apply configuration
+    leaderMotor.getConfigurator().apply(elevatorConfig);
     followerMotor.getConfigurator().apply(elevatorConfig);
+
+    //make the follower
+    followerMotor.setControl(followerRequest);
+
+    //Get info
+    leaderPosition = leaderMotor.getPosition();
+    leaderAppliedVoltage = leaderMotor.getMotorVoltage();
+    followerPosition = followerMotor.getPosition();
+    followerAppliedVoltage = followerMotor.getMotorVoltage();
+    followerDutyCycle = followerMotor.getDutyCycle();
+    leaderDutyCycle = leaderMotor.getDutyCycle();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.STATUS_SIGNAL_FREQUENCY,
         leaderPosition,
         leaderAppliedVoltage,
         followerPosition,
-        followerAppliedVoltage);
+        followerAppliedVoltage, 
+        leaderDutyCycle, 
+        followerDutyCycle);
   }
 
   @Override
   public void updateInputs(ElevatorInputs inputs) {
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
+    inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
     inputs.followerMotorPosition = followerPosition.getValueAsDouble();
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
+    inputs.followerDutyCycle = followerDutyCycle.getValueAsDouble();
   }
 
   @Override
@@ -79,14 +98,12 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public void setElevatorPosition(double position) {
-    leaderMotor.setPosition(position);
-    followerMotor.setPosition(position);
+    leaderMotor.setControl(mmPositionRequest.withPosition(position));
   }
 
   @Override
   public void setVolts(double volts) {
     leaderMotor.setVoltage(volts);
-    followerMotor.setVoltage(volts);
   }
 
   @Override

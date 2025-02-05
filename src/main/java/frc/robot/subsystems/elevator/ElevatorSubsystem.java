@@ -7,13 +7,12 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-public class Elevator extends SubsystemBase {
-  /** Creates a new Elevator. */
+public class ElevatorSubsystem extends SubsystemBase {
   private ElevatorInterface elevatorInterface;
-
   private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
-  public Elevator(ElevatorInterface elevatorInterface) {
+  /** Creates a new ElevatorSubsystem. */
+  public ElevatorSubsystem(ElevatorInterface elevatorInterface) {
     this.elevatorInterface = elevatorInterface;
   }
 
