@@ -50,7 +50,8 @@ public class RobotContainer {
   // private final Flywheel flywheel = new Flywheel(new FlywheelIOTalonFX());
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
-  private final AlgaePivotSubsystem algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+  private final AlgaePivotSubsystem algaePivotSubsystem =
+      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;

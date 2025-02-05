@@ -19,9 +19,11 @@ public class PhysicalIntake implements IntakeInterface {
     intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
 
     intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.INTAKE_STATOR_LIMIT;
-    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
+    intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
+        IntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
     intakeConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.INTAKE_SUPPLY_LIMIT;
-    intakeConfig.CurrentLimits.StatorCurrentLimitEnable = IntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
+    intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
+        IntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
     motor.getConfigurator().apply(intakeConfig);
   }
