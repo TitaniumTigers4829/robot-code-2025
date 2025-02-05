@@ -4,15 +4,14 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class Autos {
   private final AutoFactory autoFactory;
   private final SwerveDrive swerveDrive;
 
-  public Autos(
-      AutoFactory autoFactory, SwerveDrive swerveDrive) {
+  public Autos(AutoFactory autoFactory, SwerveDrive swerveDrive) {
     this.autoFactory = autoFactory;
     this.swerveDrive = swerveDrive;
   }
@@ -30,19 +29,12 @@ public class Autos {
     routine
         .active()
         .onTrue(
-            Commands.sequence(autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY), startToETraj.cmd()));
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                startToETraj.cmd()));
 
-    startToETraj
-        .active()
-        .onTrue(); // TODO: replace with elevator to L4 command
-    startToETraj
-        .atTime("score")
-        .onTrue(
-    startToETraj
-        .done()
-        .onTrue(
-            eToPickupTraj
-                .cmd()));
+    startToETraj.active().onTrue(); // TODO: replace with elevator to L4 command
+    startToETraj.atTime("score").onTrue(startToETraj.done().onTrue(eToPickupTraj.cmd()));
     // command
 
     return routine;

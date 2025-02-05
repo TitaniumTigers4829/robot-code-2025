@@ -31,27 +31,25 @@ public final class Constants {
     SWERVE_ROBOT
   }
 
-    /**
-    * This is where we place constants related to Auto and any auto-related features 
-    */
+  /** This is where we place constants related to Auto and any auto-related features */
   public static final class AutoConstants {
     // Different Pre-defined Auto Routines
     public static final string EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
     // This does not exist yet :(
     public static final string Flexible_AUTO_ROUTINE = "Flexible-Auto-Routine";
 
-// All Trajectories are created on the blue alliance and are flipped in the code
-// Right and Left are always from the perspective of the driver station
-// letters represent nodes on the coral according to FIRST's official system:
+    // All Trajectories are created on the blue alliance and are flipped in the code
+    // Right and Left are always from the perspective of the driver station
+    // letters represent nodes on the coral according to FIRST's official system:
 
-//  Left      /-----------------------|
-//          /        K--J             |  
-//         |       L------I           |
-// Driver  |     A----------H         |
-// Station |     B----------G         |
-//         |       C------F           |
-//          \        D--E             |  
-//  Right     \-----------------------|
+    //  Left      /-----------------------|
+    //          /        K--J             |
+    //         |       L------I           |
+    // Driver  |     A----------H         |
+    // Station |     B----------G         |
+    //         |       C------F           |
+    //          \        D--E             |
+    //  Right     \-----------------------|
 
     // Right Start
     public static final string RIGHT_START_TO_E_TRAJECTORY = "Right-Start-to-E";
@@ -102,9 +100,6 @@ public final class Constants {
     public static final string LEFT_PICKUP_TO_A_TRAJECTORY = "Left-Pickup-to-A";
     public static final string LEFT_PICKUP_TO_B_TRAJECTORY = "Left-Pickup-to-B";
 
-
-
-
     // These used to be in Trajectory Constants
     public static final double DRIVE_BASE_DIAMETER =
         Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
@@ -146,7 +141,6 @@ public final class Constants {
 
     public static Constraints AUTO_ALIGN_ROTATIONAL_CONSTRAINTS =
         new Constraints(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2);
-
   }
 
   /**

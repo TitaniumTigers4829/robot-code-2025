@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
@@ -27,7 +28,6 @@ import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.Constants.AutoConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -49,9 +49,7 @@ public class SwerveDrive extends SubsystemBase {
           AutoConstants.AUTO_TRANSLATION_D);
   private final PIDController headingController =
       new PIDController(
-          AutoConstants.AUTO_THETA_P,
-          AutoConstants.AUTO_THETA_I,
-          AutoConstants.AUTO_THETA_D);
+          AutoConstants.AUTO_THETA_P, AutoConstants.AUTO_THETA_I, AutoConstants.AUTO_THETA_D);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;

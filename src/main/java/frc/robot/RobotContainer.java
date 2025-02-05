@@ -140,7 +140,6 @@ public class RobotContainer {
       }
     }
 
-
     this.autoChooser = autoChooser;
     // this sets up the auto factory
     autoFactory =
