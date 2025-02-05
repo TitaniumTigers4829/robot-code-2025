@@ -20,7 +20,7 @@ public interface AlgaePivotInterface {
 
     default void setAlgaeAngle(double angle){}
 
-    default void setVoltage(double voltage){}
+    default void setAlgaeVoltage(double voltage){}
     
     default boolean isPivotWithinAcceptapleError(){
         return true;

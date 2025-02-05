@@ -102,7 +102,7 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface{
     }
 
     @Override
-    public void setVoltage(double voltage){
+    public void setAlgaeVoltage(double voltage){
         algaeMotor.setControl(voltageOut.withOutput(voltage));
     }
 

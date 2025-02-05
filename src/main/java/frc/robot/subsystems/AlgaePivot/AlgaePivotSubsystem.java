@@ -1,8 +1,8 @@
 package frc.robot.subsystems.AlgaePivot;
 
-import java.util.logging.Logger;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.AlgaePivot.AlgaePivotInterface.AlgaePivotInputs;
 
 public class AlgaePivotSubsystem extends SubsystemBase{
     private final AlgaePivotInterface algaePivotInterface;
@@ -20,8 +20,8 @@ public class AlgaePivotSubsystem extends SubsystemBase{
         algaePivotInterface.setAlgaeAngle(angle);
     }
 
-    public void setVoltage(double voltage){
-        algaePivotInterface.setVoltage(voltage);
+    public void setAlgaeVoltage(double voltage){
+        algaePivotInterface.setAlgaeVoltage(voltage);
     }
 
     public void periodic(){

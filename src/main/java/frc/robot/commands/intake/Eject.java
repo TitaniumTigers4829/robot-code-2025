@@ -14,7 +14,7 @@ public class Eject extends Command {
 
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeSpeed(IntakeConstants.ejectSpeed);
+    intakeSubsystem.setIntakeSpeed(IntakeConstants.EJECT_SPEED);
   }
 
   @Override

@@ -14,7 +14,7 @@ public class Intake extends Command {
 
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeSpeed(IntakeConstants.intakeSpeed);
+    intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
   }
 
   @Override

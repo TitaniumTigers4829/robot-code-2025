@@ -22,4 +22,9 @@ public class AlgaeConstants{
     public static final double ALGAE_GEAR_RATIO = 0.0;
     public static final double ALGAE_PIVOT_MASS = 0.0;
     public static final double ALGAE_PIVOT_LENGTH = 0.0;
+
+    public static final double ALGAE_PIVOT_ANGLE = 0.0;
+    public static final double ALGAE_PIVOT_SPEED = 0.0;
+    public static final double ALGAE_VOLTAGE = 0.0;
+    public static final double ALGAE_NEUTRAL_SPEED = 0.0;
 }
