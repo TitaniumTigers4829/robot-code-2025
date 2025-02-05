@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.simulation.field.SimulatedField;
+import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
@@ -40,7 +41,7 @@ public class RobotContainer {
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-
+  private final SlantedElevatorSim elevatorSim;
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;
   private final SwerveDriveSimulation swerveDriveSimulation;
@@ -60,6 +61,7 @@ public class RobotContainer {
         // this.simulatedArena = null;
         this.gyroSimulation = null;
         this.swerveDriveSimulation = null;
+        elevatorSim = null;
 
         swerveDrive =
             new SwerveDrive(
@@ -75,11 +77,12 @@ public class RobotContainer {
         gyroSimulation = null;
         swerveDriveSimulation = null;
         visionSubsystem = null;
+        elevatorSim = null;
       }
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-
+        elevatorSim = new SlantedElevatorSim(edu.wpi.first.math.system.plant.LinearSystemId.createElevatorSystem(DCMotor.getKrakenX60(2), 3.0,3.0,3.0), null, 0, 0, false, 0, 0, null);
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
         this.gyroSimulation = GyroSimulation.createNavX2();
@@ -128,6 +131,7 @@ public class RobotContainer {
         /* physics simulations are also not needed */
         this.gyroSimulation = null;
         this.swerveDriveSimulation = null;
+        elevatorSim = null;
         // this.simulatedArena = null;
         swerveDrive =
             new SwerveDrive(
