@@ -33,8 +33,7 @@ public class Autos {
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
 
-    startToETraj.active().onTrue(); // TODO: replace with elevator to L4 command
-    startToETraj.atTime("score").onTrue(startToETraj.done().onTrue(eToPickupTraj.cmd()));
+    startToETraj.atTime("score").onTrue(eToPickupTraj.cmd());
     // command
 
     return routine;
