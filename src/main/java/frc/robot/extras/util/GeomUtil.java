@@ -10,22 +10,52 @@ import org.dyn4j.geometry.Vector2;
 
 /** utils to convert between WPILIB and dyn4j geometry classes */
 public class GeomUtil {
+  /**
+   * Converts a WPILIB Translation2d to a dyn4j Vector2
+   *
+   * @param wpilibTranslation2d the Translation2d to convert
+   * @return the equivalent Vector2
+   */
   public static Vector2 toDyn4jVector2(Translation2d wpilibTranslation2d) {
     return new Vector2(wpilibTranslation2d.getX(), wpilibTranslation2d.getY());
   }
 
+  /**
+   * Converts a dyn4j Vector2 to a WPILIB Translation2d
+   *
+   * @param dyn4jVector2 the Vector2 to convert
+   * @return the equivalent Translation2d
+   */
   public static Translation2d toWpilibTranslation2d(Vector2 dyn4jVector2) {
     return new Translation2d(dyn4jVector2.x, dyn4jVector2.y);
   }
 
+  /**
+   * Converts a WPILIB Rotation2d to a dyn4j Rotation
+   *
+   * @param wpilibRotation2d the Rotation2d to convert
+   * @return the equivalent Rotation
+   */
   public static Rotation toDyn4jRotation(Rotation2d wpilibRotation2d) {
     return new Rotation(wpilibRotation2d.getRadians());
   }
 
+  /**
+   * Converts a dyn4j Rotation to a WPILIB Rotation2d
+   *
+   * @param dyn4jRotation the Rotation to convert
+   * @return the equivalent Rotation2d
+   */
   public static Rotation2d toWpilibRotation2d(Rotation dyn4jRotation) {
     return new Rotation2d(dyn4jRotation.toRadians());
   }
 
+  /**
+   * Converts a WPILIB Pose2d to a dyn4j Transform
+   *
+   * @param wpilibPose2d the Pose2d to convert
+   * @return the equivalent Transform
+   */
   public static Transform toDyn4jTransform(Pose2d wpilibPose2d) {
     final Transform transform = new Transform();
     transform.setTranslation(toDyn4jVector2(wpilibPose2d.getTranslation()));
@@ -33,17 +63,35 @@ public class GeomUtil {
     return transform;
   }
 
+  /**
+   * Converts a dyn4j Transform to a WPILIB Pose2d
+   *
+   * @param dyn4jTransform the Transform to convert
+   * @return the equivalent Pose2d
+   */
   public static Pose2d toWpilibPose2d(Transform dyn4jTransform) {
     return new Pose2d(
         toWpilibTranslation2d(dyn4jTransform.getTranslation()),
         toWpilibRotation2d(dyn4jTransform.getRotation()));
   }
 
+  /**
+   * Converts a WPILIB ChassisSpeeds to a dyn4j Vector2
+   *
+   * @param wpilibChassisSpeeds the ChassisSpeeds to convert
+   * @return the equivalent Vector2
+   */
   public static Vector2 toDyn4jLinearVelocity(ChassisSpeeds wpilibChassisSpeeds) {
     return new Vector2(
         wpilibChassisSpeeds.vxMetersPerSecond, wpilibChassisSpeeds.vyMetersPerSecond);
   }
 
+  /**
+   * Converts a WPILIB ChassisSpeeds to a dyn4j angular velocity in radians per second
+   *
+   * @param wpilibChassisSpeeds the ChassisSpeeds to convert
+   * @return the equivalent angular velocity in radians per second
+   */
   public static ChassisSpeeds toWpilibChassisSpeeds(
       Vector2 dyn4jLinearVelocity, double angularVelocityRadPerSec) {
     return new ChassisSpeeds(
@@ -61,27 +109,80 @@ public class GeomUtil {
   }
 
   /**
-   * Checks if two translations are within a certain threshold in meters
+   * Checks if all translations in the input are within a certain threshold in meters.
    *
-   * @param t1 Translation 1 as a Translation2d
-   * @param t2 Translation 2 as a Translation2d
-   * @param thresholdMeters the threshold between the two translations in meters
-   * @return true if the two translations are within thresholdMeters
+   * @param thresholdMeters the threshold between any two translations in meters
+   * @param translations Varargs of Translation2d objects
+   * @return true if all translations are within thresholdMeters of each other
    */
-  public static boolean isTranslationWithinThreshold(
-      Translation2d t1, Translation2d t2, double thresholdMeters) {
-    return t1.getDistance(t2) <= thresholdMeters;
+  public static boolean areTranslationsWithinThreshold(
+      double thresholdMeters, Translation2d... translations) {
+    int n = translations.length;
+
+    // Compare all pairs of translations
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        if (translations[i].getDistance(translations[j]) > thresholdMeters) {
+          return false; // Return false if any pair is out of threshold
+        }
+      }
+    }
+    return true; // Return true if all pairs are within threshold
   }
 
   /**
-   * Checks if two rotations are within a certain threshold in degrees
+   * Checks if all rotations in the input are within a certain threshold in degrees.
    *
-   * @param r1 Rotations 1 as a Rotation2d
-   * @param r2 Rotation 2 as a Rotation2d
-   * @param thresholdMeters the threshold between the two rotations in degrees
-   * @return true if the two rotations are within thresholdDegrees
+   * @param thresholdDegrees the threshold between any two rotations in degrees
+   * @param rotations Varargs of rotation values (in degrees)
+   * @return true if all rotations are within thresholdDegrees of each other
    */
-  public static boolean isRotationWithinThreshold(double r1, double r2, double thresholdDegrees) {
-    return Math.abs(r1 - r2) <= thresholdDegrees;
+  public static boolean areRotationsWithinThreshold(
+      double thresholdDegrees, Rotation2d... rotations) {
+    int n = rotations.length;
+
+    // Compare all pairs of rotations
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        if (Math.abs(rotations[i].minus(rotations[j]).getDegrees()) > thresholdDegrees) {
+          return false; // Return false if any pair is out of threshold
+        }
+      }
+    }
+    return true; // Return true if all pairs are within threshold
+  }
+
+  /**
+   * Checks if all pairs of poses in the input list are within the given translation and rotation
+   * thresholds.
+   *
+   * @param translationThresholdMeters the maximum allowed distance between any two translations in
+   *     meters
+   * @param rotationThresholdDegrees the maximum allowed difference between any two rotations in
+   *     degrees
+   * @param poses a list of Pose2d objects
+   * @return true if all pairs of poses are within the given thresholds, false otherwise
+   */
+  public static boolean arePosesWithinThreshold(
+      double translationThresholdMeters, double rotationThresholdDegrees, Pose2d... poses) {
+    int n = poses.length;
+
+    // Compare all pairs of poses
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        // Check translation threshold
+        if (poses[i].getTranslation().getDistance(poses[j].getTranslation())
+            > translationThresholdMeters) {
+          return false; // Return false if any pair of translations exceeds the threshold
+        }
+
+        // Check rotation threshold
+        if (Math.abs(poses[i].getRotation().minus(poses[j].getRotation()).getDegrees())
+            > rotationThresholdDegrees) {
+          return false; // Return false if any pair of rotations exceeds the threshold
+        }
+      }
+    }
+    return true; // Return true if all pairs are within the thresholds
   }
 }
