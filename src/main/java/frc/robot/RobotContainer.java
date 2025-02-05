@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
+import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
 import frc.robot.extras.simulation.field.SimulatedField;
@@ -20,8 +22,8 @@ import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
-import frc.robot.subsystems.AlgaePivot.AlgaePivotSubsystem;
-import frc.robot.subsystems.AlgaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
+import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
@@ -181,7 +183,9 @@ public class RobotContainer {
 
     driverController.a().whileTrue(new Intake(intakeSubsystem));
     driverController.b().whileTrue(new Eject(intakeSubsystem));
-    driverController.x().whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorRightStickY));
+    driverController
+        .x()
+        .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
 
     // // autodrive
     // Trigger driverAButton = new Trigger(driverController::getAButton);

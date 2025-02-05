@@ -1,4 +1,4 @@
-package frc.robot.subsystems.AlgaePivot;
+package frc.robot.subsystems.algaePivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;

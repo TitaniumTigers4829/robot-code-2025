@@ -1,6 +1,5 @@
 package frc.robot.commands.drive;
 
-import com.ctre.phoenix6.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;

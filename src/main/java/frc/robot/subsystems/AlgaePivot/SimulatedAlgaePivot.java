@@ -1,4 +1,4 @@
-package frc.robot.subsystems.AlgaePivot;
+package frc.robot.subsystems.algaePivot;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;

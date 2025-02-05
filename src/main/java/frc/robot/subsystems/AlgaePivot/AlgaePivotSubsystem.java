@@ -1,4 +1,4 @@
-package frc.robot.subsystems.AlgaePivot;
+package frc.robot.subsystems.algaePivot;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;

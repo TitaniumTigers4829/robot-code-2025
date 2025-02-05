@@ -1,4 +1,4 @@
-package frc.robot.subsystems.AlgaePivot;
+package frc.robot.subsystems.algaePivot;
 
 import org.littletonrobotics.junction.AutoLog;
 
