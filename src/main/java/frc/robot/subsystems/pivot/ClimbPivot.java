@@ -6,7 +6,6 @@ package frc.robot.subsystems.pivot;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,9 +41,7 @@ public class ClimbPivot extends SubsystemBase {
 
   public Command setAngle(double targetPosition) {
     return new StartEndCommand(
-      () -> setPivotPosition(targetPosition),
-      () -> stop(targetPosition),
-      this
-    ).until(() -> Math.abs(getCurrentPosition() - targetPosition) < 1.0);
+            () -> setPivotPosition(targetPosition), () -> stop(targetPosition), this)
+        .until(() -> Math.abs(getCurrentPosition() - targetPosition) < 1.0);
   }
 }

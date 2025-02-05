@@ -7,11 +7,11 @@ package frc.robot.subsystems.pivot;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.subsystems.pivot.PivotConstants;
 import frc.robot.subsystems.pivot.ClimbPivotInterface.ClimbPivot.ClimbPivotInputs;
 
 public class SimulatedClimbPivot {
-    private SingleJointedArmSim simulatedClimbPivot = new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0, 0.001);
+  private SingleJointedArmSim simulatedClimbPivot =
+      new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0, 0.001);
   private PIDController simPID;
   private double currentVolts;
 

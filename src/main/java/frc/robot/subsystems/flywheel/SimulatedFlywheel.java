@@ -23,12 +23,12 @@ public class SimulatedFlywheel implements FlywheelInterface {
   }
 
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.leaderMotorPosition = getFlywheelSpeed();
-    inputs.followerMotorPosition = getFlywheelSpeed();
+    inputs.flywheelMotorPosition = getFlywheelSpeed();
+    inputs.flywheelVelocity = getFlywheelVelocity();
   }
 
   public void setFlywheelSpeed(double speed) {
-    setVolts(simPID.calculate(getFlywheelSpeed(), speed));
+    setVolts(simPID.calculate(getFlywheelSpeed(), speed) + feedForward(speed));
   }
 
   public double getFlywheelSpeed() {

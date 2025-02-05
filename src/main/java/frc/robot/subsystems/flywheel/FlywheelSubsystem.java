@@ -6,14 +6,13 @@ package frc.robot.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.flywheel.FlywheelInterface.FlywheelInputs;
-import java.util.logging.Logger;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends SubsystemBase {
   /** Creates a new FlywheelSubsystem. */
   private FlywheelInterface flywheelInterface;
 
-  private FlywheelInputs inputs = new FlywheelInputs();
+  private FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
   public static void Flywheel() {}
 
@@ -41,6 +40,6 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public Command setFlyhweelSpeed(double speed) {
-    return this.runOnce(()->setFlyhweelSpeed(speed));
+    return this.runOnce(() -> setFlyhweelSpeed(speed));
   }
 }

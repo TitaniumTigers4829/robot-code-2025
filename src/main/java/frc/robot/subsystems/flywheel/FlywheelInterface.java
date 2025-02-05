@@ -14,7 +14,7 @@ public interface FlywheelInterface {
     public double flywheelMotorPosition = 0.0;
   }
 
-// are these docs strings?? ishan said to get the velocity but idk how :(
+  // are these docs strings?? ishan said to get the velocity but idk how :(
 
   public default void updateInputs(FlywheelInputs inputs) {}
 

@@ -9,7 +9,7 @@ import frc.robot.subsystems.pivot.ClimbPivotInterface.ClimbPivot.ClimbPivotInput
 
 /** Add your docs here. */
 public class PhysicalClimbPivot {
-    private PhysicalClimbPivot physicalClimbPivot = new PhysicalClimbPivot();
+  private PhysicalClimbPivot physicalClimbPivot = new PhysicalClimbPivot();
   private PIDController PID;
   private double currentVolts;
 

@@ -13,10 +13,9 @@ public class FlywheelConstants {
   public static final double FLYWHEEL_I = 0 - 9;
   public static final double FLYWHEEL_D = 0 - 9;
 
-  public static final double FF_FLYWHEEL_P = 0 - 9;
-  public static final double FF_FLYWHEEL_I = 0 - 9;
-  public static final double FF_FLYWHEEL_D = 0 - 9;
+  public static final double FF_FLYWHEEL_S = 0 - 9;
+  public static final double FF_FLYWHEEL_V = 0 - 9;
+  public static final double FF_FLYWHEEL_A = 0 - 9;
 
   public static final double MOMENT_OF_INERTIA = 0 - 9;
-  public static final double GEAR_RATIO = 0 - 9;
 }
