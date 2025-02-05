@@ -23,11 +23,11 @@ import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WH
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.Constants.AutoConstants;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -39,19 +39,19 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final PIDController xController =
       new PIDController(
-          TrajectoryConstants.AUTO_TRANSLATION_P,
-          TrajectoryConstants.AUTO_TRANSLATION_I,
-          TrajectoryConstants.AUTO_TRANSLATION_D);
+          AutoConstants.AUTO_TRANSLATION_P,
+          AutoConstants.AUTO_TRANSLATION_I,
+          AutoConstants.AUTO_TRANSLATION_D);
   private final PIDController yController =
       new PIDController(
-          TrajectoryConstants.AUTO_TRANSLATION_P,
-          TrajectoryConstants.AUTO_TRANSLATION_I,
-          TrajectoryConstants.AUTO_TRANSLATION_D);
+          AutoConstants.AUTO_TRANSLATION_P,
+          AutoConstants.AUTO_TRANSLATION_I,
+          AutoConstants.AUTO_TRANSLATION_D);
   private final PIDController headingController =
       new PIDController(
-          TrajectoryConstants.AUTO_THETA_P,
-          TrajectoryConstants.AUTO_THETA_I,
-          TrajectoryConstants.AUTO_THETA_D);
+          AutoConstants.AUTO_THETA_P,
+          AutoConstants.AUTO_THETA_I,
+          AutoConstants.AUTO_THETA_D);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;

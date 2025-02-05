@@ -31,6 +31,124 @@ public final class Constants {
     SWERVE_ROBOT
   }
 
+    /**
+    * This is where we place constants related to Auto and any auto-related features 
+    */
+  public static final class AutoConstants {
+    // Different Pre-defined Auto Routines
+    public static final string EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
+    // This does not exist yet :(
+    public static final string Flexible_AUTO_ROUTINE = "Flexible-Auto-Routine";
+
+// All Trajectories are created on the blue alliance and are flipped in the code
+// Right and Left are always from the perspective of the driver station
+// letters represent nodes on the coral according to FIRST's official system:
+
+//  Left      /-----------------------|
+//          /        K--J             |  
+//         |       L------I           |
+// Driver  |     A----------H         |
+// Station |     B----------G         |
+//         |       C------F           |
+//          \        D--E             |  
+//  Right     \-----------------------|
+
+    // Right Start
+    public static final string RIGHT_START_TO_E_TRAJECTORY = "Right-Start-to-E";
+    public static final string RIGHT_START_TO_F_TRAJECTORY = "Right-Start-to-F";
+    public static final string RIGHT_START_TO_G_TRAJECTORY = "Right-Start-to-G";
+    // Mid Start
+    public static final string MID_START_TO_E_TRAJECTORY = "Mid-Start-to-E";
+    public static final string MID_START_TO_F_TRAJECTORY = "Mid-Start-to-F";
+    public static final string MID_START_TO_G_TRAJECTORY = "Mid-Start-to-G";
+    public static final string MID_START_TO_H_TRAJECTORY = "Mid-Start-to-H";
+    public static final string MID_START_TO_I_TRAJECTORY = "Mid-Start-to-I";
+    public static final string MID_START_TO_J_TRAJECTORY = "Mid-Start-to-J";
+    // Left Start
+    public static final string LEFT_START_TO_I_TRAJECTORY = "Left-Start-to-I";
+    public static final string LEFT_START_TO_H_TRAJECTORY = "Left-Start-to-H";
+    public static final string LEFT_START_TO_J_TRAJECTORY = "Left-Start-to-J";
+
+    // Reef to Right Pickup
+    public static final string A_TO_RIGHT_PICKUP_TRAJECTORY = "A-to-Right-Pickup";
+    public static final string B_TO_RIGHT_PICKUP_TRAJECTORY = "B-to-Right-Pickup";
+    public static final string C_TO_RIGHT_PICKUP_TRAJECTORY = "C-to-Right-Pickup";
+    public static final string D_TO_RIGHT_PICKUP_TRAJECTORY = "D-to-Right-Pickup";
+    public static final string E_TO_RIGHT_PICKUP_TRAJECTORY = "E-to-Right-Pickup";
+    public static final string F_TO_RIGHT_PICKUP_TRAJECTORY = "F-to-Right-Pickup";
+    public static final string G_TO_RIGHT_PICKUP_TRAJECTORY = "G-to-Right-Pickup";
+    // Reef to Left Pickup
+    public static final string H_TO_LEFT_PICKUP_TRAJECTORY = "H-to-Left-Pickup";
+    public static final string I_TO_LEFT_PICKUP_TRAJECTORY = "I-to-Left-Pickup";
+    public static final string J_TO_LEFT_PICKUP_TRAJECTORY = "J-to-Left-Pickup";
+    public static final string K_TO_LEFT_PICKUP_TRAJECTORY = "K-to-Left-Pickup";
+    public static final string L_TO_LEFT_PICKUP_TRAJECTORY = "L-to-Left-Pickup";
+    public static final string A_TO_LEFT_PICKUP_TRAJECTORY = "A-to-Left-Pickup";
+    public static final string B_TO_LEFT_PICKUP_TRAJECTORY = "B-to-Left-Pickup";
+    // Right Pickup to Reef
+    public static final string RIGHT_PICKUP_TO_A_TRAJECTORY = "Right-Pickup-to-A";
+    public static final string RIGHT_PICKUP_TO_B_TRAJECTORY = "Right-Pickup-to-B";
+    public static final string RIGHT_PICKUP_TO_C_TRAJECTORY = "Right-Pickup-to-C";
+    public static final string RIGHT_PICKUP_TO_D_TRAJECTORY = "Right-Pickup-to-D";
+    public static final string RIGHT_PICKUP_TO_E_TRAJECTORY = "Right-Pickup-to-E";
+    public static final string RIGHT_PICKUP_TO_F_TRAJECTORY = "Right-Pickup-to-F";
+    public static final string RIGHT_PICKUP_TO_G_TRAJECTORY = "Right-Pickup-to-G";
+    // Left Pickup to Reef
+    public static final string LEFT_PICKUP_TO_H_TRAJECTORY = "Left-Pickup-to-H";
+    public static final string LEFT_PICKUP_TO_I_TRAJECTORY = "Left-Pickup-to-I";
+    public static final string LEFT_PICKUP_TO_J_TRAJECTORY = "Left-Pickup-to-J";
+    public static final string LEFT_PICKUP_TO_K_TRAJECTORY = "Left-Pickup-to-K";
+    public static final string LEFT_PICKUP_TO_L_TRAJECTORY = "Left-Pickup-to-L";
+    public static final string LEFT_PICKUP_TO_A_TRAJECTORY = "Left-Pickup-to-A";
+    public static final string LEFT_PICKUP_TO_B_TRAJECTORY = "Left-Pickup-to-B";
+
+
+
+
+    // These used to be in Trajectory Constants
+    public static final double DRIVE_BASE_DIAMETER =
+        Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
+
+    public static final double MAX_SPEED = 5.0;
+    public static final double MAX_ACCELERATION = 3;
+
+    public static final double AUTO_TRANSLATION_P = 1.5; // 1.7
+    public static final double AUTO_TRANSLATION_I = 0;
+    public static final double AUTO_TRANSLATION_D = 0.2;
+    public static final double AUTO_THETA_P = 4.5; // 5
+    public static final double AUTO_THETA_I = 0; // 5
+    public static final double AUTO_THETA_D = 0.4;
+
+    public static final double AUTO_SHOOT_HEADING_OFFSET = 2;
+
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
+
+    // Constraint for the motion profiled robot angle controller
+    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(
+            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+
+    public static final double X_TOLERANCE = 0.02;
+    public static final double Y_TOLERANCE = 0.02;
+    public static final double THETA_TOLERANCE = 1.25;
+
+    // Note Detection Driving Constants
+    public static final double AUTO_ALIGN_TRANSLATIONAL_P = 3;
+    public static final double AUTO_ALIGN_TRANSLATIONAL_I = 0;
+    public static final double AUTO_ALIGN_TRANSLATIONAL_D = 0;
+
+    public static Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(5, 2);
+
+    public static final double AUTO_ALIGN_ROTATIONAL_P = 3;
+    public static final double AUTO_ALIGN_ROTATIONAL_I = 0;
+    public static final double AUTO_ALIGN_ROTATIONAL_D = 0;
+
+    public static Constraints AUTO_ALIGN_ROTATIONAL_CONSTRAINTS =
+        new Constraints(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2);
+
+  }
+
   /**
    * This is where we place constants related to hardware on a robot that aren't specific to any
    * singular subsystem.

@@ -6,6 +6,7 @@ import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.Constants.AutoConstants;
 
 public class Autos {
   private final AutoFactory autoFactory;
@@ -21,18 +22,18 @@ public class Autos {
 
   public AutoRoutine exampleAutoRoutine() {
 
-    AutoRoutine routine = autoFactory.newRoutine("exampleAutoRoutine");
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.EXAMPLE_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory("startToE");
-    AutoTrajectory eToPickupTraj = routine.trajectory("eToPickup");
-    AutoTrajectory cToPickupTraj = routine.trajectory("cToPickup");
-    AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
 
     // reset odometry and start first trajectory
     routine
         .active()
         .onTrue(
-            Commands.sequence(autoFactory.resetOdometry("Right-Start-To-E"), startToETraj.cmd()));
+            Commands.sequence(autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY), startToETraj.cmd()));
 
     startToETraj
         .active()
