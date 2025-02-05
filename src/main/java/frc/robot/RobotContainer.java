@@ -11,14 +11,21 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.SimulationConstants;
+import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.intake.Eject;
+import frc.robot.commands.intake.Intake;
 import frc.robot.extras.simulation.field.SimulatedField;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
+import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -42,6 +49,9 @@ public class RobotContainer {
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
+  private final AlgaePivotSubsystem algaePivotSubsystem =
+      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;
@@ -171,6 +181,35 @@ public class RobotContainer {
     Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
 
+    driverController.a().whileTrue(new Intake(intakeSubsystem));
+    driverController.b().whileTrue(new Eject(intakeSubsystem));
+    driverController
+        .x()
+        .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
+
+    // // autodrive
+    // Trigger driverAButton = new Trigger(driverController::getAButton);
+    // lol whatever
+    // // intake
+    // Trigger operatorLeftTrigger = new Trigger(()->operatorController.getLeftTriggerAxis() > 0.2);
+    // Trigger operatorLeftBumper = new Trigger(operatorController::getLeftBumper);
+    // // amp and speaker
+    // Trigger operatorBButton = new Trigger(operatorController::getBButton);
+    // Trigger operatorRightBumper = new Trigger(operatorController::getRightBumper);
+    // Trigger operatorRightTrigger = new Trigger(()->operatorController.getRightTriggerAxis() >
+    // 0.2);
+    // Trigger driverRightTrigger = new Trigger(()->driverController.getRightTriggerAxis() > 0.2);
+
+    // // manual pivot and intake rollers
+    // Trigger operatorAButton = new Trigger(operatorController::getAButton);
+    // Trigger operatorXButton = new Trigger(operatorController::getXButton);
+    // Trigger operatorYButton = new Trigger(operatorController::getYButton);
+    // DoubleSupplier operatorRightStickY = operatorController::getRightY;
+    // // unused
+    // Trigger operatorUpDirectionPad = new Trigger(()->operatorController.getPOV() == 0);
+    // Trigger operatorLeftDirectionPad = new Trigger(()->operatorController.getPOV() == 270);
+    // Trigger operatorDownDirectionPad = new Trigger(()->operatorController.getPOV() == 180);
+    // Trigger driverLeftTrigger = new Trigger(()->driverController.getLeftTriggerAxis() > 0.2);
     Trigger driverLeftBumper = new Trigger(driverController.leftBumper());
 
     // DRIVER BUTTONS
