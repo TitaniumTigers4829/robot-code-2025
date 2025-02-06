@@ -37,6 +37,7 @@ public final class Constants {
   public static final class AutoConstants {
     // Different Pre-defined Auto Routines
     public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
+    public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
     // This does not exist yet :(
     public static final String Flexible_AUTO_ROUTINE = "Flexible-Auto-Routine";
 
@@ -52,6 +53,9 @@ public final class Constants {
     //         |       C------F           |
     //          \        D--E             |
     //  Right     \-----------------------|
+
+    // Example 1 Meter Trajectory
+    public static final String ONE_METER_TRAJECTORY = "Trajectories/ONEMETERRRR";
 
     // Right Start
     public static final String RIGHT_START_TO_E_TRAJECTORY = "Trajectories/Right-Start-to-E";

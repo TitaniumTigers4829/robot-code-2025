@@ -16,6 +16,18 @@ public class Autos {
     this.swerveDrive = swerveDrive;
   }
 
+  public AutoRoutine oneMeterTestAutoRoutine() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE);
+    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.ONE_METER_TRAJECTORY);
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
+                oneMeterTrajectory.cmd()));
+    return routine;
+  }
+
   public AutoRoutine exampleAutoRoutine() {
 
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.EXAMPLE_AUTO_ROUTINE);
