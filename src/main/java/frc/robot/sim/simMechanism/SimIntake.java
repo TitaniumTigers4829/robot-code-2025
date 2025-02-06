@@ -14,6 +14,11 @@ import org.dyn4j.geometry.Convex;
 import org.dyn4j.world.ContactCollisionData;
 import org.dyn4j.world.listener.ContactListener;
 
+/**
+ * Represents an intake in the sim environment. This intake has collision space which can interact
+ * with simulated game pieces and the rest of the simulated environment and can collect game pieces
+ * using a {@link SimIndexer}.
+ */
 public class SimIntake {
   private final BodyFixture fixture;
   private final SimDriveTrain driveTrainSimulation;
@@ -28,11 +33,11 @@ public class SimIntake {
    * <p>This constructor initializes an intake with a custom shape that is used when the intake is
    * fully extended.
    *
-   * @param targetedGamePieceType the type of game pieces that this intake can collect
    * @param driveTrainSimulation the chassis to which this intake is attached
+   * @param gamePieceStorage the storage for game pieces collected by the intake
    * @param shape the shape of the intake when fully extended, represented as a {@link Convex}
    *     object
-   * @param capacity the maximum number of game pieces that the intake can hold
+   * @param GamePieceVariant the accepted game piece variants for this intake
    */
   public SimIntake(
       SimDriveTrain driveTrainSimulation,
