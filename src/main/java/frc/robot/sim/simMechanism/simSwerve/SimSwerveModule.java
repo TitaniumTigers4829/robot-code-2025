@@ -20,12 +20,10 @@ import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.configs.SimSwerveModuleConfig;
 import frc.robot.sim.simController.SimMotorController;
-import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.SimMechanism;
 import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
 import frc.robot.sim.simMechanism.SimMechanism.MechanismVariables;
-
 import java.util.function.Supplier;
 
 public class SimSwerveModule {

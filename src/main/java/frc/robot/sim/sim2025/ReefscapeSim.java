@@ -16,7 +16,6 @@ import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.FieldMap;
 import frc.robot.sim.simField.SimGamePiece.GamePieceTarget;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -30,7 +30,6 @@ import frc.robot.sim.simController.SimMotorController.ControllerOutput.CurrentOu
 import frc.robot.sim.simController.SimMotorController.ControllerOutput.VoltageOutput;
 import frc.robot.sim.simController.UnitSafeControl.TrapezoidProfile.State;
 import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
-
 import java.util.Optional;
 
 public class UnitSafeMotorController implements SimMotorController {

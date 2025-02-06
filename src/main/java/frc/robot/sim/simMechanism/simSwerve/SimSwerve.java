@@ -29,11 +29,8 @@ import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simController.SimMotorController;
-import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
-import frc.robot.sim.simController.SimMotorController;
 import frc.robot.sim.simMechanism.SimDriveTrain;
-
 import java.util.Arrays;
 import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;

@@ -1,12 +1,11 @@
 package frc.robot.sim.simMechanism;
 
+import frc.robot.sim.simField.SimGamePiece;
+import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-
-import frc.robot.sim.simField.SimGamePiece;
-import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 
 public class SimIndexer {
   protected final Queue<SimGamePiece> gamePieces;

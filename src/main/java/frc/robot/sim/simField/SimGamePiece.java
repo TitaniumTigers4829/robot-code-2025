@@ -17,7 +17,6 @@ import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.geometry.Velocity2d;
 import frc.robot.extras.util.geometry.Velocity3d;
 import frc.robot.extras.util.mathutils.GeomUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

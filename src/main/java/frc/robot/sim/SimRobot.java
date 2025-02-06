@@ -7,15 +7,14 @@ import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.GeomUtil;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.simField.SimArena;
-import frc.robot.sim.simField.SimGamePiece;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
+import frc.robot.sim.simField.SimGamePiece;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import frc.robot.sim.simMechanism.SimBattery;
 import frc.robot.sim.simMechanism.SimDriveTrain;
 import frc.robot.sim.simMechanism.SimIndexer;
 import frc.robot.sim.simMechanism.SimIntake;
 import frc.robot.sim.simMechanism.SimMechanism;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**

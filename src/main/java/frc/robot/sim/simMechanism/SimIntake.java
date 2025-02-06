@@ -1,5 +1,7 @@
 package frc.robot.sim.simMechanism;
 
+import frc.robot.sim.simField.SimGamePiece.GamePieceCollisionBody;
+import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.dyn4j.collision.CollisionBody;
@@ -11,10 +13,6 @@ import org.dyn4j.dynamics.contact.SolvedContact;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.world.ContactCollisionData;
 import org.dyn4j.world.listener.ContactListener;
-
-import frc.robot.sim.simField.SimGamePiece;
-import frc.robot.sim.simField.SimGamePiece.GamePieceCollisionBody;
-import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 
 public class SimIntake {
   private final BodyFixture fixture;

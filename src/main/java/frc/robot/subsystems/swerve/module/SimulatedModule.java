@@ -12,8 +12,8 @@ import frc.robot.sim.simController.ClosedLoop;
 import frc.robot.sim.simController.UnitSafeControl.AngularPIDFeedback;
 import frc.robot.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
 import frc.robot.sim.simController.UnitSafeControl.FlywheelFeedforward;
-import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import frc.robot.sim.simController.UnitSafeMotorController;
+import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */

@@ -30,11 +30,7 @@ import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
 import frc.robot.sim.simController.SimMotorController;
 import frc.robot.sim.simController.SimMotorController.ControllerOutput;
-import frc.robot.sim.simController.SimMotorController.ControllerOutput.CurrentOutput;
-import frc.robot.sim.simController.SimMotorController.ControllerOutput.VoltageOutput;
-import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
-
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

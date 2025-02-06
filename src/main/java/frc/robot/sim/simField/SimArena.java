@@ -12,13 +12,11 @@ import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import frc.robot.extras.util.FrcBody;
-import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
 import frc.robot.extras.util.ProjectileUtil;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.GeomUtil;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
