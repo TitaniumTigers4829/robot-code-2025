@@ -35,8 +35,6 @@ import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
-
-import java.security.Key;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -166,7 +164,7 @@ public class RobotContainer {
 
   private void resetFieldAndOdometryForAuto(Pose2d robotStartingPoseAtBlueAlliance) {
     final Pose2d startingPose = robotStartingPoseAtBlueAlliance;
-    
+
     if (swerveDriveSimulation != null) {
       swerveDriveSimulation.setSimulationWorldPose(startingPose);
       SimulatedField.getInstance().resetFieldForAuto();
@@ -207,7 +205,7 @@ public class RobotContainer {
             () -> JoystickUtil.modifyAxis(driverRightStickX, 3),
             () -> !driverRightBumper.getAsBoolean(),
             () -> driverLeftBumper.getAsBoolean());
-            
+
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -252,9 +250,5 @@ public class RobotContainer {
     Logger.recordOutput(
         "FieldSimulation/Notes",
         SimulatedField.getInstance().getGamePiecesByType("Note").toArray(Pose3d[]::new));
-        
-
-
-      
   }
 }

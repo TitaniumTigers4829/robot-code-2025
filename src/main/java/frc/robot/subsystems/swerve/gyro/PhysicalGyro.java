@@ -11,7 +11,6 @@ public class PhysicalGyro implements GyroInterface {
   private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI, NavXUpdateRate.k200Hz);
 
   public PhysicalGyro() {}
-  
 
   @Override
   public void updateInputs(GyroInputs inputs) {
