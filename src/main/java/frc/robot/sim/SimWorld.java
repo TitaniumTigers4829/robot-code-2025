@@ -113,9 +113,10 @@ public class SimWorld {
   }
 
   /**
-   *  Updates the simulation.
-   * @para poseSupplier the pose supplier used to update the chassis's pose in the simulation world
-   *  */
+   * Updates the simulation.
+   *
+   * @param poseSupplier the pose supplier used to update the chassis's pose in the simulation world
+   */
   public void update(Supplier<Pose2d> poseSupplier) {
     robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
