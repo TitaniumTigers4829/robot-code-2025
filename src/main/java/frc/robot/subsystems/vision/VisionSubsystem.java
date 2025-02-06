@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.littletonrobotics.junction.Logger;
 
@@ -31,6 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
+    Tracer.traceFunc("Vision/", () -> visionInterface.updateInputs(inputs));
   }
 
   /**

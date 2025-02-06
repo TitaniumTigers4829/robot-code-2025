@@ -2,67 +2,80 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.extras.simulation.OdometryTimestampsSim;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
+import frc.robot.sim.simController.ClosedLoop;
+import frc.robot.sim.simController.UnitSafeControl.AngularPIDFeedback;
+import frc.robot.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
+import frc.robot.sim.simController.UnitSafeControl.FlywheelFeedforward;
+import frc.robot.sim.simController.UnitSafeMotorController;
+import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
 /** Wrapper class around {@link SwerveModuleSimulation} */
 public class SimulatedModule implements ModuleInterface {
-  private final SwerveModuleSimulation moduleSimulation;
+  private final UnitSafeMotorController driveMotor;
+  private final UnitSafeMotorController steerMotor;
+  private final ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> driveLoop;
+  private final ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> steerLoop;
 
-  private final PIDController drivePID = new PIDController(.27, 0, 0);
-  private final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(1, 1.5);
+  public SimulatedModule(int moduleId, SimSwerve simSwerve) {
+    driveMotor = new UnitSafeMotorController();
+    steerMotor = new UnitSafeMotorController();
 
-  private final Constraints turnConstraints =
-      new Constraints(
-          ModuleConstants.MAX_ANGULAR_SPEED_ROTATIONS_PER_SECOND,
-          ModuleConstants.MAX_ANGULAR_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED);
-  private final ProfiledPIDController turnPID =
-      new ProfiledPIDController(18, 0, 0, turnConstraints);
-  private final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(0, 0, 0);
+    driveLoop =
+        ClosedLoop.forVoltageAngularVelocity(
+            new AngularVelocityPIDFeedback<VoltageUnit>(
+                Volts.per(RotationsPerSecond).ofNative(.27),
+                Volts.per(RotationsPerSecondPerSecond).ofNative(0)),
+            new FlywheelFeedforward<VoltageUnit>(
+                Volts.of(1),
+                Volts.per(RotationsPerSecond).ofNative(1.5),
+                Volts.per(RotationsPerSecondPerSecond).ofNative(0.0)));
 
-  public SimulatedModule(SwerveModuleSimulation moduleSimulation) {
-    this.moduleSimulation = moduleSimulation;
-    turnPID.enableContinuousInput(-Math.PI, Math.PI);
+    steerLoop =
+        ClosedLoop.forVoltageAngle(
+            new AngularPIDFeedback<VoltageUnit>(
+                    Volts.per(Rotations).ofNative(18), Volts.per(RotationsPerSecond).ofNative(0))
+                .withContinuousAngularInput(),
+            new FlywheelFeedforward<VoltageUnit>(Volts.of(0)),
+            true);
+
+    steerMotor.configSensorToMechanismRatio(ModuleConstants.TURN_GEAR_RATIO);
+
+    simSwerve.withSetModuleControllers(moduleId, driveMotor, steerMotor);
   }
 
+  // TODO: maybe add supply?
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.drivePosition =
-        Radians.of(moduleSimulation.getDriveEncoderFinalPositionRad()).in(Rotations);
-    inputs.driveVelocity =
-        RadiansPerSecond.of(moduleSimulation.getDriveWheelFinalSpeedRadPerSec())
-            .in(RotationsPerSecond);
-    inputs.driveAppliedVolts = moduleSimulation.getDriveMotorAppliedVolts();
-    inputs.driveCurrentAmps = moduleSimulation.getDriveMotorSupplyCurrentAmps();
+    // TODO: add drive accel
+    inputs.drivePosition = driveMotor.position().in(Rotations);
+    inputs.driveVelocity = driveMotor.velocity().in(RotationsPerSecond);
+    inputs.driveAppliedVolts = driveMotor.voltage().in(Volts);
+    inputs.driveCurrentAmps = driveMotor.current().in(Amps);
 
-    inputs.turnAbsolutePosition = moduleSimulation.getTurnAbsolutePosition();
-    inputs.turnVelocity =
-        Radians.of(moduleSimulation.getTurnAbsoluteEncoderSpeedRadPerSec()).in(Rotations);
-    inputs.turnAppliedVolts = moduleSimulation.getTurnMotorAppliedVolts();
-    inputs.turnCurrentAmps = moduleSimulation.getTurnMotorSupplyCurrentAmps();
+    inputs.turnAbsolutePosition = Rotation2d.fromRotations(steerMotor.position().in(Rotations));
+    inputs.turnVelocity = steerMotor.velocity().in(RotationsPerSecond);
 
-    inputs.odometrySteerPositions = moduleSimulation.getCachedTurnAbsolutePositions();
-
-    inputs.odometryTimestamps = OdometryTimestampsSim.getTimestamps();
+    inputs.turnAppliedVolts = steerMotor.voltage().in(Volts);
+    inputs.turnCurrentAmps = steerMotor.current().in(Amps);
 
     inputs.isConnected = true;
   }
 
   @Override
   public void setDriveVoltage(Voltage volts) {
-    moduleSimulation.requestDriveVoltageOut(volts);
+    volts = driveMotor.voltage();
   }
 
   @Override
   public void setTurnVoltage(Voltage volts) {
-    moduleSimulation.requestTurnVoltageOut(volts);
+    volts = steerMotor.voltage();
   }
 
   @Override
@@ -73,30 +86,18 @@ public class SimulatedModule implements ModuleInterface {
             * ModuleConstants.DRIVE_GEAR_RATIO
             / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS;
 
-    moduleSimulation.requestDriveVoltageOut(
-        Volts.of(
-                drivePID.calculate(
-                    RadiansPerSecond.of(moduleSimulation.getDriveWheelFinalSpeedRadPerSec())
-                            .in(RotationsPerSecond)
-                        * ModuleConstants.WHEEL_CIRCUMFERENCE_METERS,
-                    desiredDriveRPS))
-            .plus(Volts.of(driveFF.calculate(desiredDriveRPS))));
-    moduleSimulation.requestTurnVoltageOut(
-        Volts.of(
-                turnPID.calculate(
-                    moduleSimulation.getTurnAbsolutePosition().getRotations(),
-                    desiredState.angle.getRotations()))
-            .plus(Volts.of(turnFF.calculate(turnPID.getSetpoint().velocity))));
+    driveMotor.controlVoltage(driveLoop, RotationsPerSecond.of(desiredDriveRPS));
+    steerMotor.controlVoltage(steerLoop, desiredState.angle.getMeasure());
   }
 
   @Override
   public double getTurnRotations() {
-    return moduleSimulation.getTurnAbsolutePosition().getRotations();
+    return steerMotor.position().in(Rotations);
   }
 
   @Override
   public void stopModule() {
-    moduleSimulation.requestDriveVoltageOut(Volts.of(0));
-    moduleSimulation.requestTurnVoltageOut(Volts.of(0));
+    setDriveVoltage(Volts.zero());
+    setTurnVoltage(Volts.zero());
   }
 }

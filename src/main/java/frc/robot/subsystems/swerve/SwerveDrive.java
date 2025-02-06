@@ -20,8 +20,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.TimeUtil;
+import frc.robot.extras.util.Tracer;
+import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
@@ -64,7 +65,7 @@ public class SwerveDrive extends SubsystemBase {
           58,
           7,
           ModuleConstants.WHEEL_DIAMETER_METERS,
-          WHEEL_GRIP.TIRE_WHEEL.cof,
+          WheelCof.BLACK_NITRILE.cof,
           0.0);
   private SwerveSetpoint setpoint = SwerveSetpoint.zeroed();
 
@@ -210,6 +211,7 @@ public class SwerveDrive extends SubsystemBase {
 
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
+    Tracer.traceFunc("Gyro", () -> gyroIO.updateInputs(gyroInputs));
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
   }
 
@@ -380,7 +382,7 @@ public class SwerveDrive extends SubsystemBase {
         moduleDeltas = getModulesDelta(modulePositions);
 
     // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the
-    // modules.
+    // // modules.
     if (gyroInputs.isConnected) {
       rawGyroRotation = getGyroRotation2d();
     } else {

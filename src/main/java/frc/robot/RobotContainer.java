@@ -4,7 +4,6 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,19 +11,21 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.SimulationConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.algaePivot.ManualAlgaePivot;
+import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowChoreoTrajectory;
-import frc.robot.extras.simulation.field.SimulatedField;
-import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
-import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
+import frc.robot.commands.intake.Eject;
+import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
+import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
+import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
@@ -33,10 +34,10 @@ import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
+import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
 
@@ -44,25 +45,21 @@ public class RobotContainer {
   private final SwerveDrive swerveDrive;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-
-  // Simulation, we store them here in the robot container
-  // private final SimulatedField simulatedArena;
-  private final SwerveDriveSimulation swerveDriveSimulation;
-  private final GyroSimulation gyroSimulation;
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
+  private final AlgaePivotSubsystem algaePivotSubsystem =
+      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   public AutoFactory autoFactory;
   public AutoChooser autoChooser;
   public Autos autos;
+
+  private final SimWorld simWorld = new SimWorld();
 
   public RobotContainer() {
 
     switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
-        /* Disable Simulations */
-        // this.simulatedArena = null;
-        this.gyroSimulation = null;
-        this.swerveDriveSimulation = null;
 
         swerveDrive =
             new SwerveDrive(
@@ -72,54 +69,28 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[2]),
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        // simWorld = null;
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
-        gyroSimulation = null;
-        swerveDriveSimulation = null;
+
         visionSubsystem = null;
+        // simWorld = null;
       }
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-
-        /* create simulations */
-        /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
-        this.gyroSimulation = GyroSimulation.createNavX2();
-        /* create a swerve drive simulation */
-        this.swerveDriveSimulation =
-            new SwerveDriveSimulation(
-                SimulationConstants.ROBOT_MASS_KG,
-                DriveConstants.TRACK_WIDTH,
-                DriveConstants.WHEEL_BASE,
-                DriveConstants.TRACK_WIDTH + .2,
-                DriveConstants.WHEEL_BASE + .2,
-                SwerveModuleSimulation.getModule(
-                    DCMotor.getFalcon500(1),
-                    DCMotor.getFalcon500(1),
-                    60,
-                    WHEEL_GRIP.TIRE_WHEEL,
-                    ModuleConstants.DRIVE_GEAR_RATIO),
-                gyroSimulation,
-                new Pose2d(3, 3, new Rotation2d()));
-        SimulatedField.getInstance().addDriveTrainSimulation(swerveDriveSimulation);
+        // simWorld = new SimWorld();
         swerveDrive =
             new SwerveDrive(
-                new SimulatedGyro(
-                    gyroSimulation), // SimulatedGyro is a wrapper around gyro simulation, that
-                // reads
-                // the simulation result
-                /* SimulatedModule are edited such that they also wraps around module simulations */
-                new SimulatedModule(swerveDriveSimulation.getModules()[0]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[1]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[2]),
-                new SimulatedModule(swerveDriveSimulation.getModules()[3]));
+                new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
+                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
 
-        visionSubsystem = null;
-
-        SimulatedField.getInstance().resetFieldForAuto();
-        resetFieldAndOdometryForAuto(
-            new Pose2d(1.3980597257614136, 5.493067741394043, Rotation2d.fromRadians(3.1415)));
+        visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
+        swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
       }
 
       default -> {
@@ -127,9 +98,6 @@ public class RobotContainer {
         /* Replayed robot, disable IO implementations */
 
         /* physics simulations are also not needed */
-        this.gyroSimulation = null;
-        this.swerveDriveSimulation = null;
-        // this.simulatedArena = null;
         swerveDrive =
             new SwerveDrive(
                 new GyroInterface() {},
@@ -137,6 +105,7 @@ public class RobotContainer {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {});
+        // simWorld = null;
       }
     }
 
@@ -177,6 +146,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     configureButtonBindings();
+
     swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
@@ -194,6 +164,35 @@ public class RobotContainer {
     Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
 
+    driverController.a().whileTrue(new Intake(intakeSubsystem));
+    driverController.b().whileTrue(new Eject(intakeSubsystem));
+    driverController
+        .x()
+        .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
+
+    // // autodrive
+    // Trigger driverAButton = new Trigger(driverController::getAButton);
+    // lol whatever
+    // // intake
+    // Trigger operatorLeftTrigger = new Trigger(()->operatorController.getLeftTriggerAxis() > 0.2);
+    // Trigger operatorLeftBumper = new Trigger(operatorController::getLeftBumper);
+    // // amp and speaker
+    // Trigger operatorBButton = new Trigger(operatorController::getBButton);
+    // Trigger operatorRightBumper = new Trigger(operatorController::getRightBumper);
+    // Trigger operatorRightTrigger = new Trigger(()->operatorController.getRightTriggerAxis() >
+    // 0.2);
+    // Trigger driverRightTrigger = new Trigger(()->driverController.getRightTriggerAxis() > 0.2);
+
+    // // manual pivot and intake rollers
+    // Trigger operatorAButton = new Trigger(operatorController::getAButton);
+    // Trigger operatorXButton = new Trigger(operatorController::getXButton);
+    // Trigger operatorYButton = new Trigger(operatorController::getYButton);
+    // DoubleSupplier operatorRightStickY = operatorController::getRightY;
+    // // unused
+    // Trigger operatorUpDirectionPad = new Trigger(()->operatorController.getPOV() == 0);
+    // Trigger operatorLeftDirectionPad = new Trigger(()->operatorController.getPOV() == 270);
+    // Trigger operatorDownDirectionPad = new Trigger(()->operatorController.getPOV() == 180);
+    // Trigger driverLeftTrigger = new Trigger(()->driverController.getLeftTriggerAxis() > 0.2);
     Trigger driverLeftBumper = new Trigger(driverController.leftBumper());
 
     // DRIVER BUTTONS
@@ -218,19 +217,17 @@ public class RobotContainer {
                         swerveDrive.getEstimatedPose().getX(),
                         swerveDrive.getEstimatedPose().getY(),
                         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
-    // driverController
-    //     .x()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () ->
-    //                 swerveDrive.resetEstimatedPose(
-    //                     swerveDriveSimulation.getSimulatedDriveTrainPose())));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
     driverLeftDirectionPad.onTrue(
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    // FieldConstants has all reef poses
+    driverController
+        .a()
+        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
   }
 
   public Command getAutonomousCommand() {
@@ -244,12 +241,9 @@ public class RobotContainer {
     return autoChooser.selectedCommand();
   }
 
-  public void updateFieldSimAndDisplay() {
-    if (swerveDriveSimulation == null) return;
-    Logger.recordOutput(
-        "FieldSimulation/RobotPosition", swerveDriveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Notes",
-        SimulatedField.getInstance().getGamePiecesByType("Note").toArray(Pose3d[]::new));
+  public void simulationPeriodic() {
+    if (Robot.isSimulation()) {
+      simWorld.update(() -> swerveDrive.getEstimatedPose());
+    }
   }
 }

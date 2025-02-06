@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.extras.simulation.field.SimulatedField;
+import frc.robot.sim.SimWorld;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -17,6 +17,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
   private RobotContainer robotContainer;
+  private SimWorld simWorld = new SimWorld();
 
   public Robot() {
     // Record metadata
@@ -132,7 +133,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
-    SimulatedField.getInstance().simulationPeriodic();
-    robotContainer.updateFieldSimAndDisplay();
+    if (simWorld != null) {
+      robotContainer.simulationPeriodic();
+    }
   }
 }
