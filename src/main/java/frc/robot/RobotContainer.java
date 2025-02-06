@@ -158,7 +158,7 @@ public class RobotContainer {
     autos = new Autos(autoFactory, swerveDrive);
     // this adds an auto routine to the auto chooser
     // autoChooser.addRoutine("Example routine", () -> autos.exampleAutoRoutine());
-    autoChooser.addRoutine("One Meter Calibration routine", () -> autos.oneMeterTestAutoRoutine());
+    autoChooser.addRoutine("One Meter Auto Routine", () -> autos.oneMeterTestAutoRoutine());
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
   }
