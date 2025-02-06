@@ -53,11 +53,10 @@ public final class VisionConstants {
           new Translation3d(-0.3119324724, 0.0, 0.1865472012), new Rotation3d(0.0, 35, 180.0));
   public static final Transform3d FRONT_LEFT_TRANSFORM =
       new Transform3d(
-          new Translation3d(0.2749477356, -0.269958439, 0.2318054546),
-          new Rotation3d(0.0, 25, -35));
+          new Translation3d(0.2749477356, -0.269958439, 0.2318054546), new Rotation3d(0.0, 25, 35));
   public static final Transform3d FRONT_RIGHT_TRANSFORM =
       new Transform3d(
-          new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, 35));
+          new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, -35));
 
   public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
   public static final PhotonCamera FRONT_LEFT_CAMERA =
@@ -78,14 +77,12 @@ public final class VisionConstants {
   public static final double LL3_FOV_MARGIN_OF_ERROR = 26;
   public static final double LL3G_FOV_MARGIN_OF_ERROR = 36;
 
-  public static final double MEGA_TAG_2_MAX_HEADING_RATE = 38; // degrees/s
-
-  public static final double MAX_TRANSLATION_DELTA_METERS =
-      0.8; // Adjust based on expected movement
-  public static final double MAX_ROTATION_DELTA_DEGREES = 50.0; // Adjust based on expected rotation
+  public static final double MAX_TRANSLATION_DELTA_METERS = 0.8;
+  public static final double MAX_ROTATION_DELTA_DEGREES = 50.0;
   public static final double MAX_AMBIGUITY_THRESHOLD = .45;
 
   public static final double MEGA_TAG_2_DISTANCE_THRESHOLD = 1.5;
+  public static final double MEGA_TAG_2_MAX_HEADING_RATE = 38; // degrees/s
 
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = .5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;

@@ -20,11 +20,6 @@ public interface ModuleInterface {
     public double turnVelocity = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
-
-    public double[] odometryTimestamps = new double[] {};
-
-    public double[] odometryDriveWheelRevolutions = new double[] {};
-    public Rotation2d[] odometrySteerPositions = new Rotation2d[] {};
   }
 
   /**

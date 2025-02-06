@@ -1,15 +1,26 @@
-package frc.robot.extras.util;
+package frc.robot.extras.util.mathutils;
 
+import static edu.wpi.first.units.Units.*;
+
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.units.measure.Torque;
+import frc.robot.extras.util.geometry.Velocity2d;
+import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Rotation;
 import org.dyn4j.geometry.Transform;
 import org.dyn4j.geometry.Vector2;
 
 /** utils to convert between WPILIB and dyn4j geometry classes */
 public class GeomUtil {
+
   /**
    * Converts a WPILIB Translation2d to a dyn4j Vector2
    *
@@ -18,6 +29,16 @@ public class GeomUtil {
    */
   public static Vector2 toDyn4jVector2(Translation2d wpilibTranslation2d) {
     return new Vector2(wpilibTranslation2d.getX(), wpilibTranslation2d.getY());
+  }
+
+  /**
+   * Converts a Velocity2d to a dyn4j Vector2
+   *
+   * @param velocity2d the Velocity2d to convert
+   * @return the equivalent Vector2
+   */
+  public static Vector2 toDyn4jVector2(Velocity2d velocity2d) {
+    return new Vector2(velocity2d.getVX(), velocity2d.getVY());
   }
 
   /**
@@ -98,15 +119,21 @@ public class GeomUtil {
         dyn4jLinearVelocity.x, dyn4jLinearVelocity.y, angularVelocityRadPerSec);
   }
 
-  /**
-   * Gets the x and y velocities of a ChassisSpeeds
-   *
-   * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
-   * @return a Translation2d containing the velocities in the x and y direction in meters per second
-   */
-  public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
-    return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  public static Rectangle toDyn4jRectangle(Rectangle2d wpilibRectangle) {
+    return new Rectangle(wpilibRectangle.getXWidth(), wpilibRectangle.getYWidth());
   }
+
+  // /**
+  //  * Gets the x and y velocities of a ChassisSpeeds
+  //  *
+  //  * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
+  //  * @return a Translation2d containing the velocities in the x and y direction in meters per
+  // second
+  //  */
+  // public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds)
+  // {
+  //   return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  // }
 
   /**
    * Checks if all translations in the input are within a certain threshold in meters.
@@ -184,5 +211,21 @@ public class GeomUtil {
       }
     }
     return true; // Return true if all pairs are within the thresholds
+  }
+
+  public static Velocity2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
+    return new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  }
+
+  public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
+    return NewtonMeters.of(torque.getTorque());
+  }
+
+  public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
+    return Newtons.of(force.getForce().getMagnitude());
+  }
+
+  public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
+    return Pair.of(Kilograms.of(mass.getMass()), KilogramSquareMeters.of(mass.getInertia()));
   }
 }
