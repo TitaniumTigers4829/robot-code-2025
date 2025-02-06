@@ -1,6 +1,7 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.util.Pose2dMovingAverageFilter;
@@ -43,7 +44,9 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
-      // Start a vision input task for each Limelight
+      // Setupt port forwarding for each limelight
+      setupPortForwarding(limelight);
+      // Start a threaded task to check and update the pose for each Limelight
       threadManager.startTask(
           limelight.getName(),
           () -> checkAndUpdatePose(limelight),
@@ -133,6 +136,26 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
+   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
+   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
+   *
+   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
+   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
+   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
+   *
+   * @param limelight The Limelight for which to set up port forwarding.
+   */
+  private void setupPortForwarding(Limelight limelight) {
+    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
+    for (int port = VisionConstants.BASE_PORT;
+        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
+        port++) {
+      PortForwarder.add(
+          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
+    }
+  }
+
+  /**
    * Gets the pose update of the specified limelight while the robot is enabled.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
@@ -140,18 +163,19 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-        && (!isLargeDiscrepancyBetweenTwoPoses(
-                limelight,
-                VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-                VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-                megatag1Estimate.pose,
-                megatag2Estimate.pose)
-            || getLimelightAprilTagDistance(limelight)
-                > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
-      limelightEstimates.set(
-          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    // if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+    //     && (!isLargeDiscrepancyBetweenTwoPoses(
+    //             limelight,
+    //             VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+    //             VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+    //             megatag1Estimate.pose,
+    //             megatag2Estimate.pose)
+    //         || getLimelightAprilTagDistance(limelight)
+    //             > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+    //   limelightEstimates.set(
+    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    // } else
+    if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {

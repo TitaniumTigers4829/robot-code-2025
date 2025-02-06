@@ -139,6 +139,7 @@ public class SwerveConstants {
 
   public static final class TrajectoryConstants {
 
+    public static final double DEADBAND_AMOUNT = 0.02;
     public static final double DRIVE_BASE_DIAMETER =
         Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
 
@@ -164,19 +165,16 @@ public class SwerveConstants {
     public static final double Y_TOLERANCE = 0.02;
     public static final double THETA_TOLERANCE = 1.25;
 
-    // Note Detection Driving Constants
-    public static final double AUTO_ALIGN_TRANSLATIONAL_P = 3;
-    public static final double AUTO_ALIGN_TRANSLATIONAL_I = 0;
-    public static final double AUTO_ALIGN_TRANSLATIONAL_D = 0;
+    public static final double AUTO_LINEUP_ROTATION_P = 5;
+    public static final double AUTO_LINEUP_ROTATION_I = 0;
+    public static final double AUTO_LINEUP_ROTATION_D = 0;
+    public static final Constraints AUTO_LINEUP_ROTATION_CONSTRAINTS =
+        new Constraints(4 * Math.PI, 6 * Math.PI);
 
-    public static Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(5, 2);
-
-    public static final double AUTO_ALIGN_ROTATIONAL_P = 3;
-    public static final double AUTO_ALIGN_ROTATIONAL_I = 0;
-    public static final double AUTO_ALIGN_ROTATIONAL_D = 0;
-
-    public static Constraints AUTO_ALIGN_ROTATIONAL_CONSTRAINTS =
-        new Constraints(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2);
+    public static final double AUTO_LINEUP_TRANSLATION_P = 4.0;
+    public static final double AUTO_LINEUP_TRANSLATION_I = 0;
+    public static final double AUTO_LINEUP_TRANSLATION_D = 0;
+    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
   }
 
   public static final ModuleConfig[] moduleConfigs =
