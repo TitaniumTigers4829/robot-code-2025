@@ -40,7 +40,7 @@ public class SimulatedVision extends PhysicalVision {
   private final int kResHeight = 800;
 
   public SimulatedVision(Supplier<VisionSystemSim> visionSim) {
-    super();
+    // super();
     // this.robotSimulationPose = robotSimulationPose;
     // Create the vision system simulation which handles cameras and targets on the
     // field.
@@ -95,13 +95,13 @@ public class SimulatedVision extends PhysicalVision {
   public void updateInputs(VisionInputs inputs) {
     // Abuse the updateInputs periodic call to update the sim
 
-    for (Limelight limelight : Limelight.values()) {
-      writeToTable(
-          getSimulationCamera(limelight).getAllUnreadResults(),
-          getLimelightTable(limelight),
-          limelight);
-    }
-    super.updateInputs(inputs);
+    // for (Limelight limelight : Limelight.values()) {
+    //   writeToTable(
+    //       getSimulationCamera(limelight).getAllUnreadResults(),
+    //       getLimelightTable(limelight),
+    //       limelight);
+    // }
+    // super.updateInputs(inputs);
   }
 
   /**
