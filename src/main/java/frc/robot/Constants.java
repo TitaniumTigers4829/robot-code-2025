@@ -2,10 +2,10 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 
 public final class Constants {
 
@@ -103,6 +103,20 @@ public final class Constants {
     public static final String LEFT_PICKUP_TO_L_TRAJECTORY = "Trajectories/Left-Pickup-to-L";
     public static final String LEFT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Left-Pickup-to-A";
     public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
+
+    // Auto Align Constants
+    public static final double DEADBAND_AMOUNT = 0.02;
+
+    public static final double AUTO_LINEUP_ROTATION_P = 5;
+    public static final double AUTO_LINEUP_ROTATION_I = 0;
+    public static final double AUTO_LINEUP_ROTATION_D = 0;
+    public static final Constraints AUTO_LINEUP_ROTATION_CONSTRAINTS =
+        new Constraints(4 * Math.PI, 6 * Math.PI);
+
+    public static final double AUTO_LINEUP_TRANSLATION_P = 4.0;
+    public static final double AUTO_LINEUP_TRANSLATION_I = 0;
+    public static final double AUTO_LINEUP_TRANSLATION_D = 0;
+    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
 
     // These used to be in Trajectory Constants
     public static final double DRIVE_BASE_DIAMETER =
