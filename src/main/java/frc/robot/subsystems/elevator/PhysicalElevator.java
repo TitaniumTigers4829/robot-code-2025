@@ -94,7 +94,7 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.followerMotorPosition = followerPosition.getValueAsDouble();
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
     inputs.followerDutyCycle = followerDutyCycle.getValueAsDouble();
-    inputs.elevatorDesiredPosition = desiredPosition;
+    inputs.desiredPosition = desiredPosition;
   }
 
   @Override

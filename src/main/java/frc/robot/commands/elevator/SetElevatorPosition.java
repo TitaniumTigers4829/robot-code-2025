@@ -11,13 +11,14 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 public class SetElevatorPosition extends Command {
   ElevatorSubsystem elevatorSubsystem;
   double position;
+
   /** Creates a new SetElevatorPosition. */
   public SetElevatorPosition(ElevatorSubsystem elevatorSubsystem, double position) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.position = position;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.elevatorSubsystem);
+    addRequirements(elevatorSubsystem);
   }
 
   // Called when the command is initially scheduled.

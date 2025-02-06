@@ -9,15 +9,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.SimulationConstants;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.simulation.field.SimulatedField;
-import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveDriveSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.PhysicalElevator;
+import frc.robot.subsystems.elevator.SimulatedElevator;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -29,6 +33,7 @@ import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
+import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
@@ -41,7 +46,7 @@ public class RobotContainer {
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-  private final SlantedElevatorSim elevatorSim;
+  private final ElevatorSubsystem elevatorSim;
   // Simulation, we store them here in the robot container
   // private final SimulatedField simulatedArena;
   private final SwerveDriveSimulation swerveDriveSimulation;
@@ -61,7 +66,7 @@ public class RobotContainer {
         // this.simulatedArena = null;
         this.gyroSimulation = null;
         this.swerveDriveSimulation = null;
-        elevatorSim = null;
+        elevatorSim = new ElevatorSubsystem(new PhysicalElevator());
 
         swerveDrive =
             new SwerveDrive(
@@ -73,7 +78,7 @@ public class RobotContainer {
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
       }
       case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
+        swerveDrive = null;
         gyroSimulation = null;
         swerveDriveSimulation = null;
         visionSubsystem = null;
@@ -82,17 +87,7 @@ public class RobotContainer {
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        elevatorSim =
-            new SlantedElevatorSim(
-                edu.wpi.first.math.system.plant.LinearSystemId.createElevatorSystem(
-                    DCMotor.getKrakenX60(2), 3.0, 3.0, 3.0),
-                null,
-                0,
-                0,
-                false,
-                0,
-                0,
-                null);
+        elevatorSim = new ElevatorSubsystem(new SimulatedElevator());
         /* create simulations */
         /* create simulation for pigeon2 IMU (different IMUs have different measurement erros) */
         this.gyroSimulation = GyroSimulation.createNavX2();
@@ -125,9 +120,9 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[2]),
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
-        visionSubsystem = null;
-        //     new VisionSubsystem(
-        //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
+        visionSubsystem =
+            new VisionSubsystem(
+                new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
 
         SimulatedField.getInstance().resetFieldForAuto();
         resetFieldAndOdometryForAuto(
@@ -179,7 +174,6 @@ public class RobotContainer {
           () -> JoystickUtil.modifyAxisPolar(driverLeftStickX, driverLeftStickY, 3)[0],
           () -> JoystickUtil.modifyAxisPolar(driverLeftStickX, driverLeftStickY, 3)[1]
         };
-
     Trigger driverRightBumper = new Trigger(driverController.rightBumper());
     Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
@@ -220,6 +214,10 @@ public class RobotContainer {
     driverLeftDirectionPad.onTrue(
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    operatorController
+        .a()
+        .whileTrue(new SetElevatorPosition(elevatorSim, FieldConstants.REEF_LEVEL_FOUR_Z));
   }
 
   public Command getAutonomousCommand() {

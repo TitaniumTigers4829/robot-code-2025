@@ -19,7 +19,7 @@ public class ManualElevator extends Command {
     this.joystickY = joystickY;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.elevatorSubsystem);
+    addRequirements(elevatorSubsystem);
   }
 
   // Called when the command is initially scheduled.

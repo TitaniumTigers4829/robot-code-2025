@@ -7,17 +7,18 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
 
 public class SimulatedElevator implements ElevatorInterface {
-  private final ElevatorSim m_elevatorSim;
+  private final SlantedElevatorSim m_elevatorSim;
   private final PIDController m_pidController;
   private final ElevatorFeedforward m_feedforward;
   private double currentVolts;
+  private double desiredPosition;
 
   public SimulatedElevator() {
     m_elevatorSim =
-        new ElevatorSim(
+        new SlantedElevatorSim(
             DCMotor.getKrakenX60(2),
             ElevatorConstants.ELEVATOR_GEAR_RATIO,
             ElevatorConstants.ELEVATOR_CARRIAGE_MASS,
@@ -25,7 +26,8 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.MIN_HEIGHT,
             ElevatorConstants.MAX_HEIGHT,
             ElevatorConstants.SIMULATE_GRAVITY,
-            ElevatorConstants.MIN_HEIGHT);
+            ElevatorConstants.MIN_HEIGHT,
+            ElevatorConstants.INCLINE_ANGLE_RADIANS);
     m_pidController =
         new PIDController(
             ElevatorConstants.ELEVATOR_P,
@@ -38,6 +40,7 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.ELEVATOR_V,
             ElevatorConstants.ELEVATOR_A);
     currentVolts = 0.0;
+    desiredPosition = 0.0;
   }
 
   @Override
@@ -47,6 +50,7 @@ public class SimulatedElevator implements ElevatorInterface {
     inputs.followerMotorPosition = m_elevatorSim.getPositionMeters();
     inputs.leaderMotorVoltage = currentVolts;
     inputs.followerMotorVoltage = currentVolts;
+    inputs.desiredPosition = desiredPosition;
   }
 
   @Override
@@ -56,6 +60,7 @@ public class SimulatedElevator implements ElevatorInterface {
 
   @Override
   public void setElevatorPosition(double position) {
+    desiredPosition = position;
     m_pidController.setSetpoint(position);
     double output = m_pidController.calculate(getElevatorPosition(), position);
     double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());
