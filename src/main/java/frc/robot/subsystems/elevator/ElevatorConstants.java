@@ -28,7 +28,7 @@ public class ElevatorConstants {
   public static final double SUPPLY_CURRENT_LIMIT = 0 - 9;
   public static final boolean STATOR_CURRENT_LIMIT_ENABLE = false;
   public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = false;
-  //Motion magic shit
-  public static final double MOTION_MAGIC_MAX_ACCELERATION = 0-9;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0-9;
+  // Motion magic shit
+  public static final double MOTION_MAGIC_MAX_ACCELERATION = 0 - 9;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 0 - 9;
 }
