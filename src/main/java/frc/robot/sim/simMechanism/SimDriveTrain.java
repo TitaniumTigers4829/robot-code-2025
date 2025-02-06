@@ -54,14 +54,11 @@ public class SimDriveTrain {
    *
    * @param config a {@link ShamDriveTrainConfig} instance containing the configurations of this
    *     drivetrain
-   * @param initialPoseOnField the initial pose of the drivetrain in the simulation world
+   * @param timing the simulation environment timing
    */
   @SuppressWarnings("unchecked")
   protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
     this.timing = timing;
-    // Logger.recordOutput("config", config, (Struct<SimDriveTrainConfig<?, ?>>)
-    // ProceduralStructGenerator
-    //         .extractClassStructDynamic(config.getClass()).get());
     chassis.addFixture(
         Geometry.createRectangle(config.bumperLengthXMeters, config.bumperWidthYMeters),
         0.0, // zero density; mass is set explicitly
@@ -142,9 +139,14 @@ public class SimDriveTrain {
    * the simulation.
    */
   public void simTick() {
-    Logger.recordOutput("SwerveStates/pose", chassis.snapshot().pose());
-    Logger.recordOutput("SwerveStates/velocity", chassis.snapshot().velocity());
-    Logger.recordOutput("SwerveStates/forces", chassis.snapshot().forces());
+    Logger.recordOutput("Forces/DriveTrainForces/pose", chassis.snapshot().pose());
+    Logger.recordOutput("Forces/DriveTrainForces/velocity", chassis.snapshot().velocity());
+    Logger.recordOutput("Forces/DriveTrainForces/forces", chassis.snapshot().forces());
+    Logger.recordOutput("Forces/DriveTrainForces/torque", chassis.snapshot().torque());
+    Logger.recordOutput(
+        "Forces/DriveTrainForces/accumulatedForce", chassis.snapshot().accumulatedForce());
+    Logger.recordOutput(
+        "Forces/DriveTrainForces/accumulatedTorque", chassis.snapshot().accumulatedTorque());
   }
 
   /**

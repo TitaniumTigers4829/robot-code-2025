@@ -130,9 +130,12 @@ public class SimSwerve extends SimDriveTrain {
       yFrictionAccel = yFrictionAccel.plus(pack.getFirst().y());
       angularFrictionAccel = angularFrictionAccel.plus(pack.getSecond());
 
-      Logger.recordOutput("Forces/Friction/module" + i + "/frictionForce", frictionForce);
-      Logger.recordOutput("Forces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
-      Logger.recordOutput("Forces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/frictionForce", frictionForce);
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
     }
 
     // clamp the friction acceleration to prevent the robot from accelerating in the opposite
@@ -146,8 +149,8 @@ public class SimSwerve extends SimDriveTrain {
         ChassisSpeeds.fromRobotRelativeSpeeds(wheelSpeeds, chassisRotation);
     final ChassisSpeeds unwantedSpeeds = newWheelSpeeds.minus(chassisSpeeds);
 
-    Logger.recordOutput("Friction/wheelSpeeds", wheelSpeeds);
-    Logger.recordOutput("Friction/unwantedSpeeds", unwantedSpeeds);
+    Logger.recordOutput("Forces/SwerveForces/Friction/wheelSpeeds", wheelSpeeds);
+    Logger.recordOutput("Forces/SwerveForces/Friction/unwantedSpeeds", unwantedSpeeds);
 
     final LinearAcceleration xAccelNeededToStop =
         MeasureMath.negate(MetersPerSecond.of(unwantedSpeeds.vxMetersPerSecond)).div(timing.dt());
@@ -156,18 +159,19 @@ public class SimSwerve extends SimDriveTrain {
     final AngularAcceleration angularAccelNeededToStop =
         MeasureMath.negate(RadiansPerSecond.of(unwantedSpeeds.omegaRadiansPerSecond))
             .div(timing.dt());
-    Logger.recordOutput("Forces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
-    Logger.recordOutput("Forces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
     xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
     yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
     angularFrictionAccel = MeasureMath.clamp(angularFrictionAccel, angularAccelNeededToStop);
 
-    Logger.recordOutput("Forces/Friction/xAccelNeededToStop", xAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/yAccelNeededToStop", yAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/xFrictionAccel", xFrictionAccel);
-    Logger.recordOutput("Forces/Friction/yFrictionAccel", yFrictionAccel);
-    Logger.recordOutput("Forces/Friction/angularFrictionAccel", angularFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/xAccelNeededToStop", xAccelNeededToStop);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yAccelNeededToStop", yAccelNeededToStop);
+    Logger.recordOutput(
+        "Forces/SwerveForces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
+    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccel", xFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccel", yFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccel", angularFrictionAccel);
 
     // convert the friction acceleration to forces and torques and apply them to the chassis
     final Force xFrictionForce = chassisMass.forceDueToAcceleration(xFrictionAccel);
@@ -196,8 +200,10 @@ public class SimSwerve extends SimDriveTrain {
       propulsionForceY = propulsionForceY.plus(pack.getFirst().y());
       propulsionTorque = propulsionTorque.plus(pack.getSecond());
 
-      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
-      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
     }
 
     // The rotor inertia can very depending on how the modules are driving the chassis.
@@ -213,9 +219,9 @@ public class SimSwerve extends SimDriveTrain {
       final double yPropulsionRatio = propulsionForceYMag / propulsionForceTotalMag;
       final double translationRatio = Math.hypot(xPropulsionRatio, yPropulsionRatio);
 
-      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
-      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
-      Logger.recordOutput("Forces/RotorInertia/translationRatio", translationRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", translationRatio);
 
       // Calculate the rotor inertia based on the propulsion ratios
       this.rotorInertia =
@@ -225,14 +231,15 @@ public class SimSwerve extends SimDriveTrain {
     } else {
       this.rotorInertia = rotorInertiaWhenTranslating;
 
-      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/RotorInertia/translationRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", 0.0);
     }
 
-    Logger.recordOutput("Forces/Propulsion/propulsionTorque", propulsionTorque);
+    Logger.recordOutput("Forces/SwerveForces/Propulsion/propulsionTorque", propulsionTorque);
     Logger.recordOutput(
-        "Forces/Propulsion/propulsionForce", new XY<>(propulsionForceX, propulsionForceY));
+        "Forces/SwerveForces/Propulsion/propulsionForce",
+        new XY<>(propulsionForceX, propulsionForceY));
 
     chassis.applyForce(new Vector2(propulsionForceX.in(Newtons), propulsionForceY.in(Newtons)));
     chassis.applyTorque(propulsionTorque.in(NewtonMeters));

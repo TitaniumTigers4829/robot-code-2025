@@ -34,9 +34,7 @@ import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * This class is used to simulate a mechanism in a physics simulation.
- */
+/** This class is used to simulate a mechanism in a physics simulation. */
 public class SimMechanism {
   private static final double kMotorEfficiency = 0.85;
 
