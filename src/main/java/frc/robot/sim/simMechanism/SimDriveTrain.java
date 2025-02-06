@@ -154,8 +154,8 @@ public class SimDriveTrain {
    *
    * @param <T> the type of the drivetrain simulation
    * @param <C> the type of the drivetrain simulation configuration
+   * @param robot the robot to which the drivetrain simulation belongs
    * @param config the configuration of the drivetrain simulation
-   * @param initialPoseOnField the initial pose of the drivetrain on the field
    * @return the created drivetrain simulation
    */
   @SuppressWarnings("unchecked")
