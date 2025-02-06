@@ -298,9 +298,7 @@ public class SimMechanism {
     }
   }
 
-  /**
-   * Gets the current variables of the mechanism.
-   */
+  /** Gets the current variables of the mechanism. */
   public MechanismVariables variables() {
     try {
       ioLock.readLock().lock();
@@ -310,9 +308,7 @@ public class SimMechanism {
     }
   }
 
-  /**
-   * Gets the current state of the motor driving the mechanism.
-   */
+  /** Gets the current state of the motor driving the mechanism. */
   public MechanismVariables motorVariables() {
     var v = variables();
     return MechanismVariables.of(
@@ -408,6 +404,7 @@ public class SimMechanism {
 
   /**
    * Gets the current of the motor.
+   *
    * @param supplyVoltage the supply voltage of the motor.
    * @return the current of the motor.
    */
@@ -429,8 +426,9 @@ public class SimMechanism {
     }
   }
 
-  /** 
-   * Updates the state of the mechanism. 
+  /**
+   * Updates the state of the mechanism.
+   *
    * @param supplyVoltage the supply voltage of the motor.
    */
   public void update(final Voltage supplyVoltage) {
