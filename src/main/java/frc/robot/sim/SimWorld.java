@@ -23,6 +23,24 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.simulation.VisionSystemSim;
 
+/**
+ * Represents the simulation world.
+ *
+ * <p>The simulation world is composed of:
+ *
+ * <ul>
+ *   <li>A {@link SimArena} object that represents the simulation arena.
+ *   <li>A {@link SimRobot} object that represents the simulation robot.
+ *   <li>A {@link VisionSystemSim} object that represents the simulation vision system. *
+ *   <li>A {@link SimMechanismConfig} object that represents the simulation mechanism configuration.
+ *       These act as the drive and turn motors for the swerve modules.
+ *   <li>A {@link SimSwerveModuleConfig} object that represents the simulation swerve module
+ *       configuration, using the {@link SimMechanismConfig}.
+ *   <li>A {@link SimGyroConfig} object that represents the simulation gyro configuration.
+ *   <li>A {@link SimSwerveConfig} object that represents the simulation swerve configuration This
+ *       uses the {@link SimSwerveModuleConfig} and {@link SimGyroConfig}.
+ * </ul>
+ */
 public class SimWorld {
 
   private final SimArena arena;
@@ -58,6 +76,7 @@ public class SimWorld {
           moduleCfg,
           SimGyroConfig.ofNavX2());
 
+  /** Constructs a new simulation world. */
   public SimWorld() {
     arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.TIMEOUT_S), 5);
     simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
@@ -76,17 +95,27 @@ public class SimWorld {
   }
 
   /**
-   * @return
+   * Returns the simulation robot.
+   *
+   * @return the simulation robot
    */
   public SimRobot<SimSwerve> robot() {
     return simRobot;
   }
 
+  /**
+   * Returns the AprilTag simulation.
+   *
+   * @return the AprilTag simulation
+   */
   public VisionSystemSim aprilTagSim() {
     return aprilTagSim;
   }
 
-  /** Updates the simulation. */
+  /**
+   *  Updates the simulation.
+   * @para poseSupplier the pose supplier used to update the chassis's pose in the simulation world
+   *  */
   public void update(Supplier<Pose2d> poseSupplier) {
     robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
