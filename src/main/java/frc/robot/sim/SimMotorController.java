@@ -7,9 +7,9 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
-import frc.robot.sim.SimMechanism.MechanismState;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.ProceduralStructGenerator;
+import frc.robot.sim.SimMechanism.MechanismState;
 
 /**
  * An interface to represent a motor controller in the simulation. This can be used to allow

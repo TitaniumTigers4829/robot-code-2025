@@ -24,12 +24,12 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.sim.SimArena.SimEnvTiming;
-import frc.robot.sim.SimMotorController.ControllerOutput;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.SimMotorController.ControllerOutput;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 

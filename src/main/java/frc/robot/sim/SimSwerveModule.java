@@ -12,15 +12,15 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
+import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.geometry.Velocity2d;
+import frc.robot.extras.util.mathutils.MeasureMath;
+import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import frc.robot.sim.SimArena.SimEnvTiming;
 import frc.robot.sim.SimMechanism.MechanismState;
 import frc.robot.sim.SimMechanism.MechanismVariables;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.configs.SimSwerveModuleConfig;
-import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.geometry.Velocity2d;
-import frc.robot.extras.util.mathutils.MeasureMath;
-import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import java.util.function.Supplier;
 
 public class SimSwerveModule {

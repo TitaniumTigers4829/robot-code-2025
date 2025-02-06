@@ -9,12 +9,12 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.sim.SimMechanism.Friction;
-import frc.robot.sim.SimMechanism.HardLimits;
-import frc.robot.sim.SimMechanism.MechanismDynamics;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator.IgnoreStructField;
+import frc.robot.sim.SimMechanism.Friction;
+import frc.robot.sim.SimMechanism.HardLimits;
+import frc.robot.sim.SimMechanism.MechanismDynamics;
 
 public class SimMechanismConfig implements StructSerializable {
   public DCMotorExt motor;
