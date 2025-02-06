@@ -235,6 +235,7 @@ public class SimMechanism {
   private MechanismState state = MechanismState.zero();
   private MechanismVariables variables = MechanismVariables.zero();
 
+  /** Constructs a new SimMechanism. */
   public SimMechanism(
       String name,
       DCMotorExt motor,
@@ -283,6 +284,11 @@ public class SimMechanism {
     return state().times(gearRatio.getReduction());
   }
 
+  /**
+   * Sets the current state of the mechanism.
+   *
+   * @param state the new state of the mechanism
+   */
   public void setState(MechanismState state) {
     try {
       ioLock.writeLock().lock();
@@ -292,6 +298,9 @@ public class SimMechanism {
     }
   }
 
+  /**
+   * Gets the current variables of the mechanism.
+   */
   public MechanismVariables variables() {
     try {
       ioLock.readLock().lock();
@@ -301,6 +310,9 @@ public class SimMechanism {
     }
   }
 
+  /**
+   * Gets the current state of the motor driving the mechanism.
+   */
   public MechanismVariables motorVariables() {
     var v = variables();
     return MechanismVariables.of(
@@ -394,6 +406,11 @@ public class SimMechanism {
     }
   }
 
+  /**
+   * Gets the current of the motor.
+   * @param supplyVoltage the supply voltage of the motor.
+   * @return the current of the motor.
+   */
   protected Current getMotorCurrent(Voltage supplyVoltage) {
     ControllerOutput co = controller.run(timing.dt(), supplyVoltage, motorState());
     if (DriverStation.isDisabled()) {
@@ -412,7 +429,10 @@ public class SimMechanism {
     }
   }
 
-  /** Updates the state of the mechanism. */
+  /** 
+   * Updates the state of the mechanism. 
+   * @param supplyVoltage the supply voltage of the motor.
+   */
   public void update(final Voltage supplyVoltage) {
     final Time dt = timing.dt();
 
