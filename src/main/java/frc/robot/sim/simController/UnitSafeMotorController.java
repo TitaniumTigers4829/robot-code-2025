@@ -26,11 +26,11 @@ import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
-import frc.robot.sim.SimMechanism.MechanismState;
-import frc.robot.sim.SimMotorController;
-import frc.robot.sim.SimMotorController.ControllerOutput.CurrentOutput;
-import frc.robot.sim.SimMotorController.ControllerOutput.VoltageOutput;
+import frc.robot.sim.simController.SimMotorController.ControllerOutput.CurrentOutput;
+import frc.robot.sim.simController.SimMotorController.ControllerOutput.VoltageOutput;
 import frc.robot.sim.simController.UnitSafeControl.TrapezoidProfile.State;
+import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
+
 import java.util.Optional;
 
 public class UnitSafeMotorController implements SimMotorController {

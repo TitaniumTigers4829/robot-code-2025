@@ -12,16 +12,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.sim.SimArena;
-import frc.robot.sim.SimArena.FieldMap;
-import frc.robot.sim.SimGamePiece.GamePieceTarget;
-import frc.robot.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.simField.SimArena;
+import frc.robot.sim.simField.SimArena.FieldMap;
+import frc.robot.sim.simField.SimGamePiece.GamePieceTarget;
+import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.dyn4j.geometry.Geometry;
 
-public class Reefscape {
+public class ReefscapeSim {
   private static List<GamePieceTarget> createCoralTargets() {
     List<Translation3d> reefPositions =
         Arrays.asList(

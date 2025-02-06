@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simField;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -16,7 +16,9 @@ import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
 import frc.robot.extras.util.ProjectileUtil;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.GeomUtil;
-import frc.robot.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.SimRobot;
+import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +49,10 @@ public abstract class SimArena {
   }
 
   // protected final DataLogger logger = RuntimeLog.loggerFor("Arena");
-  protected final ReentrantLock worldLock = new ReentrantLock();
-  protected final World<Body> physicsWorld = new World<>();
-  protected final Set<SimGamePiece> gamePieces = ConcurrentHashMap.newKeySet();
-  protected final Set<SimRobot<?>> robots = ConcurrentHashMap.newKeySet();
+  public final ReentrantLock worldLock = new ReentrantLock();
+  public final World<Body> physicsWorld = new World<>();
+  public final Set<SimGamePiece> gamePieces = ConcurrentHashMap.newKeySet();
+  public final Set<SimRobot<?>> robots = ConcurrentHashMap.newKeySet();
   public final SimEnvTiming timing;
 
   /**
@@ -75,11 +77,9 @@ public abstract class SimArena {
     for (FrcBody obstacle : obstaclesMap.obstacles) {
       this.physicsWorld.addBody(obstacle);
     }
-    FrcBodySnapshot[] obstacleSnapshot =
-        obstaclesMap.obstacles.stream().map(FrcBody::snapshot).toArray(FrcBodySnapshot[]::new);
   }
 
-  void withWorld(Consumer<World<Body>> worldModifier) {
+  public void withWorld(Consumer<World<Body>> worldModifier) {
     try {
       worldLock.lock();
       worldModifier.accept(physicsWorld);

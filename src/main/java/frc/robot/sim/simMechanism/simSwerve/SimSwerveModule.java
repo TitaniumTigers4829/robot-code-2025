@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simMechanism.simSwerve;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -16,11 +16,15 @@ import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.geometry.Velocity2d;
 import frc.robot.extras.util.mathutils.MeasureMath;
 import frc.robot.extras.util.mathutils.MeasureMath.XY;
-import frc.robot.sim.SimArena.SimEnvTiming;
-import frc.robot.sim.SimMechanism.MechanismState;
-import frc.robot.sim.SimMechanism.MechanismVariables;
+import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.configs.SimSwerveModuleConfig;
+import frc.robot.sim.simField.SimArena;
+import frc.robot.sim.simField.SimArena.SimEnvTiming;
+import frc.robot.sim.simMechanism.SimMechanism;
+import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
+import frc.robot.sim.simMechanism.SimMechanism.MechanismVariables;
+
 import java.util.function.Supplier;
 
 public class SimSwerveModule {

@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simController;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;
@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.ProceduralStructGenerator;
-import frc.robot.sim.SimMechanism.MechanismState;
+import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
 
 /**
  * An interface to represent a motor controller in the simulation. This can be used to allow
