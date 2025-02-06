@@ -31,6 +31,7 @@ import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simController.SimMotorController;
 import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
+import frc.robot.sim.simController.SimMotorController;
 import frc.robot.sim.simMechanism.SimDriveTrain;
 
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public class SimSwerve extends SimDriveTrain {
   }
 
   @Override
-  protected void simTick() {
+  public void simTick() {
     simulateModulePropulsion();
     simulateModuleFriction();
     gyroSimulation.updateSimulationSubTick(

@@ -100,7 +100,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     RuntimeLog.debug("Added SimMechanism to SimRobot");
   }
 
-  void removeMechanism(SimMechanism mechanism) {
+  public void removeMechanism(SimMechanism mechanism) {
     mechanisms.remove(mechanism);
     battery.removeMechanism(mechanism);
     RuntimeLog.debug("Removed SimMechanism from SimRobot");

@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.mathutils.GeomUtil;
+import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simField.SimArena;
@@ -37,7 +38,7 @@ public class SimDriveTrain {
   /** https://simple.wikipedia.org/wiki/Coefficient_of_restitution */
   public static final double kBumperCoR = 0.005;
 
-  protected final FrcBody chassis = new FrcBody();
+  public final FrcBody chassis = new FrcBody();
   private final SimEnvTiming timing;
 
   /**

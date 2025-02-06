@@ -36,7 +36,7 @@ public class SimIntake {
    *     object
    * @param capacity the maximum number of game pieces that the intake can hold
    */
-  SimIntake(
+  public SimIntake(
       SimDriveTrain driveTrainSimulation,
       SimIndexer gamePieceStorage,
       Convex shape,
@@ -139,7 +139,7 @@ public class SimIntake {
     public void postSolve(ContactCollisionData<Body> collision, SolvedContact contact) {}
   }
 
-  GamePieceContactListener getGamePieceContactListener() {
+  public GamePieceContactListener getGamePieceContactListener() {
     return new GamePieceContactListener();
   }
 }
