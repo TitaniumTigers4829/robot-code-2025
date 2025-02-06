@@ -1,13 +1,13 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.configs.SimDriveTrainConfig;
-import frc.robot.extras.sim.configs.SimSwerveConfig;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.configs.SimDriveTrainConfig;
+import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.mathutils.GeomUtil;
 import org.dyn4j.geometry.Geometry;

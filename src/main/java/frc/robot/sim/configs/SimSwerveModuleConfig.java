@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.configs;
+package frc.robot.sim.configs;
 
 import edu.wpi.first.util.struct.StructSerializable;
 

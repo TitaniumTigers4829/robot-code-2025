@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -12,11 +12,11 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MomentOfInertia;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.SimMechanism.MechanismState;
-import frc.robot.extras.sim.SimMechanism.MechanismVariables;
-import frc.robot.extras.sim.configs.SimSwerveConfig;
-import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.SimMechanism.MechanismState;
+import frc.robot.sim.SimMechanism.MechanismVariables;
+import frc.robot.sim.configs.SimSwerveConfig;
+import frc.robot.sim.configs.SimSwerveModuleConfig;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.geometry.Velocity2d;
 import frc.robot.extras.util.mathutils.MeasureMath;

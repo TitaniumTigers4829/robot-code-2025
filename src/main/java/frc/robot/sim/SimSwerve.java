@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
@@ -22,8 +22,8 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.configs.SimSwerveConfig;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.util.mathutils.MeasureMath;

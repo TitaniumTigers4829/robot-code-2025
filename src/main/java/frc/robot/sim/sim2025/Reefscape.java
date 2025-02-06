@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.sim2025;
+package frc.robot.sim.sim2025;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -12,10 +12,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.extras.sim.SimArena;
-import frc.robot.extras.sim.SimArena.FieldMap;
-import frc.robot.extras.sim.SimGamePiece.GamePieceTarget;
-import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.SimArena;
+import frc.robot.sim.SimArena.FieldMap;
+import frc.robot.sim.SimGamePiece.GamePieceTarget;
+import frc.robot.sim.SimGamePiece.GamePieceVariant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -11,8 +11,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.configs.SimGyroConfig;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.configs.SimGyroConfig;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import frc.robot.extras.util.mathutils.SimCommonMath;

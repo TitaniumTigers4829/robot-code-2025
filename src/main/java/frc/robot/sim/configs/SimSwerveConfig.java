@@ -1,7 +1,7 @@
-package frc.robot.extras.sim.configs;
+package frc.robot.sim.configs;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.extras.sim.SimSwerve;
+import frc.robot.sim.SimSwerve;
 import frc.robot.extras.util.ProceduralStructGenerator.FixedSizeArray;
 import java.util.Arrays;
 import java.util.OptionalDouble;

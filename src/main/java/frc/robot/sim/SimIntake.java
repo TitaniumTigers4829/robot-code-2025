@@ -1,7 +1,7 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
-import frc.robot.extras.sim.SimGamePiece.GamePieceCollisionBody;
-import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.SimGamePiece.GamePieceCollisionBody;
+import frc.robot.sim.SimGamePiece.GamePieceVariant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.dyn4j.collision.CollisionBody;

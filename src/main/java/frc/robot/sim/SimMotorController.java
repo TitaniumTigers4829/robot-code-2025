@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;
@@ -7,7 +7,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
-import frc.robot.extras.sim.SimMechanism.MechanismState;
+import frc.robot.sim.SimMechanism.MechanismState;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.ProceduralStructGenerator;
 

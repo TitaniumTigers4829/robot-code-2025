@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -11,7 +11,7 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
-import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.SimGamePiece.GamePieceVariant;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.FrcBody.FrcBodySnapshot;
 import frc.robot.extras.util.ProjectileUtil;

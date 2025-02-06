@@ -1,6 +1,6 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
-import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.SimGamePiece.GamePieceVariant;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;

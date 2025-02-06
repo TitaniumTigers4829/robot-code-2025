@@ -1,4 +1,4 @@
-package frc.robot.extras.sim.simController;
+package frc.robot.sim.simController;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
@@ -23,11 +23,11 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.sim.SimMechanism.MechanismState;
-import frc.robot.extras.sim.SimMotorController;
-import frc.robot.extras.sim.SimMotorController.ControllerOutput.CurrentOutput;
-import frc.robot.extras.sim.SimMotorController.ControllerOutput.VoltageOutput;
-import frc.robot.extras.sim.simController.UnitSafeControl.TrapezoidProfile.State;
+import frc.robot.sim.SimMechanism.MechanismState;
+import frc.robot.sim.SimMotorController;
+import frc.robot.sim.SimMotorController.ControllerOutput.CurrentOutput;
+import frc.robot.sim.SimMotorController.ControllerOutput.VoltageOutput;
+import frc.robot.sim.simController.UnitSafeControl.TrapezoidProfile.State;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;

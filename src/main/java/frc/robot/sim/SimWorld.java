@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -6,12 +6,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.sim.configs.SimGyroConfig;
-import frc.robot.extras.sim.configs.SimMechanismConfig;
-import frc.robot.extras.sim.configs.SimSwerveConfig;
-import frc.robot.extras.sim.configs.SimSwerveModuleConfig;
-import frc.robot.extras.sim.configs.SimSwerveModuleConfig.WheelCof;
-import frc.robot.extras.sim.sim2025.Reefscape.ReefscapeSimArena;
+import frc.robot.sim.configs.SimGyroConfig;
+import frc.robot.sim.configs.SimMechanismConfig;
+import frc.robot.sim.configs.SimSwerveConfig;
+import frc.robot.sim.configs.SimSwerveModuleConfig;
+import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
+import frc.robot.sim.sim2025.Reefscape.ReefscapeSimArena;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;

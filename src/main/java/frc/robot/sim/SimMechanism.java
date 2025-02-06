@@ -1,4 +1,4 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
@@ -24,8 +24,8 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.SimMotorController.ControllerOutput;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.SimMotorController.ControllerOutput;
 import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator;

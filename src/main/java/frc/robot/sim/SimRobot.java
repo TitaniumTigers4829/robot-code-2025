@@ -1,11 +1,11 @@
-package frc.robot.extras.sim;
+package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
-import frc.robot.extras.sim.SimArena.SimEnvTiming;
-import frc.robot.extras.sim.SimGamePiece.GamePieceVariant;
-import frc.robot.extras.sim.configs.SimDriveTrainConfig;
+import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.extras.util.RuntimeLog;
 import frc.robot.extras.util.mathutils.GeomUtil;
 import java.util.concurrent.ConcurrentLinkedQueue;
