@@ -1,8 +1,11 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -11,8 +14,10 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowChoreoTrajectory;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
+import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -37,20 +42,19 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
-
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
   private final AlgaePivotSubsystem algaePivotSubsystem =
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
-  private final SendableChooser<Command> autoChooser;
+  public AutoFactory autoFactory;
+  public AutoChooser autoChooser;
+  public Autos autos;
 
   private final SimWorld simWorld = new SimWorld();
 
   public RobotContainer() {
-    autoChooser = new SendableChooser<Command>();
-    autoChooser.setDefaultOption("Auto", null);
 
     switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
@@ -103,6 +107,28 @@ public class RobotContainer {
         // simWorld = null;
       }
     }
+
+    autoChooser = new AutoChooser();
+    // this sets up the auto factory
+    autoFactory =
+        new AutoFactory(
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            // provided Pose2d
+            (SwerveSample sample) -> {
+              FollowChoreoTrajectory command =
+                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
+              command.execute();
+            }, // The drive subsystem trajectory follower
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            swerveDrive); // The drive subsystem
+
+    autos = new Autos(autoFactory, swerveDrive);
+    // this adds an auto routine to the auto chooser
+    // autoChooser.addRoutine("Example routine", () -> autos.exampleAutoRoutine());
+    autoChooser.addRoutine("One Meter Auto Routine", () -> autos.oneMeterTestAutoRoutine());
+    // this updates the auto chooser
+    SmartDashboard.putData(autoChooser);
   }
 
   public void teleopInit() {
@@ -166,6 +192,7 @@ public class RobotContainer {
             () -> JoystickUtil.modifyAxis(driverRightStickX, 3),
             () -> !driverRightBumper.getAsBoolean(),
             () -> driverLeftBumper.getAsBoolean());
+
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -198,7 +225,7 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getX(),
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    return autoChooser.getSelected();
+    return autoChooser.selectedCommand();
   }
 
   public void simulationPeriodic() {

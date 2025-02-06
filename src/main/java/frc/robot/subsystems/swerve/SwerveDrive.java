@@ -2,7 +2,9 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.TimeUtil;
@@ -35,6 +38,19 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
+  private final PIDController xController =
+      new PIDController(
+          AutoConstants.AUTO_TRANSLATION_P,
+          AutoConstants.AUTO_TRANSLATION_I,
+          AutoConstants.AUTO_TRANSLATION_D);
+  private final PIDController yController =
+      new PIDController(
+          AutoConstants.AUTO_TRANSLATION_P,
+          AutoConstants.AUTO_TRANSLATION_I,
+          AutoConstants.AUTO_TRANSLATION_D);
+  private final PIDController headingController =
+      new PIDController(
+          AutoConstants.AUTO_THETA_P, AutoConstants.AUTO_THETA_I, AutoConstants.AUTO_THETA_D);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -114,7 +130,7 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput(
         "SystemPerformance/OdometryFetchingTimeMS", (TimeUtil.getRealTimeSeconds() - t0) * 1000);
     // Runs the SwerveModules periodic methods
-    for (SwerveModule module : swerveModules) module.periodic();
+    modulesPeriodic();
   }
 
   /**
@@ -199,7 +215,26 @@ public class SwerveDrive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
   }
 
-  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
+  /**
+   * Follows a Choreo Trajectory
+   *
+   * @param sample trajectory
+   */
+  public void followTrajectory(SwerveSample sample) {
+    Pose2d pose = getEstimatedPose();
+    double moveX = sample.vx + xController.calculate(pose.getX(), sample.x);
+    double moveY = sample.vy + yController.calculate(pose.getY(), sample.y);
+    double moveTheta =
+        sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
+    drive(moveX, moveY, moveTheta, true);
+  }
+
+  /** Runs the SwerveModules periodic methods */
+  private void modulesPeriodic() {
+    for (SwerveModule module : swerveModules) module.periodic();
+  }
+
+  public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
         && speeds.omegaRadiansPerSecond == 0;
