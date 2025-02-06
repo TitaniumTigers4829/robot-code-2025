@@ -62,6 +62,11 @@ public class SimMechanism {
       return NewtonMeters.zero();
     }
 
+    /**
+     * Gets the extra inertia acting on the mechanism.
+     *
+     * @return the extra inertia acting on the mechanism
+     */
     default MomentOfInertia extraInertia() {
       return KilogramSquareMeters.zero();
     }
