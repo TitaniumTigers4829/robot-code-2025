@@ -36,7 +36,10 @@ public class SimulatedAlgaePivot implements AlgaePivotInterface {
           AlgaeConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND);
   private final ProfiledPIDController algaePivotController =
       new ProfiledPIDController(
-          AlgaeConstants.PIVOT_P, AlgaeConstants.PIVOT_I, AlgaeConstants.PIVOT_D, algaeConstraints);
+          Radians.of(AlgaeConstants.PIVOT_P).in(Rotations),
+          Radians.of(AlgaeConstants.PIVOT_I).in(Rotations),
+          Radians.of(AlgaeConstants.PIVOT_D).in(Rotations),
+          algaeConstraints);
 
   private double appliedVolts = 0.0;
 
