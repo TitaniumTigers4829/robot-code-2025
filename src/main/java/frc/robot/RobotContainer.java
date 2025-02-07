@@ -2,13 +2,14 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.trajectory.SwerveSample;
+import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -16,7 +17,6 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.drive.FollowChoreoTrajectory;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.AllianceFlipper;
@@ -51,7 +51,8 @@ public class RobotContainer {
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   public AutoFactory autoFactory;
-  public AutoChooser autoChooser;
+  public final SendableChooser<AutoRoutine> autoChooser;
+  public final AutoChooser autoChooser2;
   public Autos autos;
 
   private final SimWorld simWorld = new SimWorld();
@@ -110,30 +111,41 @@ public class RobotContainer {
       }
     }
 
-    autoChooser = new AutoChooser();
+    autoChooser = new SendableChooser<AutoRoutine>();
+    autoChooser.setDefaultOption("Auto", null);
+
+    autoChooser2 = new AutoChooser();
+
     // this sets up the auto factory
     autoFactory =
         new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            () -> swerveDrive.getEstimatedPose(), // A function that returns the current robot pose
+            (pose2d) ->
+                swerveDrive.resetEstimatedPose(
+                    pose2d), // A function that resets the current robot pose to the
             // // provided Pose2d
             // FollowChoreoTrajectory::execute, // A function that follows a choreo trajectory
             // provided Pose2d
-            (SwerveSample sample) -> {
-              FollowChoreoTrajectory command =
-                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
-              command.execute();
-            }, // The drive subsystem trajectory follower
+            // (SwerveSample sample) -> {
+            //   FollowChoreoTrajectory command =
+            //       new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
+            //   command.execute();
+            // }, // The drive subsystem trajectory follower
+            swerveDrive::followTrajectory,
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
 
     autos = new Autos(autoFactory);
 
     // this adds an auto routine to the auto chooser
-    autoChooser.addRoutine("Example Auto", autos::exampleAutoRoutine);
-    autoChooser.addRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE, autos::oneMeterTestAutoRoutine);
+    autoChooser.addOption("Example Auto", autos.exampleAutoRoutine());
+    autoChooser.addOption(AutoConstants.ONE_METER_AUTO_ROUTINE, autos.oneMeterTestAutoRoutine());
+    autoChooser2.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
+    autoChooser2.addRoutine(
+        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData(autoChooser2);
   }
 
   public void teleopInit() {
@@ -225,15 +237,27 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    // swerveDrive.resetEstimatedPose(
+    // new Pose2d(
+    //     swerveDrive.getEstimatedPose().getX(),
+    //     swerveDrive.getEstimatedPose().getY(),
+    //     Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    // if (autoChooser.getSelected() != null) {
+    //   return autoChooser.getSelected().cmd();
 
-    return Commands.print("getAutonomousCommand()?");
+    // } else {
+    //   return null;
+    // }
+    // if (autoChooser2.selectedCommand() != null) {
+    //   return autoChooser2.selectedCommandScheduler();
+
+    // } else {
+    //   return null;
+    // }
+    return new RunCommand(() -> autos.oneMeterTestAutoRoutine(), swerveDrive);
+    // return new RunCommand(() -> );//), null)
   }
-  
+
   public void simulationPeriodic() {
     if (Robot.isSimulation()) {
       simWorld.update(() -> swerveDrive.getEstimatedPose());

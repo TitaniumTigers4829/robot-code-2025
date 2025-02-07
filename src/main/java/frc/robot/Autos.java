@@ -22,8 +22,7 @@ public class Autos {
             Commands.sequence(
                 Commands.print("Sample Routine"),
                 autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
-                oneMeterTrajectory.cmd()
-                ));
+                oneMeterTrajectory.cmd()));
     return routine;
   }
 
@@ -44,7 +43,6 @@ public class Autos {
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
 
-    startToETraj.atTime("score").onTrue(eToPickupTraj.cmd());
     // command
 
     return routine;

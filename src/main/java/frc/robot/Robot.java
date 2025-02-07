@@ -100,6 +100,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousPeriodic() {}
 
+  /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
     robotContainer.getAutonomousCommand();
