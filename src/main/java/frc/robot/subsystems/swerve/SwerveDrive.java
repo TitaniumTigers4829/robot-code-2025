@@ -221,12 +221,15 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followTrajectory(SwerveSample sample) {
-    Pose2d pose = getEstimatedPose();
-    double moveX = sample.vx + xController.calculate(pose.getX(), sample.x);
-    double moveY = sample.vy + yController.calculate(pose.getY(), sample.y);
-    double moveTheta =
-        sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
-    drive(moveX, moveY, moveTheta, true);
+    if (sample != null) {
+      Pose2d pose = getEstimatedPose();
+      double moveX = sample.vx + xController.calculate(pose.getX(), sample.x);
+      double moveY = sample.vy + yController.calculate(pose.getY(), sample.y);
+      double moveTheta =
+          sample.omega
+              + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
+      drive(moveX, moveY, moveTheta, true);
+    }
   }
 
   /** Runs the SwerveModules periodic methods */

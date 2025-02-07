@@ -5,15 +5,12 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class Autos {
   private final AutoFactory autoFactory;
-  private final SwerveDrive swerveDrive;
 
-  public Autos(AutoFactory autoFactory, SwerveDrive swerveDrive) {
+  public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
-    this.swerveDrive = swerveDrive;
   }
 
   public AutoRoutine oneMeterTestAutoRoutine() {
@@ -23,8 +20,10 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
+                Commands.print("Sample Routine"),
                 autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
-                oneMeterTrajectory.cmd()));
+                oneMeterTrajectory.cmd()
+                ));
     return routine;
   }
 

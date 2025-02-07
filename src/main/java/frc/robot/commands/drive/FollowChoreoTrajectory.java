@@ -25,9 +25,7 @@ public class FollowChoreoTrajectory extends DriveCommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (sample != null) {
-      swerveDrive.followTrajectory(sample);
-    }
+    swerveDrive.followTrajectory(sample);
   }
 
   // Called once the command ends or is interrupted.

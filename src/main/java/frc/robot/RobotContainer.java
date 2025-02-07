@@ -7,9 +7,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
@@ -114,6 +116,8 @@ public class RobotContainer {
         new AutoFactory(
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            // // provided Pose2d
+            // FollowChoreoTrajectory::execute, // A function that follows a choreo trajectory
             // provided Pose2d
             (SwerveSample sample) -> {
               FollowChoreoTrajectory command =
@@ -123,10 +127,11 @@ public class RobotContainer {
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
 
-    autos = new Autos(autoFactory, swerveDrive);
+    autos = new Autos(autoFactory);
+
     // this adds an auto routine to the auto chooser
-    // autoChooser.addRoutine("Example routine", () -> autos.exampleAutoRoutine());
-    autoChooser.addRoutine("One Meter Auto Routine", () -> autos.oneMeterTestAutoRoutine());
+    autoChooser.addRoutine("Example Auto", autos::exampleAutoRoutine);
+    autoChooser.addRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE, autos::oneMeterTestAutoRoutine);
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
   }
@@ -225,9 +230,10 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getX(),
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    return autoChooser.selectedCommand();
-  }
 
+    return Commands.print("getAutonomousCommand()?");
+  }
+  
   public void simulationPeriodic() {
     if (Robot.isSimulation()) {
       simWorld.update(() -> swerveDrive.getEstimatedPose());
