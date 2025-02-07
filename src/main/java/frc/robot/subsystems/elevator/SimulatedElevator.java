@@ -27,7 +27,7 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.MAX_HEIGHT,
             ElevatorConstants.SIMULATE_GRAVITY,
             ElevatorConstants.MIN_HEIGHT,
-            ElevatorConstants.INCLINE_ANGLE_RADIANS);
+            0);
     m_pidController =
         new PIDController(
             ElevatorConstants.ELEVATOR_P,
@@ -63,8 +63,8 @@ public class SimulatedElevator implements ElevatorInterface {
     desiredPosition = position;
     m_pidController.setSetpoint(position);
     double output = m_pidController.calculate(getElevatorPosition(), position);
-    double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());
-    setVolts(output + feedforward);
+    // double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());
+    setVolts(output);
   }
 
   @Override

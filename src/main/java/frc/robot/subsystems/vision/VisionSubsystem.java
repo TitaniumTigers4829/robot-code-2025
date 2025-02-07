@@ -2,8 +2,8 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -16,6 +16,8 @@ import org.littletonrobotics.junction.Logger;
  * @author Ishan
  */
 public class VisionSubsystem extends SubsystemBase {
+
+  private Pose2d lastSeenPose = new Pose2d();
 
   private final VisionInterface visionInterface;
   private final VisionInputsAutoLogged inputs = new VisionInputsAutoLogged();
@@ -30,6 +32,7 @@ public class VisionSubsystem extends SubsystemBase {
     // Updates limelight inputs
     visionInterface.updateInputs(inputs);
     Logger.processInputs("Vision/", inputs);
+    Tracer.traceFunc("Vision/", () -> visionInterface.updateInputs(inputs));
   }
 
   /**
@@ -79,8 +82,9 @@ public class VisionSubsystem extends SubsystemBase {
    * @param headingDegrees The robot's heading in degrees.
    * @param headingRateDegrees The robot's rate of rotation in degrees per second.
    */
-  public void setHeadingInfo(double headingDegrees, double headingRateDegrees) {
-    visionInterface.setHeadingInfo(headingDegrees, headingRateDegrees);
+  public void setOdometryInfo(
+      double headingDegrees, double headingRateDegrees, Pose2d odometryPose) {
+    visionInterface.setOdometryInfo(headingDegrees, headingRateDegrees, odometryPose);
   }
 
   /**
@@ -89,7 +93,6 @@ public class VisionSubsystem extends SubsystemBase {
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return True if the limelight sees any April Tags, false otherwise.
    */
-  @AutoLogOutput(key = "Vision/Has Targets")
   public boolean canSeeAprilTags(Limelight limelight) {
     return inputs.limelightSeesAprilTags[limelight.getId()];
   }
@@ -110,6 +113,16 @@ public class VisionSubsystem extends SubsystemBase {
    * @return The last seen pose of the robot.
    */
   public Pose2d getLastSeenPose() {
-    return visionInterface.getLastSeenPose();
+    for (Pose2d pose : inputs.megatag1PoseEstimates) {
+      if (pose != null && !pose.equals(new Pose2d())) {
+        lastSeenPose = pose;
+      }
+    }
+
+    return lastSeenPose;
+  }
+
+  public boolean isValidMeasurement(Limelight limelight) {
+    return visionInterface.isValidMeasurement(limelight);
   }
 }

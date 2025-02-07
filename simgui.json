@@ -1,10 +1,19 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "CANcoder (v6)[14]": {
+        "header": {
+          "open": false
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Alerts": "Alerts",
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Alerts": "Alerts",
-      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
+      "/SmartDashboard/VisionSystemSim-AprilTags/Sim Field": "Field2d"
     }
   },
   "NetworkTables Info": {

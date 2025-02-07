@@ -20,11 +20,6 @@ public interface ModuleInterface {
     public double turnVelocity = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
-
-    public double[] odometryTimestamps = new double[] {};
-
-    public double[] odometryDriveWheelRevolutions = new double[] {};
-    public Rotation2d[] odometrySteerPositions = new Rotation2d[] {};
   }
 
   /**
@@ -64,6 +59,10 @@ public interface ModuleInterface {
    * @return The current turn position of the module.
    */
   default double getTurnRotations() {
+    return 0.0;
+  }
+
+  default double getDrivePosition() {
     return 0.0;
   }
 }

@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
+import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
@@ -32,6 +33,7 @@ public class SwerveModule {
   public void updateOdometryInputs() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module-" + name, inputs);
+    Tracer.traceFunc("Module-" + name, () -> io.updateInputs(inputs));
     this.hardwareFaultAlert.set(!inputs.isConnected);
   }
 
@@ -104,7 +106,7 @@ public class SwerveModule {
 
   /** Returns the current drive position of the module in meters. */
   public double getDrivePositionMeters() {
-    return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.drivePosition;
+    return ModuleConstants.DRIVE_TO_METERS * inputs.drivePosition;
   }
 
   /**
@@ -113,7 +115,7 @@ public class SwerveModule {
    * @return the drive velocity in meters per second
    */
   public double getDriveVelocityMetersPerSec() {
-    return ModuleConstants.WHEEL_CIRCUMFERENCE_METERS * inputs.driveVelocity;
+    return ModuleConstants.DRIVE_TO_METERS_PER_SECOND * inputs.driveVelocity;
   }
 
   /**

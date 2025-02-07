@@ -8,48 +8,57 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-// Simulate the vision system.
-// Please see the following link for example code
-//
-// https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java
+/**
+ *
+ *
+ * <h3>Simulates the vision system.</h3>
+ *
+ * <p>SimulatedVision is a class that simulates the vision system and extends {@link
+ * PhysicalVision}. It uses the PhotonVision library to send simulated NetworkTables data to the
+ * limelight tables.
+ *
+ * <p><b>See</b>: <a
+ * href="https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java">PhotonVision
+ * example</a> for an example of odometry simulation using PhotonVision.
+ *
+ * @author Ishan
+ */
 public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim shooterCameraSim;
   PhotonCameraSim frontLeftCameraSim;
   PhotonCameraSim frontRightCameraSim;
-  private final VisionSystemSim visionSim;
-  private final Supplier<Pose2d> robotSimulationPose;
-  private Pose2d lastSeenPose = new Pose2d();
+  // private final VisionSystemSim visionSim;
+  // private final Supplier<Pose2d> robotSimulationPose;
 
   private final int kResWidth = 1280;
   private final int kResHeight = 800;
 
-  public SimulatedVision(Supplier<Pose2d> robotSimulationPose) {
+  public SimulatedVision(Supplier<VisionSystemSim> visionSim) {
     super();
-    this.robotSimulationPose = robotSimulationPose;
+    // this.robotSimulationPose = robotSimulationPose;
     // Create the vision system simulation which handles cameras and targets on the
     // field.
-    visionSim = new VisionSystemSim("main");
+    // visionSim = new VisionSystemSim("main");
 
     // Add all the AprilTags inside the tag layout as visible targets to this
     // simulated field.
-    visionSim.addAprilTags(VisionConstants.FIELD_LAYOUT);
+    // visionSim.addAprilTags(VisionConstants.FIELD_LAYOUT);
     // visionSim.addVisionTargets(TargetModel.kAprilTag36h11);
 
     // Create simulated camera properties. These can be set to mimic your actual
     // camera.
     var cameraProperties = new SimCameraProperties();
-    cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
-    cameraProperties.setCalibError(0.35, 0.10);
-    cameraProperties.setFPS(15);
-    cameraProperties.setAvgLatencyMs(20);
-    cameraProperties.setLatencyStdDevMs(5);
+    // cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
+    // cameraProperties.setCalibError(0.35, 0.10);
+    // cameraProperties.setFPS(15);
+    // cameraProperties.setAvgLatencyMs(20);
+    // cameraProperties.setLatencyStdDevMs(5);
 
     // Create a PhotonCameraSim which will update the linked PhotonCamera's values
     // with visible
@@ -61,9 +70,11 @@ public class SimulatedVision extends PhysicalVision {
     frontRightCameraSim =
         new PhotonCameraSim(getSimulationCamera(Limelight.FRONT_RIGHT), cameraProperties);
 
-    visionSim.addCamera(shooterCameraSim, VisionConstants.BACK_TRANSFORM); // check inverse things
-    visionSim.addCamera(frontLeftCameraSim, VisionConstants.FRONT_LEFT_TRANSFORM);
-    visionSim.addCamera(frontRightCameraSim, VisionConstants.FRONT_RIGHT_TRANSFORM);
+    visionSim
+        .get()
+        .addCamera(shooterCameraSim, VisionConstants.BACK_TRANSFORM); // check inverse things
+    visionSim.get().addCamera(frontLeftCameraSim, VisionConstants.FRONT_LEFT_TRANSFORM);
+    visionSim.get().addCamera(frontRightCameraSim, VisionConstants.FRONT_RIGHT_TRANSFORM);
 
     // Enable the raw and processed streams. (http://localhost:1181 / 1182)
     shooterCameraSim.enableRawStream(true);
@@ -84,19 +95,13 @@ public class SimulatedVision extends PhysicalVision {
   public void updateInputs(VisionInputs inputs) {
     // Abuse the updateInputs periodic call to update the sim
 
-    // Move the vision sim robot on the field
-    if (robotSimulationPose.get() != null) {
-      visionSim.update(robotSimulationPose.get());
-      Logger.recordOutput("Vision/SimIO/updateSimPose", robotSimulationPose.get());
-    }
+    // for (Limelight limelight : Limelight.values()) {
+    //   writeToTable(
+    //       getSimulationCamera(limelight).getAllUnreadResults(),
+    //       getLimelightTable(limelight),
+    //       limelight);
+    // }
     super.updateInputs(inputs);
-
-    for (Limelight limelight : Limelight.values()) {
-      writeToTable(
-          getSimulationCamera(limelight).getAllUnreadResults(),
-          getLimelightTable(limelight),
-          limelight);
-    }
   }
 
   /**
@@ -134,10 +139,10 @@ public class SimulatedVision extends PhysicalVision {
           pose_data.add((double) target.getFiducialId()); // 0: id
           pose_data.add(target.getYaw()); // 1: txnc
           pose_data.add(target.getPitch()); // 2: tync
-          pose_data.add(0.0); // 3: ta
+          pose_data.add(target.getArea()); // 3: ta
           pose_data.add(0.0); // 4: distToCamera
           pose_data.add(0.0); // 5: distToRobot
-          pose_data.add(0.5); // 6: ambiguity
+          pose_data.add(target.getPoseAmbiguity()); // 6: ambiguity
         }
 
         table
@@ -149,12 +154,6 @@ public class SimulatedVision extends PhysicalVision {
 
         table.getEntry("tv").setInteger(result.hasTargets() ? 1 : 0);
         table.getEntry("cl").setDouble(result.metadata.getLatencyMillis());
-        lastSeenPose =
-            new Pose2d(
-                result.getMultiTagResult().get().estimatedPose.best.getTranslation().getX(),
-                result.getMultiTagResult().get().estimatedPose.best.getY(),
-                new Rotation2d(
-                    result.getMultiTagResult().get().estimatedPose.best.getRotation().getAngle()));
       }
     }
   }
@@ -190,12 +189,8 @@ public class SimulatedVision extends PhysicalVision {
   }
 
   @Override
-  public void setHeadingInfo(double headingDegrees, double headingRateDegrees) {
-    super.setHeadingInfo(headingDegrees, headingRateDegrees);
-  }
-
-  @Override
-  public Pose2d getLastSeenPose() {
-    return lastSeenPose;
+  public void setOdometryInfo(
+      double headingDegrees, double headingRateDegrees, Pose2d odometryPose) {
+    super.setOdometryInfo(headingDegrees, headingRateDegrees, odometryPose);
   }
 }

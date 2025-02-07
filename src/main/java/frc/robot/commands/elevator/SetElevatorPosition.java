@@ -34,7 +34,7 @@ public class SetElevatorPosition extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    elevatorSubsystem.setVolts(0);
+    elevatorSubsystem.setElevatorPosition(elevatorSubsystem.getElevatorPosition());
   }
 
   // Returns true when the command should end.
