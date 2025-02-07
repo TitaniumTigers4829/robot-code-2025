@@ -1,7 +1,5 @@
 package frc.robot.subsystems.swerve.gyro;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import com.studica.frc.AHRS.NavXUpdateRate;
@@ -20,6 +18,8 @@ public class PhysicalGyro implements GyroInterface {
     // because sometimes the gyro can be oriented differently, causing the reading to be negative.
     inputs.yawVelocityDegreesPerSecond = -gyro.getRate();
     inputs.yawDegrees = -gyro.getAngle();
+    inputs.accelX = -gyro.getWorldLinearAccelX();
+    inputs.accelY = -gyro.getWorldLinearAccelY();
   }
 
   @Override
