@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
+import frc.robot.subsystems.swerve.odometryThread.RealOdometryThread;
 
 public class CompModule implements ModuleInterface {
   private final TalonFX driveMotor;

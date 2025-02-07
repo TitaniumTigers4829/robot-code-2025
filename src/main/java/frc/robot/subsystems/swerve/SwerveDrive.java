@@ -30,6 +30,8 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrain.OdometryThread;
+
 public class SwerveDrive extends SubsystemBase {
 
   private final GyroInterface gyroIO;
