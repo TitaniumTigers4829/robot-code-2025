@@ -220,6 +220,7 @@ public class SimMechanism {
         ProceduralStructGenerator.genRecord(MechanismVariables.class);
   }
 
+  // Create variables to store the mechanism's properties
   private final String name;
   private final MechanismDynamics dynamics;
   private final Friction friction;
@@ -231,8 +232,17 @@ public class SimMechanism {
   private final HardLimits limits;
   private final double noise;
 
+  /**
+   * A lock to ensure that the mechanism state and variables are not modified while they are being read
+   */
   private final ReentrantReadWriteLock ioLock = new ReentrantReadWriteLock();
+  /**
+   * The current state of the mechanism. This is the state of the mechanism at the current time step.
+   */
   private MechanismState state = MechanismState.zero();
+  /**
+   * The current variables of the mechanism. This is the variables of the mechanism at the current time step.
+   */
   private MechanismVariables variables = MechanismVariables.zero();
 
   /** Constructs a new SimMechanism. */
@@ -258,6 +268,7 @@ public class SimMechanism {
     this.limits = limits;
     this.noise = noise;
 
+    // Configure the controllers motor model to the mechanism's motor
     controller.configureMotorModel(this.motor);
   }
 

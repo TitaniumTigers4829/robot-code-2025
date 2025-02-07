@@ -3,30 +3,37 @@ package frc.robot.sim.simMechanism.simSwerve;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.extras.util.RuntimeLog;
+import frc.robot.extras.util.mathutils.MeasureMath;
 import frc.robot.extras.util.mathutils.MeasureMath.XY;
 import frc.robot.extras.util.mathutils.SimCommonMath;
 import frc.robot.sim.configs.SimGyroConfig;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.function.BiConsumer;
 
-// import sham.utils.mathutils.MeasureMath;
-
+/**
+ * <h1>Simulated Gyro</hh1>
+ * 
+ * 
+ */
 public class SimGyro {
-  // /* The threshold of instantaneous angular acceleration at which the chassis is considered to
-  // experience an "impact." */
-  // private static final AngularAcceleration START_DRIFTING = RadiansPerSecondPerSecond.of(500);
-  // /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of
-  // the angular acceleration threshold. */
-  // private static final Angle DRIFT_DUE_TO_IMPACT_COEFFICIENT = Radians.of(1);
+  /* The threshold of instantaneous angular acceleration at which the chassis is considered to
+  experience an "impact." */
+  private static final AngularAcceleration START_DRIFTING = RadiansPerSecondPerSecond.of(500);
+  /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of
+  the angular acceleration threshold. */
+  private static final Angle DRIFT_DUE_TO_IMPACT_COEFFICIENT = Radians.of(1);
 
   private final SimEnvTiming timing;
   private BiConsumer<Pair<Angle, AngularVelocity>, XY<LinearAcceleration>> updateConsumer;
@@ -37,6 +44,11 @@ public class SimGyro {
 
   private Twist2d lastTwist = new Twist2d();
 
+  /**
+   * Creates a new SimGyro.
+   * @param timing the simulation timing
+   * @param gyroConfig the gyro configuration
+   */
   public SimGyro(SimEnvTiming timing, SimGyroConfig gyroConfig) {
     this.timing = timing;
     this.averageDriftingMotionless =
@@ -46,6 +58,11 @@ public class SimGyro {
     RuntimeLog.debug("Created a gyro simulation");
   }
 
+  /**
+   * Sets the update consumer. This consumer takes the gyro angle and angular velocity as a {@link Pair} and the linear accerlation in the x and y directions.
+   * These values are used to update the simulation. The values change each subtick according to what occurs in the simulation space.
+   * @param updateConsumer the update consumer
+   */
   public void setUpdateConsumer(
       BiConsumer<Pair<Angle, AngularVelocity>, XY<LinearAcceleration>> updateConsumer) {
     this.updateConsumer = updateConsumer;
@@ -84,19 +101,19 @@ public class SimGyro {
     }
   }
 
-  // private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
-  //     AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
-  //         lastTwist.dtheta * timing.dt().in(Seconds)
-  //     );
-  //     AngularAcceleration angularAcceleration =
-  // actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
-  //     if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
-  //         return DRIFT_DUE_TO_IMPACT_COEFFICIENT
-  //                 .times(MeasureMath.signum(angularAcceleration))
-  //                 .times(angularAcceleration.div(START_DRIFTING))
-  //                 .div(timing.dt());
-  //     } else {
-  //         return RadiansPerSecond.of(0);
-  //     }
-  // }
+  private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
+      AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
+          lastTwist.dtheta * timing.dt().in(Seconds)
+      );
+      AngularAcceleration angularAcceleration =
+  actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
+      if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
+          return DRIFT_DUE_TO_IMPACT_COEFFICIENT
+                  .times(MeasureMath.signum(angularAcceleration))
+                  .times(angularAcceleration.div(START_DRIFTING))
+                  .div(timing.dt());
+      } else {
+          return RadiansPerSecond.of(0);
+      }
+  }
 }
