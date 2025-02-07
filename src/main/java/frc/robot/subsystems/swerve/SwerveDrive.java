@@ -25,17 +25,25 @@ import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
+import frc.robot.subsystems.swerve.odometryThread.OdometryInputsAutoLogged;
+import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInterface;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveDrivetrain.OdometryThread;
 
 public class SwerveDrive extends SubsystemBase {
+  private final ReentrantLock odometryLock = new ReentrantLock();
 
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
+  private final OdometryThreadInterface odometryThread;
+  private final OdometryInputsAutoLogged odometryInputsAutoLogged;
+
   private final SwerveModule[] swerveModules;
 
   private Rotation2d rawGyroRotation;
@@ -73,10 +81,13 @@ public class SwerveDrive extends SubsystemBase {
       ModuleInterface frontLeftModuleIO,
       ModuleInterface frontRightModuleIO,
       ModuleInterface backLeftModuleIO,
-      ModuleInterface backRightModuleIO) {
+      ModuleInterface backRightModuleIO,
+      OdometryThreadInterface odometryThread) {
     this.gyroIO = gyroIO;
     this.gyroInputs = new GyroInputsAutoLogged();
+    this.odometryInputsAutoLogged = new OdometryInputsAutoLogged();
     this.rawGyroRotation = new Rotation2d();
+    this.odometryThread = odometryThread;
 
     swerveModules =
         new SwerveModule[] {
@@ -193,11 +204,18 @@ public class SwerveDrive extends SubsystemBase {
 
   /** Updates and logs the inputs for the odometry thread, gyro, and swerve modules. */
   private void updateSwerveInputs() {
+    try {
+    odometryLock.lock();
     for (SwerveModule module : swerveModules) module.updateOdometryInputs();
 
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
-    Tracer.traceFunc("Gyro", () -> gyroIO.updateInputs(gyroInputs));
+    odometryThread.updateInputs(odometryInputsAutoLogged);
+    Logger.processInputs("Drive/OdometryThread", odometryInputsAutoLogged);
+    odometryLock.unlock();
+    } finally {
+      //do something
+    }
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
   }
 

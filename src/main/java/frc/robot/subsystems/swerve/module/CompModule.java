@@ -43,7 +43,7 @@ public class CompModule implements ModuleInterface {
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
-  // private final BaseStatusSignal[] periodicallyRefreshedSignals;
+  RealOdometryThread odometryThread = new RealOdometryThread(250);
 
   public CompModule(ModuleConfig moduleConfig) {
     driveMotor =
@@ -105,6 +105,8 @@ public class CompModule implements ModuleInterface {
     turnEncoderVelocity = turnEncoder.getVelocity();
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
+    
+    odometryThread.addModuleStatusSignals(drivePosition, driveVelocity, turnEncoderAbsolutePosition, turnEncoderVelocity);
 
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);

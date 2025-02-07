@@ -95,6 +95,33 @@ public class RealOdometryThread implements OdometryThreadInterface {
     inputs.accelMagnitude = Math.hypot(xAccel, yAccel);
   }
 
+  public void addModuleStatusSignals(
+      BaseStatusSignal drivePosition,
+      BaseStatusSignal driveVelocity,
+      BaseStatusSignal anglePosition,
+      BaseStatusSignal angleVelocity) {
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        hz, drivePosition, driveVelocity, anglePosition, angleVelocity);
+    for (int i = 0; i < MODULE_COUNT; i++) {
+    signals[i + 0] = drivePosition;
+    signals[i + 1] = driveVelocity;
+    signals[i + 2] = anglePosition;
+    signals[i + 3] = angleVelocity;}
+  }
+
+  public void addGyroStatusSignals(
+      BaseStatusSignal yaw,
+      BaseStatusSignal yawRate,
+      BaseStatusSignal xAccel,
+      BaseStatusSignal yAccel) {
+    BaseStatusSignal.setUpdateFrequencyForAll(hz, yaw, yawRate, xAccel, yAccel);
+    signals[MODULE_COUNT * 4] = yaw;
+    signals[(MODULE_COUNT * 4) + 1] = yawRate;
+    signals[(MODULE_COUNT * 4) + 2] = xAccel;
+    signals[(MODULE_COUNT * 4) + 3] = yAccel;
+  }
+
+
   /**
    * The main loop for the real odometry thread.
    * Continuously updates the sensor inputs while the thread is running.

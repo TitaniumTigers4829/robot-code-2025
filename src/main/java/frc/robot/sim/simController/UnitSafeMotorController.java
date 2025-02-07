@@ -32,6 +32,9 @@ import frc.robot.sim.simController.UnitSafeControl.TrapezoidProfile.State;
 import frc.robot.sim.simMechanism.SimMechanism.MechanismState;
 import java.util.Optional;
 
+/**
+ * 
+ */
 public class UnitSafeMotorController implements SimMotorController {
   private static final VelocityUnit<AngleUnit> VU = VelocityUnit.combine(Radians, Seconds);
   private static final VelocityUnit<AngularVelocityUnit> AU =

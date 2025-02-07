@@ -27,6 +27,9 @@ import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
 import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
+import frc.robot.subsystems.swerve.odometryThread.OdometryThreadInterface;
+import frc.robot.subsystems.swerve.odometryThread.RealOdometryThread;
+import frc.robot.subsystems.swerve.odometryThread.SimOdometryThread;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.SimulatedVision;
 import frc.robot.subsystems.vision.VisionInterface;
@@ -62,12 +65,13 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[0]),
                 new CompModule(SwerveConstants.moduleConfigs[1]),
                 new CompModule(SwerveConstants.moduleConfigs[2]),
-                new CompModule(SwerveConstants.moduleConfigs[3]));
+                new CompModule(SwerveConstants.moduleConfigs[3]),
+                new RealOdometryThread(250));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         // simWorld = null;
       }
       case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
+        swerveDrive = new SwerveDrive(null, null, null, null, null, null);
 
         visionSubsystem = null;
         // simWorld = null;
@@ -82,7 +86,8 @@ public class RobotContainer {
                 new SimulatedModule(0, simWorld.robot().getDriveTrain()),
                 new SimulatedModule(1, simWorld.robot().getDriveTrain()),
                 new SimulatedModule(2, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
+                new SimulatedModule(3, simWorld.robot().getDriveTrain()),
+                new SimOdometryThread(250));
 
         visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
         swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
@@ -99,7 +104,8 @@ public class RobotContainer {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {},
-                new ModuleInterface() {});
+                new ModuleInterface() {},
+                new OdometryThreadInterface() {});
         // simWorld = null;
       }
     }
