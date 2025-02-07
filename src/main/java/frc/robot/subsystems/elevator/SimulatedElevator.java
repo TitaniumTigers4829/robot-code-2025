@@ -26,8 +26,8 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.MIN_HEIGHT,
             ElevatorConstants.MAX_HEIGHT,
             ElevatorConstants.SIMULATE_GRAVITY,
-            ElevatorConstants.MIN_HEIGHT,
-            0);
+            ElevatorConstants.INCLINE_ANGLE_RADIANS,
+            ElevatorConstants.MIN_HEIGHT);
     m_pidController =
         new PIDController(
             ElevatorConstants.ELEVATOR_P,

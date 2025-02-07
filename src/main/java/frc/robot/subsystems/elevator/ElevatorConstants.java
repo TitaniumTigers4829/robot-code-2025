@@ -4,12 +4,14 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.math.util.Units;
+
 /** Add your docs here. */
 public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 1;
   public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 2;
 
-  public static final double ELEVATOR_P = 0.1;
+  public static final double ELEVATOR_P = 1;
   public static final double ELEVATOR_I = 0;
   public static final double ELEVATOR_D = 0;
   public static final double ELEVATOR_S = 0;
@@ -18,11 +20,11 @@ public class ElevatorConstants {
   public static final double ELEVATOR_G = 0;
 
   public static final double DRUM_RADIUS = 1;
-  public static final double ELEVATOR_GEAR_RATIO = 1;
-  public static final double ELEVATOR_CARRIAGE_MASS = 3;
+  public static final double ELEVATOR_GEAR_RATIO = 8;
+  public static final double ELEVATOR_CARRIAGE_MASS = 10;
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
-  public static final double INCLINE_ANGLE_RADIANS = 1;
+  public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);
   public static final boolean SIMULATE_GRAVITY = true;
 
   public static final double STATOR_CURRENT_LIMIT = 0;
@@ -32,4 +34,10 @@ public class ElevatorConstants {
 
   public static final double MOTION_MAGIC_MAX_ACCELERATION = 2;
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2;
+
+  // limit
+  public static final double LIMIT = 1.5;
+  public static final boolean LIMIT_ENABLE = true;
+  public static final double REVERSE_LIMIT = 0;
+  public static final boolean REVRESE_LIMIT_ENABLE = true;
 }

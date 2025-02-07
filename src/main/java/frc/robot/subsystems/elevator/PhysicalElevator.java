@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
@@ -43,6 +44,14 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Slot0.kV = ElevatorConstants.ELEVATOR_V;
     elevatorConfig.Slot0.kA = ElevatorConstants.ELEVATOR_A;
     elevatorConfig.Slot0.kG = ElevatorConstants.ELEVATOR_G;
+    elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
+
+    // Limits lol
+    elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ElevatorConstants.REVERSE_LIMIT;
+    elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable =
+        ElevatorConstants.REVRESE_LIMIT_ENABLE;
+    elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.LIMIT;
+    elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = ElevatorConstants.LIMIT_ENABLE;
 
     elevatorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -58,6 +67,8 @@ public class PhysicalElevator implements ElevatorInterface {
         ElevatorConstants.MOTION_MAGIC_MAX_ACCELERATION;
     elevatorConfig.MotionMagic.MotionMagicCruiseVelocity =
         ElevatorConstants.MOTION_MAGIC_CRUISE_VELOCITY;
+
+    elevatorConfig.Feedback.RotorToSensorRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
     // apply configuration
     leaderMotor.getConfigurator().apply(elevatorConfig);
