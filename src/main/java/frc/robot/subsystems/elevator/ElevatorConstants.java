@@ -8,8 +8,8 @@ import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
 public class ElevatorConstants {
-  public static final int ELEVATOR_LEADER_MOTOR_ID = 1;
-  public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 2;
+  public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
+  public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 28;
 
   public static final double ELEVATOR_P = 1;
   public static final double ELEVATOR_I = 0;
@@ -37,7 +37,7 @@ public class ElevatorConstants {
 
   // limit
   public static final double LIMIT = 1.5;
-  public static final boolean LIMIT_ENABLE = true;
+  public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0;
-  public static final boolean REVRESE_LIMIT_ENABLE = true;
+  public static final boolean REVRESE_LIMIT_ENABLE = false;
 }

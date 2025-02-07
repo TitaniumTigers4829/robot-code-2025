@@ -29,7 +29,7 @@ public class ManualElevator extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    elevatorSubsystem.setElevatorPosition(joystickY.getAsDouble() * 0.5);
+    elevatorSubsystem.setElevatorPosition(joystickY.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
