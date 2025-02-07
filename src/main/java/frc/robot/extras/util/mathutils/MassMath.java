@@ -30,6 +30,11 @@ public class MassMath {
       return new Pair<>(new XY<>(xAccel, yAccel), omegaAccel);
     }
 
+    /**
+     * Applies a force due to acceleration.
+     * @param acceleration
+     * @return
+     */
     public Force forceDueToAcceleration(LinearAcceleration acceleration) {
       return times(acceleration, mass);
     }

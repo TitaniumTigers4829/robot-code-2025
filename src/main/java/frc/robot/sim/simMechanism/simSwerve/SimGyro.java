@@ -75,9 +75,9 @@ public class SimGyro {
    *
    * <p>This method updates the gyro simulation and should be called during every sub-tick of the
    * simulation.
-   *
-   * @param actualAngularVelocityRadPerSec the actual angular velocity in radians per second,
-   *     usually obtained from {@link ShamDriveTrain#getAngularVelocity()}
+   * 
+   * @param angleThisTick the current angle of the simulated drivetrain.
+   * @param twistThisTick the current pose twist of the simulated drivetrain.
    */
   public void updateSimulationSubTick(Angle angleThisTick, Twist2d twistThisTick) {
     AngularVelocity actualAngularVelocity = Radians.of(twistThisTick.dtheta).div(timing.dt());

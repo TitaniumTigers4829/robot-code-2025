@@ -36,7 +36,7 @@ import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * 
+ * The class which simulates the swerve drive.
  */
 public class SimSwerve extends SimDriveTrain {
   protected final SimEnvTiming timing;
@@ -56,8 +56,7 @@ public class SimSwerve extends SimDriveTrain {
    * Creates a Swerve Drive Simulation.
    *
    * <p>This constructor initializes a swerve drive simulation with the given robot mass, bumper
-   * dimensions, module simulations, module translations, gyro simulation, and initial pose on the
-   * field.
+   * dimensions, module simulations, module translations, gyro simulation.
    *
    * @param config a {@link SimSwerveConfig} instance containing the configurations of * this
    *     drivetrain
@@ -116,6 +115,9 @@ public class SimSwerve extends SimDriveTrain {
     super.simTick();
   }
 
+  /**
+   * Simulates the friction on the swerve modules.
+   */
   private void simulateModuleFriction() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
     final ChassisSpeeds chassisSpeeds = this.getChassisWorldSpeeds();
@@ -162,8 +164,11 @@ public class SimSwerve extends SimDriveTrain {
     final AngularAcceleration angularAccelNeededToStop =
         MeasureMath.negate(RadiansPerSecond.of(unwantedSpeeds.omegaRadiansPerSecond))
             .div(timing.dt());
+
     Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
     Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccelPreClamp", angularFrictionAccel);
+
     xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
     yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
     angularFrictionAccel = MeasureMath.clamp(angularFrictionAccel, angularAccelNeededToStop);
@@ -172,11 +177,12 @@ public class SimSwerve extends SimDriveTrain {
     Logger.recordOutput("Forces/SwerveForces/Friction/yAccelNeededToStop", yAccelNeededToStop);
     Logger.recordOutput(
         "Forces/SwerveForces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
+
     Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccel", xFrictionAccel);
     Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccel", yFrictionAccel);
     Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccel", angularFrictionAccel);
 
-    // convert the friction acceleration to forces and torques and apply them to the chassis
+    // Convert the frictional acceleration to forces and torques and apply them to the chassis.
     final Force xFrictionForce = chassisMass.forceDueToAcceleration(xFrictionAccel);
     final Force yFrictionForce = chassisMass.forceDueToAcceleration(yFrictionAccel);
     final Torque angularFrictionTorque = chassisMass.torqueDueToAcceleration(angularFrictionAccel);
@@ -184,6 +190,9 @@ public class SimSwerve extends SimDriveTrain {
     chassis.applyTorque(angularFrictionTorque.in(NewtonMeters));
   }
 
+  /**
+   * Simulates the propulsion forces on the swerve modules.
+   */
   private void simulateModulePropulsion() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
 
@@ -192,6 +201,8 @@ public class SimSwerve extends SimDriveTrain {
     Force propulsionForceX = Newtons.zero();
     Force propulsionForceY = Newtons.zero();
     Torque propulsionTorque = NewtonMeters.zero();
+
+    // 
     for (final SimSwerveModule module : moduleSimulations) {
       final XY<Distance> forcePosition = XY.of(module.translation().rotateBy(chassisRotation));
       final XY<Force> propulsion = module.force(chassisRotation);
@@ -248,14 +259,29 @@ public class SimSwerve extends SimDriveTrain {
     chassis.applyTorque(propulsionTorque.in(NewtonMeters));
   }
 
+  /**
+   * Gets the swerve modules.
+   * @return the current moduleSimulations.
+   */
   public SimSwerveModule[] getModules() {
     return moduleSimulations;
   }
 
+  /**
+   * Gets the gyro.
+   * @return the current gyroSimulation.
+   */
   public SimGyro getGyro() {
     return this.gyroSimulation;
   }
 
+  /**
+   * Uses {@link SimMotorController}'s to control the moduleSimulations.
+   * @param moduleId the id of the module.
+   * @param driveController the drive controller.
+   * @param steerController the steer controller.
+   * @return this SimSwerve instance.
+   */
   public SimSwerve withSetModuleControllers(
       int moduleId, SimMotorController driveController, SimMotorController steerController) {
     moduleSimulations[moduleId].teardown();
@@ -271,6 +297,10 @@ public class SimSwerve extends SimDriveTrain {
     return this;
   }
 
+  /**
+   * Gets the current sim timing.
+   * @return the current {@link SimEnvTiming}.
+   */
   public SimEnvTiming timing() {
     return timing;
   }
