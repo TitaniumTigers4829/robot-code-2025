@@ -159,7 +159,19 @@ public class CompModule implements ModuleInterface {
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
         .getRotations();
   }
+  /**Does characterization shit */
+  public void characterizeWheelRadius() {
+    
+  }
 
+  //idek lllllllllllllllllllloooooooooooool i dont understand fr
+  public double[] getWheelRadiusCharacterizationPosition() {
+    double[] wheelPositions = {
+      frontLeftSwerveModule.getDrivePositionRadians(),
+      frontRightSwerveModule.getDrivePositionRadians(),
+      rearLeftSwerveModule.getDrivePositionRadians(),
+      rearRightSwerveModule.getDrivePositionRadians() }
+  }
   @Override
   public void stopModule() {
     driveMotor.stopMotor();
