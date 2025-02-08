@@ -14,7 +14,14 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   private final double funnelPivotLength = FunnelConstants.FUNNEL_PIVOT_LENGTH;
   private SingleJointedArmSim funnelPivotSim =
       new SingleJointedArmSim(
-          DCMotor.getKrakenX60(2), funnelGearing, funnelPivotMass, funnelPivotLength, 0, 0, true, 0);
+          DCMotor.getKrakenX60(2),
+          funnelGearing,
+          funnelPivotMass,
+          funnelPivotLength,
+          0,
+          0,
+          true,
+          0);
 
   private final double armKS = 0.0;
   private final double armKG = FunnelConstants.PIVOT_G;

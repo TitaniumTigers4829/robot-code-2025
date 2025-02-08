@@ -76,7 +76,12 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0, funnelAngle, funnelVelocity, funnelVoltage, funnelSupplyCurrent, funnelStatorCurrent);
+        100.0,
+        funnelAngle,
+        funnelVelocity,
+        funnelVoltage,
+        funnelSupplyCurrent,
+        funnelStatorCurrent);
   }
 
   @Override
