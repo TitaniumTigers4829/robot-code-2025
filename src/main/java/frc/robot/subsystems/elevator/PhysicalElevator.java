@@ -22,7 +22,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
   // private final Follower followerRequest =
-  //     new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
+  // new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
 
   private final StatusSignal<Angle> leaderPosition;
   private final StatusSignal<Angle> followerPosition;
@@ -69,15 +69,16 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.MotionMagic.MotionMagicCruiseVelocity =
         ElevatorConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 
-    elevatorConfig.Feedback.RotorToSensorRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
+    // elevatorConfig.Feedback.RotorToSensorRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
     // apply configuration
+
     leaderMotor.getConfigurator().apply(elevatorConfig);
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+    // followerMotor.setControl(followerRequest);
     followerMotor.getConfigurator().apply(elevatorConfig);
 
     // make the follower
-    // followerMotor.setControl(followerRequest);
 
     // Get info
     leaderPosition = leaderMotor.getPosition();
@@ -126,8 +127,9 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public void setElevatorPosition(double position) {
-    desiredPosition = position;
+    desiredPosition = 1;
     // leaderMotor.setControl(mmPositionRequest.withPosition(position));
+    // followerMotor.setControl(mmPositionRequest.withPosition(position));
     leaderMotor.set(-position);
     followerMotor.set(position);
   }
@@ -135,6 +137,7 @@ public class PhysicalElevator implements ElevatorInterface {
   @Override
   public void setVolts(double volts) {
     leaderMotor.setVoltage(volts);
+    followerMotor.setVoltage(volts);
   }
 
   @Override

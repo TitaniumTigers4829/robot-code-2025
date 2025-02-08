@@ -36,8 +36,8 @@ public class ElevatorConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2;
 
   // limit
-  public static final double LIMIT = 1.5;
+  public static final double LIMIT = 40;
   public static final boolean LIMIT_ENABLE = false;
-  public static final double REVERSE_LIMIT = 0;
+  public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 }
