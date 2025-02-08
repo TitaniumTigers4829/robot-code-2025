@@ -125,6 +125,8 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
+      headingController.enableContinuousInput(lastMovementTime, INACTIVITY_THRESHOLD);
+
     gyroDisconnectedAlert.set(false);
   }
 
