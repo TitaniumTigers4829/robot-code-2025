@@ -82,8 +82,6 @@ public class SwerveModule {
     Logger.recordOutput("Drive/desired turn angle", state.angle.getRotations());
   }
 
-
-
   /** Stops the module */
   public void stopModule() {
     io.stopModule();
@@ -126,10 +124,10 @@ public class SwerveModule {
    *
    * @return a SwerveModuleState object containing velocity and angle
    */
-
   public double getDrivePositionRadians() {
     return Units.rotationsToRadians(inputs.drivePosition);
   }
+
   public SwerveModuleState getMeasuredState() {
     return new SwerveModuleState(getDriveVelocityMetersPerSec(), getTurnRotation());
   }

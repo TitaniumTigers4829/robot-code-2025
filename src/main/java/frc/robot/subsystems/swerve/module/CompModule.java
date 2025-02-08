@@ -159,11 +159,9 @@ public class CompModule implements ModuleInterface {
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
         .getRotations();
   }
-  /**Does characterization shit */
-  public void characterizeWheelRadius() {
-    
-  }
 
+  /** Does characterization shit */
+  public void characterizeWheelRadius() {}
 
   @Override
   public void stopModule() {
