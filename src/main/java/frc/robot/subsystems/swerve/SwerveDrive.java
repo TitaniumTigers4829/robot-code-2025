@@ -137,7 +137,16 @@ public class SwerveDrive extends SubsystemBase {
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
   }
+  public void drive(ChassisSpeeds speeds) {
+    drive(
+        -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond, false);
+  }
 
+  /**
+   * Allows PID on the chassis rotation.
+   *
+   * @param speeds The ChassisSpeeds of the drive to set.
+   * @param rotationControl The control on the drive rotatio
   /*
    * Updates the pose estimator with the pose calculated from the april tags. How much it
    * contributes to the pose estimation is set by setPoseEstimatorVisionConfidence.
@@ -176,6 +185,24 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  /**
+   * 
+   * @param omegaspeed returns r
+   */
+  public void runWheelRadiusCharacterization(double omegaspeed){
+    drive(0,0,omegaspeed,false);
+  }
+  //idek lllllllllllllllllllloooooooooooool i dont understand fr
+  public double[] getWheelRadiusCharacterizationPosition() {
+    double[] wheelPositions =  new double[swerveModules.length];
+    
+    int i=0;
+    
+    for (SwerveModule module : swerveModules) {
+        module.getPosition();
+        wheelPositions[i++] = module.getDrivePositionRadians();
+      }
+      return wheelPositions;}
   /**
    * Gets the total characterization velocity of the modules.
    *

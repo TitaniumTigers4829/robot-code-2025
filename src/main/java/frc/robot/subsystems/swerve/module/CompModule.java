@@ -164,14 +164,7 @@ public class CompModule implements ModuleInterface {
     
   }
 
-  //idek lllllllllllllllllllloooooooooooool i dont understand fr
-  public double[] getWheelRadiusCharacterizationPosition() {
-    double[] wheelPositions = {
-      frontLeftSwerveModule.getDrivePositionRadians(),
-      frontRightSwerveModule.getDrivePositionRadians(),
-      rearLeftSwerveModule.getDrivePositionRadians(),
-      rearRightSwerveModule.getDrivePositionRadians() }
-  }
+
   @Override
   public void stopModule() {
     driveMotor.stopMotor();
