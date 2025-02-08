@@ -125,7 +125,7 @@ public final class Constants {
     public static final double MAX_SPEED = 5.0;
     public static final double MAX_ACCELERATION = 3;
 
-    public static final double AUTO_TRANSLATION_P = 1.5; // 1.7
+    public static final double AUTO_TRANSLATION_P = 5; // 1.7
     public static final double AUTO_TRANSLATION_I = 0;
     public static final double AUTO_TRANSLATION_D = 0.2;
     public static final double AUTO_THETA_P = 4.5; // 5

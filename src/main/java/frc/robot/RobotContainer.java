@@ -51,7 +51,6 @@ public class RobotContainer {
 
   public AutoFactory autoFactory;
   public final SendableChooser<AutoRoutine> autoChooser;
-  public final AutoChooser autoChooser2;
   public Autos autos;
 
   private final SimWorld simWorld = new SimWorld();
@@ -111,17 +110,12 @@ public class RobotContainer {
     }
 
     autoChooser = new SendableChooser<AutoRoutine>();
-    autoChooser.setDefaultOption("Auto", null);
-
-    autoChooser2 = new AutoChooser();
 
     // this sets up the auto factory
     autoFactory =
         new AutoFactory(
-            () -> swerveDrive.getEstimatedPose(), // A function that returns the current robot pose
-            (pose2d) ->
-                swerveDrive.resetEstimatedPose(
-                    pose2d), // A function that resets the current robot pose to the
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
             // // provided Pose2d
             // FollowChoreoTrajectory::execute, // A function that follows a choreo trajectory
             // provided Pose2d
@@ -139,12 +133,8 @@ public class RobotContainer {
     // this adds an auto routine to the auto chooser
     autoChooser.addOption("Example Auto", autos.exampleAutoRoutine());
     autoChooser.addOption(AutoConstants.ONE_METER_AUTO_ROUTINE, autos.oneMeterTestAutoRoutine());
-    autoChooser2.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
-    autoChooser2.addRoutine(
-        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
-    SmartDashboard.putData(autoChooser2);
   }
 
   public void teleopInit() {
@@ -242,7 +232,7 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     // if (autoChooser.getSelected() != null) {
-    //   return autoChooser.getSelected().cmd();
+    return autoChooser.getSelected().cmd();
 
     // } else {
     //   return null;
@@ -251,9 +241,8 @@ public class RobotContainer {
     //   return autoChooser2.selectedCommandScheduler();
 
     // } else {
-    return null;
+    // return null;
     // }
-    // return new RunCommand(() -> autos.oneMeterTestAutoRoutine(), swerveDrive);
     // return new RunCommand(() -> );//), null)
   }
 

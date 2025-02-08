@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -38,19 +38,24 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
-  private final PIDController xController =
-      new PIDController(
+  private final ProfiledPIDController xController =
+      new ProfiledPIDController(
           AutoConstants.AUTO_TRANSLATION_P,
           AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D);
-  private final PIDController yController =
-      new PIDController(
+          AutoConstants.AUTO_TRANSLATION_D,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
+  private final ProfiledPIDController yController =
+      new ProfiledPIDController(
           AutoConstants.AUTO_TRANSLATION_P,
           AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D);
-  private final PIDController headingController =
-      new PIDController(
-          AutoConstants.AUTO_THETA_P, AutoConstants.AUTO_THETA_I, AutoConstants.AUTO_THETA_D);
+          AutoConstants.AUTO_TRANSLATION_D,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
+  private final ProfiledPIDController headingController =
+      new ProfiledPIDController(
+          AutoConstants.AUTO_THETA_P,
+          AutoConstants.AUTO_THETA_I,
+          AutoConstants.AUTO_THETA_D,
+          AutoConstants.AUTO_ALIGN_ROTATIONAL_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
