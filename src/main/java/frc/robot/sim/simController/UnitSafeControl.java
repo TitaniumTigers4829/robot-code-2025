@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.AccelerationUnit;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
@@ -50,7 +52,7 @@ public class UnitSafeControl {
    * @param <Q> The unit type for the controller input (measurement and setpoint).
    */
   public static class PIDFeedback<O extends Unit, Q extends Unit> {
-    private final edu.wpi.first.math.controller.PIDController internalController;
+    private final PIDController internalController;
     private final O outputUnit;
     private final Q inputUnit;
 
@@ -65,7 +67,7 @@ public class UnitSafeControl {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
       internalController =
-          new edu.wpi.first.math.controller.PIDController(
+          new PIDController(
               kP.baseUnitMagnitude(), kI.baseUnitMagnitude(), kD.baseUnitMagnitude());
     }
 
@@ -80,7 +82,7 @@ public class UnitSafeControl {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
       internalController =
-          new edu.wpi.first.math.controller.PIDController(
+          new PIDController(
               kP.baseUnitMagnitude(), 0.0, kD.baseUnitMagnitude());
     }
 
@@ -94,7 +96,7 @@ public class UnitSafeControl {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
       internalController =
-          new edu.wpi.first.math.controller.PIDController(kP.baseUnitMagnitude(), 0.0, 0.0);
+          new PIDController(kP.baseUnitMagnitude(), 0.0, 0.0);
     }
 
     /**
@@ -455,7 +457,7 @@ public class UnitSafeControl {
    */
   public static final class FlywheelFeedforward<O extends Unit>
       implements Feedforward<O, AngleUnit> {
-    private final edu.wpi.first.math.controller.SimpleMotorFeedforward internalFeedforward;
+    private final SimpleMotorFeedforward internalFeedforward;
     private final O outputUnit;
     final Measure<O> kS;
     final Per<O, AngularVelocityUnit> kV;
@@ -475,7 +477,7 @@ public class UnitSafeControl {
       this.kV = kV;
       this.kA = kA;
       internalFeedforward =
-          new edu.wpi.first.math.controller.SimpleMotorFeedforward(
+          new SimpleMotorFeedforward(
               kS.baseUnitMagnitude(), kV.baseUnitMagnitude(), kA.baseUnitMagnitude());
     }
 
@@ -490,7 +492,7 @@ public class UnitSafeControl {
       this.kV = null;
       this.kA = null;
       internalFeedforward =
-          new edu.wpi.first.math.controller.SimpleMotorFeedforward(
+          new SimpleMotorFeedforward(
               kS.baseUnitMagnitude(), 0.0, 0.0);
     }
 
