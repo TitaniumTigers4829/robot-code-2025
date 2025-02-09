@@ -3,8 +3,10 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,10 +15,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.util.RepulsorFieldPlanner;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.extras.util.Tracer;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
@@ -30,6 +35,9 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
+
 public class SwerveDrive extends SubsystemBase {
 
   private final GyroInterface gyroIO;
@@ -39,6 +47,17 @@ public class SwerveDrive extends SubsystemBase {
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
   private final SwerveDrivePoseEstimator poseEstimator;
+
+  private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
+  
+
+  private final PIDController xController = new PIDController(5.0, 0.0, 0.1);
+  private final PIDController yController = new PIDController(5.0, 0.0, 0.1);
+  private final PIDController headingController = new PIDController(0, 1, 2);
+
+  private final PIDController xSetpointController = new PIDController(25.0, 0.0, 0.1);
+  private final PIDController ySetpointController = new PIDController(25.0, 0.0, 0.1);
+
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -136,6 +155,14 @@ public class SwerveDrive extends SubsystemBase {
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
+  }
+
+  public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
+   drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, fieldRelative);
+  }
+
+  public ChassisSpeeds getChassisSpeeds() {
+    return setpoint.chassisSpeeds();
   }
 
   /*
@@ -411,4 +438,78 @@ public class SwerveDrive extends SubsystemBase {
   public void resetEstimatedPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
+
+    /** Follows the provided swerve sample. */
+  public void followTrajectory(SwerveSample sample) {
+    // Get the current pose of the robot
+    Pose2d pose = getEstimatedPose();
+    Logger.recordOutput("Odometry/TrajectorySetpoint", pose);
+    Logger.recordOutput("Drive/PID/error", headingController.getError());
+    var out = headingController.calculate(pose.getRotation().getRadians(), sample.heading);
+    Logger.recordOutput("Drive/PID/out", out);
+
+    // Generate the next speeds for the robot
+    ChassisSpeeds speeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            sample.vx + sample.vx != 0
+                ? xSetpointController.calculate(pose.getX(), sample.x)
+                : xController.calculate(pose.getX(), sample.x),
+            sample.vy + sample.vy != 0
+                ? ySetpointController.calculate(pose.getY(), sample.y)
+                : yController.calculate(pose.getY(), sample.y),
+            sample.omega
+                + headingController.calculate(pose.getRotation().getRadians(), sample.heading),
+            getEstimatedPose().getRotation()); // Apply the generated speeds
+
+    drive(speeds, true);
+  }
+
+  public void logTrajectory(Trajectory<SwerveSample> traj, boolean isFinished) {
+    SwerveSample[] trajarray = new SwerveSample[0];
+    boolean flip =
+        DriverStation.isDSAttached() && DriverStation.getAlliance().get() != Alliance.Blue;
+    Logger.recordOutput(
+        "Odometry/Trajectory",
+        flip ? traj.flipped().samples().toArray(trajarray) : traj.samples().toArray(trajarray));
+    Logger.recordOutput("Odometry/TrajectoryFinished", isFinished);
+  }
+
+  public Command autoAlign(Pose3d _setpoint) {
+    // this.setpoint = _setpoint;
+
+    return run(
+        () -> {
+          Logger.recordOutput("Drive/Setpoint", _setpoint);
+
+          repulsorFieldPlanner.setGoal(_setpoint.toPose2d().getTranslation());
+
+          var robotPose = getEstimatedPose();
+          SwerveSample cmd =
+              repulsorFieldPlanner.getCmd(
+                  robotPose,
+                  getChassisSpeeds(),
+                  DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+                  true);
+
+          // Apply the trajectory with rotation adjustment
+          SwerveSample adjustedSample =
+              new SwerveSample(
+                  cmd.t,
+                  cmd.x,
+                  cmd.y,
+                  _setpoint.toPose2d().getRotation().getRadians(),
+                  cmd.vx,
+                  cmd.vy,
+                  0,
+                  cmd.ax,
+                  cmd.ay,
+                  cmd.alpha,
+                  cmd.moduleForcesX(),
+                  cmd.moduleForcesY());
+
+          // Apply the adjusted sample
+          followTrajectory(adjustedSample);
+        });
+  }
+
 }
