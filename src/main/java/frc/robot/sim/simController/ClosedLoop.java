@@ -30,6 +30,17 @@ import frc.robot.sim.simController.UnitSafeControl.TrapezoidProfile.State;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Represents a closed-loop controller that combines a PID feedback controller and a feedforward
+ * controller, optionally using a trapezoidal motion profile for smoothing.
+ *
+ * <p>This generic controller supports various unit types for output, input, and input dimensions,
+ * and can be specialized for voltage or current control for position, velocity, or distance.
+ *
+ * @param <OUTPUT> the unit type of the controller output (e.g., VoltageUnit or CurrentUnit)
+ * @param <INPUT> the unit type of the feedback controller input (e.g., AngleUnit, AngularVelocityUnit, or DistanceUnit)
+ * @param <INPUT_DIMENSION> the unit type representing the dimensional measurement (e.g., AngleUnit or DistanceUnit)
+ */
 public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION extends Unit> {
   private final PIDFeedback<OUTPUT, INPUT> feedback;
   private final Feedforward<OUTPUT, INPUT_DIMENSION> feedforward;
@@ -37,6 +48,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   private final boolean useFeedbackSign;
   private final Function<Measure<AngleUnit>, Measure<DistanceUnit>> angleToDistance;
 
+  /**
+   * Constructs a ClosedLoop controller without a custom angle-to-distance conversion function.
+   *
+   * @param feedback         the PID feedback controller
+   * @param feedforward      the feedforward controller
+   * @param trapezoidProfile an optional trapezoidal motion profile for the input
+   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
+   */
   private ClosedLoop(
       PIDFeedback<OUTPUT, INPUT> feedback,
       Feedforward<OUTPUT, INPUT_DIMENSION> feedforward,
@@ -46,9 +65,19 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     this.feedforward = feedforward;
     this.optTrapezoidProfile = trapezoidProfile;
     this.useFeedbackSign = useFeedbackSign;
+    // Default conversion returns zero distance.
     this.angleToDistance = angle -> Meters.zero();
   }
 
+  /**
+   * Constructs a ClosedLoop controller with a custom angle-to-distance conversion function.
+   *
+   * @param feedback         the PID feedback controller
+   * @param feedforward      the feedforward controller
+   * @param trapezoidProfile an optional trapezoidal motion profile for the input
+   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   */
   private ClosedLoop(
       PIDFeedback<OUTPUT, INPUT> feedback,
       Feedforward<OUTPUT, INPUT_DIMENSION> feedforward,
@@ -62,6 +91,18 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     this.angleToDistance = angleToDistance;
   }
 
+  // ===========================================================================
+  // Factory methods for different controller types.
+  // ===========================================================================
+
+  /**
+   * Creates a ClosedLoop controller for voltage control using angle feedback.
+   *
+   * @param feedback         the PID feedback controller for angle
+   * @param feedforward      the feedforward controller for angle
+   * @param trapezoidProfile the trapezoidal profile to smooth the angle trajectory
+   * @return a new ClosedLoop instance configured for voltage-angle control
+   */
   public static ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> forVoltageAngle(
       PIDFeedback<VoltageUnit, AngleUnit> feedback,
       Feedforward<VoltageUnit, AngleUnit> feedforward,
@@ -69,6 +110,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.of(trapezoidProfile), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for voltage control using angle feedback without a trapezoidal profile.
+   *
+   * @param feedback        the PID feedback controller for angle
+   * @param feedforward     the feedforward controller for angle
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @return a new ClosedLoop instance configured for voltage-angle control
+   */
   public static ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> forVoltageAngle(
       PIDFeedback<VoltageUnit, AngleUnit> feedback,
       Feedforward<VoltageUnit, AngleUnit> feedforward,
@@ -76,6 +125,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.empty(), useFeedbackSign);
   }
 
+  /**
+   * Creates a ClosedLoop controller for voltage control using angular velocity feedback.
+   *
+   * @param feedback         the PID feedback controller for angular velocity
+   * @param feedforward      the feedforward controller for angle
+   * @param trapezoidProfile the trapezoidal profile to smooth the angular velocity trajectory
+   * @return a new ClosedLoop instance configured for voltage-angular velocity control
+   */
   public static ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> forVoltageAngularVelocity(
       PIDFeedback<VoltageUnit, AngularVelocityUnit> feedback,
       Feedforward<VoltageUnit, AngleUnit> feedforward,
@@ -83,12 +140,27 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.of(trapezoidProfile), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for voltage control using angular velocity feedback without a trapezoidal profile.
+   *
+   * @param feedback    the PID feedback controller for angular velocity
+   * @param feedforward the feedforward controller for angle
+   * @return a new ClosedLoop instance configured for voltage-angular velocity control
+   */
   public static ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> forVoltageAngularVelocity(
       PIDFeedback<VoltageUnit, AngularVelocityUnit> feedback,
       Feedforward<VoltageUnit, AngleUnit> feedforward) {
     return new ClosedLoop<>(feedback, feedforward, Optional.empty(), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using angle feedback.
+   *
+   * @param feedback         the PID feedback controller for angle
+   * @param feedforward      the feedforward controller for angle
+   * @param trapezoidProfile the trapezoidal profile to smooth the angle trajectory
+   * @return a new ClosedLoop instance configured for current-angle control
+   */
   public static ClosedLoop<CurrentUnit, AngleUnit, AngleUnit> forCurrentAngle(
       PIDFeedback<CurrentUnit, AngleUnit> feedback,
       Feedforward<CurrentUnit, AngleUnit> feedforward,
@@ -96,6 +168,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.of(trapezoidProfile), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using angle feedback without a trapezoidal profile.
+   *
+   * @param feedback        the PID feedback controller for angle
+   * @param feedforward     the feedforward controller for angle
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @return a new ClosedLoop instance configured for current-angle control
+   */
   public static ClosedLoop<CurrentUnit, AngleUnit, AngleUnit> forCurrentAngle(
       PIDFeedback<CurrentUnit, AngleUnit> feedback,
       Feedforward<CurrentUnit, AngleUnit> feedforward,
@@ -103,6 +183,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.empty(), useFeedbackSign);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using angular velocity feedback.
+   *
+   * @param feedback         the PID feedback controller for angular velocity
+   * @param feedforward      the feedforward controller for angle
+   * @param trapezoidProfile the trapezoidal profile to smooth the angular velocity trajectory
+   * @return a new ClosedLoop instance configured for current-angular velocity control
+   */
   public static ClosedLoop<CurrentUnit, AngularVelocityUnit, AngleUnit> forCurrentAngularVelocity(
       PIDFeedback<CurrentUnit, AngularVelocityUnit> feedback,
       Feedforward<CurrentUnit, AngleUnit> feedforward,
@@ -110,12 +198,28 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.of(trapezoidProfile), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using angular velocity feedback without a trapezoidal profile.
+   *
+   * @param feedback    the PID feedback controller for angular velocity
+   * @param feedforward the feedforward controller for angle
+   * @return a new ClosedLoop instance configured for current-angular velocity control
+   */
   public static ClosedLoop<CurrentUnit, AngularVelocityUnit, AngleUnit> forCurrentAngularVelocity(
       PIDFeedback<CurrentUnit, AngularVelocityUnit> feedback,
       Feedforward<CurrentUnit, AngleUnit> feedforward) {
     return new ClosedLoop<>(feedback, feedforward, Optional.empty(), false);
   }
 
+  /**
+   * Creates a ClosedLoop controller for voltage control using distance feedback.
+   *
+   * @param feedback         the PID feedback controller for distance
+   * @param feedforward      the feedforward controller for distance
+   * @param trapezoidProfile the trapezoidal profile to smooth the distance trajectory
+   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @return a new ClosedLoop instance configured for voltage-distance control
+   */
   public static ClosedLoop<VoltageUnit, DistanceUnit, DistanceUnit> forVoltageDistance(
       PIDFeedback<VoltageUnit, DistanceUnit> feedback,
       Feedforward<VoltageUnit, DistanceUnit> feedforward,
@@ -125,6 +229,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
         feedback, feedforward, Optional.of(trapezoidProfile), false, angleToDistance);
   }
 
+  /**
+   * Creates a ClosedLoop controller for voltage control using distance feedback without a trapezoidal profile.
+   *
+   * @param feedback        the PID feedback controller for distance
+   * @param feedforward     the feedforward controller for distance
+   * @param angleToDistance a function to convert an angle measurement to a distance measurement
+   * @return a new ClosedLoop instance configured for voltage-distance control
+   */
   public static ClosedLoop<VoltageUnit, DistanceUnit, DistanceUnit> forVoltageDistance(
       PIDFeedback<VoltageUnit, DistanceUnit> feedback,
       Feedforward<VoltageUnit, DistanceUnit> feedforward,
@@ -132,6 +244,15 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     return new ClosedLoop<>(feedback, feedforward, Optional.empty(), false, angleToDistance);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using distance feedback.
+   *
+   * @param feedback         the PID feedback controller for distance
+   * @param feedforward      the feedforward controller for distance
+   * @param trapezoidProfile the trapezoidal profile to smooth the distance trajectory
+   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @return a new ClosedLoop instance configured for current-distance control
+   */
   public static ClosedLoop<CurrentUnit, DistanceUnit, DistanceUnit> forCurrentDistance(
       PIDFeedback<CurrentUnit, DistanceUnit> feedback,
       Feedforward<CurrentUnit, DistanceUnit> feedforward,
@@ -141,19 +262,38 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
         feedback, feedforward, Optional.of(trapezoidProfile), false, angleToDistance);
   }
 
+  /**
+   * Creates a ClosedLoop controller for current control using distance feedback without a trapezoidal profile.
+   *
+   * @param feedback         the PID feedback controller for distance
+   * @param feedforward      the feedforward controller for distance
+   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @return a new ClosedLoop instance configured for current-distance control
+   */
   public static ClosedLoop<CurrentUnit, DistanceUnit, DistanceUnit> forCurrentDistance(
       PIDFeedback<CurrentUnit, DistanceUnit> feedback,
       Feedforward<CurrentUnit, DistanceUnit> feedforward,
       boolean useFeedbackSign,
       Function<Measure<AngleUnit>, Measure<DistanceUnit>> angleToDistance) {
-    return new ClosedLoop<>(
-        feedback, feedforward, Optional.empty(), useFeedbackSign, angleToDistance);
+    return new ClosedLoop<>(feedback, feedforward, Optional.empty(), useFeedbackSign, angleToDistance);
   }
 
+  /**
+   * Checks whether the feedback controller is using a velocity unit.
+   *
+   * @return {@code true} if the input unit of the feedback is a PerUnit (velocity), {@code false} otherwise.
+   */
   public boolean isVelocity() {
     return feedback.getInputUnit() instanceof PerUnit;
   }
 
+  /**
+   * Converts a state from angle units to distance units using the {@code angleToDistance} function.
+   *
+   * @param state the state in angle units
+   * @return the corresponding state in distance units with adjusted velocity
+   */
   private State<DistanceUnit> angleToDistanceState(State<AngleUnit> state) {
     final VelocityUnit<DistanceUnit> velocityUnit = VelocityUnit.combine(Meters, Seconds);
     final double ratio = angleToDistance.apply(Radians.of(1)).baseUnitMagnitude();
@@ -162,6 +302,13 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
         velocityUnit.of(state.slew().baseUnitMagnitude() * ratio));
   }
 
+  /**
+   * Converts a state from angular velocity units to linear velocity units using the
+   * {@code angleToDistance} conversion.
+   *
+   * @param state the state in angular velocity units
+   * @return the corresponding state in linear velocity units
+   */
   private State<LinearVelocityUnit> angularVelocityToLinearVelocityState(
       State<AngularVelocityUnit> state) {
     final double ratio = angleToDistance.apply(Radians.of(1)).baseUnitMagnitude();
@@ -172,6 +319,19 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
         velocityUnit.of(state.slew().baseUnitMagnitude() * ratio));
   }
 
+  /**
+   * Runs the closed-loop controller for position control.
+   *
+   * <p>This method takes an angle measurement and, if the feedback input unit is a DistanceUnit,
+   * converts the position and state to distance before running the controller.
+   *
+   * @param position the current position as an angle
+   * @param state    the current state (position and velocity) in angle units
+   * @param goal     the desired goal state in angle units
+   * @param dt       the elapsed time step
+   * @return the computed controller output as a measure in the output unit
+   * @throws UnsupportedOperationException if the feedback input unit is velocity-based
+   */
   @SuppressWarnings("unchecked")
   public Measure<OUTPUT> runPosition(
       Angle position, State<AngleUnit> state, State<AngleUnit> goal, Time dt) {
@@ -190,6 +350,19 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     }
   }
 
+  /**
+   * Runs the closed-loop controller for velocity control.
+   *
+   * <p>This method takes an angle measurement and, if the feedback input unit is a DistanceUnit,
+   * converts the position and state to linear velocity before running the controller.
+   *
+   * @param position the current position as an angle
+   * @param state    the current state (velocity and acceleration) in angular velocity units
+   * @param goal     the desired goal state in angular velocity units
+   * @param dt       the elapsed time step
+   * @return the computed controller output as a measure in the output unit
+   * @throws UnsupportedOperationException if the feedback input unit is not velocity-based
+   */
   @SuppressWarnings("unchecked")
   public Measure<OUTPUT> runVelocity(
       Angle position, State<AngularVelocityUnit> state, State<AngularVelocityUnit> goal, Time dt) {
@@ -208,6 +381,20 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
     }
   }
 
+  /**
+   * Runs the closed-loop controller using the provided position, state, and goal.
+   *
+   * <p>If a trapezoidal motion profile is provided, the controller computes a step along the profile
+   * and then combines the PID feedback output with the appropriate feedforward output. Otherwise, it
+   * directly combines the feedback and feedforward outputs.
+   *
+   * @param position the current position (or converted distance) measurement
+   * @param state    the current state (position and velocity) in the input unit
+   * @param goal     the desired goal state in the input unit
+   * @param dt       the elapsed time step
+   * @return the combined controller output as a measure in the output unit
+   * @throws UnsupportedOperationException if the feedforward type is not supported
+   */
   @SuppressWarnings("unchecked")
   public Measure<OUTPUT> run(
       Measure<INPUT_DIMENSION> position, State<INPUT> state, State<INPUT> goal, Time dt) {
@@ -250,7 +437,6 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
       Measure<OUTPUT> feedbackOutput = fbResult.getFirst();
       return feedbackOutput.plus(feedforwardOutput);
     } else {
-      // Measure<OUTPUT> feedbackOutput = feedback.calculate(state.value(), goal.value());
       var fbResult = feedback.calculate(state.value(), goal.value());
       Measure<OUTPUT> feedbackOutput = fbResult.getFirst();
       Measure<OUTPUT> feedforwardOutput = (Measure<OUTPUT>) feedback.getOutputUnit().zero();
