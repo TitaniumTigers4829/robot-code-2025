@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simField;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -246,7 +246,7 @@ public class SimGamePiece implements StructSerializable {
    * A class representing the collision body of a game piece. This is used to provide extra info in
    * the dyn4j functions when doing collision handling.
    */
-  protected static class GamePieceCollisionBody extends Body {
+  public static class GamePieceCollisionBody extends Body {
     public final SimGamePiece gp;
 
     private GamePieceCollisionBody(SimGamePiece gp) {
@@ -336,12 +336,12 @@ public class SimGamePiece implements StructSerializable {
    *
    * @return this {@link SimGamePiece} object
    */
-  SimGamePiece userControlled() {
+  public SimGamePiece userControlled() {
     userControlled = true;
     return this;
   }
 
-  SimGamePiece withLib(Consumer<SimGamePiece> consumer) {
+  public SimGamePiece withLib(Consumer<SimGamePiece> consumer) {
     boolean prevControl = userControlled;
     userControlled = true;
     consumer.accept(this);
@@ -373,7 +373,7 @@ public class SimGamePiece implements StructSerializable {
   }
 
   /** Intakes the {@link SimGamePiece} if the user has control of the {@link SimGamePiece}. */
-  void intake() {
+  public void intake() {
     if (userControlled) {
       transitionState(new GamePieceStateData.Held());
       releaseControl();

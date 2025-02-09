@@ -1,7 +1,7 @@
 package frc.robot.sim.configs;
 
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.sim.SimDriveTrain;
+import frc.robot.sim.simMechanism.SimDriveTrain;
 
 /**
  *

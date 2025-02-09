@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simMechanism;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Volts;

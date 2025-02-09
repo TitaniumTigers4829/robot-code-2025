@@ -11,12 +11,17 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.elevator.ElevatorInterface;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.PhysicalElevator;
+import frc.robot.subsystems.elevator.SimulatedElevator;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
@@ -37,6 +42,7 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
+  private final ElevatorSubsystem elevatorSubsystem;
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -64,12 +70,14 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[2]),
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         // simWorld = null;
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
 
         visionSubsystem = null;
+        elevatorSubsystem = null;
         // simWorld = null;
       }
 
@@ -86,6 +94,7 @@ public class RobotContainer {
 
         visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
         swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
+        elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
       }
 
       default -> {
@@ -100,6 +109,7 @@ public class RobotContainer {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {});
+        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         // simWorld = null;
       }
     }
@@ -188,6 +198,9 @@ public class RobotContainer {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+    operatorController
+        .a()
+        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
   }
 
   public Command getAutonomousCommand() {

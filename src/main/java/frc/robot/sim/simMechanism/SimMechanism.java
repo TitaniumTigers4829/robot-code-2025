@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simMechanism;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
@@ -28,8 +28,9 @@ import frc.robot.extras.util.DCMotorExt;
 import frc.robot.extras.util.GearRatio;
 import frc.robot.extras.util.ProceduralStructGenerator;
 import frc.robot.extras.util.mathutils.MeasureMath;
-import frc.robot.sim.SimArena.SimEnvTiming;
-import frc.robot.sim.SimMotorController.ControllerOutput;
+import frc.robot.sim.simController.SimMotorController;
+import frc.robot.sim.simController.SimMotorController.ControllerOutput;
+import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -406,7 +407,7 @@ public class SimMechanism {
   }
 
   /** Updates the state of the mechanism. */
-  void update(final Voltage supplyVoltage) {
+  public void update(final Voltage supplyVoltage) {
     final Time dt = timing.dt();
 
     final MomentOfInertia inertia = rotorInertia.plus(dynamics.extraInertia());

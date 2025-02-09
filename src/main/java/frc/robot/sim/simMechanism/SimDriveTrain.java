@@ -1,4 +1,4 @@
-package frc.robot.sim;
+package frc.robot.sim.simMechanism;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -7,9 +7,12 @@ import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.util.FrcBody;
 import frc.robot.extras.util.mathutils.GeomUtil;
-import frc.robot.sim.SimArena.SimEnvTiming;
+import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.configs.SimSwerveConfig;
+import frc.robot.sim.simField.SimArena;
+import frc.robot.sim.simField.SimArena.SimEnvTiming;
+import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import org.dyn4j.geometry.Geometry;
 import org.dyn4j.geometry.Mass;
 import org.dyn4j.geometry.Vector2;
@@ -34,7 +37,7 @@ public class SimDriveTrain {
   /** https://simple.wikipedia.org/wiki/Coefficient_of_restitution */
   public static final double kBumperCoR = 0.005;
 
-  protected final FrcBody chassis = new FrcBody();
+  public final FrcBody chassis = new FrcBody();
   private final SimEnvTiming timing;
 
   /**
@@ -138,7 +141,7 @@ public class SimDriveTrain {
    * <p>It is responsible for applying the propelling forces to the robot during each sub-tick of
    * the simulation.
    */
-  protected void simTick() {
+  public void simTick() {
     Logger.recordOutput("SwerveStates/pose", chassis.snapshot().pose());
     Logger.recordOutput("SwerveStates/velocity", chassis.snapshot().velocity());
     Logger.recordOutput("SwerveStates/forces", chassis.snapshot().forces());

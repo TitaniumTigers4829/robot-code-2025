@@ -2,7 +2,7 @@ package frc.robot.subsystems.swerve.gyro;
 
 import static edu.wpi.first.units.Units.*;
 
-import frc.robot.sim.SimGyro;
+import frc.robot.sim.simMechanism.simSwerve.SimGyro;
 
 public class SimulatedGyro implements GyroInterface {
   private double yawRads = 0.0;

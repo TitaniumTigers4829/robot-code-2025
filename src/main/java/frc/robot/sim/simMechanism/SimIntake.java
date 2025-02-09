@@ -1,7 +1,7 @@
-package frc.robot.sim;
+package frc.robot.sim.simMechanism;
 
-import frc.robot.sim.SimGamePiece.GamePieceCollisionBody;
-import frc.robot.sim.SimGamePiece.GamePieceVariant;
+import frc.robot.sim.simField.SimGamePiece.GamePieceCollisionBody;
+import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.dyn4j.collision.CollisionBody;
@@ -34,7 +34,7 @@ public class SimIntake {
    *     object
    * @param capacity the maximum number of game pieces that the intake can hold
    */
-  SimIntake(
+  public SimIntake(
       SimDriveTrain driveTrainSimulation,
       SimIndexer gamePieceStorage,
       Convex shape,
@@ -137,7 +137,7 @@ public class SimIntake {
     public void postSolve(ContactCollisionData<Body> collision, SolvedContact contact) {}
   }
 
-  GamePieceContactListener getGamePieceContactListener() {
+  public GamePieceContactListener getGamePieceContactListener() {
     return new GamePieceContactListener();
   }
 }
