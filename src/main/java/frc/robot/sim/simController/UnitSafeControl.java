@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
-import edu.wpi.first.epilogue.logging.EpilogueBackend;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.AccelerationUnit;
 import edu.wpi.first.units.AngleUnit;
@@ -896,11 +895,11 @@ public class UnitSafeControl {
      *
      * @param logger the backend logger to record the constraints.
      */
-    public void logConstraints(EpilogueBackend logger) {
-      logger.log("maxValue", maxValue.baseUnitMagnitude());
-      logger.log("maxSlew", maxSlew.baseUnitMagnitude());
-      logger.log("maxSlewSlew", maxSlewSlew.baseUnitMagnitude());
-      logger.log("constraintUnit", maxValue.unit().name());
+    public void logConstraints() {
+      Logger.recordOutput("Sim/maxValue", maxValue.baseUnitMagnitude());
+      Logger.recordOutput("Sim/maxSlew", maxSlew.baseUnitMagnitude());
+      Logger.recordOutput("Sim/maxSlewSlew", maxSlewSlew.baseUnitMagnitude());
+      Logger.recordOutput("Sim/constraintUnit", maxValue.unit().name());
     }
 
     /**
