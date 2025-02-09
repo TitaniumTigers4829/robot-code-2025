@@ -233,15 +233,20 @@ public class SimMechanism {
   private final double noise;
 
   /**
-   * A lock to ensure that the mechanism state and variables are not modified while they are being read
+   * A lock to ensure that the mechanism state and variables are not modified while they are being
+   * read
    */
   private final ReentrantReadWriteLock ioLock = new ReentrantReadWriteLock();
+
   /**
-   * The current state of the mechanism. This is the state of the mechanism at the current time step.
+   * The current state of the mechanism. This is the state of the mechanism at the current time
+   * step.
    */
   private MechanismState state = MechanismState.zero();
+
   /**
-   * The current variables of the mechanism. This is the variables of the mechanism at the current time step.
+   * The current variables of the mechanism. This is the variables of the mechanism at the current
+   * time step.
    */
   private MechanismVariables variables = MechanismVariables.zero();
 

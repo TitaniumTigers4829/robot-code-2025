@@ -32,6 +32,7 @@ public class MassMath {
 
     /**
      * Applies a force due to acceleration.
+     *
      * @param acceleration
      * @return
      */

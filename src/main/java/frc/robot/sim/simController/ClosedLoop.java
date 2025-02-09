@@ -38,8 +38,10 @@ import java.util.function.Function;
  * and can be specialized for voltage or current control for position, velocity, or distance.
  *
  * @param <OUTPUT> the unit type of the controller output (e.g., VoltageUnit or CurrentUnit)
- * @param <INPUT> the unit type of the feedback controller input (e.g., AngleUnit, AngularVelocityUnit, or DistanceUnit)
- * @param <INPUT_DIMENSION> the unit type representing the dimensional measurement (e.g., AngleUnit or DistanceUnit)
+ * @param <INPUT> the unit type of the feedback controller input (e.g., AngleUnit,
+ *     AngularVelocityUnit, or DistanceUnit)
+ * @param <INPUT_DIMENSION> the unit type representing the dimensional measurement (e.g., AngleUnit
+ *     or DistanceUnit)
  */
 public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION extends Unit> {
   private final PIDFeedback<OUTPUT, INPUT> feedback;
@@ -51,10 +53,11 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Constructs a ClosedLoop controller without a custom angle-to-distance conversion function.
    *
-   * @param feedback         the PID feedback controller
-   * @param feedforward      the feedforward controller
+   * @param feedback the PID feedback controller
+   * @param feedforward the feedforward controller
    * @param trapezoidProfile an optional trapezoidal motion profile for the input
-   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for
+   *     feedforward calculation
    */
   private ClosedLoop(
       PIDFeedback<OUTPUT, INPUT> feedback,
@@ -72,11 +75,12 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Constructs a ClosedLoop controller with a custom angle-to-distance conversion function.
    *
-   * @param feedback         the PID feedback controller
-   * @param feedforward      the feedforward controller
+   * @param feedback the PID feedback controller
+   * @param feedforward the feedforward controller
    * @param trapezoidProfile an optional trapezoidal motion profile for the input
-   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
-   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for
+   *     feedforward calculation
+   * @param angleToDistance a function to convert an angle measurement to a distance measurement
    */
   private ClosedLoop(
       PIDFeedback<OUTPUT, INPUT> feedback,
@@ -98,8 +102,8 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for voltage control using angle feedback.
    *
-   * @param feedback         the PID feedback controller for angle
-   * @param feedforward      the feedforward controller for angle
+   * @param feedback the PID feedback controller for angle
+   * @param feedforward the feedforward controller for angle
    * @param trapezoidProfile the trapezoidal profile to smooth the angle trajectory
    * @return a new ClosedLoop instance configured for voltage-angle control
    */
@@ -111,11 +115,13 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for voltage control using angle feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for voltage control using angle feedback without a trapezoidal
+   * profile.
    *
-   * @param feedback        the PID feedback controller for angle
-   * @param feedforward     the feedforward controller for angle
-   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @param feedback the PID feedback controller for angle
+   * @param feedforward the feedforward controller for angle
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for
+   *     feedforward calculation
    * @return a new ClosedLoop instance configured for voltage-angle control
    */
   public static ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> forVoltageAngle(
@@ -128,8 +134,8 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for voltage control using angular velocity feedback.
    *
-   * @param feedback         the PID feedback controller for angular velocity
-   * @param feedforward      the feedforward controller for angle
+   * @param feedback the PID feedback controller for angular velocity
+   * @param feedforward the feedforward controller for angle
    * @param trapezoidProfile the trapezoidal profile to smooth the angular velocity trajectory
    * @return a new ClosedLoop instance configured for voltage-angular velocity control
    */
@@ -141,9 +147,10 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for voltage control using angular velocity feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for voltage control using angular velocity feedback without a
+   * trapezoidal profile.
    *
-   * @param feedback    the PID feedback controller for angular velocity
+   * @param feedback the PID feedback controller for angular velocity
    * @param feedforward the feedforward controller for angle
    * @return a new ClosedLoop instance configured for voltage-angular velocity control
    */
@@ -156,8 +163,8 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for current control using angle feedback.
    *
-   * @param feedback         the PID feedback controller for angle
-   * @param feedforward      the feedforward controller for angle
+   * @param feedback the PID feedback controller for angle
+   * @param feedforward the feedforward controller for angle
    * @param trapezoidProfile the trapezoidal profile to smooth the angle trajectory
    * @return a new ClosedLoop instance configured for current-angle control
    */
@@ -169,11 +176,13 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for current control using angle feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for current control using angle feedback without a trapezoidal
+   * profile.
    *
-   * @param feedback        the PID feedback controller for angle
-   * @param feedforward     the feedforward controller for angle
-   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for feedforward calculation
+   * @param feedback the PID feedback controller for angle
+   * @param feedforward the feedforward controller for angle
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for
+   *     feedforward calculation
    * @return a new ClosedLoop instance configured for current-angle control
    */
   public static ClosedLoop<CurrentUnit, AngleUnit, AngleUnit> forCurrentAngle(
@@ -186,8 +195,8 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for current control using angular velocity feedback.
    *
-   * @param feedback         the PID feedback controller for angular velocity
-   * @param feedforward      the feedforward controller for angle
+   * @param feedback the PID feedback controller for angular velocity
+   * @param feedforward the feedforward controller for angle
    * @param trapezoidProfile the trapezoidal profile to smooth the angular velocity trajectory
    * @return a new ClosedLoop instance configured for current-angular velocity control
    */
@@ -199,9 +208,10 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for current control using angular velocity feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for current control using angular velocity feedback without a
+   * trapezoidal profile.
    *
-   * @param feedback    the PID feedback controller for angular velocity
+   * @param feedback the PID feedback controller for angular velocity
    * @param feedforward the feedforward controller for angle
    * @return a new ClosedLoop instance configured for current-angular velocity control
    */
@@ -214,10 +224,10 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for voltage control using distance feedback.
    *
-   * @param feedback         the PID feedback controller for distance
-   * @param feedforward      the feedforward controller for distance
+   * @param feedback the PID feedback controller for distance
+   * @param feedforward the feedforward controller for distance
    * @param trapezoidProfile the trapezoidal profile to smooth the distance trajectory
-   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @param angleToDistance a function to convert an angle measurement to a distance measurement
    * @return a new ClosedLoop instance configured for voltage-distance control
    */
   public static ClosedLoop<VoltageUnit, DistanceUnit, DistanceUnit> forVoltageDistance(
@@ -230,10 +240,11 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for voltage control using distance feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for voltage control using distance feedback without a
+   * trapezoidal profile.
    *
-   * @param feedback        the PID feedback controller for distance
-   * @param feedforward     the feedforward controller for distance
+   * @param feedback the PID feedback controller for distance
+   * @param feedforward the feedforward controller for distance
    * @param angleToDistance a function to convert an angle measurement to a distance measurement
    * @return a new ClosedLoop instance configured for voltage-distance control
    */
@@ -247,10 +258,10 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Creates a ClosedLoop controller for current control using distance feedback.
    *
-   * @param feedback         the PID feedback controller for distance
-   * @param feedforward      the feedforward controller for distance
+   * @param feedback the PID feedback controller for distance
+   * @param feedforward the feedforward controller for distance
    * @param trapezoidProfile the trapezoidal profile to smooth the distance trajectory
-   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @param angleToDistance a function to convert an angle measurement to a distance measurement
    * @return a new ClosedLoop instance configured for current-distance control
    */
   public static ClosedLoop<CurrentUnit, DistanceUnit, DistanceUnit> forCurrentDistance(
@@ -263,12 +274,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Creates a ClosedLoop controller for current control using distance feedback without a trapezoidal profile.
+   * Creates a ClosedLoop controller for current control using distance feedback without a
+   * trapezoidal profile.
    *
-   * @param feedback         the PID feedback controller for distance
-   * @param feedforward      the feedforward controller for distance
-   * @param useFeedbackSign  flag indicating whether to use the sign of the feedback output for feedforward calculation
-   * @param angleToDistance  a function to convert an angle measurement to a distance measurement
+   * @param feedback the PID feedback controller for distance
+   * @param feedforward the feedforward controller for distance
+   * @param useFeedbackSign flag indicating whether to use the sign of the feedback output for
+   *     feedforward calculation
+   * @param angleToDistance a function to convert an angle measurement to a distance measurement
    * @return a new ClosedLoop instance configured for current-distance control
    */
   public static ClosedLoop<CurrentUnit, DistanceUnit, DistanceUnit> forCurrentDistance(
@@ -276,13 +289,15 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
       Feedforward<CurrentUnit, DistanceUnit> feedforward,
       boolean useFeedbackSign,
       Function<Measure<AngleUnit>, Measure<DistanceUnit>> angleToDistance) {
-    return new ClosedLoop<>(feedback, feedforward, Optional.empty(), useFeedbackSign, angleToDistance);
+    return new ClosedLoop<>(
+        feedback, feedforward, Optional.empty(), useFeedbackSign, angleToDistance);
   }
 
   /**
    * Checks whether the feedback controller is using a velocity unit.
    *
-   * @return {@code true} if the input unit of the feedback is a PerUnit (velocity), {@code false} otherwise.
+   * @return {@code true} if the input unit of the feedback is a PerUnit (velocity), {@code false}
+   *     otherwise.
    */
   public boolean isVelocity() {
     return feedback.getInputUnit() instanceof PerUnit;
@@ -303,8 +318,8 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   }
 
   /**
-   * Converts a state from angular velocity units to linear velocity units using the
-   * {@code angleToDistance} conversion.
+   * Converts a state from angular velocity units to linear velocity units using the {@code
+   * angleToDistance} conversion.
    *
    * @param state the state in angular velocity units
    * @return the corresponding state in linear velocity units
@@ -326,9 +341,9 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
    * converts the position and state to distance before running the controller.
    *
    * @param position the current position as an angle
-   * @param state    the current state (position and velocity) in angle units
-   * @param goal     the desired goal state in angle units
-   * @param dt       the elapsed time step
+   * @param state the current state (position and velocity) in angle units
+   * @param goal the desired goal state in angle units
+   * @param dt the elapsed time step
    * @return the computed controller output as a measure in the output unit
    * @throws UnsupportedOperationException if the feedback input unit is velocity-based
    */
@@ -357,9 +372,9 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
    * converts the position and state to linear velocity before running the controller.
    *
    * @param position the current position as an angle
-   * @param state    the current state (velocity and acceleration) in angular velocity units
-   * @param goal     the desired goal state in angular velocity units
-   * @param dt       the elapsed time step
+   * @param state the current state (velocity and acceleration) in angular velocity units
+   * @param goal the desired goal state in angular velocity units
+   * @param dt the elapsed time step
    * @return the computed controller output as a measure in the output unit
    * @throws UnsupportedOperationException if the feedback input unit is not velocity-based
    */
@@ -384,14 +399,14 @@ public class ClosedLoop<OUTPUT extends Unit, INPUT extends Unit, INPUT_DIMENSION
   /**
    * Runs the closed-loop controller using the provided position, state, and goal.
    *
-   * <p>If a trapezoidal motion profile is provided, the controller computes a step along the profile
-   * and then combines the PID feedback output with the appropriate feedforward output. Otherwise, it
-   * directly combines the feedback and feedforward outputs.
+   * <p>If a trapezoidal motion profile is provided, the controller computes a step along the
+   * profile and then combines the PID feedback output with the appropriate feedforward output.
+   * Otherwise, it directly combines the feedback and feedforward outputs.
    *
    * @param position the current position (or converted distance) measurement
-   * @param state    the current state (position and velocity) in the input unit
-   * @param goal     the desired goal state in the input unit
-   * @param dt       the elapsed time step
+   * @param state the current state (position and velocity) in the input unit
+   * @param goal the desired goal state in the input unit
+   * @param dt the elapsed time step
    * @return the combined controller output as a measure in the output unit
    * @throws UnsupportedOperationException if the feedforward type is not supported
    */

@@ -4,8 +4,8 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -23,9 +23,9 @@ import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.function.BiConsumer;
 
 /**
+ *
+ *
  * <h1>Simulated Gyro</hh1>
- * 
- * 
  */
 public class SimGyro {
   /* The threshold of instantaneous angular acceleration at which the chassis is considered to
@@ -46,6 +46,7 @@ public class SimGyro {
 
   /**
    * Creates a new SimGyro.
+   *
    * @param timing the simulation timing
    * @param gyroConfig the gyro configuration
    */
@@ -59,8 +60,10 @@ public class SimGyro {
   }
 
   /**
-   * Sets the update consumer. This consumer takes the gyro angle and angular velocity as a {@link Pair} and the linear accerlation in the x and y directions.
-   * These values are used to update the simulation. The values change each subtick according to what occurs in the simulation space.
+   * Sets the update consumer. This consumer takes the gyro angle and angular velocity as a {@link
+   * Pair} and the linear accerlation in the x and y directions. These values are used to update the
+   * simulation. The values change each subtick according to what occurs in the simulation space.
+   *
    * @param updateConsumer the update consumer
    */
   public void setUpdateConsumer(
@@ -75,7 +78,7 @@ public class SimGyro {
    *
    * <p>This method updates the gyro simulation and should be called during every sub-tick of the
    * simulation.
-   * 
+   *
    * @param angleThisTick the current angle of the simulated drivetrain.
    * @param twistThisTick the current pose twist of the simulated drivetrain.
    */
@@ -102,18 +105,17 @@ public class SimGyro {
   }
 
   private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
-      AngularVelocity lastAngularVelocity = RadiansPerSecond.of(
-          lastTwist.dtheta * timing.dt().in(Seconds)
-      );
-      AngularAcceleration angularAcceleration =
-  actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
-      if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
-          return DRIFT_DUE_TO_IMPACT_COEFFICIENT
-                  .times(MeasureMath.signum(angularAcceleration))
-                  .times(angularAcceleration.div(START_DRIFTING))
-                  .div(timing.dt());
-      } else {
-          return RadiansPerSecond.of(0);
-      }
+    AngularVelocity lastAngularVelocity =
+        RadiansPerSecond.of(lastTwist.dtheta * timing.dt().in(Seconds));
+    AngularAcceleration angularAcceleration =
+        actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
+    if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
+      return DRIFT_DUE_TO_IMPACT_COEFFICIENT
+          .times(MeasureMath.signum(angularAcceleration))
+          .times(angularAcceleration.div(START_DRIFTING))
+          .div(timing.dt());
+    } else {
+      return RadiansPerSecond.of(0);
+    }
   }
 }

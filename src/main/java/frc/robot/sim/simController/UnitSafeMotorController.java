@@ -42,16 +42,14 @@ public class UnitSafeMotorController implements SimMotorController {
   private static final VelocityUnit<AngularVelocityUnit> AU =
       VelocityUnit.combine(RadiansPerSecond, Seconds);
 
-  /**
-   * Represents an output command from the motor controller.
-   */
+  /** Represents an output command from the motor controller. */
   private sealed interface Output {
     /**
      * Computes the controller output for the given time step, supply voltage, and mechanism state.
      *
-     * @param dt      the time step for this update.
-     * @param supply  the available supply voltage.
-     * @param state   the current state of the mechanism.
+     * @param dt the time step for this update.
+     * @param supply the available supply voltage.
+     * @param state the current state of the mechanism.
      * @return the controller output as a {@link ControllerOutput}.
      */
     public ControllerOutput run(Time dt, Voltage supply, MechanismState state);
@@ -62,9 +60,7 @@ public class UnitSafeMotorController implements SimMotorController {
      * @param <U> the unit type for the output value.
      */
     public record ClosedLoopOutput<U extends Unit>(
-        ClosedLoop<?, U, AngleUnit> controller,
-        Measure<U> value,
-        Velocity<U> secondOrderValue)
+        ClosedLoop<?, U, AngleUnit> controller, Measure<U> value, Velocity<U> secondOrderValue)
         implements Output {
 
       /**
@@ -74,9 +70,9 @@ public class UnitSafeMotorController implements SimMotorController {
        * <p>If the controller is in velocity mode, it uses the velocity and acceleration values.
        * Otherwise, it uses the position and velocity values.
        *
-       * @param dt      the elapsed time step.
-       * @param supply  the available supply voltage.
-       * @param state   the current mechanism state.
+       * @param dt the elapsed time step.
+       * @param supply the available supply voltage.
+       * @param state the current mechanism state.
        * @return the computed controller output as a {@link ControllerOutput} (voltage or current).
        */
       @Override
@@ -111,16 +107,14 @@ public class UnitSafeMotorController implements SimMotorController {
       }
     }
 
-    /**
-     * Represents an open-loop voltage command.
-     */
+    /** Represents an open-loop voltage command. */
     public record OpenLoopVoltageOutput(Voltage volts) implements Output {
       /**
        * Runs the open-loop voltage command by clamping the voltage to the available supply.
        *
-       * @param dt      the elapsed time step (unused in open-loop voltage).
-       * @param supply  the available supply voltage.
-       * @param state   the current mechanism state (unused).
+       * @param dt the elapsed time step (unused in open-loop voltage).
+       * @param supply the available supply voltage.
+       * @param state the current mechanism state (unused).
        * @return the clamped voltage as a {@link ControllerOutput}.
        */
       @Override
@@ -129,16 +123,14 @@ public class UnitSafeMotorController implements SimMotorController {
       }
     }
 
-    /**
-     * Represents an open-loop current command.
-     */
+    /** Represents an open-loop current command. */
     public record OpenLoopCurrentOutput(Current amps) implements Output {
       /**
        * Runs the open-loop current command.
        *
-       * @param dt      the elapsed time step (unused in open-loop current).
-       * @param supply  the available supply voltage (unused).
-       * @param state   the current mechanism state (unused).
+       * @param dt the elapsed time step (unused in open-loop current).
+       * @param supply the available supply voltage (unused).
+       * @param state the current mechanism state (unused).
        * @return the specified current as a {@link ControllerOutput}.
        */
       @Override
@@ -174,10 +166,10 @@ public class UnitSafeMotorController implements SimMotorController {
    * <p>This record holds limits for the motor’s stator current, supply current, a lower supply
    * current limit, and a trigger time for the lower supply limit.
    *
-   * @param statorCurrentLimit     the maximum allowable stator current.
-   * @param supplyCurrentLimit     the maximum allowable supply current.
+   * @param statorCurrentLimit the maximum allowable stator current.
+   * @param supplyCurrentLimit the maximum allowable supply current.
    * @param supplyCurrentLowerLimit the reduced supply current limit triggered after a set time.
-   * @param lowerLimitTriggerTime  the time after which the lower supply current limit is applied.
+   * @param lowerLimitTriggerTime the time after which the lower supply current limit is applied.
    */
   public record CurrentLimits(
       Current statorCurrentLimit,
@@ -214,9 +206,7 @@ public class UnitSafeMotorController implements SimMotorController {
         ProceduralStructGenerator.genRecord(CurrentLimits.class);
   }
 
-  /**
-   * Enumerates the possible soft limit trigger states.
-   */
+  /** Enumerates the possible soft limit trigger states. */
   public enum SoftLimitTrigger {
     NONE,
     REVERSE,
@@ -231,32 +221,41 @@ public class UnitSafeMotorController implements SimMotorController {
 
   /** The motor model used for simulation. */
   private DCMotorExt motor = null;
+
   /** The number of motors in the simulation (used for scaling current limits). */
   private int numMotors = 0;
+
   /** The current limits for the motor controller. */
   private CurrentLimits currentLimits = CurrentLimits.base();
+
   /** Accumulated time over the supply current limit. */
   private Time timeOverSupplyLimit = Seconds.of(0.0);
+
   /** The ratio between sensor measurements and the actual mechanism. */
   private double sensorToMechanismRatio = 1.0;
+
   /** The forward soft limit for mechanism position. */
   private Angle forwardSoftLimit = Radians.of(Double.POSITIVE_INFINITY);
+
   /** The reverse soft limit for mechanism position. */
   private Angle reverseSoftLimit = Radians.of(Double.NEGATIVE_INFINITY);
+
   /** The current output command, if any. */
   private Optional<Output> output = Optional.empty();
+
   /** Whether brake mode is enabled. */
   private boolean brakeMode = false;
+
   /** The last measured motor current. */
   private Current lastCurrent = Amps.of(0.0);
+
   /** The last calculated motor voltage. */
   private Voltage lastVoltage = Volts.of(0.0);
+
   /** The last mechanism state. */
   private MechanismState lastState = MechanismState.zero();
 
-  /**
-   * Constructs a new UnitSafeMotorController.
-   */
+  /** Constructs a new UnitSafeMotorController. */
   public UnitSafeMotorController() {}
 
   /**
@@ -318,8 +317,8 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop current control using position and velocity feedback.
    *
    * @param controller the closed-loop controller for current.
-   * @param position   the desired mechanism position.
-   * @param velocity   the measured mechanism velocity.
+   * @param position the desired mechanism position.
+   * @param velocity the measured mechanism velocity.
    */
   public void controlCurrent(
       ClosedLoop<CurrentUnit, AngleUnit, AngleUnit> controller,
@@ -339,7 +338,7 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop current control using position feedback only.
    *
    * @param controller the closed-loop controller for current.
-   * @param position   the desired mechanism position.
+   * @param position the desired mechanism position.
    */
   public void controlCurrent(
       ClosedLoop<CurrentUnit, AngleUnit, AngleUnit> controller, Angle position) {
@@ -349,8 +348,8 @@ public class UnitSafeMotorController implements SimMotorController {
   /**
    * Sets closed-loop current control using velocity and acceleration feedback.
    *
-   * @param controller  the closed-loop controller for current.
-   * @param velocity    the desired mechanism velocity.
+   * @param controller the closed-loop controller for current.
+   * @param velocity the desired mechanism velocity.
    * @param acceleration the desired mechanism acceleration.
    */
   public void controlCurrent(
@@ -371,7 +370,7 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop current control using velocity feedback only.
    *
    * @param controller the closed-loop controller for current.
-   * @param velocity   the desired mechanism velocity.
+   * @param velocity the desired mechanism velocity.
    */
   public void controlCurrent(
       ClosedLoop<CurrentUnit, AngularVelocityUnit, AngleUnit> controller,
@@ -392,8 +391,8 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop voltage control using position and velocity feedback.
    *
    * @param controller the closed-loop controller for voltage.
-   * @param position   the desired mechanism position.
-   * @param velocity   the measured mechanism velocity.
+   * @param position the desired mechanism position.
+   * @param velocity the measured mechanism velocity.
    */
   public void controlVoltage(
       ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> controller,
@@ -413,7 +412,7 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop voltage control using position feedback only.
    *
    * @param controller the closed-loop controller for voltage.
-   * @param position   the desired mechanism position.
+   * @param position the desired mechanism position.
    */
   public void controlVoltage(
       ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> controller, Angle position) {
@@ -423,8 +422,8 @@ public class UnitSafeMotorController implements SimMotorController {
   /**
    * Sets closed-loop voltage control using velocity and acceleration feedback.
    *
-   * @param controller  the closed-loop controller for voltage.
-   * @param velocity    the desired mechanism velocity.
+   * @param controller the closed-loop controller for voltage.
+   * @param velocity the desired mechanism velocity.
    * @param acceleration the desired mechanism acceleration.
    */
   public void controlVoltage(
@@ -445,7 +444,7 @@ public class UnitSafeMotorController implements SimMotorController {
    * Sets closed-loop voltage control using velocity feedback only.
    *
    * @param controller the closed-loop controller for voltage.
-   * @param velocity   the desired mechanism velocity.
+   * @param velocity the desired mechanism velocity.
    */
   public void controlVoltage(
       ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> controller,
@@ -521,9 +520,9 @@ public class UnitSafeMotorController implements SimMotorController {
    * Executes one simulation step by calculating the desired output based on the current control
    * mode and then applying soft limits and current limits.
    *
-   * @param dt         the elapsed time step.
-   * @param supply     the available supply voltage.
-   * @param rawState   the raw mechanism state.
+   * @param dt the elapsed time step.
+   * @param supply the available supply voltage.
+   * @param rawState the raw mechanism state.
    * @return the final {@link ControllerOutput} after applying all limits.
    */
   @Override
@@ -542,8 +541,9 @@ public class UnitSafeMotorController implements SimMotorController {
    * Applies soft limit constraints to the requested output based on the mechanism's position.
    *
    * @param requestedOutput the controller output requested.
-   * @param state           the current mechanism state.
-   * @return a zero output if the soft limits are exceeded; otherwise, the original requested output.
+   * @param state the current mechanism state.
+   * @return a zero output if the soft limits are exceeded; otherwise, the original requested
+   *     output.
    */
   private ControllerOutput softLimit(ControllerOutput requestedOutput, MechanismState state) {
     double direction = requestedOutput.signumMagnitude();
@@ -557,18 +557,19 @@ public class UnitSafeMotorController implements SimMotorController {
   }
 
   /**
-   * Applies current limiting logic based on motor characteristics and supply limits.
-   * This method adjusts the voltage or current output if any of the current limits are exceeded.
+   * Applies current limiting logic based on motor characteristics and supply limits. This method
+   * adjusts the voltage or current output if any of the current limits are exceeded.
    *
-   * @param dt             the elapsed time step.
+   * @param dt the elapsed time step.
    * @param requestedOutput the initial controller output.
-   * @param state          the current mechanism state.
-   * @param supplyVoltage  the available supply voltage.
+   * @param state the current mechanism state.
+   * @param supplyVoltage the available supply voltage.
    * @return the adjusted {@link ControllerOutput} after current limiting.
    */
   private ControllerOutput currentLimit(
       Time dt, ControllerOutput requestedOutput, MechanismState state, Voltage supplyVoltage) {
-    // See https://file.tavsys.net/control/controls-engineering-in-frc.pdf (sec 12.1.3) for reference.
+    // See https://file.tavsys.net/control/controls-engineering-in-frc.pdf (sec 12.1.3) for
+    // reference.
     final CurrentLimits limits = currentLimits.times(numMotors);
     final AngularVelocity velocity = state.velocity();
     Voltage voltageInput;

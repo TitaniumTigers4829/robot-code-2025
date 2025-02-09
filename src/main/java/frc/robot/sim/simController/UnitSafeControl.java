@@ -67,13 +67,12 @@ public class UnitSafeControl {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
       internalController =
-          new PIDController(
-              kP.baseUnitMagnitude(), kI.baseUnitMagnitude(), kD.baseUnitMagnitude());
+          new PIDController(kP.baseUnitMagnitude(), kI.baseUnitMagnitude(), kD.baseUnitMagnitude());
     }
 
     /**
-     * Constructs a PIDFeedback controller with proportional and derivative gains.
-     * The integral gain is set to zero.
+     * Constructs a PIDFeedback controller with proportional and derivative gains. The integral gain
+     * is set to zero.
      *
      * @param kP the proportional gain as a ratio of output to input.
      * @param kD the derivative gain as a ratio of output to the velocity of input.
@@ -81,27 +80,22 @@ public class UnitSafeControl {
     public PIDFeedback(Per<O, Q> kP, Per<O, VelocityUnit<Q>> kD) {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
-      internalController =
-          new PIDController(
-              kP.baseUnitMagnitude(), 0.0, kD.baseUnitMagnitude());
+      internalController = new PIDController(kP.baseUnitMagnitude(), 0.0, kD.baseUnitMagnitude());
     }
 
     /**
-     * Constructs a PIDFeedback controller with only a proportional gain.
-     * The integral and derivative gains are set to zero.
+     * Constructs a PIDFeedback controller with only a proportional gain. The integral and
+     * derivative gains are set to zero.
      *
      * @param kP the proportional gain as a ratio of output to input.
      */
     public PIDFeedback(Per<O, Q> kP) {
       outputUnit = kP.unit().numerator();
       inputUnit = kP.unit().denominator();
-      internalController =
-          new PIDController(kP.baseUnitMagnitude(), 0.0, 0.0);
+      internalController = new PIDController(kP.baseUnitMagnitude(), 0.0, 0.0);
     }
 
-    /**
-     * Logs the current PID controller gains and unit configuration.
-     */
+    /** Logs the current PID controller gains and unit configuration. */
     public void logGains() {
       Logger.recordOutput("Sim/kP", internalController.getP());
       Logger.recordOutput("Sim/kI", internalController.getI());
@@ -115,7 +109,8 @@ public class UnitSafeControl {
      *
      * @param measurement the current measurement.
      * @param setpoint the desired setpoint.
-     * @return a Pair where the first element is the control output and the second element is the error.
+     * @return a Pair where the first element is the control output and the second element is the
+     *     error.
      */
     @SuppressWarnings("unchecked")
     public Pair<Measure<O>, Measure<Q>> calculate(Measure<Q> measurement, Measure<Q> setpoint) {
@@ -237,7 +232,8 @@ public class UnitSafeControl {
      *
      * @param measurement the current distance measurement.
      * @param setpoint the desired distance setpoint.
-     * @return a Pair where the first element is the control output and the second element is the error.
+     * @return a Pair where the first element is the control output and the second element is the
+     *     error.
      */
     public Pair<Measure<O>, Measure<DistanceUnit>> calculate(
         Distance measurement, Distance setpoint) {
@@ -254,7 +250,8 @@ public class UnitSafeControl {
       extends PIDFeedback<O, LinearVelocityUnit> {
 
     /**
-     * Constructs a LinearVelocityPIDFeedback controller with proportional, integral, and derivative gains.
+     * Constructs a LinearVelocityPIDFeedback controller with proportional, integral, and derivative
+     * gains.
      *
      * @param kP the proportional gain as a ratio of output to linear velocity.
      * @param kI the integral gain as a ratio of output to linear velocity.
@@ -299,7 +296,8 @@ public class UnitSafeControl {
      *
      * @param measurement the current linear velocity measurement.
      * @param setpoint the desired linear velocity setpoint.
-     * @return a Pair where the first element is the control output and the second element is the error.
+     * @return a Pair where the first element is the control output and the second element is the
+     *     error.
      */
     public Pair<Measure<O>, Measure<LinearVelocityUnit>> calculate(
         LinearVelocity measurement, LinearVelocity setpoint) {
@@ -315,7 +313,8 @@ public class UnitSafeControl {
   public static class AngularPIDFeedback<O extends Unit> extends PIDFeedback<O, AngleUnit> {
 
     /**
-     * Constructs an AngularPIDFeedback controller with proportional, integral, and derivative gains.
+     * Constructs an AngularPIDFeedback controller with proportional, integral, and derivative
+     * gains.
      *
      * @param kP the proportional gain as a ratio of output to angle.
      * @param kI the integral gain as a ratio of output to angle.
@@ -357,7 +356,8 @@ public class UnitSafeControl {
      *
      * @param measurement the current angular measurement.
      * @param setpoint the desired angular setpoint.
-     * @return a Pair where the first element is the control output and the second element is the error.
+     * @return a Pair where the first element is the control output and the second element is the
+     *     error.
      */
     public Pair<Measure<O>, Measure<AngleUnit>> calculate(Angle measurement, Angle setpoint) {
       return super.calculate(measurement, setpoint);
@@ -383,7 +383,8 @@ public class UnitSafeControl {
       extends PIDFeedback<O, AngularVelocityUnit> {
 
     /**
-     * Constructs an AngularVelocityPIDFeedback controller with proportional, integral, and derivative gains.
+     * Constructs an AngularVelocityPIDFeedback controller with proportional, integral, and
+     * derivative gains.
      *
      * @param kP the proportional gain as a ratio of output to angular velocity.
      * @param kI the integral gain as a ratio of output to angular velocity.
@@ -424,11 +425,13 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the control output and error for a given angular velocity measurement and setpoint.
+     * Calculates the control output and error for a given angular velocity measurement and
+     * setpoint.
      *
      * @param measurement the current angular velocity measurement.
      * @param setpoint the desired angular velocity setpoint.
-     * @return a Pair where the first element is the control output and the second element is the error.
+     * @return a Pair where the first element is the control output and the second element is the
+     *     error.
      */
     public Pair<Measure<O>, Measure<AngularVelocityUnit>> calculate(
         AngularVelocity measurement, AngularVelocity setpoint) {
@@ -444,9 +447,7 @@ public class UnitSafeControl {
    */
   public sealed interface Feedforward<O extends Unit, Q extends Unit>
       permits FlywheelFeedforward, ElevatorFeedforward, ArmFeedforward {
-    /**
-     * Logs the feedforward gains.
-     */
+    /** Logs the feedforward gains. */
     public void logGains();
   }
 
@@ -491,9 +492,7 @@ public class UnitSafeControl {
       this.kS = kS;
       this.kV = null;
       this.kA = null;
-      internalFeedforward =
-          new SimpleMotorFeedforward(
-              kS.baseUnitMagnitude(), 0.0, 0.0);
+      internalFeedforward = new SimpleMotorFeedforward(kS.baseUnitMagnitude(), 0.0, 0.0);
     }
 
     @Override
@@ -511,7 +510,8 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the feedforward output based on the desired angular velocity and angular acceleration.
+     * Calculates the feedforward output based on the desired angular velocity and angular
+     * acceleration.
      *
      * @param goalRate the desired angular velocity.
      * @param goalRateRate the desired angular acceleration.
@@ -597,7 +597,8 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the feedforward output based on the desired linear velocity and linear acceleration.
+     * Calculates the feedforward output based on the desired linear velocity and linear
+     * acceleration.
      *
      * @param goalRate the desired linear velocity.
      * @param goalRateRate the desired linear acceleration.
@@ -690,7 +691,8 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the feedforward output using current arm angle and two successive angular velocity values.
+     * Calculates the feedforward output using current arm angle and two successive angular velocity
+     * values.
      *
      * @param currentAngle the current arm angle.
      * @param goalRate the current desired angular velocity.
@@ -709,7 +711,8 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the feedforward output based on the current arm angle and desired angular velocity.
+     * Calculates the feedforward output based on the current arm angle and desired angular
+     * velocity.
      *
      * @param currentAngle the current arm angle.
      * @param goalRate the desired angular velocity.
@@ -743,8 +746,8 @@ public class UnitSafeControl {
     private final Acceleration<DIM> maxSlewSlew;
 
     /**
-     * Represents a state within a trapezoidal motion profile, consisting of a value (position)
-     * and a slew (velocity).
+     * Represents a state within a trapezoidal motion profile, consisting of a value (position) and
+     * a slew (velocity).
      *
      * @param <DIM> The dimensional unit for the state.
      * @param value the position value.
@@ -905,8 +908,8 @@ public class UnitSafeControl {
     }
 
     /**
-     * Calculates the next state of the trapezoidal profile given the current state, goal state,
-     * and elapsed time.
+     * Calculates the next state of the trapezoidal profile given the current state, goal state, and
+     * elapsed time.
      *
      * @param current the current state.
      * @param goal the goal state.

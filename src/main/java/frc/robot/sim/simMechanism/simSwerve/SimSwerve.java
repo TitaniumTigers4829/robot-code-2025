@@ -35,9 +35,7 @@ import java.util.Arrays;
 import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;
 
-/**
- * The class which simulates the swerve drive.
- */
+/** The class which simulates the swerve drive. */
 public class SimSwerve extends SimDriveTrain {
   protected final SimEnvTiming timing;
   protected final SimSwerveModule[] moduleSimulations;
@@ -115,9 +113,7 @@ public class SimSwerve extends SimDriveTrain {
     super.simTick();
   }
 
-  /**
-   * Simulates the friction on the swerve modules.
-   */
+  /** Simulates the friction on the swerve modules. */
   private void simulateModuleFriction() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
     final ChassisSpeeds chassisSpeeds = this.getChassisWorldSpeeds();
@@ -167,7 +163,8 @@ public class SimSwerve extends SimDriveTrain {
 
     Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
     Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
-    Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccelPreClamp", angularFrictionAccel);
+    Logger.recordOutput(
+        "Forces/SwerveForces/Friction/angularFrictionAccelPreClamp", angularFrictionAccel);
 
     xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
     yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
@@ -190,9 +187,7 @@ public class SimSwerve extends SimDriveTrain {
     chassis.applyTorque(angularFrictionTorque.in(NewtonMeters));
   }
 
-  /**
-   * Simulates the propulsion forces on the swerve modules.
-   */
+  /** Simulates the propulsion forces on the swerve modules. */
   private void simulateModulePropulsion() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
 
@@ -202,7 +197,7 @@ public class SimSwerve extends SimDriveTrain {
     Force propulsionForceY = Newtons.zero();
     Torque propulsionTorque = NewtonMeters.zero();
 
-    // 
+    //
     for (final SimSwerveModule module : moduleSimulations) {
       final XY<Distance> forcePosition = XY.of(module.translation().rotateBy(chassisRotation));
       final XY<Force> propulsion = module.force(chassisRotation);
@@ -261,6 +256,7 @@ public class SimSwerve extends SimDriveTrain {
 
   /**
    * Gets the swerve modules.
+   *
    * @return the current moduleSimulations.
    */
   public SimSwerveModule[] getModules() {
@@ -269,6 +265,7 @@ public class SimSwerve extends SimDriveTrain {
 
   /**
    * Gets the gyro.
+   *
    * @return the current gyroSimulation.
    */
   public SimGyro getGyro() {
@@ -277,6 +274,7 @@ public class SimSwerve extends SimDriveTrain {
 
   /**
    * Uses {@link SimMotorController}'s to control the moduleSimulations.
+   *
    * @param moduleId the id of the module.
    * @param driveController the drive controller.
    * @param steerController the steer controller.
@@ -299,6 +297,7 @@ public class SimSwerve extends SimDriveTrain {
 
   /**
    * Gets the current sim timing.
+   *
    * @return the current {@link SimEnvTiming}.
    */
   public SimEnvTiming timing() {
