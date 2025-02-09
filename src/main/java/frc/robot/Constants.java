@@ -6,12 +6,6 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
-  public static final class LogPaths {
-    public static final String SYSTEM_PERFORMANCE_PATH = "SystemPerformance/";
-    public static final String PHYSICS_SIMULATION_PATH = "MaplePhysicsSimulation/";
-    public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
-  }
-
   public static final RobotType ROBOT_TYPE = RobotType.COMP_ROBOT;
 
   public static enum RobotType {
