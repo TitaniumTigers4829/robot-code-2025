@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -139,8 +138,8 @@ public class RobotContainer {
 
     choreoAutoChooser.addRoutine("Example One Meter Auto", autos::oneMeterTestAutoRoutine);
     // this updates the auto chooser
-    SmartDashboard.putData(autoChooser);
-    SmartDashboard.putData(choreoAutoChooser);
+    SmartDashboard.putData("Normal AutoChooser", autoChooser);
+    SmartDashboard.putData("Choreo AutoChooser", choreoAutoChooser);
   }
 
   public void teleopInit() {
