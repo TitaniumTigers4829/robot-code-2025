@@ -246,7 +246,7 @@ public class RobotContainer {
     //   return null;
     // }
     // if (choreoAutoChooser.selectedCommand() != null) {
-    return choreoAutoChooser.selectedCommand();
+    return choreoAutoChooser.selectedCommandScheduler();
     // return new RunCommand(() -> choreoAutoChooser.selectedCommand());
 
     // } else {

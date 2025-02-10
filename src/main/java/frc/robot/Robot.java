@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.sim.SimWorld;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -69,6 +70,7 @@ public class Robot extends LoggedRobot {
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     robotContainer = new RobotContainer();
+    RobotModeTriggers.autonomous().whileTrue(robotContainer.getAutonomousCommand());
   }
 
   /** This function is called periodically during all modes. */
@@ -103,9 +105,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when autonomous is enabled. */
   @Override
-  public void autonomousInit() {
-    robotContainer.getAutonomousCommand();
-  }
+  public void autonomousInit() {}
 
   /** This function is called once when teleop is enabled. */
   @Override
