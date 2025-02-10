@@ -25,13 +25,31 @@ import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.util.mathutils.MeasureMath;
 
+/**
+ * An extended version of the DCMotor class that provides additional methods for calculating motor
+ * properties.
+ */
 public class DCMotorExt extends DCMotor {
 
+  /** A proto of a {@link DCMotorExt}. Used for serialization and deserialization. */
   public static final DCMotorProto proto = new DCMotorProto();
+
+  /** A struct of a {@link DCMotorExt}. Used for serialization and deserialization. */
   public static final DCMotorStruct struct = new DCMotorStruct();
 
+  /** The number of motors. */
   public final int numMotors;
 
+  /**
+   * Constructs a DCMotorExt.
+   *
+   * @param nominalVoltageVolts The nominal voltage of the motor.
+   * @param stallTorqueNewtonMeters The torque when stalled at 12v.
+   * @param stallCurrentAmps The current draw of the motor when stalled at 12v.
+   * @param freeCurrentAmps The current draw of the motor under no load.
+   * @param freeSpeedRadPerSec The speed of the motor under no load.
+   * @param numMotors The number of motors.
+   */
   public DCMotorExt(
       double nominalVoltageVolts,
       double stallTorqueNewtonMeters,
@@ -49,6 +67,12 @@ public class DCMotorExt extends DCMotor {
     this.numMotors = numMotors;
   }
 
+  /**
+   * Constructs a DCMotorExt from a DCMotor.
+   *
+   * @param motor The DCMotor to construct from.
+   * @param numMotors The number of motors.
+   */
   public DCMotorExt(DCMotor motor, int numMotors) {
     super(
         motor.nominalVoltageVolts,
@@ -95,10 +119,28 @@ public class DCMotorExt extends DCMotor {
     return Ohms.of(rOhms);
   }
 
+  /**
+   * The kV constants of a DC motor represents the "velocity constant" or "voltage constant", which
+   * indicates how many RPM the motor will spin per volt applied when unloaded.
+   *
+   * <p>Simply, kV tells you how fast the motor will spin based on voltage
+   *
+   * @return The kV constant of the motor as an {@link AngularVelocityUnit} {@link Per} a {@link
+   *     VoltageUnit}.
+   */
   public Per<AngularVelocityUnit, VoltageUnit> kV() {
     return RadiansPerSecond.per(Volt).ofNative(KvRadPerSecPerVolt);
   }
 
+  /**
+   * The kT constants of a DC motor represents the "torque constant", signifying the amount of
+   * torque produced per unit of current drawn by the motor.
+   *
+   * <p>Simply, kT tells you how much torque the motor will produce based on the current flowing
+   * through it
+   *
+   * @return The kT constant of the motor as a {@link TorqueUnit} {@link Per} a {@link CurrentUnit}.
+   */
   public Per<TorqueUnit, CurrentUnit> kT() {
     return NewtonMeters.per(Amp).ofNative(KtNMPerAmp);
   }
