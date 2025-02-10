@@ -160,9 +160,6 @@ public class CompModule implements ModuleInterface {
         .getRotations();
   }
 
-  /** Does characterization shit */
-  public void characterizeWheelRadius() {}
-
   @Override
   public void stopModule() {
     driveMotor.stopMotor();
