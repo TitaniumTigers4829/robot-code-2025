@@ -14,6 +14,8 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
+import frc.robot.extras.characterization.WheelRadiusCharacterization;
+import frc.robot.extras.characterization.WheelRadiusCharacterization.Direction;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -39,7 +41,6 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.DoubleSupplier;
 
 public class RobotContainer {
-
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
   private final ElevatorSubsystem elevatorSubsystem;
@@ -134,7 +135,7 @@ public class RobotContainer {
     Trigger driverRightBumper = new Trigger(driverController.rightBumper());
     Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
-
+    Trigger operatorRightBumper = new Trigger(operatorController.rightBumper());
     driverController.a().whileTrue(new Intake(intakeSubsystem));
     driverController.b().whileTrue(new Eject(intakeSubsystem));
     driverController
@@ -201,9 +202,15 @@ public class RobotContainer {
     operatorController
         .a()
         .whileTrue(new SetElevatorPosition(elevatorSubsystem, FieldConstants.REEF_LEVEL_FOUR_Z));
-  }
-
-  public Command getAutonomousCommand() {
+    operatorRightBumper.onTrue(new WheelRadiusCharacterization(swerveDrive, Direction.CLOCKWISE));
+          }
+    //temp fix
+      private Command WheelRadiusCharacterization() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'WheelRadiusCharacterization'");
+      }
+    
+      public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
     swerveDrive.resetEstimatedPose(
