@@ -135,8 +135,9 @@ public class RobotContainer {
     // this adds an auto routine to the auto chooser
     autoChooser.addOption("Example Auto", autos.exampleAutoRoutine());
     autoChooser.addOption(AutoConstants.ONE_METER_AUTO_ROUTINE, autos.oneMeterTestAutoRoutine());
-
-    choreoAutoChooser.addRoutine("Example One Meter Auto", autos::oneMeterTestAutoRoutine);
+    
+    choreoAutoChooser.addRoutine("Example Auto", autos::exampleAutoRoutine);
+    choreoAutoChooser.addRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE, autos::oneMeterTestAutoRoutine);
     // this updates the auto chooser
     SmartDashboard.putData("Normal AutoChooser", autoChooser);
     SmartDashboard.putData("Choreo AutoChooser", choreoAutoChooser);
