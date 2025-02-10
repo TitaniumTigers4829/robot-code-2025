@@ -1,5 +1,6 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,6 +51,7 @@ public class RobotContainer {
 
   public AutoFactory autoFactory;
   public final SendableChooser<AutoRoutine> autoChooser;
+  public final AutoChooser choreoAutoChooser;
   public Autos autos;
 
   private final SimWorld simWorld = new SimWorld();
@@ -109,6 +111,7 @@ public class RobotContainer {
     }
 
     autoChooser = new SendableChooser<AutoRoutine>();
+    choreoAutoChooser = new AutoChooser();
 
     // this sets up the auto factory
     autoFactory =
@@ -132,8 +135,11 @@ public class RobotContainer {
     // this adds an auto routine to the auto chooser
     autoChooser.addOption("Example Auto", autos.exampleAutoRoutine());
     autoChooser.addOption(AutoConstants.ONE_METER_AUTO_ROUTINE, autos.oneMeterTestAutoRoutine());
+
+    choreoAutoChooser.addRoutine("Example One Meter Auto", autos::oneMeterTestAutoRoutine);
     // this updates the auto chooser
     SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData(choreoAutoChooser);
   }
 
   public void teleopInit() {
@@ -231,18 +237,17 @@ public class RobotContainer {
     //         swerveDrive.getEstimatedPose().getY(),
     //         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     // if (autoChooser.getSelected() != null) {
-    return autoChooser.getSelected().cmd();
+    // return new RunCommand(() -> autoChooser.getSelected());
 
     // } else {
     //   return null;
     // }
-    // if (autoChooser2.selectedCommand() != null) {
-    //   return autoChooser2.selectedCommandScheduler();
+    if (choreoAutoChooser.selectedCommand() != null) {
+      return choreoAutoChooser.selectedCommandScheduler();
 
-    // } else {
-    // return null;
-    // }
-    // return new RunCommand(() -> );//), null)
+    } else {
+      return null;
+    }
   }
 
   public void simulationPeriodic() {
