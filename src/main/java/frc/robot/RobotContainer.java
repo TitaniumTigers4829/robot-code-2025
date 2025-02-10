@@ -135,9 +135,10 @@ public class RobotContainer {
     // this adds an auto routine to the auto chooser
     autoChooser.addOption("Example Auto", autos.exampleAutoRoutine());
     autoChooser.addOption(AutoConstants.ONE_METER_AUTO_ROUTINE, autos.oneMeterTestAutoRoutine());
-    
-    choreoAutoChooser.addRoutine("Example Auto", autos::exampleAutoRoutine);
-    choreoAutoChooser.addRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE, autos::oneMeterTestAutoRoutine);
+
+    choreoAutoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
+    choreoAutoChooser.addRoutine(
+        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
     // this updates the auto chooser
     SmartDashboard.putData("Normal AutoChooser", autoChooser);
     SmartDashboard.putData("Choreo AutoChooser", choreoAutoChooser);
@@ -237,18 +238,20 @@ public class RobotContainer {
             swerveDrive.getEstimatedPose().getX(),
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    SmartDashboard.putBoolean("Did Get Auto Run", true);
     // if (autoChooser.getSelected() != null) {
     //   return new RunCommand(() -> autoChooser.getSelected());
 
     // } else {
     //   return null;
     // }
-    if (choreoAutoChooser.selectedCommand() != null) {
-      return choreoAutoChooser.selectedCommand();
+    // if (choreoAutoChooser.selectedCommand() != null) {
+    return choreoAutoChooser.selectedCommand();
+    // return new RunCommand(() -> choreoAutoChooser.selectedCommand());
 
-    } else {
-      return null;
-    }
+    // } else {
+    // return null;
+    // }
   }
 
   public void simulationPeriodic() {

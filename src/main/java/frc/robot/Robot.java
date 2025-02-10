@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.sim.SimWorld;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -109,6 +110,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    SmartDashboard.putBoolean("Did Get Auto Run", false);
+    SmartDashboard.putBoolean("Did Auto Routine Run", false);
+
     robotContainer.teleopInit();
   }
 
