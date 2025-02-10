@@ -16,18 +16,38 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.elevatorInterface = elevatorInterface;
   }
 
+  /**
+   * Returns the current position of the elevator.
+   *
+   * @return Position of the elevator in meters.
+   */
   public double getElevatorPosition() {
     return elevatorInterface.getElevatorPosition();
   }
 
+  /**
+   * Returns the voltage of the elevator.
+   *
+   * @return Current voltage of the elevator.
+   */
   public double getVolts() {
     return elevatorInterface.getVolts();
   }
 
+  /**
+   * Sets the position of the elevator.
+   *
+   * @param position The requested elevator position in meters.
+   */
   public void setElevatorPosition(double position) {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  /**
+   * Sets the voltage of the elevator.
+   *
+   * @param volts Requested voltage for the elevator.
+   */
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }

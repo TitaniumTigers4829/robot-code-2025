@@ -7,8 +7,10 @@ package frc.robot.subsystems.elevator;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -21,8 +23,8 @@ public class PhysicalElevator implements ElevatorInterface {
   private final TalonFX followerMotor = new TalonFX(ElevatorConstants.ELEVATOR_FOLLOWER_MOTOR_ID);
 
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
-  // private final Follower followerRequest =
-  // new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, true);
+  private final Follower followerRequest =
+      new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, false);
 
   private final StatusSignal<Angle> leaderPosition;
   private final StatusSignal<Angle> followerPosition;
@@ -46,15 +48,17 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Slot0.kG = ElevatorConstants.ELEVATOR_G;
     elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-    // Limits lol
+    // Software Limit switches
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ElevatorConstants.REVERSE_LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable =
         ElevatorConstants.REVRESE_LIMIT_ENABLE;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = ElevatorConstants.LIMIT_ENABLE;
 
+    // Sets the motors to brake mode for them to hold their position
     elevatorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
+    // Current limits
     elevatorConfig.CurrentLimits.StatorCurrentLimit = ElevatorConstants.STATOR_CURRENT_LIMIT;
     elevatorConfig.CurrentLimits.SupplyCurrentLimit = ElevatorConstants.SUPPLY_CURRENT_LIMIT;
     elevatorConfig.CurrentLimits.StatorCurrentLimitEnable =
@@ -62,32 +66,32 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable =
         ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
 
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    // configuration
+    // Motion Magic configuration
     elevatorConfig.MotionMagic.MotionMagicAcceleration =
         ElevatorConstants.MOTION_MAGIC_MAX_ACCELERATION;
     elevatorConfig.MotionMagic.MotionMagicCruiseVelocity =
         ElevatorConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 
-    // elevatorConfig.Feedback.RotorToSensorRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
+    elevatorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+    elevatorConfig.Feedback.SensorToMechanismRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
-    // apply configuration
-
+    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     leaderMotor.getConfigurator().apply(elevatorConfig);
 
-    // followerMotor.setControl(followerRequest);
+    elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
 
-    // make the follower
+    followerMotor.setControl(followerRequest);
 
-    // Get info
-    leaderPosition = leaderMotor.getPosition();
+    // Gets motor information
+    leaderPosition = leaderMotor.getRotorPosition();
     leaderAppliedVoltage = leaderMotor.getMotorVoltage();
-    followerPosition = followerMotor.getPosition();
+    leaderDutyCycle = leaderMotor.getDutyCycle();
+    followerPosition = followerMotor.getRotorPosition();
     followerAppliedVoltage = followerMotor.getMotorVoltage();
     followerDutyCycle = followerMotor.getDutyCycle();
-    leaderDutyCycle = leaderMotor.getDutyCycle();
 
+    // Set update frequency for all motor signals
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.STATUS_SIGNAL_FREQUENCY,
         leaderPosition,
@@ -97,7 +101,7 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderDutyCycle,
         followerDutyCycle);
 
-    desiredPosition = 0.0;
+    desiredPosition = 0;
   }
 
   @Override
@@ -127,17 +131,16 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public void setElevatorPosition(double position) {
-    desiredPosition = 1;
-    // leaderMotor.setControl(mmPositionRequest.withPosition(position));
-    // followerMotor.setControl(mmPositionRequest.withPosition(position));
-    leaderMotor.set(-position);
-    followerMotor.set(position);
+    desiredPosition = position;
+    leaderMotor.setControl(mmPositionRequest.withPosition(position));
+    leaderPosition.refresh();
+    // leaderMotor.set(-position);
+    // followerMotor.set(position);
   }
 
   @Override
   public void setVolts(double volts) {
     leaderMotor.setVoltage(volts);
-    followerMotor.setVoltage(volts);
   }
 
   @Override

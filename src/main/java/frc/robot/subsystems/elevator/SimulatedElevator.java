@@ -64,6 +64,7 @@ public class SimulatedElevator implements ElevatorInterface {
     m_pidController.setSetpoint(position);
     double output = m_pidController.calculate(getElevatorPosition(), position);
     // double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());
+    m_elevatorSim.setState(output, 1);
     setVolts(output);
   }
 

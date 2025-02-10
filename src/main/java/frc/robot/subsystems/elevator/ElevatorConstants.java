@@ -11,7 +11,7 @@ public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
   public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 28;
 
-  public static final double ELEVATOR_P = 1;
+  public static final double ELEVATOR_P = 0.5;
   public static final double ELEVATOR_I = 0;
   public static final double ELEVATOR_D = 0;
   public static final double ELEVATOR_S = 0;
@@ -22,6 +22,7 @@ public class ElevatorConstants {
   public static final double DRUM_RADIUS = 1;
   public static final double ELEVATOR_GEAR_RATIO = 8;
   public static final double ELEVATOR_CARRIAGE_MASS = 10;
+  public static final double BASE_HEIGHT = Units.inchesToMeters(0);
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
   public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);

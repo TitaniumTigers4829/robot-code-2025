@@ -11,7 +11,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.JoystickUtil;
@@ -200,7 +200,7 @@ public class RobotContainer {
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
     operatorController
         .a()
-        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, FieldConstants.REEF_LEVEL_TWO_Z));
   }
 
   public Command getAutonomousCommand() {

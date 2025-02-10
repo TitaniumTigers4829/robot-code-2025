@@ -6,10 +6,10 @@ package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
 
+/** Creates a new ElevatorInterface. */
 public interface ElevatorInterface {
-  /** Creates a new ElevatorInterface. */
   @AutoLog
-  public static class ElevatorInputs { // For values
+  public static class ElevatorInputs {
     public double leaderMotorPosition = 0.0;
     public double followerMotorPosition = 0.0;
     public double leaderMotorVoltage = 0.0;
@@ -19,16 +19,41 @@ public interface ElevatorInterface {
     public double desiredPosition = 0.0;
   }
 
+  /**
+   * Updates the inputs for the elevator.
+   *
+   * @param inputs The inputs for the elevator.
+   */
   public default void updateInputs(ElevatorInputs inputs) {}
 
+  /**
+   * Returns the current position of the elevator.
+   *
+   * @return Position of the elevator in meters.
+   */
   public default double getElevatorPosition() {
     return 0.0;
   }
 
+  /**
+   * Sets the position of the elevator.
+   *
+   * @param position The requested elevator position in meters.
+   */
   public default void setElevatorPosition(double position) {}
 
+  /**
+   * Sets the voltage of the elevator.
+   *
+   * @param volts Requested voltage for the elevator.
+   */
   public default void setVolts(double volts) {}
 
+  /**
+   * Returns the voltage of the elevator.
+   *
+   * @return Current voltage of the elevator.
+   */
   public default double getVolts() {
     return 0.0;
   }
