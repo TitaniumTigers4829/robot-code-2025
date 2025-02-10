@@ -206,39 +206,39 @@
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"10.625 in",
+    "val":0.269875
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"10.625 in",
+    "val":0.269875
    }
   },
   "backLeft":{
    "x":{
-    "exp":"-11 in",
-    "val":-0.2794
+    "exp":"-10.625 in",
+    "val":-0.269875
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"10.625 in",
+    "val":0.269875
    }
   },
   "mass":{
-   "exp":"120 lbs",
-   "val":54.4310844
+   "exp":"125 lbs",
+   "val":56.69904625
   },
   "inertia":{
-   "exp":"6 kg m ^ 2",
-   "val":6.0
+   "exp":"7 kg m ^ 2",
+   "val":7.0
   },
   "gearing":{
-   "exp":"6.5",
-   "val":6.5
+   "exp":"4.59",
+   "val":4.59
   },
   "radius":{
-   "exp":"2 in",
-   "val":0.0508
+   "exp":"1.7 in",
+   "val":0.04318
   },
   "vmax":{
    "exp":"6000 RPM",

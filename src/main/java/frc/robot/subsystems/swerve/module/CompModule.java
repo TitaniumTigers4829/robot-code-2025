@@ -117,7 +117,7 @@ public class CompModule implements ModuleInterface {
   @Override
   public void updateInputs(ModuleInputs inputs) {
     BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
-    inputs.driveVelocity = driveVelocity.getValueAsDouble();
+    inputs.driveVelocity = -driveVelocity.getValueAsDouble();
     inputs.drivePosition = -drivePosition.getValueAsDouble();
 
     inputs.turnAbsolutePosition =

@@ -233,11 +233,11 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    // swerveDrive.resetEstimatedPose(
+    //     new Pose2d(
+    //         swerveDrive.getEstimatedPose().getX(),
+    //         swerveDrive.getEstimatedPose().getY(),
+    //         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     SmartDashboard.putBoolean("Did Get Auto Run", true);
     // if (autoChooser.getSelected() != null) {
     //   return new RunCommand(() -> autoChooser.getSelected());

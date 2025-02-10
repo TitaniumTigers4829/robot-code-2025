@@ -125,12 +125,12 @@ public final class Constants {
     public static final double MAX_SPEED = 5.0;
     public static final double MAX_ACCELERATION = 3;
 
-    public static final double AUTO_TRANSLATION_P = 10.0; // 1.7
+    public static final double AUTO_TRANSLATION_P = 0.0; // 1.7
     public static final double AUTO_TRANSLATION_I = 0;
-    public static final double AUTO_TRANSLATION_D = 0.2;
-    public static final double AUTO_THETA_P = 7.0; // 5
+    public static final double AUTO_TRANSLATION_D = 0.0;
+    public static final double AUTO_THETA_P = 0.0; // 5
     public static final double AUTO_THETA_I = 0; // 5
-    public static final double AUTO_THETA_D = 0.4;
+    public static final double AUTO_THETA_D = 0.0;
 
     public static final double AUTO_SHOOT_HEADING_OFFSET = 2;
 
