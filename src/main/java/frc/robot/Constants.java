@@ -35,6 +35,7 @@ public final class Constants {
   public static final class AutoConstants {
     // Different Pre-defined Auto Routines
     public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
+    public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
     public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
     // This does not exist yet :(
     public static final String Flexible_AUTO_ROUTINE = "Flexible-Auto-Routine";
