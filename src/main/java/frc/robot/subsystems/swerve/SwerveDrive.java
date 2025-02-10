@@ -54,8 +54,8 @@ public class SwerveDrive extends SubsystemBase {
   private final PIDController yController = new PIDController(5.0, 0.0, 0.1);
   private final PIDController headingController = new PIDController(1, 0, 2);
 
-  private final PIDController xSetpointController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController xSetpointController = new PIDController(7.0, 0.0, 0.0);
+  private final PIDController ySetpointController = new PIDController(7.0, 0.0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -445,8 +445,8 @@ public class SwerveDrive extends SubsystemBase {
     return new Trigger(
         () ->
             Math.abs(headingController.getError()) < 0.5
-                && (Math.abs(xSetpointController.getError()) < 0.05
-                    || Math.abs(ySetpointController.getError()) < 0.05));
+                && (Math.abs(xSetpointController.getError()) < 0.08
+                    || Math.abs(ySetpointController.getError()) < 0.08));
   }
 
   /** Follows the provided swerve sample. */
