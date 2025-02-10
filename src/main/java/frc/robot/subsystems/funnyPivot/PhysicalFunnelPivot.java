@@ -20,9 +20,7 @@ import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final TalonFX funnelMotor;
-  private final CANcoder funnelEncoder;
   private final TalonFXConfiguration funnelMotorConfig;
-  private final CANcoderConfiguration funnelEncoderConfig;
   private final StatusSignal<Voltage> funnelVoltage;
   private final StatusSignal<AngularVelocity> funnelVelocity;
   private StatusSignal<Angle> funnelAngle;
@@ -34,21 +32,16 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
-    funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_MOTOR_ID);
     funnelMotorConfig = new TalonFXConfiguration();
-    funnelEncoderConfig = new CANcoderConfiguration();
     mmPositionRequest = new MotionMagicVoltage(0);
-
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelEncoder.getAbsolutePosition();
+    funnelAngle = funnelMotor.getRotorPosition();
     funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
 
-    funnelEncoderConfig.MagnetSensor.MagnetOffset = -FunnelConstants.ANGLE_ZERO;
-    funnelEncoderConfig.MagnetSensor.SensorDirection = FunnelConstants.FUNNEL_ENCODER_REVERSED;
-    funnelEncoder.getConfigurator().apply(funnelEncoderConfig, HardwareConstants.TIMEOUT_S);
+    //funnelEncoder.getConfigurator().apply(funnelEncoderConfig, HardwareConstants.TIMEOUT_S);
 
     funnelMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     funnelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -67,8 +60,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotorConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
-    funnelMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    funnelMotorConfig.Feedback.FeedbackRemoteSensorID = funnelEncoder.getDeviceID();
+    // funnelMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // funnelMotorConfig.Feedback.FeedbackRemoteSensorID = funnelEncoder.getDeviceID();
 
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = FunnelConstants.MAX_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
@@ -82,6 +75,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
         funnelVoltage,
         funnelSupplyCurrent,
         funnelStatorCurrent);
+
+    funnelMotor.setPosition(FunnelConstants.startingPos);
   }
 
   @Override
