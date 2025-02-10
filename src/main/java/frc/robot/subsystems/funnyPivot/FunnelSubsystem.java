@@ -5,26 +5,26 @@ import org.littletonrobotics.junction.Logger;
 
 public class FunnelSubsystem extends SubsystemBase {
   private final FunnelPivotInterface funnelPivotInterface;
-  private final AlgaePivotInputsAutoLogged inputs = new AlgaePivotInputsAutoLogged();
+  private final FunnelPivotInputsAutoLogged inputs = new FunnelPivotInputsAutoLogged();
 
   public FunnelSubsystem(FunnelPivotInterface funnelPivotInterface) {
     this.funnelPivotInterface = funnelPivotInterface;
   }
 
-  public void setAlgaeSpeed(double speed) {
-    funnelPivotInterface.setAlgaeSpeed(speed);
+  public void setFunnelSpeed(double speed) {
+    funnelPivotInterface.setFunnelSpeed(speed);
   }
 
-  public void setAlgaeAngle(double angle) {
-    funnelPivotInterface.setAlgaeAngle(angle);
+  public void setFunnelAngle(double angle) {
+    funnelPivotInterface.setFunnelAngle(angle);
   }
 
-  public void setAlgaeVoltage(double voltage) {
-    funnelPivotInterface.setAlgaeVoltage(voltage);
+  public void setFunnelVoltage(double voltage) {
+    funnelPivotInterface.setFunnelVoltage(voltage);
   }
 
   public void periodic() {
     funnelPivotInterface.updateInputs(inputs);
-    Logger.processInputs("AlgaePivotSubsystem/", inputs);
+    Logger.processInputs("FunnelPivotSubsystem/", inputs);
   }
 }

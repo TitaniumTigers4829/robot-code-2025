@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface FunnelPivotInterface {
   @AutoLog
-  public static class AlgaePivotInputs {
+  public class FunnelPivotInputs {
     public boolean isConnected = true;
     public double funnelAngle = 0.0;
     public double funnelVoltage = 0.0;
@@ -14,23 +14,23 @@ public interface FunnelPivotInterface {
     public double funnelTorqueCurrentAmps = 0.0;
   }
 
-  default void updateInputs(AlgaePivotInputs inputs) {}
+  default void updateInputs(FunnelPivotInputs inputs) {}
 
-  default void setAlgaeSpeed(double speed) {}
+  default void setFunnelSpeed(double speed) {}
 
-  default void setAlgaeAngle(double angle) {}
+  default void setFunnelAngle(double angle) {}
 
-  default void setAlgaeVoltage(double voltage) {}
+  default void setFunnelVoltage(double voltage) {}
 
   default boolean isPivotWithinAcceptapleError() {
     return true;
   }
 
-  default double getAlgaeAngle() {
+  default double getFunnelAngle() {
     return 0.0;
   }
 
-  default double getAlgaePivotTarget() {
+  default double getFunnelPivotTarget() {
     return 0.0;
   }
 }

@@ -37,7 +37,7 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   private double supplyCurrentAmps = 0.0;
 
   @Override
-  public void updateInputs(AlgaePivotInputs inputs) {
+  public void updateInputs(FunnelPivotInputs inputs) {
     funnelPivotSim.update(HardwareConstants.TIMEOUT_S);
 
     inputs.funnelVelocity = Units.radiansToRotations(funnelPivotSim.getAngleRads());
@@ -47,15 +47,15 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   }
 
   @Override
-  public void setAlgaeVoltage(double voltage) {
+  public void setFunnelVoltage(double voltage) {
     appliedVolts = voltage;
     funnelPivotSim.setInputVoltage(voltage);
   }
 
   @Override
-  public void setAlgaeAngle(double angle) {
-    double currentAlgaePivotAngleRots = Units.radiansToRotations(funnelPivotSim.getAngleRads());
+  public void setFunnelAngle(double angle) {
+    double currentFunnelPivotAngleRots = Units.radiansToRotations(funnelPivotSim.getAngleRads());
     double armFF = armFeedForward.calculate(angle, funnelPivotController.getSetpoint().velocity);
-    setAlgaeVoltage(funnelPivotController.calculate(angle, currentAlgaePivotAngleRots) + armFF);
+    setFunnelVoltage(funnelPivotController.calculate(angle, currentFunnelPivotAngleRots) + armFF);
   }
 }

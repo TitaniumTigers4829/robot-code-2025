@@ -85,36 +85,36 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   }
 
   @Override
-  public void updateInputs(AlgaePivotInputs inputs) {
+  public void updateInputs(FunnelPivotInputs inputs) {
     inputs.funnelAngle = funnelAngle.getValueAsDouble();
     inputs.funnelVelocity = funnelVelocity.getValueAsDouble();
     inputs.funnelVoltage = funnelVoltage.getValueAsDouble();
   }
 
   @Override
-  public void setAlgaeSpeed(double speed) {
+  public void setFunnelSpeed(double speed) {
     funnelMotor.set(speed);
   }
 
   @Override
-  public void setAlgaeAngle(double angle) {
+  public void setFunnelAngle(double angle) {
     funnelTargetAngle = angle;
     funnelMotor.setControl(mmPositionRequest.withPosition(angle));
   }
 
   @Override
-  public void setAlgaeVoltage(double voltage) {
+  public void setFunnelVoltage(double voltage) {
     funnelMotor.setControl(voltageOut.withOutput(voltage));
   }
 
   @Override
-  public double getAlgaeAngle() {
+  public double getFunnelAngle() {
     funnelAngle.refresh();
     return funnelAngle.getValueAsDouble();
   }
 
   @Override
-  public double getAlgaePivotTarget() {
+  public double getFunnelPivotTarget() {
     return funnelTargetAngle;
   }
 }
