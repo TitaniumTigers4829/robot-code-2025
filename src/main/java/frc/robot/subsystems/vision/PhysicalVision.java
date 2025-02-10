@@ -163,19 +163,18 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    // if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-    //     && (!isLargeDiscrepancyBetweenTwoPoses(
-    //             limelight,
-    //             VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-    //             VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-    //             megatag1Estimate.pose,
-    //             megatag2Estimate.pose)
-    //         || getLimelightAprilTagDistance(limelight)
-    //             > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
-    //   limelightEstimates.set(
-    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    // } else
-    if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+        && (!isLargeDiscrepancyBetweenTwoPoses(
+                limelight,
+                VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+                VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+                megatag1Estimate.pose,
+                megatag2Estimate.pose)
+            || getLimelightAprilTagDistance(limelight)
+                > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+      limelightEstimates.set(
+          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
@@ -327,8 +326,7 @@ public class PhysicalVision implements VisionInterface {
       // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
       // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
       // we don't send those values to the limelight (hence the 0's).
-      LimelightHelpers.SetRobotOrientation(
-          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0, 0, 0, 0, 0);
       updatePoseEstimate(limelight);
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
