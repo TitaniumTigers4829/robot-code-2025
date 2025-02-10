@@ -2,10 +2,8 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoRoutine;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -130,7 +128,6 @@ public class RobotContainer {
 
     autos = new Autos(autoFactory);
 
- 
     choreoAutoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
     choreoAutoChooser.addRoutine(
         AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
@@ -234,7 +231,6 @@ public class RobotContainer {
     //         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
     SmartDashboard.putBoolean("Did Get Auto Run", true);
     return choreoAutoChooser.selectedCommandScheduler();
-
   }
 
   public void simulationPeriodic() {
