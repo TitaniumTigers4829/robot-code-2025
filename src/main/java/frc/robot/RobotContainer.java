@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,8 +13,6 @@ import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
-import frc.robot.commands.intake.Eject;
-import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -135,8 +134,8 @@ public class RobotContainer {
     Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
     Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
 
-    driverController.a().whileTrue(new Intake(intakeSubsystem));
-    driverController.b().whileTrue(new Eject(intakeSubsystem));
+    // driverController.a().whileTrue(new Intake(intakeSubsystem));
+    // driverController.b().whileTrue(new Eject(intakeSubsystem));
     driverController
         .x()
         .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
@@ -197,10 +196,20 @@ public class RobotContainer {
     // FieldConstants has all reef poses
     driverController
         .a()
-        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+        .whileTrue(
+            new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_LEFT_CORAL_STATION));
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+    driverController
+        .b()
+        .whileTrue(
+            swerveDrive
+                .autoAlign(new Pose3d(FieldConstants.BLUE_LEFT_CORAL_STATION))
+                .until(swerveDrive.isAtSetpoint())
+                .andThen(
+                    new AutoAlign(
+                        swerveDrive, visionSubsystem, FieldConstants.BLUE_LEFT_CORAL_STATION)));
   }
 
   public Command getAutonomousCommand() {

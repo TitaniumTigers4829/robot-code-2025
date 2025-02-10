@@ -13,6 +13,7 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /* Auto Align takes in Pose2d and moves robot to it */
 public class AutoAlign extends DriveCommandBase {
@@ -65,6 +66,8 @@ public class AutoAlign extends DriveCommandBase {
   @Override
   public void execute() {
     super.execute();
+    Logger.recordOutput("Odometry/using repulor", false);
+    Logger.recordOutput("Odometry/using auto align", true);
     // Gets the error between the desired pos (the target) and the current pos of the robot
     Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = targetPose.getX() - drivePose.getX();

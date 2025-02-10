@@ -2,6 +2,8 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.RepulsorFieldPlanner;
@@ -35,9 +38,6 @@ import java.util.Optional;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
-
 public class SwerveDrive extends SubsystemBase {
 
   private final GyroInterface gyroIO;
@@ -49,21 +49,19 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
-  
 
   private final PIDController xController = new PIDController(5.0, 0.0, 0.1);
   private final PIDController yController = new PIDController(5.0, 0.0, 0.1);
-  private final PIDController headingController = new PIDController(0, 1, 2);
+  private final PIDController headingController = new PIDController(1, 0, 2);
 
-  private final PIDController xSetpointController = new PIDController(25.0, 0.0, 0.1);
-  private final PIDController ySetpointController = new PIDController(25.0, 0.0, 0.1);
-
+  private final PIDController xSetpointController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController ySetpointController = new PIDController(10.0, 0.0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
           DriveConstants.MODULE_TRANSLATIONS,
           DCMotor.getKrakenX60(1).withReduction(ModuleConstants.DRIVE_GEAR_RATIO),
-          DCMotor.getFalcon500(1).withReduction(1),
+          DCMotor.getFalcon500(1).withReduction(11),
           60,
           58,
           7,
@@ -151,14 +149,18 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
+    setpoint = setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, 0.02);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
   }
 
   public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
-   drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, fieldRelative);
+    drive(
+        speeds.vxMetersPerSecond,
+        speeds.vyMetersPerSecond,
+        speeds.omegaRadiansPerSecond,
+        fieldRelative);
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -439,12 +441,25 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  public Trigger isAtSetpoint() {
+    return new Trigger(
+        () ->
+            Math.abs(headingController.getError()) < 0.5
+                && (Math.abs(xSetpointController.getError()) < 0.05
+                    || Math.abs(ySetpointController.getError()) < 0.05));
+  }
+
   /** Follows the provided swerve sample. */
   public void followTrajectory(SwerveSample sample) {
     // Get the current pose of the robot
     Pose2d pose = getEstimatedPose();
     Logger.recordOutput("Odometry/TrajectorySetpoint", pose);
     Logger.recordOutput("Drive/PID/error", headingController.getError());
+    Logger.recordOutput("Drive/PID/xSetpointTranslationError", xSetpointController.getError());
+    Logger.recordOutput("Drive/PID/xTranslationError", xController.getError());
+    Logger.recordOutput("Drive/PID/ySetpointTranslationError", ySetpointController.getError());
+    Logger.recordOutput("Drive/PID/yTranslationError", yController.getError());
+
     var out = headingController.calculate(pose.getRotation().getRadians(), sample.heading);
     Logger.recordOutput("Drive/PID/out", out);
 
@@ -460,7 +475,6 @@ public class SwerveDrive extends SubsystemBase {
             sample.omega
                 + headingController.calculate(pose.getRotation().getRadians(), sample.heading),
             getEstimatedPose().getRotation()); // Apply the generated speeds
-
     drive(speeds, true);
   }
 
@@ -476,6 +490,8 @@ public class SwerveDrive extends SubsystemBase {
 
   public Command autoAlign(Pose3d _setpoint) {
     // this.setpoint = _setpoint;
+    Logger.recordOutput("Odometry/using repulsor", true);
+    Logger.recordOutput("Odometry/using auto align", false);
 
     return run(
         () -> {
@@ -486,10 +502,7 @@ public class SwerveDrive extends SubsystemBase {
           var robotPose = getEstimatedPose();
           SwerveSample cmd =
               repulsorFieldPlanner.getCmd(
-                  robotPose,
-                  getChassisSpeeds(),
-                  DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                  true);
+                  robotPose, getChassisSpeeds(), DriveConstants.MAX_SPEED_METERS_PER_SECOND, true);
 
           // Apply the trajectory with rotation adjustment
           SwerveSample adjustedSample =
@@ -511,5 +524,4 @@ public class SwerveDrive extends SubsystemBase {
           followTrajectory(adjustedSample);
         });
   }
-
 }
