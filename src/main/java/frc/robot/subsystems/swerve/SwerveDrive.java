@@ -230,10 +230,10 @@ public class SwerveDrive extends SubsystemBase {
   public void followTrajectory(SwerveSample sample) {
     if (sample != null) {
       Pose2d pose = getEstimatedPose();
-      double moveX = sample.vx + xController.calculate(pose.getX(), sample.x);
-      double moveY = sample.vy + yController.calculate(pose.getY(), sample.y);
+      double moveX = -sample.vx + xController.calculate(pose.getX(), sample.x);
+      double moveY = -sample.vy + yController.calculate(pose.getY(), sample.y);
       double moveTheta =
-          sample.omega
+          -sample.omega
               + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
       drive(moveX, moveY, moveTheta, true);
     }
