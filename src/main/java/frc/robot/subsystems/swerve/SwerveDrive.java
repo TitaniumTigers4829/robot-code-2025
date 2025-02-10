@@ -439,7 +439,7 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
-    /** Follows the provided swerve sample. */
+  /** Follows the provided swerve sample. */
   public void followTrajectory(SwerveSample sample) {
     // Get the current pose of the robot
     Pose2d pose = getEstimatedPose();
