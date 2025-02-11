@@ -17,7 +17,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   public static void Flywheel() {}
 
   public double getFlywheelSpeed() {
-    return flywheelInterface.getFlywheelSpeed();
+    return flywheelInterface.getFlywheelVelocity();
   }
 
   public double getVolts() {

@@ -12,13 +12,14 @@ public interface FlywheelInterface {
   public static class FlywheelInputs {
     public double flywheelVelocity = 0.0;
     public double flywheelMotorSpeed = 0.0;
+    public double flywheelAppliedVolts = 0.0;
   }
 
   // are these docs strings?? ishan said to get the velocity but idk how :(
 
   public default void updateInputs(FlywheelInputs inputs) {}
 
-  public default double getFlywheelSpeed() {
+  public default double getFlywheelVelocity() {
     return 0.0;
   }
 

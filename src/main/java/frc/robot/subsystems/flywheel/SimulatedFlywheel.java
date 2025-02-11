@@ -4,53 +4,48 @@
 
 package frc.robot.subsystems.flywheel;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 /** Add your docs here. */
 public class SimulatedFlywheel implements FlywheelInterface {
-  private FlywheelSim simulatedFlywheel = new FlywheelSim(LinearSystemId.createFlywheelSystem(DCMotor.getFalcon500(1), FlywheelConstants.MOMENT_OF_INERTIA, FlywheelConstants.FLYWHEEL_GEAR_RATIO), DCMotor.getFalcon500(1));
+  private FlywheelSim simulatedFlywheel =
+      new FlywheelSim(
+          LinearSystemId.createFlywheelSystem(
+              DCMotor.getFalcon500(1),
+              FlywheelConstants.MOMENT_OF_INERTIA,
+              FlywheelConstants.FLYWHEEL_GEAR_RATIO),
+          DCMotor.getFalcon500(1));
+
   private double currentVolts;
-  public TalonFXConfiguration config;
-
-  private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
-  
-
+  private PIDController simPID;
+  private SimpleMotorFeedforward simFF;
 
   public SimulatedFlywheel() {
-    config.Slot0.kP = FlywheelConstants.FLYWHEEL_P;
-    config.Slot0.kI = FlywheelConstants.FLYWHEEL_I;
-    config.Slot0.kD = FlywheelConstants.FLYWHEEL_D;
-
-    config.Slot0.kS = FlywheelConstants.FF_FLYWHEEL_S;
-    config.Slot0.kV = FlywheelConstants.FF_FLYWHEEL_V;
-    config.Slot0.kA = FlywheelConstants.FF_FLYWHEEL_A;
-
+    simPID = new PIDController(FlywheelConstants.FLYWHEEL_P, FlywheelConstants.FLYWHEEL_I, FlywheelConstants.FLYWHEEL_D);
+    simFF = new SimpleMotorFeedforward(FlywheelConstants.FF_FLYWHEEL_S, FlywheelConstants.FF_FLYWHEEL_V, FlywheelConstants.FF_FLYWHEEL_A);
   }
 
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.flywheelMotorSpeed = getFlywheelSpeed();
+    inputs.flywheelAppliedVolts = currentVolts;
+    inputs.flywheelMotorSpeed = getFlywheelVelocity();
   }
 
-  public void setFlywheelSpeed(double speed) {
-    simulatedFlywheel.setControl(velocityRequest.withVelocity(speed));
+  public void setFlywheelSpeed(double velocity) {
+    setVolts(simPID.calculate(getFlywheelVelocity(), velocity) + simFF.calculate(velocity));
   }
 
-  public double getFlywheelSpeed(double speed){
-    return simulatedFlywheel.getVelocity(velocityRequest.withVelocity(speed));
+  public double getFlywheelVelocity(double velocity) {
+    return simulatedFlywheel.getAngularVelocity().in(RotationsPerSecond);
   }
 
   public void setVolts(double volts) {
-    currentVolts = velocityRequest.calculate(volts);
-    simulatedFlywheel.setInputVoltage(currentVolts);
+    simulatedFlywheel.setInputVoltage(volts);
   }
 
   public double getVolts() {
