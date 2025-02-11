@@ -1,5 +1,7 @@
 package frc.robot.subsystems.vision;
 
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,7 +14,6 @@ import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * This class is the implementation of the VisionInterface for the physical robot. It uses the
@@ -74,6 +75,8 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+
+      // inputs.isMegaTag2[limelight.getId()] = limelightEstimates.get(0).
     }
   }
 
@@ -135,6 +138,23 @@ public class PhysicalVision implements VisionInterface {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
+  public boolean isLimelight4(Limelight limelight) {
+    return limelight.isLimelight4();
+  }
+
+  private void updateIMUMode(Limelight limelight) {
+    if (isLimelight4(limelight)) {
+      if (DriverStation.isEnabled()) {
+        // Enable internal IMU for better pose accuracy when enabled
+        LimelightHelpers.SetIMUMode(limelight.getName(), 2);
+      } else {
+        // Disable internal IMU when robot is disabled
+        LimelightHelpers.SetIMUMode(limelight.getName(), 1);
+      }
+    }
+  }
+  
+
   /**
    * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
    * the robot to the Limelight, allowing network communication between the robot and the Limelight.
@@ -191,6 +211,7 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
+    
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
@@ -320,6 +341,7 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void checkAndUpdatePose(Limelight limelight) {
+    try {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
       // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
       // This creates a much more stable and accurate pose when translating, but when rotating
@@ -329,10 +351,17 @@ public class PhysicalVision implements VisionInterface {
       // we don't send those values to the limelight (hence the 0's).
       LimelightHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+      updateIMUMode(limelight);
       updatePoseEstimate(limelight);
+      LimelightHelpers.Flush();
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-    }
+    }}
+     catch(Exception e) {
+    System.err.printf("Error updating pose for limelight %s: %s%n", limelight.getName(), e.getMessage());
+    // Optionally, clear or mark the estimate as invalid.
+    limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+  }
   }
 
   /**
