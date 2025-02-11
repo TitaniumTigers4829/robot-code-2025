@@ -23,7 +23,6 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                Commands.print("Sample Routine"),
                 autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
                 oneMeterTrajectory.cmd()));
     return routine;
