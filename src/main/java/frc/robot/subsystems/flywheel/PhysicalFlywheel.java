@@ -35,8 +35,7 @@ public class PhysicalFlywheel implements FlywheelInterface {
   }
 
   public void updateInputs(FlywheelInputs inputs) {
-    inputs.flywheelMotorPosition = getFlywheelSpeed();
-    inputs.flywheelVelocity = getFlywheelVelocity();
+    inputs.flywheelMotorSpeed = getFlywheelSpeed();
   }
 
   public void setFlywheelSpeed(double speed) {
@@ -49,7 +48,7 @@ public class PhysicalFlywheel implements FlywheelInterface {
 
   public void setVolts(double volts) {
     currentVolts = velocityRequest.calculate(volts);
-    flywheelMotor.setVolts(currentVolts);
+    flywheelMotor.setVoltage(currentVolts);
   }
 
   public double getVolts() {

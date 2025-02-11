@@ -11,7 +11,7 @@ public interface FlywheelInterface {
   @AutoLog
   public static class FlywheelInputs {
     public double flywheelVelocity = 0.0;
-    public double flywheelMotorPosition = 0.0;
+    public double flywheelMotorSpeed = 0.0;
   }
 
   // are these docs strings?? ishan said to get the velocity but idk how :(

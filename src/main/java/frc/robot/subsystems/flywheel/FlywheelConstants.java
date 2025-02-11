@@ -17,5 +17,5 @@ public class FlywheelConstants {
   public static final double FF_FLYWHEEL_V = 0 - 9;
   public static final double FF_FLYWHEEL_A = 0 - 9;
 
-  public static final double MOMENT_OF_INERTIA = 0 - 9;
+  public static final double MOMENT_OF_INERTIA = 0.1;
 }
