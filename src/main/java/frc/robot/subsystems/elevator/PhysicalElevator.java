@@ -133,6 +133,7 @@ public class PhysicalElevator implements ElevatorInterface {
   public void setElevatorPosition(double position) {
     desiredPosition = position;
     leaderMotor.setControl(mmPositionRequest.withPosition(position));
+    leaderMotor.setPosition(position);
     leaderPosition.refresh();
     // leaderMotor.set(-position);
     // followerMotor.set(position);

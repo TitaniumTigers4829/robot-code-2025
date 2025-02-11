@@ -5,19 +5,21 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
+import frc.robot.Constants.HardwareConstants;
+import frc.robot.sim.simMechanism.SlantedElevatorSim;
 
 public class SimulatedElevator implements ElevatorInterface {
-  private final SlantedElevatorSim m_elevatorSim;
-  private final PIDController m_pidController;
-  private final ElevatorFeedforward m_feedforward;
+  private final SlantedElevatorSim elevatorSim;
+  private final ProfiledPIDController pidController;
+  private final ElevatorFeedforward feedForward;
+
   private double currentVolts;
   private double desiredPosition;
 
   public SimulatedElevator() {
-    m_elevatorSim =
+    elevatorSim =
         new SlantedElevatorSim(
             DCMotor.getKrakenX60(2),
             ElevatorConstants.ELEVATOR_GEAR_RATIO,
@@ -28,50 +30,54 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.SIMULATE_GRAVITY,
             ElevatorConstants.INCLINE_ANGLE_RADIANS,
             ElevatorConstants.MIN_HEIGHT);
-    m_pidController =
-        new PIDController(
+    pidController =
+        new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_P,
             ElevatorConstants.ELEVATOR_I,
-            ElevatorConstants.ELEVATOR_D);
-    m_feedforward =
+            ElevatorConstants.ELEVATOR_D,
+            ElevatorConstants.ELEVATOR_CONSTRAINTS);
+    feedForward =
         new ElevatorFeedforward(
             ElevatorConstants.ELEVATOR_S,
             ElevatorConstants.ELEVATOR_G,
             ElevatorConstants.ELEVATOR_V,
             ElevatorConstants.ELEVATOR_A);
+
     currentVolts = 0.0;
-    desiredPosition = 1.0;
+    desiredPosition = 0.0;
   }
 
   @Override
   public void updateInputs(ElevatorInputs inputs) {
-    m_elevatorSim.update(0.02);
-    inputs.leaderMotorPosition = m_elevatorSim.getPositionMeters();
-    inputs.followerMotorPosition = m_elevatorSim.getPositionMeters();
+    elevatorSim.update(HardwareConstants.TIMEOUT_S);
+
+    inputs.leaderMotorPosition = elevatorSim.getPositionMeters();
+    inputs.followerMotorPosition = elevatorSim.getPositionMeters();
     inputs.leaderMotorVoltage = currentVolts;
     inputs.followerMotorVoltage = currentVolts;
-    inputs.desiredPosition = 1;
+    inputs.desiredPosition = desiredPosition;
   }
 
   @Override
   public double getElevatorPosition() {
-    return m_elevatorSim.getPositionMeters();
+    return elevatorSim.getPositionMeters();
   }
 
   @Override
   public void setElevatorPosition(double position) {
-    // desiredPosition = position;
-    m_pidController.setSetpoint(position);
-    double output = m_pidController.calculate(getElevatorPosition(), position);
-    // double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());
-    m_elevatorSim.setState(output, 1);
-    setVolts(output);
+    desiredPosition = position;
+    pidController.setGoal(position);
+    double output = pidController.calculate(getElevatorPosition());
+    double feedforwardOutput = feedForward.calculate(pidController.getSetpoint().velocity);
+
+    elevatorSim.setState(output, pidController.getSetpoint().velocity);
+    setVolts(output + feedforwardOutput);
   }
 
   @Override
   public void setVolts(double volts) {
     currentVolts = volts;
-    m_elevatorSim.setInputVoltage(currentVolts);
+    elevatorSim.setInputVoltage(currentVolts);
   }
 
   @Override

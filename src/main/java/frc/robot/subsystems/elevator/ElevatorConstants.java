@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /** Add your docs here. */
@@ -11,7 +12,7 @@ public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
   public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 28;
 
-  public static final double ELEVATOR_P = 0.5;
+  public static final double ELEVATOR_P = 1;
   public static final double ELEVATOR_I = 0;
   public static final double ELEVATOR_D = 0;
   public static final double ELEVATOR_S = 0;
@@ -41,4 +42,7 @@ public class ElevatorConstants {
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
+
+  public static final Constraints ELEVATOR_CONSTRAINTS =
+      new Constraints(MOTION_MAGIC_CRUISE_VELOCITY, MOTION_MAGIC_MAX_ACCELERATION);
 }

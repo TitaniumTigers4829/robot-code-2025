@@ -200,7 +200,9 @@ public class RobotContainer {
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, FieldConstants.REEF_LEVEL_TWO_Z));
+        .whileTrue(
+            new SetElevatorPosition(
+                elevatorSubsystem, () -> operatorController.b().getAsBoolean()));
   }
 
   public Command getAutonomousCommand() {

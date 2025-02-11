@@ -6,16 +6,19 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import java.util.function.BooleanSupplier;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevatorPosition extends Command {
   ElevatorSubsystem elevatorSubsystem;
+  BooleanSupplier test;
   double position;
 
   /** Creates a new SetElevatorPosition. */
-  public SetElevatorPosition(ElevatorSubsystem elevatorSubsystem, double position) {
+  public SetElevatorPosition(ElevatorSubsystem elevatorSubsystem, BooleanSupplier test) {
     this.elevatorSubsystem = elevatorSubsystem;
-    this.position = position;
+    this.test = test;
+    this.position = 1;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevatorSubsystem);
@@ -28,6 +31,12 @@ public class SetElevatorPosition extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (test.getAsBoolean()) {
+      position = 2;
+    } else {
+      position = 0;
+    }
+
     elevatorSubsystem.setElevatorPosition(position);
   }
 
