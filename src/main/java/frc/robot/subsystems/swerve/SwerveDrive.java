@@ -50,12 +50,12 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(5.0, 0.0, 0.1);
-  private final PIDController yController = new PIDController(5.0, 0.0, 0.1);
-  private final PIDController headingController = new PIDController(1, 0, 2);
+  private final PIDController xController = new PIDController(0.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(0.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(0, 0, 0);
 
-  private final PIDController xSetpointController = new PIDController(7.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(7.0, 0.0, 0.0);
+  private final PIDController xSetpointController = new PIDController(0.0, 0.0, 0.0);
+  private final PIDController ySetpointController = new PIDController(0.0, 0.0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -466,14 +466,14 @@ public class SwerveDrive extends SubsystemBase {
     // Generate the next speeds for the robot
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            sample.vx + sample.vx != 0
-                ? xSetpointController.calculate(pose.getX(), sample.x)
-                : xController.calculate(pose.getX(), sample.x),
-            sample.vy + sample.vy != 0
-                ? ySetpointController.calculate(pose.getY(), sample.y)
-                : yController.calculate(pose.getY(), sample.y),
-            sample.omega
-                + headingController.calculate(pose.getRotation().getRadians(), sample.heading),
+            -sample.vx + sample.vx != 0
+                ? -xSetpointController.calculate(pose.getX(), sample.x)
+                : -xController.calculate(pose.getX(), sample.x),
+            -sample.vy + sample.vy != 0
+                ? -ySetpointController.calculate(pose.getY(), sample.y)
+                : -yController.calculate(pose.getY(), sample.y),
+            -sample.omega
+                + -headingController.calculate(pose.getRotation().getRadians(), sample.heading),
             getEstimatedPose().getRotation()); // Apply the generated speeds
     drive(speeds, true);
   }

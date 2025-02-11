@@ -193,6 +193,20 @@ public class RobotContainer {
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
 
+    driverController
+        .povUp()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveDrive.resetEstimatedPose(new Pose2d(0, 0, new Rotation2d()))));
+    driverController
+        .povDown()
+        .whileTrue(
+            swerveDrive
+                .autoAlign(new Pose3d(new Pose2d(1, 0, new Rotation2d())))
+                .until(swerveDrive.isAtSetpoint())
+                .andThen(
+                    new AutoAlign(
+                        swerveDrive, visionSubsystem, new Pose2d(1, 0, new Rotation2d()))));
     // FieldConstants has all reef poses
     driverController
         .a()
@@ -203,13 +217,11 @@ public class RobotContainer {
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
     driverController
         .b()
-        .whileTrue(
-            swerveDrive
-                .autoAlign(new Pose3d(FieldConstants.BLUE_LEFT_CORAL_STATION))
-                .until(swerveDrive.isAtSetpoint())
-                .andThen(
-                    new AutoAlign(
-                        swerveDrive, visionSubsystem, FieldConstants.BLUE_LEFT_CORAL_STATION)));
+        .whileTrue(swerveDrive.autoAlign(new Pose3d(FieldConstants.BLUE_LEFT_CORAL_STATION)));
+    // .until(swerveDrive.isAtSetpoint())
+    // .andThen(
+    //     new AutoAlign(
+    //         swerveDrive, visionSubsystem, FieldConstants.BLUE_LEFT_CORAL_STATION)));
   }
 
   public Command getAutonomousCommand() {
