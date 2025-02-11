@@ -44,7 +44,7 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
-      // Setupt port forwarding for each limelight
+      // Setup port forwarding for each limelight
       setupPortForwarding(limelight);
       // Start a threaded task to check and update the pose for each Limelight
       threadManager.startTask(
