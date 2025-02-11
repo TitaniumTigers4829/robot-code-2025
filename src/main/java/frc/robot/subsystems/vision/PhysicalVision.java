@@ -1,7 +1,5 @@
 package frc.robot.subsystems.vision;
 
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,6 +12,7 @@ import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * This class is the implementation of the VisionInterface for the physical robot. It uses the
@@ -153,7 +152,6 @@ public class PhysicalVision implements VisionInterface {
       }
     }
   }
-  
 
   /**
    * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
@@ -211,7 +209,7 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
-    
+
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
@@ -342,26 +340,27 @@ public class PhysicalVision implements VisionInterface {
    */
   public void checkAndUpdatePose(Limelight limelight) {
     try {
-    if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
-      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-      // This creates a much more stable and accurate pose when translating, but when rotating
-      // but the pose will not be consistent due to latency between receiving and sending
-      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
-      // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
-      // we don't send those values to the limelight (hence the 0's).
-      LimelightHelpers.SetRobotOrientation(
-          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-      updateIMUMode(limelight);
-      updatePoseEstimate(limelight);
-      LimelightHelpers.Flush();
-    } else {
+      if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
+        // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
+        // This creates a much more stable and accurate pose when translating, but when rotating
+        // but the pose will not be consistent due to latency between receiving and sending
+        // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
+        // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
+        // we don't send those values to the limelight (hence the 0's).
+        LimelightHelpers.SetRobotOrientation(
+            limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+        updateIMUMode(limelight);
+        updatePoseEstimate(limelight);
+        LimelightHelpers.Flush();
+      } else {
+        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      }
+    } catch (Exception e) {
+      System.err.printf(
+          "Error updating pose for limelight %s: %s%n", limelight.getName(), e.getMessage());
+      // Optionally, clear or mark the estimate as invalid.
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-    }}
-     catch(Exception e) {
-    System.err.printf("Error updating pose for limelight %s: %s%n", limelight.getName(), e.getMessage());
-    // Optionally, clear or mark the estimate as invalid.
-    limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-  }
+    }
   }
 
   /**
