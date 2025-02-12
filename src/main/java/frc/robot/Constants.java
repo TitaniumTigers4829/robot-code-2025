@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 
 public final class Constants {
 
@@ -30,7 +29,6 @@ public final class Constants {
     /** Running the swerve robot. */
     SWERVE_ROBOT
   }
-
 
   /**
    * This is where we place constants related to hardware on a robot that aren't specific to any
@@ -372,7 +370,6 @@ public final class Constants {
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
     public static final double CHOREO_AUTO_THETA_D = 0.0;
 
-
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
 
@@ -380,8 +377,6 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
-
-    
   }
 
   public static final class JoystickConstants {

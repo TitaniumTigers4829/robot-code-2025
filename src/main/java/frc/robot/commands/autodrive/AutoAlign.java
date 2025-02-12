@@ -23,24 +23,24 @@ public class AutoAlign extends DriveCommandBase {
 
   private final ProfiledPIDController rotationController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_LINEUP_ROTATION_P,
-          AutoConstants.AUTO_LINEUP_ROTATION_I,
-          AutoConstants.AUTO_LINEUP_ROTATION_D,
-          AutoConstants.AUTO_LINEUP_ROTATION_CONSTRAINTS);
+          AutoConstants.AUTO_ALIGN_ROTATION_P,
+          AutoConstants.AUTO_ALIGN_ROTATION_I,
+          AutoConstants.AUTO_ALIGN_ROTATION_D,
+          AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
 
   private final ProfiledPIDController xTranslationController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_LINEUP_TRANSLATION_P,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_I,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_D,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
+          AutoConstants.AUTO_ALIGN_TRANSLATION_P,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_I,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_D,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
 
   private final ProfiledPIDController yTranslationController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_LINEUP_TRANSLATION_P,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_I,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_D,
-          AutoConstants.AUTO_LINEUP_TRANSLATION_CONSTRAINTS);
+          AutoConstants.AUTO_ALIGN_TRANSLATION_P,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_I,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_D,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
 
   /**
    * Creates a new AutoAlign.
@@ -74,13 +74,16 @@ public class AutoAlign extends DriveCommandBase {
     // Uses the PID controllers to calculate the drive output
     double xOutput =
         MathUtil.applyDeadband(
-            xTranslationController.calculate(xPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
+            xTranslationController.calculate(xPoseError, 0),
+            AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
     double yOutput =
         MathUtil.applyDeadband(
-            yTranslationController.calculate(yPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
+            yTranslationController.calculate(yPoseError, 0),
+            AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
     double turnOutput =
         MathUtil.applyDeadband(
-            rotationController.calculate(thetaPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
+            rotationController.calculate(thetaPoseError, 0),
+            AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =

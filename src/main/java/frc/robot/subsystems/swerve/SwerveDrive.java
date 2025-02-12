@@ -41,22 +41,22 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final ProfiledPIDController xController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_TRANSLATION_P,
-          AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController yController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_TRANSLATION_P,
-          AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController rotationController =
       new ProfiledPIDController(
-          AutoConstants.AUTO_THETA_P,
-          AutoConstants.AUTO_THETA_I,
-          AutoConstants.AUTO_THETA_D,
-          AutoConstants.AUTO_ALIGN_ROTATIONAL_CONSTRAINTS);
+          AutoConstants.CHOREO_AUTO_THETA_P,
+          AutoConstants.CHOREO_AUTO_THETA_I,
+          AutoConstants.CHOREO_AUTO_THETA_D,
+          AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -126,7 +126,7 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    rotationController.enableContinuousInput(-Math.Pi, Math.Pi);
+    rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -245,12 +245,14 @@ public class SwerveDrive extends SubsystemBase {
   private void modulesPeriodic() {
     for (SwerveModule module : swerveModules) module.periodic();
   }
-  
-  /** Returns if the robot speed is to zero when zeroed 
+
+  /**
+   * Returns if the robot speed is to zero when zeroed
+   *
    * @return is robot moving along x
    * @return is robot moving along y
    * @return is robot rotating
-  */
+   */
   public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0

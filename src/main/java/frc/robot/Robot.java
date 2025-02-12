@@ -5,15 +5,19 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -168,7 +172,7 @@ public class Robot extends LoggedRobot {
         simWorld = null;
       }
     }
-        autoChooser = new AutoChooser();
+    autoChooser = new AutoChooser();
     // this sets up the auto factory
     autoFactory =
         new AutoFactory(
@@ -186,9 +190,8 @@ public class Robot extends LoggedRobot {
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // This 
+    // This
     RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
-
   }
 
   /** This function is called periodically during all modes. */

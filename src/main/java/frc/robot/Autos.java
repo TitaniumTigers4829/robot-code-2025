@@ -1,11 +1,8 @@
 package frc.robot;
 
-import java.util.List;
-
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AutoConstants;
 
@@ -45,9 +42,6 @@ public class Autos {
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
 
-
     return routine;
   }
-
-
 }
