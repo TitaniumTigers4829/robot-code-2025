@@ -7,7 +7,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
+import frc.robot.sim.simMechanism.SlantedElevatorSim;
 
 public class SimulatedElevator implements ElevatorInterface {
   private final SlantedElevatorSim m_elevatorSim;
