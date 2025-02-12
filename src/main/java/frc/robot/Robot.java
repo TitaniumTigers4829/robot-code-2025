@@ -2,6 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.FollowChoreoTrajectory;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
@@ -178,7 +180,15 @@ public class Robot extends LoggedRobot {
         new AutoFactory(
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            swerveDrive::followTrajectory, // A function that follows a choreo trajectory
+            (SwerveSample sample) -> {
+              FollowChoreoTrajectory followCommand =
+                  new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
+              followCommand.setSample(sample);
+              followCommand.execute();
+              if (swerveDrive.isTrajectoryFinished(sample)) {
+                followCommand.cancel();
+              }
+            }, // A function that follows a choreo trajectory
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
 

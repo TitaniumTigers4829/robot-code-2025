@@ -126,6 +126,9 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
+    xController.setTolerance(0.05);
+    yController.setTolerance(0.05);
+
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
@@ -239,6 +242,11 @@ public class SwerveDrive extends SubsystemBase {
               + rotationController.calculate(pose.getRotation().getRadians(), sample.heading);
       drive(moveX, moveY, moveTheta, true);
     }
+  }
+
+  public boolean isTrajectoryFinished(SwerveSample swerveSample) {
+    return swerveSample.x < xController.getSetpoint().position
+        && swerveSample.y < yController.getSetpoint().position;
   }
 
   /** Runs the SwerveModules periodic methods */
