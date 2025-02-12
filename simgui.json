@@ -1,13 +1,4 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "CANcoder (v6)[14]": {
-        "header": {
-          "open": false
-        }
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Alerts": "Alerts",

@@ -130,7 +130,7 @@ public class SwerveSetpointGenerator {
             vars.prevSpeeds.vxMetersPerSecond + vars.minS * vars.dx,
             vars.prevSpeeds.vyMetersPerSecond + vars.minS * vars.dy,
             vars.prevSpeeds.omegaRadiansPerSecond + vars.minS * vars.dtheta);
-    retSpeeds.discretize(retSpeeds, dt);
+    ChassisSpeeds.discretize(retSpeeds, dt);
 
     double chassisAccelX = (retSpeeds.vxMetersPerSecond - vars.prevSpeeds.vxMetersPerSecond) / dt;
     double chassisAccelY = (retSpeeds.vyMetersPerSecond - vars.prevSpeeds.vyMetersPerSecond) / dt;

@@ -11,11 +11,11 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
-import frc.robot.extras.characterization.WheelRadiusCharacterization;
-import frc.robot.extras.characterization.WheelRadiusCharacterization.Direction;
+import frc.robot.commands.characterization.WheelRadiusCharacterization;
+import frc.robot.commands.characterization.WheelRadiusCharacterization.Direction;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -201,16 +201,10 @@ public class RobotContainer {
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, FieldConstants.REEF_LEVEL_FOUR_Z));
-    operatorRightBumper.onTrue(new WheelRadiusCharacterization(swerveDrive, Direction.CLOCKWISE));
-          }
-    //temp fix
-      private Command WheelRadiusCharacterization() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'WheelRadiusCharacterization'");
-      }
-    
-      public Command getAutonomousCommand() {
+        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+  }
+
+  public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
     swerveDrive.resetEstimatedPose(
