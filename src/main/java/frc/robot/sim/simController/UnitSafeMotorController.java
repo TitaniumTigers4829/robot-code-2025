@@ -163,7 +163,7 @@ public class UnitSafeMotorController implements SimMotorController {
   /**
    * Represents current limit parameters for the motor controller.
    *
-   * <p>This record holds limits for the motor’s stator current, supply current, a lower supply
+   * <p>This record holds limits for the motors stator current, supply current, a lower supply
    * current limit, and a trigger time for the lower supply limit.
    *
    * @param statorCurrentLimit the maximum allowable stator current.
@@ -538,7 +538,7 @@ public class UnitSafeMotorController implements SimMotorController {
   }
 
   /**
-   * Applies soft limit constraints to the requested output based on the mechanism's position.
+   * Applies soft limit constraints to the requested output based on the mechanisms position.
    *
    * @param requestedOutput the controller output requested.
    * @param state the current mechanism state.

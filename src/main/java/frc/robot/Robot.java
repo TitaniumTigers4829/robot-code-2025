@@ -1,5 +1,7 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
@@ -61,6 +63,10 @@ public class Robot extends LoggedRobot {
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   private final SimWorld simWorld;
+
+  public AutoFactory autoFactory;
+  public final AutoChooser autoChooser;
+  public Autos autos;
 
   public Robot() {
     // Record metadata
@@ -162,7 +168,26 @@ public class Robot extends LoggedRobot {
         simWorld = null;
       }
     }
-    RobotModeTriggers.autonomous().whileTrue(robotContainer.getAutonomousCommand());
+        autoChooser = new AutoChooser();
+    // this sets up the auto factory
+    autoFactory =
+        new AutoFactory(
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            swerveDrive::followTrajectory, // A function that follows a choreo trajectory
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            swerveDrive); // The drive subsystem
+
+    autos = new Autos(autoFactory);
+
+    autoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
+    autoChooser.addRoutine(
+        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
+    // This updates the auto chooser
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // This 
+    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
 
   }
 

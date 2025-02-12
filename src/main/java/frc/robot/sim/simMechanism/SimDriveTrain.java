@@ -69,13 +69,13 @@ public class SimDriveTrain {
   }
 
   /**
-   * Sets the Robot's Current Pose in the Simulation World.
+   * Sets the Robots Current Pose in the Simulation World.
    *
    * <p>This method instantly teleports the robot to the specified pose in the simulation world. The
    * robot does not drive to the new pose; it is moved directly.
    *
    * @param robotPose the desired robot pose, represented as a {@link Pose2d}
-   * @param resetVelocity whether to reset the robot's velocity to zero after teleporting
+   * @param resetVelocity whether to reset the robots velocity to zero after teleporting
    */
   public void setChassisWorldPose(Pose2d robotPose, boolean resetVelocity) {
     chassis.setTransform(GeomUtil.toDyn4jTransform(robotPose));
@@ -87,7 +87,7 @@ public class SimDriveTrain {
   }
 
   /**
-   * Sets the chassis's Speeds to the Given ChassisSpeeds.
+   * Sets the chassiss Speeds to the Given ChassisSpeeds.
    *
    * <p>The robot does not accelerate smoothly to these speeds; instead, it jumps to the velocity
    * Instantaneously.
@@ -161,7 +161,7 @@ public class SimDriveTrain {
   @SuppressWarnings("unchecked")
   public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>> T createDriveTrain(
       SimRobot<T> robot, C config) {
-    // Don't forget to update this method when adding new drivetrain configurations
+    // Dont forget to update this method when adding new drivetrain configurations
     if (config instanceof SimSwerveConfig) {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }

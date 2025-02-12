@@ -26,7 +26,7 @@ public class SimIndexer {
     gamePiecesSet = Set.of(gamePieceVariantFilet);
   }
 
-  /** Inserts a game piece into the storage, regardless of the storage's current state. */
+  /** Inserts a game piece into the storage, regardless of the storages current state. */
   boolean forceInsertGamePiece(SimGamePiece gamePiece) {
     if (gamePieces.size() < numPieces
         && (gamePiecesSet.contains(gamePiece.variant()) || gamePiecesSet.isEmpty())) {

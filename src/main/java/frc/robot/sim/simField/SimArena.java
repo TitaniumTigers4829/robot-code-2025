@@ -175,7 +175,7 @@ public abstract class SimArena {
    * autonomous mode.
    *
    * <p>It should be implemented differently for each season-specific subclass of {@link SimArena}
-   * to reflect the unique game piece placements for that season's game.
+   * to reflect the unique game piece placements for that seasons game.
    */
   protected abstract void placeGamePiecesOnField();
 
@@ -195,7 +195,7 @@ public abstract class SimArena {
    * </ul>
    *
    * <p>This method should be implemented in the season-specific subclass of {@link SimArena} to
-   * reflect the unique aspects of that season's game.
+   * reflect the unique aspects of that seasons game.
    */
   protected abstract void competitionPeriodic();
 
@@ -207,7 +207,7 @@ public abstract class SimArena {
    * <p>Stores the layout of obstacles and game pieces.
    *
    * <p>For each season-specific subclass of {@link SimArena}, there should be a corresponding
-   * subclass of this class to store the field map for that specific season's game.
+   * subclass of this class to store the field map for that specific seasons game.
    */
   public static class FieldMap {
     private final List<FrcBody> obstacles = new ArrayList<>();

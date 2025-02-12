@@ -17,7 +17,7 @@ public class SimCommonMath {
   public static double generateRandomNormal(double mean, double stdDev) {
     double u1 = random.nextDouble();
     double u2 = random.nextDouble();
-    // Box–Muller transform https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+    // Box-Muller transform https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
     double z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     return z0 * stdDev + mean;
   }

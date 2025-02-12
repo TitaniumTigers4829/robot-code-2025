@@ -52,7 +52,7 @@ public class SimMechanism {
    *
    * <p>It is sound behavior for this to capture outputs of other mechanisms but be aware the order
    * of calculations between mechanisms is not guaranteed. For example, if an inverse pendulum
-   * mechanism could have extra load depending on the drive mechanism's acceleration, the drive
+   * mechanism could have extra load depending on the drive mechanisms acceleration, the drive
    * mechanism should be calculated first in the same time slot but this can not be promised.
    */
   public interface MechanismDynamics {
@@ -220,7 +220,7 @@ public class SimMechanism {
         ProceduralStructGenerator.genRecord(MechanismVariables.class);
   }
 
-  // Create variables to store the mechanism's properties
+  // Create variables to store the mechanisms properties
   private final String name;
   private final MechanismDynamics dynamics;
   private final Friction friction;
@@ -273,7 +273,7 @@ public class SimMechanism {
     this.limits = limits;
     this.noise = noise;
 
-    // Configure the controllers motor model to the mechanism's motor
+    // Configure the controllers motor model to the mechanisms motor
     controller.configureMotorModel(this.motor);
   }
 

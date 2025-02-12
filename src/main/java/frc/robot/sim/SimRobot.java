@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <p>A robot is composed of:
  *
  * <ul>
- *   <li>A {@link SimDriveTrain} subclass that represents the robot's drivetrain.
+ *   <li>A {@link SimDriveTrain} subclass that represents the robots drivetrain.
  *   <li>A {@link SimIndexer} object that stores {@link SimGamePiece}s for the robot.
- *   <li>A {@link SimBattery} object that simulates the robot's battery.
- *   <li>A collection of {@link SimIntake} objects that represent the robot's intakes.
- *   <li>A collection of {@link SimMechanism} objects that represent the robot's mechanisms.
+ *   <li>A {@link SimBattery} object that simulates the robots battery.
+ *   <li>A collection of {@link SimIntake} objects that represent the robots intakes.
+ *   <li>A collection of {@link SimMechanism} objects that represent the robots mechanisms.
  * </ul>
  */
 public class SimRobot<DrvTrn extends SimDriveTrain> {
@@ -45,7 +45,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    * @param <C> The type of the drivetrain configuration.
    * @param arena The simulation arena where the robot will operate.
    * @param name The name of the robot.
-   * @param drivetrainConfig The configuration for the robot's drivetrain.
+   * @param drivetrainConfig The configuration for the robots drivetrain.
    * @param gamePieceStorageCapacity The capacity for storing game pieces.
    */
   public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(
@@ -65,7 +65,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    * through all mechanisms and updates each one with a constant voltage of 12.0 volts to simulate
    * battery conditions.
    *
-   * <p>This method is typically called periodically to simulate the robot's behavior over time.
+   * <p>This method is typically called periodically to simulate the robots behavior over time.
    */
   public void simTick() {
     driveTrain.simTick();
@@ -125,7 +125,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     RuntimeLog.debug("Removed SimMechanism from SimRobot");
   }
 
-  /** Returns the {@link SimDriveTrain} object that represents the robot's drivetrain. */
+  /** Returns the {@link SimDriveTrain} object that represents the robots drivetrain. */
   public DrvTrn getDriveTrain() {
     return driveTrain;
   }
