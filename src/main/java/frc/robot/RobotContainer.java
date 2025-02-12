@@ -102,19 +102,11 @@ public class RobotContainer {
         new AutoFactory(
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
             swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            // // provided Pose2d
-            // FollowChoreoTrajectory::execute, // A function that follows a choreo trajectory
-            // provided Pose2d
-            // (SwerveSample sample) -> {
-            //   FollowChoreoTrajectory command =
-            //       new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
-            //   command.execute();
-            // }, // The drive subsystem trajectory follower
-            swerveDrive::followTrajectory,
+            swerveDrive::followTrajectory, // The drive subsystem trajectory follower
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             swerveDrive); // The drive subsystem
     autos = new Autos(autoFactory);
- 
+   // This adds the autoRoutines to the AutoChooser
     autoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
     autoChooser.addRoutine(
         AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
