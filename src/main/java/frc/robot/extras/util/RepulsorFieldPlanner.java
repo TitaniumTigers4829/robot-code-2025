@@ -202,7 +202,7 @@ public class RepulsorFieldPlanner {
             DataLogManager.getLog(), "SmartDashboard/Alerts", "SmartDashboard/Alerts");
   }
 
-  private boolean useGoalInArrows = false;
+  private boolean useGoalInArrows = true;
   private boolean useObstaclesInArrows = true;
   private boolean useWallsInArrows = true;
   private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);

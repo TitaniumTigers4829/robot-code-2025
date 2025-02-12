@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
@@ -50,12 +49,12 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(0.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(0.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(0, 0, 0);
+  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(10, 0, 0);
 
-  private final PIDController xSetpointController = new PIDController(0.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(0.0, 0.0, 0.0);
+  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
+  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -467,13 +466,13 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             -sample.vx + sample.vx != 0
-                ? -xSetpointController.calculate(pose.getX(), sample.x)
-                : -xController.calculate(pose.getX(), sample.x),
+                ? xSetpointController.calculate(pose.getX(), -sample.x)
+                : xController.calculate(pose.getX(), -sample.x),
             -sample.vy + sample.vy != 0
-                ? -ySetpointController.calculate(pose.getY(), sample.y)
-                : -yController.calculate(pose.getY(), sample.y),
+                ? ySetpointController.calculate(pose.getY(), -sample.y)
+                : yController.calculate(pose.getY(), -sample.y),
             -sample.omega
-                + -headingController.calculate(pose.getRotation().getRadians(), sample.heading),
+                + headingController.calculate(pose.getRotation().getRadians(), -sample.heading),
             getEstimatedPose().getRotation()); // Apply the generated speeds
     drive(speeds, true);
   }
@@ -488,40 +487,37 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput("Odometry/TrajectoryFinished", isFinished);
   }
 
-  public Command autoAlign(Pose3d _setpoint) {
+  public void autoAlign(Pose3d _setpoint, Pose2d estimatedPose) {
     // this.setpoint = _setpoint;
     Logger.recordOutput("Odometry/using repulsor", true);
     Logger.recordOutput("Odometry/using auto align", false);
 
-    return run(
-        () -> {
-          Logger.recordOutput("Drive/Setpoint", _setpoint);
+    Logger.recordOutput("Drive/Setpoint", _setpoint);
 
-          repulsorFieldPlanner.setGoal(_setpoint.toPose2d().getTranslation());
+    repulsorFieldPlanner.setGoal(_setpoint.toPose2d().getTranslation());
 
-          var robotPose = getEstimatedPose();
-          SwerveSample cmd =
-              repulsorFieldPlanner.getCmd(
-                  robotPose, getChassisSpeeds(), DriveConstants.MAX_SPEED_METERS_PER_SECOND, true);
+    SwerveSample cmd =
+        repulsorFieldPlanner.getCmd(
+            estimatedPose, getChassisSpeeds(), DriveConstants.MAX_SPEED_METERS_PER_SECOND, true);
 
-          // Apply the trajectory with rotation adjustment
-          SwerveSample adjustedSample =
-              new SwerveSample(
-                  cmd.t,
-                  cmd.x,
-                  cmd.y,
-                  _setpoint.toPose2d().getRotation().getRadians(),
-                  cmd.vx,
-                  cmd.vy,
-                  0,
-                  cmd.ax,
-                  cmd.ay,
-                  cmd.alpha,
-                  cmd.moduleForcesX(),
-                  cmd.moduleForcesY());
+    // Apply the trajectory with rotation adjustment
+    SwerveSample adjustedSample =
+        new SwerveSample(
+            cmd.t,
+            -cmd.x,
+            -cmd.y,
+            _setpoint.toPose2d().getRotation().getRadians(),
+            -cmd.vx,
+            -cmd.vy,
+            0,
+            -cmd.ax,
+            -cmd.ay,
+            cmd.alpha,
+            cmd.moduleForcesX(),
+            cmd.moduleForcesY());
 
-          // Apply the adjusted sample
-          followTrajectory(adjustedSample);
-        });
+    // Apply the adjusted sample
+    followTrajectory(adjustedSample);
+    // });
   }
 }

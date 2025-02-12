@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -9,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.RepulsorCommand;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
@@ -197,16 +197,19 @@ public class RobotContainer {
         .povUp()
         .onTrue(
             new InstantCommand(
-                () -> swerveDrive.resetEstimatedPose(new Pose2d(0, 0, new Rotation2d()))));
+                () -> swerveDrive.resetEstimatedPose(new Pose2d(3, 1, new Rotation2d()))));
     driverController
         .povDown()
         .whileTrue(
-            swerveDrive
-                .autoAlign(new Pose3d(new Pose2d(1, 0, new Rotation2d())))
-                .until(swerveDrive.isAtSetpoint())
-                .andThen(
-                    new AutoAlign(
-                        swerveDrive, visionSubsystem, new Pose2d(1, 0, new Rotation2d()))));
+            new RepulsorCommand(
+                swerveDrive,
+                visionSubsystem,
+                new Pose2d(4, 1, new Rotation2d()),
+                swerveDrive.getEstimatedPose()));
+    // .until(swerveDrive.isAtSetpoint())
+    // .andThen(
+    //     new AutoAlign(
+    //         swerveDrive, visionSubsystem, new Pose2d(1, 0, new Rotation2d()))));
     // FieldConstants has all reef poses
     driverController
         .a()
@@ -215,9 +218,9 @@ public class RobotContainer {
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
-    driverController
-        .b()
-        .whileTrue(swerveDrive.autoAlign(new Pose3d(FieldConstants.BLUE_LEFT_CORAL_STATION)));
+    // driverController
+    //     .b()
+    //     .whileTrue(swerveDrive.autoAlign(new Pose3d(FieldConstants.BLUE_LEFT_CORAL_STATION)));
     // .until(swerveDrive.isAtSetpoint())
     // .andThen(
     //     new AutoAlign(
@@ -227,12 +230,17 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // Resets the pose factoring in the robot side
     // This is just a failsafe, pose should be reset at the beginning of auto
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    return autoChooser.getSelected();
+    // swerveDrive.resetEstimatedPose(
+    //     new Pose2d(
+    //         swerveDrive.getEstimatedPose().getX(),
+    //         swerveDrive.getEstimatedPose().getY(),
+    //         Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    swerveDrive.resetEstimatedPose(new Pose2d(3, 1, new Rotation2d()));
+    return new RepulsorCommand(
+        swerveDrive,
+        visionSubsystem,
+        new Pose2d(4, 1, new Rotation2d()),
+        swerveDrive.getEstimatedPose());
   }
 
   public void simulationPeriodic() {
