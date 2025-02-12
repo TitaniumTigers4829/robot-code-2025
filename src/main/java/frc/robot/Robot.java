@@ -125,7 +125,6 @@ public class Robot extends LoggedRobot {
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
-
         visionSubsystem = null;
         elevatorSubsystem = null;
         simWorld = null;
