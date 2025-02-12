@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
-// import frc.cotc.util.ReefLocations;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -207,8 +206,8 @@ public class RepulsorFieldPlanner {
   static final List<Obstacle> FIELD_OBSTACLES =
       List.of(
           // Reef
-          //   new TeardropObstacle(ReefLocations.BLUE_REEF, 1, 2, .83, 3, 2),
-          //   new TeardropObstacle(ReefLocations.RED_REEF, 1, 2, .83, 3, 2),
+            new TeardropObstacle(ReefLocations.BLUE_REEF, 1, 2, .83, 3, 2),
+            new TeardropObstacle(ReefLocations.RED_REEF, 1, 2, .83, 3, 2),
           // Walls
           new HorizontalObstacle(0.0, 0.5, .5, true),
           new HorizontalObstacle(FIELD_WIDTH, 0.5, .5, false),
