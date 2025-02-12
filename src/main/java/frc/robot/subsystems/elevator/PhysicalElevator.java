@@ -46,13 +46,18 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Slot0.kG = ElevatorConstants.ELEVATOR_G;
     elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
+
     // Limits lol
+    elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ElevatorConstants.REVERSE_LIMIT;
+    elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable =
+        ElevatorConstants.REVRESE_LIMIT_ENABLE;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = ElevatorConstants.LIMIT_ENABLE;
 
     elevatorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     elevatorConfig.CurrentLimits.StatorCurrentLimit = ElevatorConstants.STATOR_CURRENT_LIMIT;
+    elevatorConfig.CurrentLimits.SupplyCurrentLimit = ElevatorConstants.SUPPLY_CURRENT_LIMIT;
     elevatorConfig.CurrentLimits.StatorCurrentLimitEnable =
         ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
     elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable =
