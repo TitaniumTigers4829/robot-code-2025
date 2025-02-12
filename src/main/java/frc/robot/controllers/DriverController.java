@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class DriverController extends ControllerBase {
 
-  public DriverController(int port, Subsystem subsystems) {
+  public DriverController(int port, Subsystem... subsystems) {
     super(port, true);
 
     // disregard null safety for subsystems as it is checked on assignment

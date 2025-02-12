@@ -14,6 +14,7 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
+import frc.robot.controllers.DriverController;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -44,6 +45,8 @@ public class RobotContainer {
   private final SwerveDrive swerveDrive;
   private final ElevatorSubsystem elevatorSubsystem;
 
+
+  private final DriverController driverController2;
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
@@ -113,6 +116,7 @@ public class RobotContainer {
         // simWorld = null;
       }
     }
+    driverController2 = new DriverController(0, swerveDrive, visionSubsystem, elevatorSubsystem);
   }
 
   public void teleopInit() {
