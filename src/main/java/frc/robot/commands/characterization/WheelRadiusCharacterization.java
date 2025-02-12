@@ -1,4 +1,5 @@
 package frc.robot.commands.characterization;
+
 // package frc.robot.extras.characterization;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -59,7 +60,7 @@ public class WheelRadiusCharacterization extends Command {
     // Get yaw and wheel positions
     accumGyroYawRads = swerveSubsystem.getGyroRotation2d().getRadians() - lastGyroYawRads;
     // accumGyroYawRads +=
-    //MathUtil.angleModulus(driveSubsystem.getPose().getRotation().getRadians()
+    // MathUtil.angleModulus(driveSubsystem.getPose().getRotation().getRadians()
     // - lastGyroYawRads);
     double averageWheelPosition = 0.0;
     double[] wheelPositiions = swerveSubsystem.getWheelRadiusCharacterizationPosition();
@@ -87,8 +88,7 @@ public class WheelRadiusCharacterization extends Command {
               + Units.metersToInches(currentEffectiveWheelRadius)
               + " inches");
       SmartDashboard.putNumber(
-          "Effective Wheel Radius (inches): ",
-Units.metersToInches(currentEffectiveWheelRadius));
+          "Effective Wheel Radius (inches): ", Units.metersToInches(currentEffectiveWheelRadius));
     }
   }
 }

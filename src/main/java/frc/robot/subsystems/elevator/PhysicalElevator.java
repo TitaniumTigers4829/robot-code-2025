@@ -46,7 +46,6 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Slot0.kG = ElevatorConstants.ELEVATOR_G;
     elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
-
     // Limits lol
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ElevatorConstants.REVERSE_LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable =

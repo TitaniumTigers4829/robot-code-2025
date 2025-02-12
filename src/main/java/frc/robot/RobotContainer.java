@@ -14,8 +14,6 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.intake.Eject;
 import frc.robot.commands.intake.Intake;
-import frc.robot.commands.characterization.WheelRadiusCharacterization;
-import frc.robot.commands.characterization.WheelRadiusCharacterization.Direction;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;

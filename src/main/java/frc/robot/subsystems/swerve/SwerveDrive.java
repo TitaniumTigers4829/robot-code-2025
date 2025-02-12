@@ -198,7 +198,7 @@ public class SwerveDrive extends SubsystemBase {
     double[] wheelPositions = new double[swerveModules.length];
 
     int i = 0;
-    //iterate over all the swerve modules, get their positions and add them to the array
+    // iterate over all the swerve modules, get their positions and add them to the array
     for (SwerveModule module : swerveModules) {
       module.getPosition();
       wheelPositions[i++] = module.getDrivePositionRadians();
