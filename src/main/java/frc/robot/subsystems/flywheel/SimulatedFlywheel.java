@@ -27,8 +27,16 @@ public class SimulatedFlywheel implements FlywheelInterface {
   private SimpleMotorFeedforward simFF;
 
   public SimulatedFlywheel() {
-    simPID = new PIDController(FlywheelConstants.FLYWHEEL_P, FlywheelConstants.FLYWHEEL_I, FlywheelConstants.FLYWHEEL_D);
-    simFF = new SimpleMotorFeedforward(FlywheelConstants.FF_FLYWHEEL_S, FlywheelConstants.FF_FLYWHEEL_V, FlywheelConstants.FF_FLYWHEEL_A);
+    simPID =
+        new PIDController(
+            FlywheelConstants.FLYWHEEL_P,
+            FlywheelConstants.FLYWHEEL_I,
+            FlywheelConstants.FLYWHEEL_D);
+    simFF =
+        new SimpleMotorFeedforward(
+            FlywheelConstants.FF_FLYWHEEL_S,
+            FlywheelConstants.FF_FLYWHEEL_V,
+            FlywheelConstants.FF_FLYWHEEL_A);
   }
 
   public void updateInputs(FlywheelInputs inputs) {

@@ -2,17 +2,22 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.climbpivot;
 
 /** Add your docs here. */
 public class PivotConstants {
   public static final int CLIMB_PIVOT_MOTOR_ID = 0 - 9;
-  
+
   public static final double CLIMB_PIVOT_P = 0 - 9;
   public static final double CLIMB_PIVOT_I = 0 - 9;
   public static final double CLIMB_PIVOT_D = 0 - 9;
 
   public static final double FF_CLIMB_PIVOT_S = 0 - 9;
+  public static final double FF_CLIMB_PIVOT_G = 0 - 9;
   public static final double FF_CLIMB_PIVOT_V = 0 - 9;
-  public static final double FF_CLIMB_PIVOT_A = 0 - 9;
+
+  public static final double PIVOT_MASS = 0-9;
+  public static final double  PIVOT_LENGTH = 0-9;
+
+  public static final double PIVOT_ACCEPTABLE_ERROR_DEGREES = 1.0;
 }
