@@ -7,6 +7,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.sim.simMechanism.SlantedElevatorSim;
 
@@ -14,6 +15,7 @@ public class SimulatedElevator implements ElevatorInterface {
   private final SlantedElevatorSim elevatorSim;
   private final ProfiledPIDController pidController;
   private final ElevatorFeedforward feedForward;
+  private final DIOSim limitSwitch;
 
   private double currentVolts;
   private double desiredPosition;
@@ -29,7 +31,7 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.MAX_HEIGHT,
             ElevatorConstants.SIMULATE_GRAVITY,
             ElevatorConstants.INCLINE_ANGLE_RADIANS,
-            ElevatorConstants.MIN_HEIGHT);
+            ElevatorConstants.BASE_HEIGHT);
     pidController =
         new ProfiledPIDController(
             ElevatorConstants.ELEVATOR_P,
@@ -42,6 +44,8 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.ELEVATOR_G,
             ElevatorConstants.ELEVATOR_V,
             ElevatorConstants.ELEVATOR_A);
+    limitSwitch = new DIOSim(ElevatorConstants.LIMIT_SWITCH_ID);
+    limitSwitch.setInitialized(false);
 
     currentVolts = 0.0;
     desiredPosition = 0.0;
@@ -52,9 +56,10 @@ public class SimulatedElevator implements ElevatorInterface {
     elevatorSim.update(HardwareConstants.TIMEOUT_S);
 
     inputs.leaderMotorPosition = elevatorSim.getPositionMeters();
-    inputs.followerMotorPosition = elevatorSim.getPositionMeters();
     inputs.leaderMotorVoltage = currentVolts;
+    inputs.followerMotorPosition = elevatorSim.getPositionMeters();
     inputs.followerMotorVoltage = currentVolts;
+    inputs.limitSwitchActivated = isLimitSwitchActivated();
     inputs.desiredPosition = desiredPosition;
   }
 
@@ -70,7 +75,6 @@ public class SimulatedElevator implements ElevatorInterface {
     double output = pidController.calculate(getElevatorPosition());
     double feedforwardOutput = feedForward.calculate(pidController.getSetpoint().velocity);
 
-    elevatorSim.setState(output, pidController.getSetpoint().velocity);
     setVolts(output + feedforwardOutput);
   }
 
@@ -83,5 +87,10 @@ public class SimulatedElevator implements ElevatorInterface {
   @Override
   public double getVolts() {
     return currentVolts;
+  }
+
+  @Override
+  public boolean isLimitSwitchActivated() {
+    return limitSwitch.getValue();
   }
 }

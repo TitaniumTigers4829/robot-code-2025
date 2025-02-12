@@ -26,7 +26,7 @@ public class ElevatorConstants {
   public static final double BASE_HEIGHT = Units.inchesToMeters(0);
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
-  public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);
+  public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(82);
   public static final boolean SIMULATE_GRAVITY = true;
 
   public static final double STATOR_CURRENT_LIMIT = 0;
@@ -38,6 +38,7 @@ public class ElevatorConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2;
 
   // limit
+  public static final int LIMIT_SWITCH_ID = 0;
   public static final double LIMIT = 40;
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.15;

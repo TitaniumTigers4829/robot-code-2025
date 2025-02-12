@@ -16,6 +16,7 @@ public interface ElevatorInterface {
     public double followerMotorVoltage = 0.0;
     public double leaderDutyCycle = 0.0;
     public double followerDutyCycle = 0.0;
+    public boolean limitSwitchActivated = false;
     public double desiredPosition = 0.0;
   }
 
@@ -56,5 +57,14 @@ public interface ElevatorInterface {
    */
   public default double getVolts() {
     return 0.0;
+  }
+
+  /**
+   * Returns whether the elevator is past it's limit
+   *
+   * @return If elevator reaches the top
+   */
+  public default boolean isLimitSwitchActivated() {
+    return false;
   }
 }
