@@ -1,371 +1,313 @@
+// Copyright (c) 2024 FRC 167
+// https://github.com/icrobotics-team167
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package frc.robot.extras.util;
 
-import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableEvent.Kind;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableListener;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
+// import frc.cotc.util.ReefLocations;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 
 public class RepulsorFieldPlanner {
-
-  abstract static class Obstacle {
-    double strength = 1.0;
-    boolean positive = true;
+  private abstract static class Obstacle {
+    double strength;
+    boolean positive;
 
     public Obstacle(double strength, boolean positive) {
       this.strength = strength;
       this.positive = positive;
     }
 
-    public abstract Force getForceAtPosition(Translation2d position, Translation2d target);
+    public abstract Translation2d getForceAtPosition(Translation2d position, Translation2d target);
 
-    protected double distToForceMag(double dist) {
-      var forceMag = strength / (0.00001 + Math.abs(dist * dist));
+    protected double distToForceMag(double dist, double maxRange) {
+      if (Math.abs(dist) > maxRange) {
+        return 0;
+      }
+      if (MathUtil.isNear(0, dist, 1e-2)) {
+        dist = 1e-2;
+      }
+      var forceMag = strength / (dist * dist);
+      forceMag -= strength / (maxRange * maxRange);
       forceMag *= positive ? 1 : -1;
       return forceMag;
     }
-
-    protected double distToForceMag(double dist, double falloff) {
-      var original = strength / (0.00001 + Math.abs(dist * dist));
-      var falloffMag = strength / (0.00001 + Math.abs(falloff * falloff));
-      return Math.max(original - falloffMag, 0) * (positive ? 1 : -1);
-    }
   }
 
-  static class PointObstacle extends Obstacle {
-    Translation2d loc;
-    double radius = 0.5;
+  private static class TeardropObstacle extends Obstacle {
+    final Translation2d loc;
+    final double primaryMaxRange;
+    final double primaryRadius;
+    final double tailStrength;
+    final double tailLength;
 
-    public PointObstacle(Translation2d loc, double strength, boolean positive) {
-      super(strength, positive);
+    public TeardropObstacle(
+        Translation2d loc,
+        double primaryStrength,
+        double primaryMaxRange,
+        double primaryRadius,
+        double tailStrength,
+        double tailLength) {
+      super(primaryStrength, true);
       this.loc = loc;
+      this.primaryMaxRange = primaryMaxRange;
+      this.primaryRadius = primaryRadius;
+      this.tailStrength = tailStrength;
+      this.tailLength = tailLength + primaryMaxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
-      var dist = loc.getDistance(position);
-      if (dist > 4) {
-        return new Force();
-      }
-      var outwardsMag = distToForceMag(loc.getDistance(position) - radius);
-      var initial = new Force(outwardsMag, position.minus(loc).getAngle());
-      var theta = target.minus(position).getAngle().minus(position.minus(loc).getAngle());
-      double mag = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
-
-      return initial
-          .rotateBy(Rotation2d.kCCW_90deg)
-          .div(initial.getNorm())
-          .times(mag)
-          .plus(initial);
-    }
-  }
-
-  static class SnowmanObstacle extends Obstacle {
-    Translation2d loc;
-    double radius = 0.5;
-
-    public SnowmanObstacle(Translation2d loc, double strength, double radius, boolean positive) {
-      super(strength, positive);
-      this.loc = loc;
-      this.radius = radius;
-    }
-
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       var targetToLoc = loc.minus(target);
       var targetToLocAngle = targetToLoc.getAngle();
-      // 1 meter away from loc, opposite target.
-      var sidewaysCircle = new Translation2d(1, targetToLoc.getAngle()).plus(loc);
-      var sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position));
-      var outwardsMag = distToForceMag(Math.max(0.01, loc.getDistance(position) - radius));
-      var initial = new Force(outwardsMag, position.minus(loc).getAngle());
+      var sidewaysPoint = new Translation2d(tailLength, targetToLoc.getAngle()).plus(loc);
 
-      // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
-      var sidewaysTheta =
-          target.minus(position).getAngle().minus(position.minus(sidewaysCircle).getAngle());
+      var positionToLocation = position.minus(loc);
+      var positionToLocationDistance = positionToLocation.getNorm();
+      Translation2d outwardsForce;
+      if (positionToLocationDistance <= primaryMaxRange) {
+        outwardsForce =
+            new Translation2d(
+                distToForceMag(
+                    Math.max(positionToLocationDistance - primaryRadius, 0),
+                    primaryMaxRange - primaryRadius),
+                positionToLocation.getAngle());
+      } else {
+        outwardsForce = Translation2d.kZero;
+      }
 
-      double sideways = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
-      var sidewaysAngle = targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg);
-      return new Force(sideways, sidewaysAngle).plus(initial);
+      var positionToLine = position.minus(loc).rotateBy(targetToLocAngle.unaryMinus());
+      var distanceAlongLine = positionToLine.getX();
+
+      Translation2d sidewaysForce;
+      var distanceScalar = distanceAlongLine / tailLength;
+      if (distanceScalar >= 0 && distanceScalar <= 1) {
+        var secondaryMaxRange =
+            MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
+        var distanceToLine = Math.abs(positionToLine.getY());
+        if (distanceToLine <= secondaryMaxRange) {
+          double strength;
+          if (distanceAlongLine < primaryMaxRange) {
+            strength = tailStrength * (distanceAlongLine / primaryMaxRange);
+          } else {
+            strength =
+                -tailStrength * distanceAlongLine / (tailLength - primaryMaxRange)
+                    + tailLength * tailStrength / (tailLength - primaryMaxRange);
+          }
+          strength *= 1 - distanceToLine / secondaryMaxRange;
+
+          var sidewaysMag = tailStrength * strength * (secondaryMaxRange - distanceToLine);
+          // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
+          var sidewaysTheta =
+              target.minus(position).getAngle().minus(position.minus(sidewaysPoint).getAngle());
+          sidewaysForce =
+              new Translation2d(
+                  sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians())),
+                  targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg));
+        } else {
+          sidewaysForce = Translation2d.kZero;
+        }
+      } else {
+        sidewaysForce = Translation2d.kZero;
+      }
+
+      return outwardsForce.plus(sidewaysForce);
     }
   }
 
   static class HorizontalObstacle extends Obstacle {
-    double y;
+    final double y;
+    final double maxRange;
 
-    public HorizontalObstacle(double y, double strength, boolean positive) {
+    public HorizontalObstacle(double y, double strength, double maxRange, boolean positive) {
       super(strength, positive);
       this.y = y;
+      this.maxRange = maxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
-      return new Force(0, distToForceMag(y - position.getY(), 1));
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+      var dist = Math.abs(position.getY() - y);
+      if (dist > maxRange) {
+        return Translation2d.kZero;
+      }
+      return new Translation2d(0, distToForceMag(y - position.getY(), maxRange));
     }
   }
 
-  static class VerticalObstacle extends Obstacle {
-    double x;
+  private static class VerticalObstacle extends Obstacle {
+    final double x;
+    final double maxRange;
 
-    public VerticalObstacle(double x, double strength, boolean positive) {
+    public VerticalObstacle(double x, double strength, double maxRange, boolean positive) {
       super(strength, positive);
       this.x = x;
+      this.maxRange = maxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
-      return new Force(distToForceMag(x - position.getX(), 1), 0);
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+      var dist = Math.abs(position.getX() - x);
+      if (dist > maxRange) {
+        return Translation2d.kZero;
+      }
+      return new Translation2d(distToForceMag(x - position.getX(), maxRange), 0);
     }
   }
 
-  public static final double GOAL_STRENGTH = 0.65;
+  private static class LineObstacle extends Obstacle {
+    final Translation2d startPoint;
+    final Translation2d endPoint;
+    final double length;
+    final Rotation2d angle;
+    final Rotation2d inverseAngle;
+    final double maxRange;
 
-  public static final List<Obstacle> FIELD_OBSTACLES =
+    public LineObstacle(Translation2d start, Translation2d end, double strength, double maxRange) {
+      super(strength, true);
+      startPoint = start;
+      endPoint = end;
+      var delta = end.minus(start);
+      length = delta.getNorm();
+      angle = delta.getAngle();
+      inverseAngle = angle.unaryMinus();
+      this.maxRange = maxRange;
+    }
+
+    @Override
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+      var positionToLine = position.minus(startPoint).rotateBy(inverseAngle);
+      if (positionToLine.getX() > 0 && positionToLine.getX() < length) {
+        return new Translation2d(
+            Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY()),
+            angle.rotateBy(Rotation2d.kCCW_90deg));
+      }
+      Translation2d closerPoint;
+      if (positionToLine.getX() <= 0) {
+        closerPoint = startPoint;
+      } else {
+        closerPoint = endPoint;
+      }
+      return new Translation2d(
+          distToForceMag(position.getDistance(closerPoint), maxRange),
+          position.minus(closerPoint).getAngle());
+    }
+  }
+
+  static final double FIELD_LENGTH = 17.6022;
+  static final double FIELD_WIDTH = 8.1026;
+
+  static final double SOURCE_X = 1.75;
+  static final double SOURCE_Y = 1.25;
+  static final List<Obstacle> FIELD_OBSTACLES =
       List.of(
-          new SnowmanObstacle(
-              new Translation2d(4.49, 4), 0.6, Units.inchesToMeters(65.5 / 2.0), true),
-          new SnowmanObstacle(
-              new Translation2d(13.08, 4), 0.6, Units.inchesToMeters(65.5 / 2.0), true));
-  static final double FIELD_LENGTH = 16.42;
-  static final double FIELD_WIDTH = 8.16;
-  public static final List<Obstacle> WALLS =
-      List.of(
-          new HorizontalObstacle(0.0, 0.5, true),
-          new HorizontalObstacle(FIELD_WIDTH, 0.5, false),
-          new VerticalObstacle(0.0, 0.5, true),
-          new VerticalObstacle(FIELD_LENGTH, 0.5, false));
+          // Reef
+        //   new TeardropObstacle(ReefLocations.BLUE_REEF, 1, 2, .83, 3, 2),
+        //   new TeardropObstacle(ReefLocations.RED_REEF, 1, 2, .83, 3, 2),
+          // Walls
+          new HorizontalObstacle(0.0, 0.5, .5, true),
+          new HorizontalObstacle(FIELD_WIDTH, 0.5, .5, false),
+          new VerticalObstacle(0.0, 0.5, .5, true),
+          new VerticalObstacle(FIELD_LENGTH, 0.5, .5, false),
+          // Sources
+          new LineObstacle(new Translation2d(0, SOURCE_Y), new Translation2d(SOURCE_X, 0), .5, .5),
+          new LineObstacle(
+              new Translation2d(0, FIELD_WIDTH - SOURCE_Y),
+              new Translation2d(SOURCE_X, FIELD_WIDTH),
+              .5,
+              .5),
+          new LineObstacle(
+              new Translation2d(FIELD_LENGTH, SOURCE_Y),
+              new Translation2d(FIELD_LENGTH - SOURCE_X, 0),
+              .5,
+              .5),
+          new LineObstacle(
+              new Translation2d(FIELD_LENGTH, FIELD_WIDTH - SOURCE_Y),
+              new Translation2d(FIELD_LENGTH - SOURCE_X, FIELD_WIDTH),
+              .5,
+              .5));
 
-  private List<Obstacle> fixedObstacles = new ArrayList<>();
-  private Optional<Translation2d> goalOpt = Optional.empty();
+  private Translation2d goal = new Translation2d(1, 1);
 
-  public Pose2d goal() {
-    return new Pose2d(goalOpt.orElse(Translation2d.kZero), Rotation2d.kZero);
-  }
+  private static final int ARROWS_X = 40;
+  private static final int ARROWS_Y = 20;
 
-  private static final int ARROWS_X = RobotBase.isSimulation() ? 40 : 0;
-  private static final int ARROWS_Y = RobotBase.isSimulation() ? 20 : 0;
-  private static final int ARROWS_SIZE = (ARROWS_X + 1) * (ARROWS_Y + 1);
-  private ArrayList<Pose2d> arrows = new ArrayList<>(ARROWS_SIZE);
-
-  public RepulsorFieldPlanner() {
-    fixedObstacles.addAll(FIELD_OBSTACLES);
-    fixedObstacles.addAll(WALLS);
-    for (int i = 0; i < ARROWS_SIZE; i++) {
-      arrows.add(new Pose2d());
-    }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useGoalInArrows");
-      topic.publish().set(useGoalInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useGoalInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useGoalInArrows);
-    }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useObstaclesInArrows");
-      topic.publish().set(useObstaclesInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useObstaclesInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useObstaclesInArrows);
-    }
-    {
-      var topic = NetworkTableInstance.getDefault().getBooleanTopic("useWallsInArrows");
-      topic.publish().set(useWallsInArrows);
-      NetworkTableListener.createListener(
-          topic,
-          EnumSet.of(Kind.kValueAll),
-          (event) -> {
-            useWallsInArrows = event.valueData.value.getBoolean();
-            updateArrows();
-          });
-      topic.subscribe(useWallsInArrows);
-    }
-    NetworkTableInstance.getDefault()
-        .startEntryDataLog(
-            DataLogManager.getLog(), "SmartDashboard/Alerts", "SmartDashboard/Alerts");
-  }
-
-  private boolean useGoalInArrows = true;
-  private boolean useObstaclesInArrows = true;
-  private boolean useWallsInArrows = true;
-  private Pose2d arrowBackstage = new Pose2d(-10, -10, Rotation2d.kZero);
+  private Translation2d lastGoal;
+  private Pose2d[] arrowList;
 
   // A grid of arrows drawn in AScope
-  void updateArrows() {
+  public Pose2d[] getArrows() {
+    if (goal.equals(lastGoal)) {
+      return arrowList;
+    }
+    var list = new ArrayList<Pose2d>();
     for (int x = 0; x <= ARROWS_X; x++) {
       for (int y = 0; y <= ARROWS_Y; y++) {
         var translation =
             new Translation2d(x * FIELD_LENGTH / ARROWS_X, y * FIELD_WIDTH / ARROWS_Y);
-        var force = Force.kZero;
-        if (useObstaclesInArrows)
-          force = force.plus(getObstacleForce(translation, goal().getTranslation()));
-        if (useWallsInArrows)
-          force = force.plus(getWallForce(translation, goal().getTranslation()));
-        if (useGoalInArrows) {
-          force = force.plus(getGoalForce(translation, goal().getTranslation()));
-        }
-        if (force.getNorm() < 1e-6) {
-          arrows.set(x * (ARROWS_Y + 1) + y, arrowBackstage);
-        } else {
+        var force = getObstacleForce(translation, goal);
+        if (force.getNorm() > 1e-6) {
           var rotation = force.getAngle();
 
-          arrows.set(x * (ARROWS_Y + 1) + y, new Pose2d(translation, rotation));
+          list.add(new Pose2d(translation, rotation));
         }
       }
     }
+    lastGoal = goal;
+    arrowList = list.toArray(new Pose2d[0]);
+    return arrowList;
   }
 
-  Force getGoalForce(Translation2d curLocation, Translation2d goal) {
+  Translation2d getGoalForce(Translation2d curLocation, Translation2d goal) {
     var displacement = goal.minus(curLocation);
     if (displacement.getNorm() == 0) {
-      return new Force();
+      return new Translation2d();
     }
     var direction = displacement.getAngle();
-    var mag =
-        GOAL_STRENGTH * (1 + 1.0 / (0.0001 + displacement.getNorm() * displacement.getNorm()));
-    return new Force(mag, direction);
+    var mag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
+    return new Translation2d(mag, direction);
   }
 
-  Force getWallForce(Translation2d curLocation, Translation2d target) {
-    var force = Force.kZero;
-    for (Obstacle obs : WALLS) {
-      force = force.plus(obs.getForceAtPosition(curLocation, target));
-    }
-    return force;
-  }
-
-  Force getObstacleForce(Translation2d curLocation, Translation2d target) {
-    var force = Force.kZero;
+  Translation2d getObstacleForce(Translation2d curLocation, Translation2d target) {
+    var force = Translation2d.kZero;
     for (Obstacle obs : FIELD_OBSTACLES) {
       force = force.plus(obs.getForceAtPosition(curLocation, target));
     }
     return force;
   }
 
-  Force getForce(Translation2d curLocation, Translation2d target) {
-    var goalForce =
-        getGoalForce(curLocation, target)
-            .plus(getObstacleForce(curLocation, target))
-            .plus(getWallForce(curLocation, target))
-            .times(Math.min(1.0, curLocation.getDistance(target))); // Adjust scaling
-    return goalForce;
-  }
-
-  public static SwerveSample sample(
-      Translation2d trans, Rotation2d rot, double vx, double vy, double omega) {
-    return new SwerveSample(
-        0,
-        trans.getX(),
-        trans.getY(),
-        rot.getRadians(),
-        vx,
-        vy,
-        omega,
-        0,
-        0,
-        0,
-        new double[4],
-        new double[4]);
+  Translation2d getForce(Translation2d curLocation, Translation2d target) {
+    return getGoalForce(curLocation, target).plus(getObstacleForce(curLocation, target));
   }
 
   public void setGoal(Translation2d goal) {
-    this.goalOpt = Optional.of(goal);
-    updateArrows();
+    this.goal = goal;
   }
 
-  public SwerveSample getCmd(
-      Pose2d pose, ChassisSpeeds currentSpeeds, double maxSpeed, boolean useGoal) {
-    return getCmd(pose, currentSpeeds, maxSpeed, useGoal, pose.getRotation());
-  }
+  public record RepulsorSample(Translation2d intermediateGoal, double vx, double vy) {}
 
-  public SwerveSample getCmd(
-      Pose2d pose,
-      ChassisSpeeds currentSpeeds,
-      double maxSpeed,
-      boolean useGoal,
-      Rotation2d goalRotation) {
-    double stepSize_m = maxSpeed * 0.02; // TODO
-    if (goalOpt.isEmpty()) {
-      return sample(pose.getTranslation(), pose.getRotation(), 0, 0, 0);
+  public RepulsorSample sampleField(
+      Translation2d curTrans, double maxSpeed, double slowdownDistance) {
+    var err = curTrans.minus(goal);
+    var netForce = getForce(curTrans, goal);
+
+    double stepSize_m;
+    if (err.getNorm() < slowdownDistance) {
+      stepSize_m =
+          MathUtil.interpolate(
+              0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
     } else {
-      var startTime = System.nanoTime();
-      var goal = goalOpt.get();
-      var curTrans = pose.getTranslation();
-      var err = curTrans.minus(goal);
-
-      Logger.recordOutput("Repulsor/err", curTrans.getDistance(goal));
-      Logger.recordOutput("Repulsor/step", stepSize_m * 1.5);
-      if (useGoal && err.getNorm() < stepSize_m * 1.5) {
-        return sample(goal, goalRotation, 0, 0, 0);
-      } else {
-        var obstacleForce = getObstacleForce(curTrans, goal).plus(getWallForce(curTrans, goal));
-        var netForce = obstacleForce;
-        if (useGoal) {
-          netForce = getGoalForce(curTrans, goal).plus(netForce);
-          SmartDashboard.putNumber("forceLog", netForce.getNorm());
-          // Calculate how quickly to move in this direction
-          var closeToGoalMax = maxSpeed * Math.min(err.getNorm() / 2, 1);
-
-          stepSize_m = Math.min(maxSpeed, closeToGoalMax) * 0.02;
-        }
-
-        Logger.recordOutput("Repulsor/net", netForce);
-
-        var step = new Translation2d(stepSize_m, netForce.getAngle());
-        var intermediateGoal = curTrans.plus(step);
-        var endTime = System.nanoTime();
-        SmartDashboard.putNumber("repulsorTimeS", (endTime - startTime) / 1e9);
-        return sample(
-            intermediateGoal,
-            goalRotation,
-            (step.getX() / 0.02) * Math.min(1.0, curTrans.getDistance(goal) / 3),
-            (step.getY() / 0.02) * Math.min(1.0, curTrans.getDistance(goal) / 3),
-            0);
-      }
+      stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
     }
-  }
-
-  public double pathLength = 0;
-
-  public ArrayList<Translation2d> getTrajectory(
-      Translation2d current, Translation2d goalTranslation, double stepSize_m) {
-    pathLength = 0;
-    ArrayList<Translation2d> traj = new ArrayList<>();
-    Translation2d robot = current;
-    for (int i = 0; i < 400; i++) {
-      var err = robot.minus(goalTranslation);
-      if (err.getNorm() < stepSize_m * 1.5) {
-        traj.add(goalTranslation);
-        break;
-      } else {
-        var netForce = getForce(robot, goalTranslation);
-        if (netForce.getNorm() == 0) {
-          break;
-        }
-        var step = new Translation2d(stepSize_m, netForce.getAngle());
-        var intermediateGoal = robot.plus(step);
-        traj.add(intermediateGoal);
-        pathLength += stepSize_m;
-        robot = intermediateGoal;
-      }
-    }
-    return traj;
+    var step = new Translation2d(stepSize_m, netForce.getAngle());
+    return new RepulsorSample(
+        curTrans.plus(step),
+        step.getX() / Robot.defaultPeriodSecs,
+        step.getY() / Robot.defaultPeriodSecs);
   }
 }

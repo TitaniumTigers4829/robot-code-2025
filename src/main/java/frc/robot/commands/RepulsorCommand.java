@@ -36,7 +36,7 @@ public class RepulsorCommand extends DriveCommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerveDrive.autoAlign(new Pose3d(setpoint), estimatedPose);
+    swerveDrive.followRepulsorField(setpoint);
   }
 
   // Called once the command ends or is interrupted.

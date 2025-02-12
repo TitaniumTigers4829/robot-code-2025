@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.extras.setpointGen.SwerveSetpoint;
@@ -448,76 +450,66 @@ public class SwerveDrive extends SubsystemBase {
                     || Math.abs(ySetpointController.getError()) < 0.08));
   }
 
-  /** Follows the provided swerve sample. */
-  public void followTrajectory(SwerveSample sample) {
-    // Get the current pose of the robot
-    Pose2d pose = getEstimatedPose();
-    Logger.recordOutput("Odometry/TrajectorySetpoint", pose);
-    Logger.recordOutput("Drive/PID/error", headingController.getError());
-    Logger.recordOutput("Drive/PID/xSetpointTranslationError", xSetpointController.getError());
-    Logger.recordOutput("Drive/PID/xTranslationError", xController.getError());
-    Logger.recordOutput("Drive/PID/ySetpointTranslationError", ySetpointController.getError());
-    Logger.recordOutput("Drive/PID/yTranslationError", yController.getError());
+  public Command followRepulsorField(Pose2d goal) {
+    return Commands.sequence(
+            runOnce(
+                () -> {
+                  repulsorFieldPlanner.setGoal(goal.getTranslation());
+                  xController.reset();
+                  yController.reset();
+                  headingController.reset();
+                }),
+            run(
+                () -> {
+                  Logger.recordOutput("Repulsor/Goal", goal);
 
-    var out = headingController.calculate(pose.getRotation().getRadians(), sample.heading);
-    Logger.recordOutput("Drive/PID/out", out);
+                  var sample =
+                      repulsorFieldPlanner.sampleField(
+                          poseEstimator.getEstimatedPosition().getTranslation(),
+                          DriveConstants.MAX_SPEED_METERS_PER_SECOND * .8,
+                          1.5);
 
-    // Generate the next speeds for the robot
-    ChassisSpeeds speeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            -sample.vx + sample.vx != 0
-                ? xSetpointController.calculate(pose.getX(), -sample.x)
-                : xController.calculate(pose.getX(), -sample.x),
-            -sample.vy + sample.vy != 0
-                ? ySetpointController.calculate(pose.getY(), -sample.y)
-                : yController.calculate(pose.getY(), -sample.y),
-            -sample.omega
-                + headingController.calculate(pose.getRotation().getRadians(), -sample.heading),
-            getEstimatedPose().getRotation()); // Apply the generated speeds
-    drive(speeds, true);
+                  var feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
+                  var feedback =
+                      new ChassisSpeeds(
+                          xController.calculate(
+                              poseEstimator.getEstimatedPosition().getX(),
+                              sample.intermediateGoal().getX()),
+                          yController.calculate(
+                              poseEstimator.getEstimatedPosition().getY(),
+                              sample.intermediateGoal().getY()),
+                          headingController.calculate(
+                              poseEstimator.getEstimatedPosition().getRotation().getRadians(),
+                              goal.getRotation().getRadians()));
+
+                  Logger.recordOutput(
+                      "Repulsor/Error", goal.minus(poseEstimator.getEstimatedPosition()));
+                  Logger.recordOutput("Repulsor/Feedforward", feedforward);
+                  Logger.recordOutput("Repulsor/Feedback", feedback);
+
+                                   Logger.recordOutput("Repulsor/Vector field",
+                  repulsorFieldPlanner.getArrows());
+
+                  var outputFieldRelative = feedforward.plus(feedback);
+                  var outputRobotRelative =
+                      ChassisSpeeds.fromFieldRelativeSpeeds(
+                          outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
+
+                  drive(outputRobotRelative, false);
+                }))
+        .until(
+            () -> {
+              var error = goal.minus(poseEstimator.getEstimatedPosition());
+              return error.getTranslation().getNorm() < .01
+                  && Math.abs(error.getRotation().getDegrees()) < 5;
+            });
   }
 
-  public void logTrajectory(Trajectory<SwerveSample> traj, boolean isFinished) {
-    SwerveSample[] trajarray = new SwerveSample[0];
-    boolean flip =
-        DriverStation.isDSAttached() && DriverStation.getAlliance().get() != Alliance.Blue;
-    Logger.recordOutput(
-        "Odometry/Trajectory",
-        flip ? traj.flipped().samples().toArray(trajarray) : traj.samples().toArray(trajarray));
-    Logger.recordOutput("Odometry/TrajectoryFinished", isFinished);
-  }
-
-  public void autoAlign(Pose3d _setpoint, Pose2d estimatedPose) {
-    // this.setpoint = _setpoint;
-    Logger.recordOutput("Odometry/using repulsor", true);
-    Logger.recordOutput("Odometry/using auto align", false);
-
-    Logger.recordOutput("Drive/Setpoint", _setpoint);
-
-    repulsorFieldPlanner.setGoal(_setpoint.toPose2d().getTranslation());
-
-    SwerveSample cmd =
-        repulsorFieldPlanner.getCmd(
-            estimatedPose, getChassisSpeeds(), DriveConstants.MAX_SPEED_METERS_PER_SECOND, true);
-
-    // Apply the trajectory with rotation adjustment
-    SwerveSample adjustedSample =
-        new SwerveSample(
-            cmd.t,
-            -cmd.x,
-            -cmd.y,
-            _setpoint.toPose2d().getRotation().getRadians(),
-            -cmd.vx,
-            -cmd.vy,
-            0,
-            -cmd.ax,
-            -cmd.ay,
-            cmd.alpha,
-            cmd.moduleForcesX(),
-            cmd.moduleForcesY());
-
-    // Apply the adjusted sample
-    followTrajectory(adjustedSample);
-    // });
-  }
+  // public Command reefAlign(Boolean left) {
+  //   return defer(
+  //       () ->
+  //           followRepulsorField(
+  //               ReefLocations.getSelectedLocation(
+  //                   poseEstimator.getEstimatedPosition().getTranslation(), left)));
+  // }
 }
