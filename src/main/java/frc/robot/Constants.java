@@ -347,7 +347,7 @@ public final class Constants {
     public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
-    public static final double DEADBAND_AMOUNT = 0.02;
+    public static final double TRANSLATION_DEADBAND_AMOUNT = 0.02;
 
     public static final double AUTO_ALIGN_ROTATION_P = 5;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
@@ -372,7 +372,6 @@ public final class Constants {
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
     public static final double CHOREO_AUTO_THETA_D = 0.0;
 
-    public static final double AUTO_SHOOT_HEADING_OFFSET = 2;
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
@@ -381,10 +380,6 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
-
-    public static final double X_TOLERANCE = 0.02;
-    public static final double Y_TOLERANCE = 0.02;
-    public static final double THETA_TOLERANCE = 1.25;
 
     
   }

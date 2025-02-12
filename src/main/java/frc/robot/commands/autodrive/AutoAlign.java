@@ -74,13 +74,13 @@ public class AutoAlign extends DriveCommandBase {
     // Uses the PID controllers to calculate the drive output
     double xOutput =
         MathUtil.applyDeadband(
-            xTranslationController.calculate(xPoseError, 0), AutoConstants.DEADBAND_AMOUNT);
+            xTranslationController.calculate(xPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
     double yOutput =
         MathUtil.applyDeadband(
-            yTranslationController.calculate(yPoseError, 0), AutoConstants.DEADBAND_AMOUNT);
+            yTranslationController.calculate(yPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
     double turnOutput =
         MathUtil.applyDeadband(
-            rotationController.calculate(thetaPoseError, 0), AutoConstants.DEADBAND_AMOUNT);
+            rotationController.calculate(thetaPoseError, 0), AutoConstants.TRANSLATION_DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
