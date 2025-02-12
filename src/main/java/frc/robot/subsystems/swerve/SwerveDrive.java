@@ -245,7 +245,12 @@ public class SwerveDrive extends SubsystemBase {
   private void modulesPeriodic() {
     for (SwerveModule module : swerveModules) module.periodic();
   }
-
+  
+  /** Returns if the robot speed is to zero when zeroed 
+   * @return is robot moving along x
+   * @return is robot moving along y
+   * @return is robot rotating
+  */
   public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
