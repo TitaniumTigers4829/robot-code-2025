@@ -39,6 +39,15 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
   private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
 
+  /**
+   * Constructs a new SimRobot instance.
+   *
+   * @param <C> The type of the drivetrain configuration.
+   * @param arena The simulation arena where the robot will operate.
+   * @param name The name of the robot.
+   * @param drivetrainConfig The configuration for the robot's drivetrain.
+   * @param gamePieceStorageCapacity The capacity for storing game pieces.
+   */
   public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(
       SimArena arena, String name, C drivetrainConfig, int gamePieceStorageCapacity) {
     this.arena = arena;
@@ -48,8 +57,19 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     this.gamePieceStorage = new SimIndexer(gamePieceStorageCapacity);
   }
 
+  /**
+   * The simulated robots sim tick. This runs the sim tick for the drivetrain and updates all the
+   * mechanisms that have been added to the SimRobot.
+   *
+   * <p>It calls the simTick method on the driveTrain object to update its state. Then, it iterates
+   * through all mechanisms and updates each one with a constant voltage of 12.0 volts to simulate
+   * battery conditions.
+   *
+   * <p>This method is typically called periodically to simulate the robot's behavior over time.
+   */
   public void simTick() {
     driveTrain.simTick();
+    // TODO: fix SimBattery :/
     // final Voltage batVolts = battery.getBatteryVoltage();
     for (var mechanism : mechanisms) {
       mechanism.update(Volts.of(12.0));
