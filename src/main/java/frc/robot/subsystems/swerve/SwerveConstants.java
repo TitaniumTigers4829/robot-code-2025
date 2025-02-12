@@ -20,6 +20,8 @@ public class SwerveConstants {
     public static final double TRACK_WIDTH = Units.inchesToMeters(21.25);
     // Distance between front and back wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(21.25);
+    public static final double DRIVE_BASE_DIAMETER =
+        Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
 
     public static final Translation2d[] MODULE_TRANSLATIONS =
         new Translation2d[] {

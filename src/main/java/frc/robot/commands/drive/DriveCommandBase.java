@@ -46,7 +46,6 @@ public abstract class DriveCommandBase extends Command {
     addLimelightVisionMeasurement(Limelight.BACK);
     addLimelightVisionMeasurement(Limelight.FRONT_LEFT);
     addLimelightVisionMeasurement(Limelight.FRONT_RIGHT);
-    Logger.recordOutput("Odometry/is using vision measurement", true);
   }
 
   /**

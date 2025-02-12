@@ -51,7 +51,7 @@ public class SwerveDrive extends SubsystemBase {
           AutoConstants.AUTO_TRANSLATION_I,
           AutoConstants.AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController headingController =
+  private final ProfiledPIDController rotationController =
       new ProfiledPIDController(
           AutoConstants.AUTO_THETA_P,
           AutoConstants.AUTO_THETA_I,
@@ -126,7 +126,7 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    headingController.enableContinuousInput(lastMovementTime, INACTIVITY_THRESHOLD);
+    rotationController.enableContinuousInput(-Math.Pi, Math.Pi);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -236,7 +236,7 @@ public class SwerveDrive extends SubsystemBase {
       double moveY = -sample.vy + yController.calculate(pose.getY(), sample.y);
       double moveTheta =
           -sample.omega
-              + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
+              + rotationController.calculate(pose.getRotation().getRadians(), sample.heading);
       drive(moveX, moveY, moveTheta, true);
     }
   }
