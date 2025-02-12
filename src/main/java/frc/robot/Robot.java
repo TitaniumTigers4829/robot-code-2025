@@ -5,16 +5,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
-import frc.robot.commands.intake.Eject;
-import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -63,7 +60,7 @@ public class Robot extends LoggedRobot {
   private final AlgaePivotSubsystem algaePivotSubsystem =
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
-  private final SimWorld simWorld = new SimWorld();
+  private final SimWorld simWorld;
 
   public Robot() {
     // Record metadata
@@ -100,13 +97,14 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      default: {
-        // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-      }
+      default:
+        {
+          // Replaying a log, set up replay source
+          setUseTiming(false); // Run as fast as possible
+          String logPath = LogFileUtil.findReplayLog();
+          Logger.setReplaySource(new WPILOGReader(logPath));
+          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
     }
 
     // Start AdvantageKit logger
@@ -114,7 +112,6 @@ public class Robot extends LoggedRobot {
     switch (Constants.ROBOT_TYPE) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
-
         swerveDrive =
             new SwerveDrive(
                 new PhysicalGyro(),
@@ -124,19 +121,19 @@ public class Robot extends LoggedRobot {
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
-        // simWorld = null;
+        simWorld = null;
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
 
         visionSubsystem = null;
         elevatorSubsystem = null;
-        // simWorld = null;
+        simWorld = null;
       }
 
       case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
-        // simWorld = new SimWorld();
+        simWorld = new SimWorld();
         swerveDrive =
             new SwerveDrive(
                 new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
@@ -163,7 +160,7 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {},
                 new ModuleInterface() {});
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
-        // simWorld = null;
+        simWorld = null;
       }
     }
   }
@@ -210,88 +207,71 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    configureButtonBindings();
+    configureDriverController();
+    configureOperatorController();
 
     swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
-  private void configureButtonBindings() {
-    DoubleSupplier driverLeftStickX = driverController::getLeftX;
-    DoubleSupplier driverLeftStickY = driverController::getLeftY;
-    DoubleSupplier driverRightStickX = driverController::getRightX;
+  private void configureDriverController() {
+    // Driver Left Stick
     DoubleSupplier driverLeftStick[] =
         new DoubleSupplier[] {
-          () -> JoystickUtil.modifyAxisPolar(driverLeftStickX, driverLeftStickY, 3)[0],
-          () -> JoystickUtil.modifyAxisPolar(driverLeftStickX, driverLeftStickY, 3)[1]
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[0],
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[1]
         };
-
-    Trigger driverRightBumper = new Trigger(driverController.rightBumper());
-    Trigger driverRightDirectionPad = new Trigger(driverController.pov(90));
-    Trigger driverLeftDirectionPad = new Trigger(driverController.pov(270));
-
-    driverController.a().whileTrue(new Intake(intakeSubsystem));
-    driverController.b().whileTrue(new Eject(intakeSubsystem));
-    driverController
-        .x()
-        .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
-
-    // // autodrive
-    // Trigger driverAButton = new Trigger(driverController::getAButton);
-    // lol whatever
-    // // intake
-    // Trigger operatorLeftTrigger = new Trigger(()->operatorController.getLeftTriggerAxis() > 0.2);
-    // Trigger operatorLeftBumper = new Trigger(operatorController::getLeftBumper);
-    // // amp and speaker
-    // Trigger operatorBButton = new Trigger(operatorController::getBButton);
-    // Trigger operatorRightBumper = new Trigger(operatorController::getRightBumper);
-    // Trigger operatorRightTrigger = new Trigger(()->operatorController.getRightTriggerAxis() >
-    // 0.2);
-    // Trigger driverRightTrigger = new Trigger(()->driverController.getRightTriggerAxis() > 0.2);
-
-    // // manual pivot and intake rollers
-    // Trigger operatorAButton = new Trigger(operatorController::getAButton);
-    // Trigger operatorXButton = new Trigger(operatorController::getXButton);
-    // Trigger operatorYButton = new Trigger(operatorController::getYButton);
-    // DoubleSupplier operatorRightStickY = operatorController::getRightY;
-    // // unused
-    // Trigger operatorUpDirectionPad = new Trigger(()->operatorController.getPOV() == 0);
-    // Trigger operatorLeftDirectionPad = new Trigger(()->operatorController.getPOV() == 270);
-    // Trigger operatorDownDirectionPad = new Trigger(()->operatorController.getPOV() == 180);
-    // Trigger driverLeftTrigger = new Trigger(()->driverController.getLeftTriggerAxis() > 0.2);
-    Trigger driverLeftBumper = new Trigger(driverController.leftBumper());
 
     // DRIVER BUTTONS
     Command driveCommand =
         new DriveCommand(
             swerveDrive,
             visionSubsystem,
+            // Translation in the Y direction
             driverLeftStick[1],
+            // Translation in the X direction
             driverLeftStick[0],
-            () -> JoystickUtil.modifyAxis(driverRightStickX, 3),
-            () -> !driverRightBumper.getAsBoolean(),
-            () -> driverLeftBumper.getAsBoolean());
+            // Rotation
+            () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
+            // Robot relative
+            () -> !driverController.rightBumper().getAsBoolean(),
+            // Rotation speed
+            () -> driverController.leftBumper().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
-    driverRightDirectionPad.onTrue(
-        new InstantCommand(
-            () ->
-                swerveDrive.resetEstimatedPose(
-                    new Pose2d(
-                        swerveDrive.getEstimatedPose().getX(),
-                        swerveDrive.getEstimatedPose().getY(),
-                        Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
+    driverController
+        .povRight()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    swerveDrive.resetEstimatedPose(
+                        new Pose2d(
+                            swerveDrive.getEstimatedPose().getX(),
+                            swerveDrive.getEstimatedPose().getY(),
+                            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
-    driverLeftDirectionPad.onTrue(
-        new InstantCommand(
-            () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+    driverController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
 
     // FieldConstants has all reef poses
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+  }
+
+  private void configureOperatorController() {
+    operatorController.b().whileTrue(Commands.none());
+    operatorController.y().whileTrue(Commands.none());
+    operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
