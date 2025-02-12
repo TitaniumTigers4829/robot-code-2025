@@ -108,16 +108,16 @@ public final class Constants {
     // Auto Align Constants
     public static final double DEADBAND_AMOUNT = 0.02;
 
-    public static final double AUTO_LINEUP_ROTATION_P = 5;
-    public static final double AUTO_LINEUP_ROTATION_I = 0;
-    public static final double AUTO_LINEUP_ROTATION_D = 0;
-    public static final Constraints AUTO_LINEUP_ROTATION_CONSTRAINTS =
+    public static final double AUTO_ALIGN_ROTATION_P = 5;
+    public static final double AUTO_ALIGN_ROTATION_I = 0;
+    public static final double AUTO_ALIGN_ROTATION_D = 0;
+    public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
 
-    public static final double AUTO_LINEUP_TRANSLATION_P = 4.0;
-    public static final double AUTO_LINEUP_TRANSLATION_I = 0;
-    public static final double AUTO_LINEUP_TRANSLATION_D = 0;
-    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
+    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0;
+    public static final double AUTO_ALIGN_TRANSLATION_I = 0;
+    public static final double AUTO_ALIGN_TRANSLATION_D = 0;
+    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
 
     // These used to be in Trajectory Constants
     public static final double DRIVE_BASE_DIAMETER =
@@ -126,12 +126,12 @@ public final class Constants {
     public static final double MAX_SPEED = 5.0;
     public static final double MAX_ACCELERATION = 3;
 
-    public static final double AUTO_TRANSLATION_P = 0.0; // 1.7
-    public static final double AUTO_TRANSLATION_I = 0;
-    public static final double AUTO_TRANSLATION_D = 0.0;
-    public static final double AUTO_THETA_P = 0.0; // 5
-    public static final double AUTO_THETA_I = 0; // 5
-    public static final double AUTO_THETA_D = 0.0;
+    public static final double CHOREO_AUTO_TRANSLATION_P = 0.0; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_I = 0;
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
+    public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
+    public static final double CHOREO_AUTO_THETA_I = 0; // 5
+    public static final double CHOREO_AUTO_THETA_D = 0.0;
 
     public static final double AUTO_SHOOT_HEADING_OFFSET = 2;
 
@@ -147,19 +147,7 @@ public final class Constants {
     public static final double Y_TOLERANCE = 0.02;
     public static final double THETA_TOLERANCE = 1.25;
 
-    // Note Detection Driving Constants
-    public static final double AUTO_ALIGN_TRANSLATIONAL_P = 3;
-    public static final double AUTO_ALIGN_TRANSLATIONAL_I = 0;
-    public static final double AUTO_ALIGN_TRANSLATIONAL_D = 0;
-
-    public static Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(5, 2);
-
-    public static final double AUTO_ALIGN_ROTATIONAL_P = 3;
-    public static final double AUTO_ALIGN_ROTATIONAL_I = 0;
-    public static final double AUTO_ALIGN_ROTATIONAL_D = 0;
-
-    public static Constraints AUTO_ALIGN_ROTATIONAL_CONSTRAINTS =
-        new Constraints(DriveConstants.MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, 2);
+    
   }
 
   /**
