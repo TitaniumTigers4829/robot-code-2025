@@ -175,7 +175,7 @@ public abstract class SimArena {
    * autonomous mode.
    *
    * <p>It should be implemented differently for each season-specific subclass of {@link SimArena}
-   * to reflect the unique game piece placements for that season's game.
+   * to reflect the unique game piece placements for that seaso's game.
    */
   protected abstract void placeGamePiecesOnField();
 

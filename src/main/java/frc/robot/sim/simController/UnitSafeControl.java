@@ -364,7 +364,7 @@ public class UnitSafeControl {
     }
 
     /**
-     * Configures the controller to use continuous angular input over the range [-π, π].
+     * Configures the controller to use continuous angular input over the range [-pi, pi].
      *
      * @return this AngularPIDFeedback instance.
      */
