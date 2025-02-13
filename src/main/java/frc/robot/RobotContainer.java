@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.characterization.WheelRadiusCharacterization;
+import frc.robot.commands.characterization.WheelRadiusCharacterization.Direction;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.intake.Eject;
@@ -139,7 +141,8 @@ public class RobotContainer {
     driverController
         .x()
         .whileTrue(new ManualAlgaePivot(algaePivotSubsystem, operatorController::getLeftY));
-
+    operatorRightBumper.whileTrue(
+        new WheelRadiusCharacterization(swerveDrive, Direction.CLOCKWISE));
     // // autodrive
     // Trigger driverAButton = new Trigger(driverController::getAButton);
     // lol whatever
