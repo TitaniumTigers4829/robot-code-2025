@@ -82,7 +82,9 @@ public class CompModule implements ModuleInterface {
     turnConfig.Slot0.kV = ModuleConstants.TURN_V;
     turnConfig.Slot0.kA = ModuleConstants.TURN_A;
     turnConfig.Feedback.FeedbackRemoteSensorID = turnEncoder.getDeviceID();
-    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+    turnConfig.Feedback.SensorToMechanismRatio = 1.0;
+    turnConfig.Feedback.RotorToSensorRatio = 11;
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.MotorOutput.Inverted = moduleConfig.turnReversed();
     turnConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
@@ -116,7 +118,7 @@ public class CompModule implements ModuleInterface {
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
+    BaseStatusSignal.waitForAll(0.020, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
 
     inputs.isConnected =
         BaseStatusSignal.isAllGood(
