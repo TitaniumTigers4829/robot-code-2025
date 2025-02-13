@@ -53,6 +53,7 @@ public class SimulatedFlywheel implements FlywheelInterface {
   }
 
   public void setVolts(double volts) {
+    currentVolts = volts;
     simulatedFlywheel.setInputVoltage(volts);
   }
 

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.climbpivot;
 
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -14,6 +16,9 @@ public class SimulatedClimbPivot implements ClimbPivotInterface{
       new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0, 0.001);
   private PIDController simPID;
   private SimpleMotorFeedforward simFFPID;
+    MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
+    private double currentVolts;
+
 
   public SimulatedClimbPivot() {
     simPID =
@@ -33,17 +38,30 @@ public class SimulatedClimbPivot implements ClimbPivotInterface{
 @Override
   public void updateInputs(ClimbPivotInputs inputs) {
     inputs.position = getClimbPivotPosition();
+    inputs.climbPivotAppliedVolts = currentVolts;
   }
 
 @Override
-  public void setClimbPivotPosition(double position) {
-    setClimbPivotPosition(
-        simPID.calculate(getClimbPivotPosition(), position)
-            + simFFPID.calculate(position));
-  }
+public void setClimbPivotPosition(double targetPosition) {
+  double pidOutput = simPID.calculate(getClimbPivotPosition(), targetPosition);
+  double feedforwardOutput = simFFPID.calculate(getClimbPivotPosition(), simulatedClimbPivot.getVelocityRadPerSec());
+  currentVolts = pidOutput + feedforwardOutput;
+  simulatedClimbPivot.setInputVoltage(currentVolts);
+}
 
 @Override
   public double getClimbPivotPosition() {
     return simulatedClimbPivot.getAngleRads();
+  }
+
+@Override
+  public double getVolts() {
+    return currentVolts;
+  }
+
+@Override
+public void setVolts(double volts) {
+  currentVolts = volts;
+  simulatedClimbPivot.setInputVoltage(volts);
   }
 }

@@ -4,50 +4,42 @@
 
 package frc.robot.subsystems.climbpivot;
 
-import static edu.wpi.first.units.Units.Radians;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import frc.robot.subsystems.climbpivot.ClimbPivotInterface;
+
 
 /** Add your docs here. */
 public class PhysicalClimbPivot implements ClimbPivotInterface{
-  private PhysicalClimbPivot physicalClimbPivot = new PhysicalClimbPivot();
   public TalonFXConfiguration config;
-  public PIDController climbPivotPIDController;
-  public SimpleMotorFeedforward climbMotorFeedforward;
   private TalonFX climbMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
+  MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
 
   public PhysicalClimbPivot() {
-    climbPivotPIDController =
-        new PIDController(
-            PivotConstants.CLIMB_PIVOT_P,
-            PivotConstants.CLIMB_PIVOT_I,
-            PivotConstants.CLIMB_PIVOT_D);
-    climbMotorFeedforward =
-        new SimpleMotorFeedforward(
-            PivotConstants.FF_CLIMB_PIVOT_S,
-            PivotConstants.FF_CLIMB_PIVOT_G,
-            PivotConstants.FF_CLIMB_PIVOT_V);
-      
+    config.Slot0.kP = PivotConstants.CLIMB_PIVOT_P;
+    config.Slot0.kI = PivotConstants.CLIMB_PIVOT_I;
+    config.Slot0.kD = PivotConstants.CLIMB_PIVOT_D;
+
+    config.Slot0.kS = PivotConstants.FF_CLIMB_PIVOT_S;
+    config.Slot0.kV = PivotConstants.FF_CLIMB_PIVOT_G;
+    config.Slot0.kA = PivotConstants.FF_CLIMB_PIVOT_V;
+
+    climbMotor.getConfigurator().apply(config);
   }
 
 @Override
   public void updateInputs(ClimbPivotInputs inputs) {
     inputs.position = getClimbPivotPosition();
+    inputs.climbPivotAppliedVolts = climbMotor.getMotorVoltage().getValueAsDouble();
   }
 
 @Override
   public void setClimbPivotPosition(double position) {
-    setClimbPivotPosition(
-        climbPivotPIDController.calculate(getClimbPivotPosition(), position)
-            + climbMotorFeedforward.calculate(position));
+    climbMotor.setControl(motionMagicVoltage.withPosition(position));
   }
 
 @Override
   public double getClimbPivotPosition() {
-    return climbMotor.getPosition();
+    return climbMotor.getPosition().getValueAsDouble();
+}
 }
