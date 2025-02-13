@@ -47,7 +47,7 @@ public class SwerveDrive extends SubsystemBase {
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController yController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P * 0.0,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
           AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
@@ -245,8 +245,8 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xController.getSetpoint().position
-        && swerveSample.y < yController.getSetpoint().position;
+    return swerveSample.x < xController.getGoal().position
+        && swerveSample.y < yController.getGoal().position;
   }
 
   /** Runs the SwerveModules periodic methods */

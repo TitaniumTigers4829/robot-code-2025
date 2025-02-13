@@ -14,7 +14,7 @@ public final class Constants {
     public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
   }
 
-  public static final RobotType ROBOT_TYPE = RobotType.COMP_ROBOT;
+  public static final RobotType ROBOT_TYPE = RobotType.SIM_ROBOT;
 
   public static enum RobotType {
     /** Running on a real robot. */
@@ -363,7 +363,7 @@ public final class Constants {
     public static final double MAX_AUTO_SPEED = 5.0;
     public static final double MAX_AUTO_ACCELERATION = 3;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 0.0; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = .5; // 1.7
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
     public static final double CHOREO_AUTO_THETA_P = 0.0; // 5

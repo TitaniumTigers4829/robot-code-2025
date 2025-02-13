@@ -183,7 +183,6 @@ public class Robot extends LoggedRobot {
             (SwerveSample sample) -> {
               FollowChoreoTrajectory followCommand =
                   new FollowChoreoTrajectory(swerveDrive, visionSubsystem, sample);
-              followCommand.setSample(sample);
               followCommand.execute();
               if (swerveDrive.isTrajectoryFinished(sample)) {
                 followCommand.cancel();

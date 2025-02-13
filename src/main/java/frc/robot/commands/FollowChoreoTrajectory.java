@@ -14,24 +14,12 @@ public class FollowChoreoTrajectory extends DriveCommandBase {
   SwerveDrive swerveDrive;
   SwerveSample swerveSample;
 
-  /** Creates a new FollowChoreoTrajectory. */
-  public FollowChoreoTrajectory(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem) {
-    super(swerveDrive, visionSubsystem);
-    this.swerveDrive = swerveDrive;
-    addRequirements(swerveDrive, visionSubsystem);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-
   public FollowChoreoTrajectory(
       SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, SwerveSample swerveSample) {
     super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
     this.swerveSample = swerveSample;
     addRequirements(swerveDrive, visionSubsystem);
-  }
-
-  public void setSample(SwerveSample sample) {
-    swerveSample = sample;
   }
 
   // Called when the command is initially scheduled.
