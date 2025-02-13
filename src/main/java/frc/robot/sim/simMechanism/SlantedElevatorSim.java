@@ -141,7 +141,7 @@ public class SlantedElevatorSim extends LinearSystemSim<N2, N1, N2> {
   }
 
   /**
-   * Sets the elevators state. The new position will be limited between the minimum and maximum
+   * Sets the elevator's state. The new position will be limited between the minimum and maximum
    * allowed heights.
    *
    * @param positionMeters The new position in meters.

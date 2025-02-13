@@ -55,8 +55,8 @@ public class SimIntake {
    *
    * <h2>Turns the Intake On.</h2>
    *
-   * <p>Extends the intake out from the chassis, making it part of the chassiss collision space.
-   *
+   * <p>Extends the intake out from the chassis, making it part of the chassis's collision space.
+   * 
    * <p>Once activated, the intake is considered running and will listen for contact with {@link
    * GamePieceOnFieldSimulation} instances, allowing it to collect game pieces.
    */
@@ -72,8 +72,8 @@ public class SimIntake {
    *
    * <h2>Turns the Intake Off.</h2>
    *
-   * <p>Retracts the intake into the chassis, removing it from the chassiss collision space.
-   *
+   * <p>Retracts the intake into the chassis, removing it from the chassis's collision space.
+   * 
    * <p>Once turned off, the intake will no longer listen for or respond to contacts with {@link
    * GamePieceOnFieldSimulation} instances.
    */

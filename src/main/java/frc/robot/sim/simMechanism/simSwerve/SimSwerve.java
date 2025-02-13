@@ -273,8 +273,8 @@ public class SimSwerve extends SimDriveTrain {
   }
 
   /**
-   * Uses {@link SimMotorController}s to control the moduleSimulations.
-   *
+   * Uses {@link SimMotorController}'s to control the moduleSimulations.
+   * 
    * @param moduleId the id of the module.
    * @param driveController the drive controller.
    * @param steerController the steer controller.

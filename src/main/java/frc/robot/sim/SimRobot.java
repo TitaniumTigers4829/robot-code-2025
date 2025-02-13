@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * <p>A robot is composed of:
  *
  * <ul>
- *   <li>A {@link SimDriveTrain} subclass that represents the robots drivetrain.
+ *   <li>A {@link SimDriveTrain} subclass that represents the robot's drivetrain.
  *   <li>A {@link SimIndexer} object that stores {@link SimGamePiece}s for the robot.
- *   <li>A {@link SimBattery} object that simulates the robots battery.
+ *   <li>A {@link SimBattery} object that simulates the robot's battery
  *   <li>A collection of {@link SimIntake} objects that represent the robots intakes.
- *   <li>A collection of {@link SimMechanism} objects that represent the robots mechanisms.
+ *   <li>A collection of {@link SimMechanism} objects that represent the robot's mechanisms.
  * </ul>
  */
 public class SimRobot<DrvTrn extends SimDriveTrain> {
