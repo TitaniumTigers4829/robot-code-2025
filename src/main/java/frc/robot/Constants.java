@@ -369,12 +369,13 @@ public final class Constants {
     public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
     public static final double CHOREO_AUTO_THETA_D = 0.0;
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
 
     // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS = 
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
   }

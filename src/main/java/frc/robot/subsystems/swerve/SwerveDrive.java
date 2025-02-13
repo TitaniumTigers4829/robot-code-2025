@@ -39,19 +39,19 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
-  private final ProfiledPIDController xController =
+  private final ProfiledPIDController xChoreoController =
+      new ProfiledPIDController(
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
+  private final ProfiledPIDController yChoreoController =
       new ProfiledPIDController(
           AutoConstants.CHOREO_AUTO_TRANSLATION_P,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
           AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController yController =
-      new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P * 0.0,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
-          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController rotationController =
+  private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
           AutoConstants.CHOREO_AUTO_THETA_P,
           AutoConstants.CHOREO_AUTO_THETA_I,
@@ -126,10 +126,10 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xController.setTolerance(0.05);
-    yController.setTolerance(0.05);
+    xChoreoController.setTolerance(0.05);
+    yChoreoController.setTolerance(0.05);
 
-    rotationController.enableContinuousInput(-Math.PI, Math.PI);
+    rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -235,18 +235,21 @@ public class SwerveDrive extends SubsystemBase {
   public void followSwerveSample(SwerveSample sample) {
     if (sample != null) {
       Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yController.calculate(pose.getY(), sample.y);
+      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
+      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
       double moveTheta =
           -sample.omega
-              + rotationController.calculate(pose.getRotation().getRadians(), sample.heading);
+              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
       drive(moveX, moveY, moveTheta, true);
     }
   }
-
+  /**
+   * 
+   * @return if the robot is at the desired swerveSample
+   */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xController.getGoal().position
-        && swerveSample.y < yController.getGoal().position;
+    return swerveSample.x < xChoreoController.getGoal().position
+        && swerveSample.y < yChoreoController.getGoal().position;
   }
 
   /** Runs the SwerveModules periodic methods */
