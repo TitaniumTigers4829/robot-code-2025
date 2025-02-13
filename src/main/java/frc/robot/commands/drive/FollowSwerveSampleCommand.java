@@ -2,19 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
 import choreo.trajectory.SwerveSample;
-import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class FollowChoreoTrajectory extends DriveCommandBase {
-  SwerveDrive swerveDrive;
-  SwerveSample swerveSample;
+public class FollowSwerveSampleCommand extends DriveCommandBase {
+  private final SwerveDrive swerveDrive;
+  private final SwerveSample swerveSample;
 
-  public FollowChoreoTrajectory(
+  public FollowSwerveSampleCommand(
       SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, SwerveSample swerveSample) {
     super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
@@ -30,7 +29,7 @@ public class FollowChoreoTrajectory extends DriveCommandBase {
   @Override
   public void execute() {
     super.execute();
-    swerveDrive.followTrajectory(swerveSample);
+    swerveDrive.followSwerveSample(swerveSample);
   }
 
   // Called once the command ends or is interrupted.

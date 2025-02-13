@@ -228,11 +228,11 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Follows a Choreo Trajectory
+   * Moves the robot to a sample(one point) of a swerve Trajectory provided by Choreo
    *
    * @param sample trajectory
    */
-  public void followTrajectory(SwerveSample sample) {
+  public void followSwerveSample(SwerveSample sample) {
     if (sample != null) {
       Pose2d pose = getEstimatedPose();
       double moveX = -sample.vx + xController.calculate(pose.getX(), sample.x);

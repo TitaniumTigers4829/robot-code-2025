@@ -345,8 +345,8 @@ public final class Constants {
     public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
-    public static final double TRANSLATION_DEADBAND_AMOUNT = 0.02;
-
+    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.02;
+    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
     public static final double AUTO_ALIGN_ROTATION_P = 5;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
