@@ -126,8 +126,9 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(0.05);
-    yChoreoController.setTolerance(0.05);
+    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
+    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
+    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -243,8 +244,8 @@ public class SwerveDrive extends SubsystemBase {
       drive(moveX, moveY, moveTheta, true);
     }
   }
+
   /**
-   * 
    * @return if the robot is at the desired swerveSample
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {

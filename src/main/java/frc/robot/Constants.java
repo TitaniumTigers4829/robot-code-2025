@@ -273,6 +273,7 @@ public final class Constants {
 
   /** This is where we place constants related to Auto and any auto-related features */
   public static final class AutoConstants {
+
     // Different Pre-defined Auto Routines
     public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
     public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
@@ -369,13 +370,18 @@ public final class Constants {
     public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
     public static final double CHOREO_AUTO_THETA_D = 0.0;
-    public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
 
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.01;
+
+    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
+
     // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS = 
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
   }

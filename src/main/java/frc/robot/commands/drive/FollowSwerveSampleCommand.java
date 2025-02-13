@@ -34,9 +34,7 @@ public class FollowSwerveSampleCommand extends DriveCommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    swerveDrive.drive(0, 0, 0, false);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
