@@ -1,4 +1,4 @@
-package frc.robot.extras.characterization;
+package frc.robot.commands.characterization;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

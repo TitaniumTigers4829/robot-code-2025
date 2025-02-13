@@ -34,6 +34,7 @@ import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/** This class is used to simulate a mechanism in a physics simulation. */
 public class SimMechanism {
   private static final double kMotorEfficiency = 0.85;
 
@@ -59,6 +60,11 @@ public class SimMechanism {
       return NewtonMeters.zero();
     }
 
+    /**
+     * Gets the extra inertia acting on the mechanism.
+     *
+     * @return the extra inertia acting on the mechanism
+     */
     default MomentOfInertia extraInertia() {
       return KilogramSquareMeters.zero();
     }
@@ -214,6 +220,7 @@ public class SimMechanism {
         ProceduralStructGenerator.genRecord(MechanismVariables.class);
   }
 
+  // Create variables to store the mechanism's properties
   private final String name;
   private final MechanismDynamics dynamics;
   private final Friction friction;
@@ -225,10 +232,25 @@ public class SimMechanism {
   private final HardLimits limits;
   private final double noise;
 
+  /**
+   * A lock to ensure that the mechanism state and variables are not modified while they are being
+   * read
+   */
   private final ReentrantReadWriteLock ioLock = new ReentrantReadWriteLock();
+
+  /**
+   * The current state of the mechanism. This is the state of the mechanism at the current time
+   * step.
+   */
   private MechanismState state = MechanismState.zero();
+
+  /**
+   * The current variables of the mechanism. This is the variables of the mechanism at the current
+   * time step.
+   */
   private MechanismVariables variables = MechanismVariables.zero();
 
+  /** Constructs a new SimMechanism. */
   public SimMechanism(
       String name,
       DCMotorExt motor,
@@ -251,6 +273,7 @@ public class SimMechanism {
     this.limits = limits;
     this.noise = noise;
 
+    // Configure the controllers motor model to the mechanism's motor
     controller.configureMotorModel(this.motor);
   }
 
@@ -277,6 +300,11 @@ public class SimMechanism {
     return state().times(gearRatio.getReduction());
   }
 
+  /**
+   * Sets the current state of the mechanism.
+   *
+   * @param state the new state of the mechanism
+   */
   public void setState(MechanismState state) {
     try {
       ioLock.writeLock().lock();
@@ -286,6 +314,7 @@ public class SimMechanism {
     }
   }
 
+  /** Gets the current variables of the mechanism. */
   public MechanismVariables variables() {
     try {
       ioLock.readLock().lock();
@@ -295,6 +324,7 @@ public class SimMechanism {
     }
   }
 
+  /** Gets the current state of the motor driving the mechanism. */
   public MechanismVariables motorVariables() {
     var v = variables();
     return MechanismVariables.of(
@@ -388,6 +418,12 @@ public class SimMechanism {
     }
   }
 
+  /**
+   * Gets the current of the motor.
+   *
+   * @param supplyVoltage the supply voltage of the motor.
+   * @return the current of the motor.
+   */
   protected Current getMotorCurrent(Voltage supplyVoltage) {
     ControllerOutput co = controller.run(timing.dt(), supplyVoltage, motorState());
     if (DriverStation.isDisabled()) {
@@ -406,7 +442,11 @@ public class SimMechanism {
     }
   }
 
-  /** Updates the state of the mechanism. */
+  /**
+   * Updates the state of the mechanism.
+   *
+   * @param supplyVoltage the supply voltage of the motor.
+   */
   public void update(final Voltage supplyVoltage) {
     final Time dt = timing.dt();
 

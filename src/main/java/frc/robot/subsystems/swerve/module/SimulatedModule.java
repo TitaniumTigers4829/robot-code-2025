@@ -30,11 +30,11 @@ public class SimulatedModule implements ModuleInterface {
     driveLoop =
         ClosedLoop.forVoltageAngularVelocity(
             new AngularVelocityPIDFeedback<VoltageUnit>(
-                Volts.per(RotationsPerSecond).ofNative(.27),
+                Volts.per(RotationsPerSecond).ofNative(.20),
                 Volts.per(RotationsPerSecondPerSecond).ofNative(0)),
             new FlywheelFeedforward<VoltageUnit>(
-                Volts.of(1),
-                Volts.per(RotationsPerSecond).ofNative(1.5),
+                Volts.of(.5),
+                Volts.per(RotationsPerSecond).ofNative(1.0),
                 Volts.per(RotationsPerSecondPerSecond).ofNative(0.0)));
 
     steerLoop =
