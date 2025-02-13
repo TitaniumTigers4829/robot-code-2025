@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants.FieldConstants;
-
 import org.littletonrobotics.junction.Logger;
 
 public final class ReefLocations {
@@ -29,14 +28,19 @@ public final class ReefLocations {
   static {
     BLUE_REEF = new Translation2d(4.495, FieldConstants.FIELD_WIDTH_METERS / 2);
     var FIELD_CENTER =
-        new Translation2d(FieldConstants.FIELD_LENGTH_METERS / 2, FieldConstants.FIELD_WIDTH_METERS / 2);
+        new Translation2d(
+            FieldConstants.FIELD_LENGTH_METERS / 2, FieldConstants.FIELD_WIDTH_METERS / 2);
 
     var A =
         new Pose2d(
-            BLUE_REEF.getX() - 1.265, FieldConstants.FIELD_WIDTH_METERS / 2 + .165, Rotation2d.kZero);
+            BLUE_REEF.getX() - 1.265,
+            FieldConstants.FIELD_WIDTH_METERS / 2 + .165,
+            Rotation2d.kZero);
     var B =
         new Pose2d(
-            BLUE_REEF.getX() - 1.265, FieldConstants.FIELD_WIDTH_METERS / 2 - .165, Rotation2d.kZero);
+            BLUE_REEF.getX() - 1.265,
+            FieldConstants.FIELD_WIDTH_METERS / 2 - .165,
+            Rotation2d.kZero);
 
     BLUE_POSES = new Pose2d[12];
     BLUE_POSES[0] = A;
