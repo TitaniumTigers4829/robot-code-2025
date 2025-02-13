@@ -21,9 +21,12 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  *
  * @author Jack
  * @author Ishan
+ * @author Max
+ * @author Carsonish
  */
 public class PhysicalVision implements VisionInterface {
-
+  public static final double HORIZONTAL_ANGLE_TO_TARGET = LimelightHelpers.getTX("idk whatto put");//hmmm
+  public static final double VERTICAL_ANGLE_TO_TARGET = LimelightHelpers.getTY("idkwhattoputhere"); //idk how to set the target which it finds its angle from
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;

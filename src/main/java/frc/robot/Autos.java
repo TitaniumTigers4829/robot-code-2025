@@ -8,15 +8,16 @@ import frc.robot.subsystems.example.ExampleSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class Autos {
-    private final AutoFactory autoFactory;
-    private final ExampleSubsystem exampleSubsystem;
-    private final SwerveDrive swerveDrive;
-    
-    public Autos(AutoFactory autoFactory, ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
-        this.autoFactory = autoFactory;
-        this.exampleSubsystem = exampleSubsystem;
-        this.swerveDrive = swerveDrive;
-    }
+  private final AutoFactory autoFactory;
+  private final ExampleSubsystem exampleSubsystem;
+  private final SwerveDrive swerveDrive;
+
+  public Autos(
+      AutoFactory autoFactory, ExampleSubsystem exampleSubsystem, SwerveDrive swerveDrive) {
+    this.autoFactory = autoFactory;
+    this.exampleSubsystem = exampleSubsystem;
+    this.swerveDrive = swerveDrive;
+  }
 
   public AutoRoutine exampleAutoRoutine() {
 
@@ -28,7 +29,10 @@ public class Autos {
     AutoTrajectory pickupToCTraj = routine.trajectory("pickupToC");
 
     // reset odometry and start first trajectory
-    routine.active().onTrue(Commands.sequence(autoFactory.resetOdometry("Right-Start-To-E"), startToETraj.cmd()));
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(autoFactory.resetOdometry("Right-Start-To-E"), startToETraj.cmd()));
 
     startToETraj
         .active()
