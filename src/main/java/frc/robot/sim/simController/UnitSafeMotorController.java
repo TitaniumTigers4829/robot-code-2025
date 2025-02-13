@@ -539,7 +539,7 @@ public class UnitSafeMotorController implements SimMotorController {
 
   /**
    * Applies soft limit constraints to the requested output based on the mechanism's position.
-   * 
+   *
    * @param requestedOutput the controller output requested.
    * @param state the current mechanism state.
    * @return a zero output if the soft limits are exceeded; otherwise, the original requested

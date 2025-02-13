@@ -88,7 +88,7 @@ public class SimDriveTrain {
 
   /**
    * Sets the chassis's Speeds to the Given ChassisSpeeds.
-   * 
+   *
    * <p>The robot does not accelerate smoothly to these speeds; instead, it jumps to the velocity
    * Instantaneously.
    *
