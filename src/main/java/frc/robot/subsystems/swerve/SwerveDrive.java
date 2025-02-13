@@ -18,10 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
-<<<<<<< HEAD
-=======
 import frc.robot.Constants.HardwareConstants;
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
 import frc.robot.extras.setpointGen.SwerveSetpoint;
 import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.TimeUtil;
@@ -42,26 +39,6 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
-<<<<<<< HEAD
-  private final ProfiledPIDController xController =
-      new ProfiledPIDController(
-          AutoConstants.AUTO_TRANSLATION_P,
-          AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D,
-          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController yController =
-      new ProfiledPIDController(
-          AutoConstants.AUTO_TRANSLATION_P,
-          AutoConstants.AUTO_TRANSLATION_I,
-          AutoConstants.AUTO_TRANSLATION_D,
-          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController headingController =
-      new ProfiledPIDController(
-          AutoConstants.AUTO_THETA_P,
-          AutoConstants.AUTO_THETA_I,
-          AutoConstants.AUTO_THETA_D,
-          AutoConstants.AUTO_ALIGN_ROTATIONAL_CONSTRAINTS);
-=======
   private final ProfiledPIDController xChoreoController =
       new ProfiledPIDController(
           AutoConstants.CHOREO_AUTO_TRANSLATION_P,
@@ -80,7 +57,6 @@ public class SwerveDrive extends SubsystemBase {
           AutoConstants.CHOREO_AUTO_THETA_I,
           AutoConstants.CHOREO_AUTO_THETA_D,
           AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -150,15 +126,11 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-<<<<<<< HEAD
-    headingController.enableContinuousInput(lastMovementTime, INACTIVITY_THRESHOLD);
-=======
     xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
     yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
     rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
 
     gyroDisconnectedAlert.set(false);
   }
@@ -188,12 +160,8 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-<<<<<<< HEAD
-    setpoint = setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, 0.02);
-=======
     setpoint =
         setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, HardwareConstants.TIMEOUT_S);
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -261,20 +229,6 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-<<<<<<< HEAD
-   * Follows a Choreo Trajectory
-   *
-   * @param sample trajectory
-   */
-  public void followTrajectory(SwerveSample sample) {
-    if (sample != null) {
-      Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yController.calculate(pose.getY(), sample.y);
-      double moveTheta =
-          -sample.omega
-              + headingController.calculate(pose.getRotation().getRadians(), sample.heading);
-=======
    * Moves the robot to a sample(one point) of a swerve Trajectory provided by Choreo
    *
    * @param sample trajectory
@@ -287,13 +241,10 @@ public class SwerveDrive extends SubsystemBase {
       double moveTheta =
           -sample.omega
               + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
       drive(moveX, moveY, moveTheta, true);
     }
   }
 
-<<<<<<< HEAD
-=======
   /**
    * @return if the robot is at the desired swerveSample
    */
@@ -302,14 +253,11 @@ public class SwerveDrive extends SubsystemBase {
         && swerveSample.y < yChoreoController.getGoal().position;
   }
 
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
   /** Runs the SwerveModules periodic methods */
   private void modulesPeriodic() {
     for (SwerveModule module : swerveModules) module.periodic();
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Returns if the robot speed is to zero when zeroed
    *
@@ -317,7 +265,6 @@ public class SwerveDrive extends SubsystemBase {
    * @return is robot moving along y
    * @return is robot rotating
    */
->>>>>>> ad9901cf6e9604588e571a349d560707fcdf3b25
   public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
