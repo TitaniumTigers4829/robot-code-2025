@@ -451,14 +451,15 @@ public class SwerveDrive extends SubsystemBase {
     //         runOnce(
     //             () -> {
     //               repulsorFieldPlanner.setGoal(goal.getTranslation());
-    //               xController.reset();
-    //               yController.reset();
-    //               headingController.reset();
+    // xController.reset();
+    // yController.reset();
+    // headingController.reset();
     //             }),
     //         run(
     //             () -> {
     Logger.recordOutput("Repulsor/Goal", goal);
 
+    repulsorFieldPlanner.setGoal(goal.getTranslation());
     RepulsorSample sample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
@@ -487,7 +488,7 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    drive(outputRobotRelative, false);
     //         }))
     // .until(
     //     () -> {
