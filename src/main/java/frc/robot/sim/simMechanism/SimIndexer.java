@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
+/** Represents an indexer in the sim environment. An indexer can store game pieces. */
 public class SimIndexer {
   protected final Queue<SimGamePiece> gamePieces;
   protected final Set<GamePieceVariant> gamePiecesSet;
@@ -25,6 +26,7 @@ public class SimIndexer {
     gamePiecesSet = Set.of(gamePieceVariantFilet);
   }
 
+  /** Inserts a game piece into the storage, regardless of the storage's current state. */
   boolean forceInsertGamePiece(SimGamePiece gamePiece) {
     if (gamePieces.size() < numPieces
         && (gamePiecesSet.contains(gamePiece.variant()) || gamePiecesSet.isEmpty())) {

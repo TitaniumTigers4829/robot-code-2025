@@ -117,6 +117,10 @@ public class CompModule implements ModuleInterface {
   @Override
   public void updateInputs(ModuleInputs inputs) {
     BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
+
+    inputs.isConnected =
+        BaseStatusSignal.isAllGood(
+            drivePosition, turnEncoderAbsolutePosition, driveVelocity, turnEncoderVelocity);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
     inputs.drivePosition = -drivePosition.getValueAsDouble();
 
@@ -136,12 +140,6 @@ public class CompModule implements ModuleInterface {
   }
 
   @Override
-  public double getDrivePosition() {
-    drivePosition.refresh();
-    return drivePosition.getValueAsDouble();
-  }
-
-  @Override
   public void setDesiredState(SwerveModuleState desiredState) {
     // Converts meters per second to rotations per second
     double desiredDriveRPS =
@@ -158,6 +156,12 @@ public class CompModule implements ModuleInterface {
     turnEncoder.getAbsolutePosition().refresh();
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
         .getRotations();
+  }
+
+  @Override
+  public double getDrivePositionRadians() {
+    drivePosition.refresh();
+    return 2.0 * Math.PI * (drivePosition.getValueAsDouble() / ModuleConstants.DRIVE_GEAR_RATIO);
   }
 
   @Override

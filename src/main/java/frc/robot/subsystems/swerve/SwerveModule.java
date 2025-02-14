@@ -119,10 +119,14 @@ public class SwerveModule {
   }
 
   /**
-   * Gets the measured state of the module consisting of the velocity and angle.
+   * Gets the drive position in radians.
    *
-   * @return a SwerveModuleState object containing velocity and angle
+   * @return a double containing current position of the driving motors in radians.
    */
+  public double getDrivePositionRadians() {
+    return io.getDrivePositionRadians();
+  }
+
   public SwerveModuleState getMeasuredState() {
     return new SwerveModuleState(getDriveVelocityMetersPerSec(), getTurnRotation());
   }
