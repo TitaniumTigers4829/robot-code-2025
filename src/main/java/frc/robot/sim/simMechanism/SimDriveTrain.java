@@ -162,6 +162,7 @@ public class SimDriveTrain {
   public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>> T createDriveTrain(
       SimRobot<T> robot, C config) {
     // Don't forget to update this method when adding new drivetrain configurations
+
     if (config instanceof SimSwerveConfig) {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }

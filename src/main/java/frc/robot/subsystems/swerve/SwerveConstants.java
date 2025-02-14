@@ -4,8 +4,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /** Swerve Constants */
@@ -22,6 +20,8 @@ public class SwerveConstants {
     public static final double TRACK_WIDTH = Units.inchesToMeters(21.25);
     // Distance between front and back wheels on robot
     public static final double WHEEL_BASE = Units.inchesToMeters(21.25);
+    public static final double DRIVE_BASE_DIAMETER =
+        Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
 
     public static final Translation2d[] MODULE_TRANSLATIONS =
         new Translation2d[] {
@@ -135,46 +135,6 @@ public class SwerveConstants {
     public static final int QUEUE_SIZE = 10;
 
     public static final String THREAD_NAME = "OdometryThread";
-  }
-
-  public static final class TrajectoryConstants {
-
-    public static final double DEADBAND_AMOUNT = 0.02;
-    public static final double DRIVE_BASE_DIAMETER =
-        Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
-
-    public static final double MAX_SPEED = 5.0;
-    public static final double MAX_ACCELERATION = 3;
-
-    public static final double AUTO_TRANSLATION_P = 1.5; // 1.7
-    public static final double AUTO_TRANSLATION_D = 0.2;
-    public static final double AUTO_THETA_P = 4.5; // 5
-    public static final double AUTO_THETA_D = 0.4;
-
-    public static final double AUTO_SHOOT_HEADING_OFFSET = 2;
-
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
-
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints THETA_CONTROLLER_CONSTRAINTS =
-        new TrapezoidProfile.Constraints(
-            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
-
-    public static final double X_TOLERANCE = 0.02;
-    public static final double Y_TOLERANCE = 0.02;
-    public static final double THETA_TOLERANCE = 1.25;
-
-    public static final double AUTO_LINEUP_ROTATION_P = 5;
-    public static final double AUTO_LINEUP_ROTATION_I = 0;
-    public static final double AUTO_LINEUP_ROTATION_D = 0;
-    public static final Constraints AUTO_LINEUP_ROTATION_CONSTRAINTS =
-        new Constraints(4 * Math.PI, 6 * Math.PI);
-
-    public static final double AUTO_LINEUP_TRANSLATION_P = 4.0;
-    public static final double AUTO_LINEUP_TRANSLATION_I = 0;
-    public static final double AUTO_LINEUP_TRANSLATION_D = 0;
-    public static final Constraints AUTO_LINEUP_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
   }
 
   public static final ModuleConfig[] moduleConfigs =

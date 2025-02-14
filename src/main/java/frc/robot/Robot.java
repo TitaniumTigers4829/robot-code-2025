@@ -1,8 +1,48 @@
 package frc.robot;
 
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowSwerveSampleCommand;
+import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
+import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.elevator.ElevatorInterface;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.elevator.PhysicalElevator;
+import frc.robot.subsystems.elevator.SimulatedElevator;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.PhysicalIntake;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.gyro.GyroInterface;
+import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
+import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
+import frc.robot.subsystems.swerve.module.CompModule;
+import frc.robot.subsystems.swerve.module.ModuleInterface;
+import frc.robot.subsystems.swerve.module.SimulatedModule;
+import frc.robot.subsystems.vision.PhysicalVision;
+import frc.robot.subsystems.vision.SimulatedVision;
+import frc.robot.subsystems.vision.VisionInterface;
+import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -17,9 +57,22 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
-  private RobotContainer m_robotContainer;
-  private SimWorld simWorld = new SimWorld();
+
+  private final VisionSubsystem visionSubsystem;
+  private final SwerveDrive swerveDrive;
+  private final ElevatorSubsystem elevatorSubsystem;
+
+  private final CommandXboxController operatorController = new CommandXboxController(1);
+  private final CommandXboxController driverController = new CommandXboxController(0);
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
+  private final AlgaePivotSubsystem algaePivotSubsystem =
+      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+
+  private final SimWorld simWorld;
+
+  public AutoFactory autoFactory;
+  public final AutoChooser autoChooser;
+  public Autos autos;
 
   public Robot() {
     // Record metadata
@@ -44,7 +97,7 @@ public class Robot extends LoggedRobot {
 
     // Set up data receivers & replay source
     switch (Constants.ROBOT_TYPE) {
-      case COMP_ROBOT:
+      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         // Gets data from network tables
@@ -56,29 +109,105 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      case DEV_ROBOT:
-        // Replaying a log, set up replay source
-        setUseTiming(false); // Run as fast as possible
-        String logPath = LogFileUtil.findReplayLog();
-        Logger.setReplaySource(new WPILOGReader(logPath));
-        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        break;
+      default:
+        {
+          // Replaying a log, set up replay source
+          setUseTiming(false); // Run as fast as possible
+          String logPath = LogFileUtil.findReplayLog();
+          Logger.setReplaySource(new WPILOGReader(logPath));
+          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
     }
 
     // Start AdvantageKit logger
     Logger.start();
+    switch (Constants.ROBOT_TYPE) {
+      case COMP_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new CompModule(SwerveConstants.moduleConfigs[0]),
+                new CompModule(SwerveConstants.moduleConfigs[1]),
+                new CompModule(SwerveConstants.moduleConfigs[2]),
+                new CompModule(SwerveConstants.moduleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        simWorld = null;
+      }
+      case DEV_ROBOT -> {
+        swerveDrive = new SwerveDrive(null, null, null, null, null);
+        visionSubsystem = null;
+        elevatorSubsystem = null;
+        simWorld = null;
+      }
 
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
+      case SIM_ROBOT -> {
+        /* Sim robot, instantiate physics sim IO implementations */
+        simWorld = new SimWorld();
+        swerveDrive =
+            new SwerveDrive(
+                new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
+                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
+
+        visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
+        swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
+        elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
+      }
+
+      default -> {
+        visionSubsystem = new VisionSubsystem(new VisionInterface() {});
+        /* Replayed robot, disable IO implementations */
+
+        /* physics simulations are also not needed */
+        swerveDrive =
+            new SwerveDrive(
+                new GyroInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {});
+        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        simWorld = null;
+      }
+    }
+    autoChooser = new AutoChooser();
+    // this sets up the auto factory
+    autoFactory =
+        new AutoFactory(
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            (SwerveSample sample) -> {
+              FollowSwerveSampleCommand followCommand =
+                  new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
+              followCommand.execute();
+              if (swerveDrive.isTrajectoryFinished(sample)) {
+                followCommand.cancel();
+              }
+            }, // A function that follows a choreo trajectory
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            swerveDrive); // The drive subsystem
+
+    autos = new Autos(autoFactory);
+
+    autoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
+    autoChooser.addRoutine(
+        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
+    // This updates the auto chooser
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // This
+    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    // TODO: test this!
     // Switch thread to high priority to improve loop timing
-    // Threads.setCurrentThreadPriority(true, 99);
+    Threads.setCurrentThreadPriority(true, 99);
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
@@ -88,7 +217,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
 
     // Return to normal thread priority
-    // Threads.setCurrentThreadPriority(false, 10);
+    Threads.setCurrentThreadPriority(false, 10);
   }
 
   /** This function is called once when the robot is disabled. */
@@ -102,12 +231,11 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    swerveDrive.resetEstimatedPose(
+        new Pose2d(
+            swerveDrive.getEstimatedPose().getX(),
+            swerveDrive.getEstimatedPose().getY(),
+            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
   }
 
   /** This function is called periodically during autonomous. */
@@ -117,15 +245,74 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
+    configureDriverController();
+    configureOperatorController();
 
-    m_robotContainer.teleopInit();
+    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
+  }
+
+  private void configureDriverController() {
+    // Driver Left Stick
+    DoubleSupplier driverLeftStick[] =
+        new DoubleSupplier[] {
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[0],
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[1]
+        };
+
+    // DRIVER BUTTONS
+    Command driveCommand =
+        new DriveCommand(
+            swerveDrive,
+            visionSubsystem,
+            // Translation in the Y direction
+            driverLeftStick[1],
+            // Translation in the X direction
+            driverLeftStick[0],
+            // Rotation
+            () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
+            // Robot relative
+            () -> !driverController.rightBumper().getAsBoolean(),
+            // Rotation speed
+            () -> driverController.leftBumper().getAsBoolean());
+    swerveDrive.setDefaultCommand(driveCommand);
+
+    // Resets the robot angle in the odometry, factors in which alliance the robot is on
+    driverController
+        .povRight()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    swerveDrive.resetEstimatedPose(
+                        new Pose2d(
+                            swerveDrive.getEstimatedPose().getX(),
+                            swerveDrive.getEstimatedPose().getY(),
+                            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
+
+    // Reset robot odometry based on the most recent vision pose measurement from april tags
+    // This should be pressed when looking at an april tag
+    driverController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    // FieldConstants has all reef poses
+    driverController
+        .a()
+        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+  }
+
+  private void configureOperatorController() {
+    operatorController.b().whileTrue(Commands.none());
+    operatorController.y().whileTrue(Commands.none());
+    operatorController.x().whileTrue(Commands.none());
+    operatorController
+        .a()
+        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
   }
 
   /** This function is called periodically during operator control. */
@@ -151,7 +338,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     if (simWorld != null) {
-      m_robotContainer.simulationPeriodic();
+      simWorld.update(() -> swerveDrive.getEstimatedPose());
     }
   }
 }
