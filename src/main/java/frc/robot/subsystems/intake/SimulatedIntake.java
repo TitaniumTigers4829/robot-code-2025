@@ -11,8 +11,7 @@ public class SimulatedIntake implements IntakeInterface {
   DCMotorSim simIntake =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getFalcon500(1), 0.01, 1),
-          DCMotor.getFalcon500(1),
-          0);
+          DCMotor.getFalcon500(1));
 
   private double intakeAppliedVolts = 0.0;
 
