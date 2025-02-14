@@ -62,7 +62,12 @@ public interface ModuleInterface {
     return 0.0;
   }
 
-  default double getDrivePosition() {
+  /**
+   * Gets the drive position using the internal encoder
+   *
+   * @return the drive position in radians
+   */
+  default double getDrivePositionRadians() {
     return 0.0;
   }
 }

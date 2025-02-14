@@ -1,7 +1,6 @@
 package frc.robot.commands.characterization;
 
-// package frc.robot.extras.characterization;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,13 +58,12 @@ public class WheelRadiusCharacterization extends Command {
 
     // Get yaw and wheel positions
     accumGyroYawRads = swerveSubsystem.getGyroRotation2d().getRadians() - lastGyroYawRads;
-    // accumGyroYawRads +=
-    // MathUtil.angleModulus(driveSubsystem.getPose().getRotation().getRadians()
-    // - lastGyroYawRads);
+    accumGyroYawRads +=
+        MathUtil.angleModulus(swerveSubsystem.getGyroRotation2d().getRadians() - lastGyroYawRads);
     double averageWheelPosition = 0.0;
-    double[] wheelPositiions = swerveSubsystem.getWheelRadiusCharacterizationPosition();
+    double[] wheelPositions = swerveSubsystem.getWheelRadiusCharacterizationPosition();
     for (int i = 0; i < 4; i++) {
-      averageWheelPosition += Math.abs(wheelPositiions[i] - startWheelPositions[i]);
+      averageWheelPosition += Math.abs(wheelPositions[i] - startWheelPositions[i]);
     }
     averageWheelPosition /= 4.0;
 

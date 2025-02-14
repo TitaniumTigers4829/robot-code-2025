@@ -214,21 +214,23 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * @param omegaspeed returns radian rotations per second
+   * @param omegaspeed Controls the rotation speed of the drivetrain for characterization.
    */
   public void runWheelRadiusCharacterization(double omegaspeed) {
     drive(0, 0, omegaspeed, false);
   }
 
-  // idek lllllllllllllllllllloooooooooooool i dont understand fr
+  /**
+   * Gets the wheel radiues characterization position
+   *
+   * @return returns the averaged wheel positions.
+   */
   public double[] getWheelRadiusCharacterizationPosition() {
     double[] wheelPositions = new double[swerveModules.length];
 
-    int i = 0;
-    // iterate over all the swerve modules, get their positions and add them to the array
+    // Iterate over all the swerve modules, get their positions and add them to the array
     for (SwerveModule module : swerveModules) {
-      module.getPosition();
-      wheelPositions[i++] = module.getDrivePositionRadians();
+      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
     }
     return wheelPositions;
   }

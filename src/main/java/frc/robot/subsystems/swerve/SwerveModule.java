@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.extras.util.Tracer;
@@ -120,12 +119,12 @@ public class SwerveModule {
   }
 
   /**
-   * Gets the measured state of the module consisting of the velocity and angle.
+   * Gets the drive position in radians.
    *
-   * @return a SwerveModuleState object containing velocity and angle
+   * @return a double containing current position of the driving motors in radians.
    */
   public double getDrivePositionRadians() {
-    return Units.rotationsToRadians(inputs.drivePosition);
+    return io.getDrivePositionRadians();
   }
 
   public SwerveModuleState getMeasuredState() {
