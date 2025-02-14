@@ -10,10 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-/**
- * This 
- */
+/** This */
 public class ClimbPivot extends SubsystemBase {
   /** Creates a new ClimbPivot. */
   public TalonFX climbPivotMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
@@ -26,41 +23,37 @@ public class ClimbPivot extends SubsystemBase {
     climbPivotMotor.getConfigurator().apply(config);
   }
 
-  /**
-   * angle is in rotations,        idk where the angles are or what 0 is
-   */
+  /** angle is in rotations, idk where the angles are or what 0 is */
   public void setClimbPivotPosition(double angle) {
     climbPivotMotor.setPosition(angle);
   }
 
-  /**
-   * in rotations, i think that's a problem y'all
-  */
+  /** in rotations, i think that's a problem y'all */
   public double getClimbPivotPosition() {
     return climbPivotMotor.getPosition().getValueAsDouble();
   }
-/**
- * in rotations, endAngle is something i guess i need help
- * 
- * @param endAngle this is the angle where the pivot ends
- */
+
+  /**
+   * in rotations, endAngle is something i guess i need help
+   *
+   * @param endAngle this is the angle where the pivot ends
+   */
   public void stop(double endAngle) {
     climbPivotMotor.setPosition(endAngle);
   }
 
-@Override
+  @Override
   public void periodic() {}
 
   public Command setAngle(double targetPosition) {
     return new StartEndCommand(
-            () -> setClimbPivotPosition(targetPosition),
-            () -> stop(targetPosition),
-            this
-        ).until(() -> isPivotCloseEnough(targetPosition));
-}
+            () -> setClimbPivotPosition(targetPosition), () -> stop(targetPosition), this)
+        .until(() -> isPivotCloseEnough(targetPosition));
+  }
 
-// Private helper method to check if the pivot is close enough to the target position
-private boolean isPivotCloseEnough(double targetPosition) {
-    return Math.abs(getClimbPivotPosition() - targetPosition) < PivotConstants.PIVOT_ACCEPTABLE_ERROR_DEGREES;
-}
+  // Private helper method to check if the pivot is close enough to the target position
+  private boolean isPivotCloseEnough(double targetPosition) {
+    return Math.abs(getClimbPivotPosition() - targetPosition)
+        < PivotConstants.PIVOT_ACCEPTABLE_ERROR_DEGREES;
+  }
 }

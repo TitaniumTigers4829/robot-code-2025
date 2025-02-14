@@ -68,7 +68,7 @@ public class SwerveModule {
    * angle to be the shortest path to the desired angle. So rather than turning 170 degrees CW it
    * will turn 10 degrees CCW and invert the motor.
    *
-   * @param state 
+   * @param state
    */
   public void setOptimizedDesiredState(SwerveModuleState state) {
     state.optimize(getTurnRotation());

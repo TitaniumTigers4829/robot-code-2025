@@ -8,9 +8,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
 /** Add your docs here. */
-public class PhysicalClimbPivot implements ClimbPivotInterface{
+public class PhysicalClimbPivot implements ClimbPivotInterface {
   public TalonFXConfiguration config;
   private TalonFX climbMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
@@ -27,19 +26,19 @@ public class PhysicalClimbPivot implements ClimbPivotInterface{
     climbMotor.getConfigurator().apply(config);
   }
 
-@Override
+  @Override
   public void updateInputs(ClimbPivotInputs inputs) {
     inputs.position = getClimbPivotPosition();
     inputs.climbPivotAppliedVolts = climbMotor.getMotorVoltage().getValueAsDouble();
   }
 
-@Override
+  @Override
   public void setClimbPivotPosition(double position) {
     climbMotor.setControl(motionMagicVoltage.withPosition(position));
   }
 
-@Override
+  @Override
   public double getClimbPivotPosition() {
     return climbMotor.getPosition().getValueAsDouble();
-}
+  }
 }
