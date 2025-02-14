@@ -6,13 +6,13 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.swerve.SwerveConstants.TrajectoryConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class WheelRadiusCharacterization extends Command {
   private SwerveDrive swerveSubsystem;
   private static final double characterizationSpeed = 0.1;
-  private static final double driveRadius = TrajectoryConstants.DRIVE_BASE_DIAMETER;
+  private static final double driveRadius = DriveConstants.DRIVE_BASE_DIAMETER;
 
   public enum Direction {
     CLOCKWISE(-1),
