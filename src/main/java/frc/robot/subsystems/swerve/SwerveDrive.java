@@ -7,6 +7,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -451,9 +452,9 @@ public class SwerveDrive extends SubsystemBase {
     //         runOnce(
     //             () -> {
     //               repulsorFieldPlanner.setGoal(goal.getTranslation());
-    // xController.reset();
-    // yController.reset();
-    // headingController.reset();
+    xController.reset();
+    yController.reset();
+    headingController.reset();
     //             }),
     //         run(
     //             () -> {
@@ -492,9 +493,10 @@ public class SwerveDrive extends SubsystemBase {
     //         }))
     // .until(
     //     () -> {
-    //       var error = goal.minus(poseEstimator.getEstimatedPosition());
-    //       return error.getTranslation().getNorm() < .01
-    //           && Math.abs(error.getRotation().getDegrees()) < 5;
+    Transform2d error = goal.minus(getEstimatedPose());
+    if (error.getTranslation().getNorm() < .01 && Math.abs(error.getRotation().getDegrees()) < 5) {
+      drive(new ChassisSpeeds(), false);
+    }
     //     });
   }
 

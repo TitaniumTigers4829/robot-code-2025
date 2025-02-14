@@ -11,6 +11,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.RepulsorCommand;
 import frc.robot.commands.algaePivot.ManualAlgaePivot;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.extras.util.JoystickUtil;
@@ -206,6 +207,7 @@ public class RobotContainer {
                 visionSubsystem,
                 new Pose2d(4, 1, new Rotation2d()),
                 swerveDrive.getEstimatedPose()));
+    driverController.povUpLeft().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem));
     // .until(swerveDrive.isAtSetpoint())
     // .andThen(
     //     new AutoAlign(
