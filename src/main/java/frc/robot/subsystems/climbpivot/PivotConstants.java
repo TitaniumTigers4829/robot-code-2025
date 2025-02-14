@@ -20,4 +20,7 @@ public class PivotConstants {
   public static final double PIVOT_LENGTH = 0 - 9;
 
   public static final double PIVOT_ACCEPTABLE_ERROR_DEGREES = 1.0;
+
+  public static final double TARGET_POSITION = 0.0;
+  public static final double GEAR_RATIO = 64;
 }

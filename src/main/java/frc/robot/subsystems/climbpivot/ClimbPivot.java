@@ -4,33 +4,32 @@
 
 package frc.robot.subsystems.climbpivot;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 /** This */
 public class ClimbPivot extends SubsystemBase {
   /** Creates a new ClimbPivot. */
-  public TalonFX climbPivotMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
+  ClimbPivotInterface climbPivotInterface;
+  ClimbPivotInputsAutoLogged inputsAutoLogged;
+  private ClimbPivotInputsAutoLogged inputs = new ClimbPivotInputsAutoLogged();
 
-  public ClimbPivot() {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    config.Slot0.kP = 0.0;
-    config.Slot0.kI = 0.0;
-    config.Slot0.kD = 0.0;
-    climbPivotMotor.getConfigurator().apply(config);
+
+  public ClimbPivot(ClimbPivotInterface climbPivotInterface) {
+    this.climbPivotInterface = climbPivotInterface;
+    inputsAutoLogged = new ClimbPivotInputsAutoLogged();
   }
 
   /** angle is in rotations, idk where the angles are or what 0 is */
   public void setClimbPivotPosition(double angle) {
-    climbPivotMotor.setPosition(angle);
+    climbPivotInterface.setClimbPivotPosition(angle);
   }
 
   /** in rotations, i think that's a problem y'all */
   public double getClimbPivotPosition() {
-    return climbPivotMotor.getPosition().getValueAsDouble();
+    return climbPivotInterface.getClimbPivotPosition();
   }
 
   /**
@@ -39,21 +38,24 @@ public class ClimbPivot extends SubsystemBase {
    * @param endAngle this is the angle where the pivot ends
    */
   public void stop(double endAngle) {
-    climbPivotMotor.setPosition(endAngle);
+    climbPivotInterface.setClimbPivotPosition(endAngle);
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+      climbPivotInterface.updateInputs(inputs);
+      Logger.processInputs("Climb Pivot/", inputs);
+  }
 
-  public Command setAngle(double targetPosition) {
+  public Command setAngle() {
     return new StartEndCommand(
-            () -> setClimbPivotPosition(targetPosition), () -> stop(targetPosition), this)
-        .until(() -> isPivotCloseEnough(targetPosition));
+            () -> setClimbPivotPosition(PivotConstants.TARGET_POSITION), () -> stop(PivotConstants.TARGET_POSITION), this)
+        .until(()-> isPivotCloseEnough());
   }
 
   // Private helper method to check if the pivot is close enough to the target position
-  private boolean isPivotCloseEnough(double targetPosition) {
-    return Math.abs(getClimbPivotPosition() - targetPosition)
+  private boolean isPivotCloseEnough() {
+    return Math.abs(getClimbPivotPosition() - PivotConstants.TARGET_POSITION)
         < PivotConstants.PIVOT_ACCEPTABLE_ERROR_DEGREES;
   }
 }

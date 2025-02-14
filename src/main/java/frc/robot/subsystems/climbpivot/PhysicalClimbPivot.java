@@ -4,9 +4,19 @@
 
 package frc.robot.subsystems.climbpivot;
 
+import java.util.Queue;
+
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.swerve.module.ModuleInterface;
 
 /** Add your docs here. */
 public class PhysicalClimbPivot implements ClimbPivotInterface {
@@ -14,7 +24,21 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   private TalonFX climbMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
 
+  private final StatusSignal<Voltage> climbMotorAppliedVoltage;
+  private final Queue<Angle> climbMotorAngle;
+
+
+
+
+
+
   public PhysicalClimbPivot() {
+    climbMotorAppliedVoltage = climbMotor.getMotorVoltage();
+    climbMotorAngle = climbMotor.getClimbPivotPosition;
+
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0);
+      climbMotor.optimizeBusUtilization();
+    
     config.Slot0.kP = PivotConstants.CLIMB_PIVOT_P;
     config.Slot0.kI = PivotConstants.CLIMB_PIVOT_I;
     config.Slot0.kD = PivotConstants.CLIMB_PIVOT_D;

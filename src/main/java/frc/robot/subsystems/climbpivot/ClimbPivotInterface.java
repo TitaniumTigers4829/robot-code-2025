@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems.climbpivot;
 
+import org.littletonrobotics.junction.AutoLog;
+
 /** Add your docs here. */
 public interface ClimbPivotInterface {
+  @AutoLog
   public static class ClimbPivotInputs {
     /**
      * THESE DOCSTRINGS WERE ALL WRITTEN BY CHATGPT, i think they're mostly accurate but idk so TAKE
