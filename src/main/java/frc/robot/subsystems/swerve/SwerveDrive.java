@@ -500,6 +500,17 @@ public class SwerveDrive extends SubsystemBase {
     //     });
   }
 
+  public Trigger isReefInRange() {
+    return new Trigger(
+        () ->
+            getEstimatedPose()
+                    .getTranslation()
+                    .getDistance(
+                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                            .getTranslation())
+                < 1.0);
+  }
+
   public void reefAlign(Boolean left) {
     // return defer(
     // () ->

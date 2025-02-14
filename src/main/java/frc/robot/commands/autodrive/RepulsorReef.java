@@ -29,7 +29,6 @@ public class RepulsorReef extends DriveCommandBase {
   public void execute() {
     super.execute();
     swerveDrive.reefAlign(true);
-    
   }
 
   // Called once the command ends or is interrupted.

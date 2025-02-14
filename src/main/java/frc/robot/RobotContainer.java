@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,6 +16,7 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.extras.util.JoystickUtil;
+import frc.robot.extras.util.ReefLocations;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
@@ -208,7 +209,17 @@ public class RobotContainer {
                 visionSubsystem,
                 new Pose2d(4, 1, new Rotation2d()),
                 swerveDrive.getEstimatedPose()));
-    driverController.povUpLeft().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem));
+    driverController
+        .povUpLeft()
+        .whileTrue(
+            Commands.sequence(new RepulsorReef(swerveDrive, visionSubsystem))
+                .until(swerveDrive.isReefInRange())
+                .andThen(
+                    new AutoAlign(
+                        swerveDrive,
+                        visionSubsystem,
+                        ReefLocations.getSelectedLocation(
+                            swerveDrive.getEstimatedPose().getTranslation(), true))));
     // .until(swerveDrive.isAtSetpoint())
     // .andThen(
     //     new AutoAlign(
