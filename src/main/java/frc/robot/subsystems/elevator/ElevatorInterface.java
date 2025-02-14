@@ -28,6 +28,13 @@ public interface ElevatorInterface {
   public default void updateInputs(ElevatorInputs inputs) {}
 
   /**
+   * Sets the position of the elevator.
+   *
+   * @param position The requested elevator position in meters.
+   */
+  public default void setElevatorPosition(double position) {}
+
+  /**
    * Returns the current position of the elevator.
    *
    * @return Position of the elevator in meters.
@@ -35,13 +42,6 @@ public interface ElevatorInterface {
   public default double getElevatorPosition() {
     return 0.0;
   }
-
-  /**
-   * Sets the position of the elevator.
-   *
-   * @param position The requested elevator position in meters.
-   */
-  public default void setElevatorPosition(double position) {}
 
   /**
    * Sets the voltage of the elevator.

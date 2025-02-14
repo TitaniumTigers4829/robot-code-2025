@@ -64,11 +64,6 @@ public class SimulatedElevator implements ElevatorInterface {
   }
 
   @Override
-  public double getElevatorPosition() {
-    return elevatorSim.getPositionMeters();
-  }
-
-  @Override
   public void setElevatorPosition(double position) {
     desiredPosition = position;
     pidController.setGoal(position);
@@ -76,6 +71,11 @@ public class SimulatedElevator implements ElevatorInterface {
     double feedforwardOutput = feedForward.calculate(pidController.getSetpoint().velocity);
 
     setVolts(output + feedforwardOutput);
+  }
+
+  @Override
+  public double getElevatorPosition() {
+    return elevatorSim.getPositionMeters();
   }
 
   @Override
@@ -91,6 +91,6 @@ public class SimulatedElevator implements ElevatorInterface {
 
   @Override
   public boolean isLimitSwitchActivated() {
-    return limitSwitch.getValue();
+    return !limitSwitch.getValue();
   }
 }

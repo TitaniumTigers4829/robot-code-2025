@@ -6,7 +6,7 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
-  public static final RobotType ROBOT_TYPE = RobotType.SIM_ROBOT;
+  public static final RobotType ROBOT_TYPE = RobotType.COMP_ROBOT;
 
   public static enum RobotType {
     /** Running on a real robot. */

@@ -7,6 +7,7 @@ package frc.robot.subsystems.elevator;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -14,6 +15,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -25,6 +27,7 @@ public class PhysicalElevator implements ElevatorInterface {
   private final DigitalInput limitSwitch = new DigitalInput(ElevatorConstants.LIMIT_SWITCH_ID);
 
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
+  private final DutyCycleOut dutyRequest = new DutyCycleOut(0.0);
   private final Follower followerRequest =
       new Follower(ElevatorConstants.ELEVATOR_LEADER_MOTOR_ID, false);
 
@@ -85,7 +88,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
     followerMotor.setControl(followerRequest);
 
-    // Gets motor information
+    // Gets information about the motor
     leaderPosition = leaderMotor.getRotorPosition();
     leaderAppliedVoltage = leaderMotor.getMotorVoltage();
     leaderDutyCycle = leaderMotor.getDutyCycle();
@@ -98,9 +101,9 @@ public class PhysicalElevator implements ElevatorInterface {
         HardwareConstants.STATUS_SIGNAL_FREQUENCY,
         leaderPosition,
         leaderAppliedVoltage,
+        leaderDutyCycle,
         followerPosition,
         followerAppliedVoltage,
-        leaderDutyCycle,
         followerDutyCycle);
 
     desiredPosition = 0;
@@ -126,24 +129,26 @@ public class PhysicalElevator implements ElevatorInterface {
   }
 
   @Override
-  public double getElevatorPosition() {
-    leaderPosition.refresh();
-    followerPosition.refresh();
-    return leaderPosition.getValueAsDouble();
-  }
-
-  @Override
   public void setElevatorPosition(double position) {
     desiredPosition = position;
 
     if (!isLimitSwitchActivated()) {
-      leaderMotor.setControl(mmPositionRequest.withPosition(position));
-      leaderMotor.setPosition(position);
+      // leaderMotor.setControl(mmPositionRequest.withPosition(position));
+      leaderMotor.setControl(mmPositionRequest.withPosition(position * ElevatorConstants.ROTATIONS_PER_METER));
+      // leaderMotor.setControl(dutyRequest.withOutput(position / 2));
+      // leaderMotor.setPosition(position);
     }
 
     leaderPosition.refresh();
     // leaderMotor.set(-position);
     // followerMotor.set(position);
+  }
+
+  @Override
+  public double getElevatorPosition() {
+    leaderPosition.refresh();
+    followerPosition.refresh();
+    return leaderPosition.getValueAsDouble() / ElevatorConstants.ROTATIONS_PER_METER;
   }
 
   @Override
@@ -158,6 +163,6 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public boolean isLimitSwitchActivated() {
-    return limitSwitch.get();
+    return !limitSwitch.get();
   }
 }
