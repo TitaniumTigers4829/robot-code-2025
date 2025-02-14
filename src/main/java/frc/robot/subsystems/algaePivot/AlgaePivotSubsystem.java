@@ -44,4 +44,14 @@ public class AlgaePivotSubsystem extends SubsystemBase {
       //requirements for command
       this);
   }
+
+  private Command setAlgaePivotWithPID(){
+    return new StartEndCommand(
+      //does this on start
+      () -> this.setAlgaeAngle(AlgaeConstants.ALGAE_PIVOT_ANGLE),
+      //does this when command ends
+      () -> this.setAlgaeAngle(AlgaeConstants.ANGLE_ZERO),
+      //requirements for command
+      this);
+  }
 }
