@@ -69,7 +69,7 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.MotionMagic.MotionMagicCruiseVelocity =
         ElevatorConstants.MOTION_MAGIC_CRUISE_VELOCITY;
 
-    // elevatorConfig.Feedback.RotorToSensorRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
+    elevatorConfig.Feedback.SensorToMechanismRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
     // apply configuration
 
