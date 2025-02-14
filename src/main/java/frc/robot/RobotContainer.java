@@ -213,7 +213,8 @@ public class RobotContainer {
         .povUpLeft()
         .whileTrue(
             Commands.sequence(new RepulsorReef(swerveDrive, visionSubsystem))
-                .until(swerveDrive.isReefInRange()).andThen(
+                .until(swerveDrive.isReefInRange())
+                .andThen(
                     new AutoAlign(
                         swerveDrive,
                         visionSubsystem,
