@@ -196,11 +196,11 @@ public class RobotContainer {
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
 
-    driverController
-        .povUp()
-        .onTrue(
-            new InstantCommand(
-                () -> swerveDrive.resetEstimatedPose(new Pose2d(3, 1, new Rotation2d()))));
+    // driverController
+    //     .povUp()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> swerveDrive.resetEstimatedPose(new Pose2d(3, 1, new Rotation2d()))));
     driverController
         .povDown()
         .whileTrue(
@@ -210,7 +210,7 @@ public class RobotContainer {
                 new Pose2d(4, 1, new Rotation2d()),
                 swerveDrive.getEstimatedPose()));
     driverController
-        .povUpLeft()
+        .povUp()
         .whileTrue(
             Commands.sequence(new RepulsorReef(swerveDrive, visionSubsystem))
                 .until(swerveDrive.isReefInRange())

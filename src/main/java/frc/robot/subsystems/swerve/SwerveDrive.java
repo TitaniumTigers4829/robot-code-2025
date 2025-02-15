@@ -7,7 +7,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -489,14 +488,15 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative, false);
+    drive(outputRobotRelative.unaryMinus(), false);
     //         }))
     // .until(
     //     () -> {
-    Transform2d error = goal.minus(getEstimatedPose());
-    if (error.getTranslation().getNorm() < .01 && Math.abs(error.getRotation().getDegrees()) < 5) {
-      drive(new ChassisSpeeds(), false);
-    }
+    // Transform2d error = goal.minus(getEstimatedPose());
+    // if (error.getTranslation().getNorm() < .01 && Math.abs(error.getRotation().getDegrees()) < 5)
+    // {
+    //   drive(new ChassisSpeeds(), false);
+    // }
     //     });
   }
 
@@ -508,7 +508,7 @@ public class SwerveDrive extends SubsystemBase {
                     .getDistance(
                         ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                             .getTranslation())
-                < 1.0);
+                < 0.5);
   }
 
   public void reefAlign(Boolean left) {
