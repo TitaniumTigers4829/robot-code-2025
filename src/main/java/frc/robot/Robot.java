@@ -19,6 +19,8 @@ import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.intake.Eject;
+import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -343,8 +345,8 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
+    operatorController.b().whileTrue(new Intake(coralIntakeSubsystem));
+    operatorController.y().whileTrue(new Eject(coralIntakeSubsystem));
     operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
