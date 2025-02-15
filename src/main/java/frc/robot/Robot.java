@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -309,11 +308,20 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_1));
-    operatorController.y().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
-    operatorController.x().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_3));
-    operatorController.a().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
-    operatorController.rightBumper()
+    operatorController
+        .b()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_1));
+    operatorController
+        .y()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
+    operatorController
+        .x()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_3));
+    operatorController
+        .a()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
+    operatorController
+        .rightBumper()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
   }
 
