@@ -4,7 +4,12 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -36,5 +41,25 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void periodic() {
     elevatorInterface.updateInputs(inputs);
     Logger.processInputs("Elevator/", inputs);
+  }
+
+  private Command ManualElevator(DoubleSupplier joystickY){
+    return new StartEndCommand(
+      //does this while command is active
+      () -> this.setVolts(joystickY.getAsDouble()), 
+      //does this when command ends
+      () -> this.setVolts(0),
+      //requirements for command
+       this);
+  }
+
+  private Command SetElevationPosition(double position){
+    return new StartEndCommand(
+      //does this while command is active
+      () -> this.setElevatorPosition(position), 
+      //does this when command ends
+      () -> this.setElevatorPosition(0),
+      //requirements for command
+       this);
   }
 }
