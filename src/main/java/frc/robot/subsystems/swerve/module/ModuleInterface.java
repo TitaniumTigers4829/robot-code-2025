@@ -70,4 +70,12 @@ public interface ModuleInterface {
   default double getDrivePositionRadians() {
     return 0.0;
   }
+
+  default void setDrivePID(double kP, double kI, double kD) {}
+
+  default void setTurnPID(double kP, double kI, double kD) {}
+
+  default void setDriveFF(double kS, double kV, double kA) {}
+
+  default void setTurnFF(double kS, double kV, double kA) {}
 }

@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
+import frc.robot.Constants;
+import frc.robot.extras.util.LoggedTunableNumber;
 import frc.robot.extras.util.Tracer;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
@@ -20,6 +23,40 @@ public class SwerveModule {
   private final ModuleInputsAutoLogged inputs = new ModuleInputsAutoLogged();
 
   private final Alert hardwareFaultAlert;
+  private static final LoggedTunableNumber drivekS =
+      new LoggedTunableNumber("Drive/Module/DrivekS");
+  private static final LoggedTunableNumber drivekV =
+      new LoggedTunableNumber("Drive/Module/DrivekV");
+  // private static final LoggedTunableNumber drivekT =
+  //     new LoggedTunableNumber("Drive/Module/DrivekT");
+  private static final LoggedTunableNumber drivekP =
+      new LoggedTunableNumber("Drive/Module/DrivekP");
+  private static final LoggedTunableNumber drivekD =
+      new LoggedTunableNumber("Drive/Module/DrivekD");
+  private static final LoggedTunableNumber turnkP = new LoggedTunableNumber("Drive/Module/TurnkP");
+  private static final LoggedTunableNumber turnkD = new LoggedTunableNumber("Drive/Module/TurnkD");
+
+  static {
+    switch (Constants.getRobot()) {
+      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT -> {
+        drivekS.initDefault(5.0);
+        drivekV.initDefault(0);
+        drivekP.initDefault(35.0);
+        drivekD.initDefault(0);
+        turnkP.initDefault(4000.0);
+        turnkD.initDefault(50.0);
+      }
+      default -> {
+        drivekS.initDefault(0.014);
+        drivekV.initDefault(0.134);
+        // drivekT.initDefault(0);
+        drivekP.initDefault(0.1);
+        drivekD.initDefault(0);
+        turnkP.initDefault(10.0);
+        turnkD.initDefault(0);
+      }
+    }
+  }
 
   public SwerveModule(ModuleInterface io, String name) {
     this.io = io;
@@ -145,5 +182,17 @@ public class SwerveModule {
    * This is called in the periodic method of the SwerveDrive. It is used to update module values
    * periodically
    */
-  public void periodic() {}
+  public void periodic() {
+    
+    // Update tunable numbers
+    if (drivekS.hasChanged(hashCode()) || drivekV.hasChanged(hashCode())) {
+      io.setDriveFF(drivekS.get(), drivekV.get(), 0.0);
+    }
+    if (drivekP.hasChanged(hashCode()) || drivekD.hasChanged(hashCode())) {
+      io.setDrivePID(drivekP.get(), 0, drivekD.get());
+    }
+    if (turnkP.hasChanged(hashCode()) || turnkD.hasChanged(hashCode())) {
+      io.setTurnPID(turnkP.get(), 0, turnkD.get());
+    }
+  }
 }

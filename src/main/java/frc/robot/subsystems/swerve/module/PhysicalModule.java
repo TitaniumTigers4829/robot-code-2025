@@ -42,6 +42,9 @@ public class PhysicalModule implements ModuleInterface {
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
+  TalonFXConfiguration driveConfig;
+  TalonFXConfiguration turnConfig;
+
   // private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
   public PhysicalModule(ModuleConfig moduleConfig) {
@@ -57,7 +60,7 @@ public class PhysicalModule implements ModuleInterface {
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
     turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.TIMEOUT_S);
 
-    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+    driveConfig = new TalonFXConfiguration();
     driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
     driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
     driveConfig.Slot0.kD = ModuleConstants.DRIVE_D;
@@ -74,7 +77,7 @@ public class PhysicalModule implements ModuleInterface {
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.TIMEOUT_S);
 
-    TalonFXConfiguration turnConfig = new TalonFXConfiguration();
+    turnConfig = new TalonFXConfiguration();
     turnConfig.Slot0.kP = ModuleConstants.TURN_P;
     turnConfig.Slot0.kI = ModuleConstants.TURN_I;
     turnConfig.Slot0.kD = ModuleConstants.TURN_D;
@@ -169,4 +172,38 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.stopMotor();
     turnMotor.stopMotor();
   }
+
+  
+  @Override
+  public void setDrivePID(double kP, double kI, double kD) {
+    driveConfig.Slot0.kP = kP;
+    driveConfig.Slot0.kI = kI;
+    driveConfig.Slot0.kD = kD;
+    driveMotor.getConfigurator().apply(driveConfig, 0.25);
+  }
+
+  @Override
+  public void setTurnPID(double kP, double kI, double kD) {
+    turnConfig.Slot0.kP = kP;
+    turnConfig.Slot0.kI = kI;
+    turnConfig.Slot0.kD = kD;
+    turnMotor.getConfigurator().apply(turnConfig, 0.25);
+  }
+
+  @Override
+  public void setDriveFF(double kS, double kV, double kA) {
+      driveConfig.Slot0.kS = kS;
+      driveConfig.Slot0.kV = kV;
+      driveConfig.Slot0.kA = kA;
+      driveMotor.getConfigurator().apply(driveConfig, 0.25);
+  }
+
+  @Override
+  public void setTurnFF(double kS, double kV, double kA) {
+    turnConfig.Slot0.kS = kS;
+    turnConfig.Slot0.kV = kV;
+    turnConfig.Slot0.kA = kA;
+    turnMotor.getConfigurator().apply(turnConfig, 0.25);
+  }
+
 }
