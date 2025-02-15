@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.Constants;
@@ -183,7 +182,7 @@ public class SwerveModule {
    * periodically
    */
   public void periodic() {
-    
+
     // Update tunable numbers
     if (drivekS.hasChanged(hashCode()) || drivekV.hasChanged(hashCode())) {
       io.setDriveFF(drivekS.get(), drivekV.get(), 0.0);

@@ -6,7 +6,6 @@ package frc.robot.subsystems.coralIntake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.IntakeInputsAutoLogged;
-
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {

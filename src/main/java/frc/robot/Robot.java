@@ -125,7 +125,7 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
     switch (Constants.getRobot()) {
-      case COMP_ROBOT-> {
+      case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -140,7 +140,7 @@ public class Robot extends LoggedRobot {
         coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         simWorld = null;
       }
-      case DEV_ROBOT-> {
+      case DEV_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -152,12 +152,11 @@ public class Robot extends LoggedRobot {
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
-        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {
-          
-        });
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
         simWorld = null;
       }
-      case SWERVE_ROBOT-> {
+      case SWERVE_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -168,12 +167,12 @@ public class Robot extends LoggedRobot {
                 new PhysicalModule(SwerveConstants.aquilaModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
-        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface(){});
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
         algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         simWorld = null;
       }
 
-      case SIM_ROBOT-> {
+      case SIM_ROBOT -> {
         /* Sim robot, instantiate physics sim IO implementations */
         simWorld = new SimWorld();
         swerveDrive =
@@ -191,7 +190,7 @@ public class Robot extends LoggedRobot {
         algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
       }
 
-      default-> {
+      default -> {
         visionSubsystem = new VisionSubsystem(new VisionInterface() {});
         /* Replayed robot, disable IO implementations */
 
@@ -204,13 +203,10 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {},
                 new ModuleInterface() {});
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
-        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {
-          
-        });
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
 
-        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {
-          
-        });
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
         simWorld = null;
       }
     }

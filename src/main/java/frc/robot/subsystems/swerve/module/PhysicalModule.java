@@ -173,7 +173,6 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.stopMotor();
   }
 
-  
   @Override
   public void setDrivePID(double kP, double kI, double kD) {
     driveConfig.Slot0.kP = kP;
@@ -192,10 +191,10 @@ public class PhysicalModule implements ModuleInterface {
 
   @Override
   public void setDriveFF(double kS, double kV, double kA) {
-      driveConfig.Slot0.kS = kS;
-      driveConfig.Slot0.kV = kV;
-      driveConfig.Slot0.kA = kA;
-      driveMotor.getConfigurator().apply(driveConfig, 0.25);
+    driveConfig.Slot0.kS = kS;
+    driveConfig.Slot0.kV = kV;
+    driveConfig.Slot0.kA = kA;
+    driveMotor.getConfigurator().apply(driveConfig, 0.25);
   }
 
   @Override
@@ -205,5 +204,4 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.Slot0.kA = kA;
     turnMotor.getConfigurator().apply(turnConfig, 0.25);
   }
-
 }
