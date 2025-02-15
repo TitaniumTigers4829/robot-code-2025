@@ -96,20 +96,20 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    switch (Constants.ROBOT_TYPE) {
-      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT:
+    switch (Constants.getMode()) {
+      case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         // Gets data from network tables
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      case SIM_ROBOT:
+      case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      default:
+      case REPLAY:
         {
           // Replaying a log, set up replay source
           setUseTiming(false); // Run as fast as possible
@@ -121,7 +121,7 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
-    switch (Constants.ROBOT_TYPE) {
+    switch (Constants.getRobot()) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =

@@ -5,29 +5,75 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 
 public final class Constants {
+ public static final double loopPeriodSecs = 0.02;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
+  public static final boolean tuningMode = false;
 
-  public static final class LogPaths {
-    public static final String SYSTEM_PERFORMANCE_PATH = "SystemPerformance/";
-    public static final String PHYSICS_SIMULATION_PATH = "MaplePhysicsSimulation/";
-    public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
+  @SuppressWarnings("resource")
+  public static RobotType getRobot() {
+    if (!disableHAL && RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+          .set(true);
+      robotType = RobotType.COMP_ROBOT;
+    }
+    return robotType;
   }
 
-  public static final RobotType ROBOT_TYPE = RobotType.DEV_ROBOT;
+  public static Mode getMode() {
+    return switch (robotType) {
+      case DEV_ROBOT, COMP_ROBOT, SWERVE_ROBOT -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case SIM_ROBOT -> Mode.SIM;
+    };
+  }
 
-  public static enum RobotType {
+  public enum Mode {
     /** Running on a real robot. */
-    COMP_ROBOT,
+    REAL,
 
     /** Running a physics simulator. */
-    SIM_ROBOT,
+    SIM,
 
     /** Replaying from a log file. */
-    DEV_ROBOT,
+    REPLAY
+  }
 
-    /** Running the swerve robot. */
+  public enum RobotType {
+    SIM_ROBOT,
+    DEV_ROBOT,
+    COMP_ROBOT,
     SWERVE_ROBOT
+  }
+
+  public static boolean disableHAL = false;
+
+  public static void disableHAL() {
+    disableHAL = true;
+  }
+
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (robotType == RobotType.SIM_ROBOT) {
+        System.err.println("Cannot deploy, invalid robot selected: " + robotType);
+        System.exit(1);
+      }
+    }
+  }
+
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (robotType != RobotType.DEV_ROBOT || tuningMode) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
   }
 
   /**
