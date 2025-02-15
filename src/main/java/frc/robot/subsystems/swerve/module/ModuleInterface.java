@@ -15,11 +15,15 @@ public interface ModuleInterface {
     public double driveAppliedVolts = 0.0;
     public double driveCurrentAmps = 0.0;
     public double drivePosition = 0.0;
+    public double driveTorqueCurrent = 0.0;
+    public double driveDesiredPosition = 0.0;
 
     public Rotation2d turnAbsolutePosition = new Rotation2d();
     public double turnVelocity = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;
+    public double turnTorqueCurrent = 0.0;
+    public double turnDesiredPosition = 0.0;
   }
 
   /**
