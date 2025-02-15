@@ -35,8 +35,8 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
-import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
+import frc.robot.subsystems.swerve.module.PhysicalModule;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.SimulatedVision;
@@ -127,18 +127,38 @@ public class Robot extends LoggedRobot {
         swerveDrive =
             new SwerveDrive(
                 new PhysicalGyro(),
-                new CompModule(SwerveConstants.moduleConfigs[0]),
-                new CompModule(SwerveConstants.moduleConfigs[1]),
-                new CompModule(SwerveConstants.moduleConfigs[2]),
-                new CompModule(SwerveConstants.moduleConfigs[3]));
+                new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         simWorld = null;
       }
       case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
-        visionSubsystem = null;
-        elevatorSubsystem = null;
+        /* Real robot, instantiate hardware IO implementations */
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        simWorld = null;
+      }
+      case SWERVE_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         simWorld = null;
       }
 

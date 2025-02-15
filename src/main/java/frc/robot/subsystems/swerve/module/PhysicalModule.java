@@ -23,7 +23,7 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
-public class DevModule implements ModuleInterface {
+public class PhysicalModule implements ModuleInterface {
   private final TalonFX driveMotor;
   private final TalonFX turnMotor;
   private final CANcoder turnEncoder;
@@ -42,9 +42,9 @@ public class DevModule implements ModuleInterface {
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
 
-  private final BaseStatusSignal[] periodicallyRefreshedSignals;
+  // private final BaseStatusSignal[] periodicallyRefreshedSignals;
 
-  public DevModule(ModuleConfig moduleConfig) {
+  public PhysicalModule(ModuleConfig moduleConfig) {
     driveMotor =
         new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
     turnMotor =
@@ -105,43 +105,28 @@ public class DevModule implements ModuleInterface {
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
 
-    periodicallyRefreshedSignals =
-        new BaseStatusSignal[] {
-          drivePosition,
-          driveVelocity,
-          driveMotorAppliedVoltage,
-          driveMotorCurrent,
-          turnEncoderAbsolutePosition,
-          turnEncoderVelocity,
-          turnMotorAppliedVolts,
-          turnMotorCurrent
-        };
-
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, periodicallyRefreshedSignals);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        250.0, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    inputs.isConnected = BaseStatusSignal.isAllGood(periodicallyRefreshedSignals);
+    BaseStatusSignal.refreshAll(drivePosition, turnEncoderAbsolutePosition, driveVelocity);
 
+    inputs.isConnected =
+        BaseStatusSignal.isAllGood(
+            drivePosition, turnEncoderAbsolutePosition, driveVelocity, turnEncoderVelocity);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
-
-    inputs.drivePosition = drivePosition.getValueAsDouble();
+    inputs.drivePosition = -drivePosition.getValueAsDouble();
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
-
-    inputs.driveAppliedVolts = driveMotorAppliedVoltage.getValueAsDouble();
-    inputs.driveCurrentAmps = driveMotorCurrent.getValueAsDouble();
-
     inputs.turnVelocity = turnEncoderVelocity.getValueAsDouble();
-    inputs.turnAppliedVolts = turnMotorAppliedVolts.getValueAsDouble();
-    inputs.turnCurrentAmps = turnMotorCurrent.getValueAsDouble();
   }
 
   @Override
@@ -171,6 +156,12 @@ public class DevModule implements ModuleInterface {
     turnEncoder.getAbsolutePosition().refresh();
     return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
         .getRotations();
+  }
+
+  @Override
+  public double getDrivePositionRadians() {
+    drivePosition.refresh();
+    return 2.0 * Math.PI * (drivePosition.getValueAsDouble() / ModuleConstants.DRIVE_GEAR_RATIO);
   }
 
   @Override
