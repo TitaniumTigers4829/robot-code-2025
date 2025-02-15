@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -19,11 +18,13 @@ import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -307,11 +308,20 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
-    operatorController.x().whileTrue(Commands.none());
+    operatorController
+        .b()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_1));
+    operatorController
+        .y()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
+    operatorController
+        .x()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_3));
     operatorController
         .a()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
+    operatorController
+        .rightBumper()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
   }
 
