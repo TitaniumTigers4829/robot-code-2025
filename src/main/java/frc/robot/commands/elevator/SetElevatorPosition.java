@@ -12,7 +12,10 @@ public class SetElevatorPosition extends Command {
   ElevatorSubsystem elevatorSubsystem;
   double position;
 
-  /** Creates a new SetElevatorPosition. */
+  /** Creates a new SetElevatorPosition.
+   * @param elevatorSubsystem The subsystem used by this command.
+   * @param position The position to set the elevator to in meters.
+   */
   public SetElevatorPosition(ElevatorSubsystem elevatorSubsystem, double position) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.position = position;
