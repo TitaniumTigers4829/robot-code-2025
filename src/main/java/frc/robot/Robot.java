@@ -19,11 +19,13 @@ import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -57,7 +59,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
   private final ElevatorSubsystem elevatorSubsystem;
@@ -69,7 +70,7 @@ public class Robot extends LoggedRobot {
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   private final SimWorld simWorld;
-
+  // private final ZeroElevator zeroElevator = new ZeroElevator();
   public AutoFactory autoFactory;
   public final AutoChooser autoChooser;
   public Autos autos;
@@ -176,20 +177,20 @@ public class Robot extends LoggedRobot {
     }
     autoChooser = new AutoChooser();
     // this sets up the auto factory
-    autoFactory =
-        new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followCommand =
-                  new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
-              followCommand.execute();
-              if (swerveDrive.isTrajectoryFinished(sample)) {
-                followCommand.cancel();
-              }
-            }, // A function that follows a choreo trajectory
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
-            swerveDrive); // The drive subsystem
+    // autoFactory =
+    //     new AutoFactory(
+    //         swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+    //         swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+    //         (SwerveSample sample) -> {
+    //           FollowSwerveSampleCommand followCommand =
+    //               new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
+    //           followCommand.execute();
+    //           if (swerveDrive.isTrajectoryFinished(sample)) {
+    //             followCommand.cancel();
+    //           }
+    //         }, // A function that follows a choreo trajectory
+    //         AllianceFlipper.isRed(), // If alliance flipping should be enabled
+    //         swerveDrive); // The drive subsystem
 
     autos = new Autos(autoFactory);
 
@@ -208,7 +209,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     // Switch thread to high priority to improve loop timing
     Threads.setCurrentThreadPriority(true, 99);
-
+    
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
@@ -313,11 +314,26 @@ public class Robot extends LoggedRobot {
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+    // Manual zero
+    operatorController.leftBumper().whileTrue(new ZeroElevator(elevatorSubsystem));
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    //Elevator Safety
+    if (SwerveDrive.getRoll() >= ElevatorConstants.MAX_ANGLE_X //gyro safety
+    || SwerveDrive.getRoll() <= ElevatorConstants.MIN_ANGLE_X
+    || SwerveDrive.getPitch() >= ElevatorConstants.MAX_ANGLE_Y
+    || SwerveDrive.getPitch() <= ElevatorConstants.MIN_ANGLE_Y
+    || SwerveDrive.accelX() >= ElevatorConstants.MAX_ACCEL_X  //accel safety
+    || SwerveDrive.accelY() >= ElevatorConstants.MAX_ACCEL_Y) //TODO if robot is not in climbing state, then do this (AND logic)
+    {
+    elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem));//maybe works
+    }
+    
+ 
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

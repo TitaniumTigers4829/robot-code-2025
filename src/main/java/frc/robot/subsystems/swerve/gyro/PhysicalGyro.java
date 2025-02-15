@@ -20,6 +20,8 @@ public class PhysicalGyro implements GyroInterface {
     inputs.yawDegrees = -gyro.getAngle();
     inputs.accelX = -gyro.getWorldLinearAccelX();
     inputs.accelY = -gyro.getWorldLinearAccelY();
+    inputs.pitchDegrees = gyro.getPitch();
+    inputs.rollDegrees = gyro.getRoll();
   }
 
   @Override

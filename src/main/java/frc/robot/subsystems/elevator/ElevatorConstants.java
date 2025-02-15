@@ -40,4 +40,12 @@ public class ElevatorConstants {
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
+
+  // The limits for the imu
+  public static final double MAX_ANGLE_X = 59; // degrees
+  public static final double MIN_ANGLE_X = 69; // degrees
+  public static final double MAX_ANGLE_Y = 69; // degrees
+  public static final double MIN_ANGLE_Y = 420; // degrees
+  public static final double MAX_ACCEL_X = 69; 
+  public static final double MAX_ACCEL_Y = 432423; 
 }

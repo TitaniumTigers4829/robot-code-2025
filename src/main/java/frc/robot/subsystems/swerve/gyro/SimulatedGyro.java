@@ -24,6 +24,8 @@ public class SimulatedGyro implements GyroInterface {
   public void updateInputs(GyroInputs inputs) {
     inputs.isConnected = false;
     inputs.yawDegrees = -yawRads;
+    inputs.rollDegrees = 0.0;
+    inputs.pitchDegrees = 0.0;
     inputs.yawVelocityDegreesPerSecond = -yawVelRadsPerSec;
     inputs.accelX = accelX;
     inputs.accelY = accelY;
