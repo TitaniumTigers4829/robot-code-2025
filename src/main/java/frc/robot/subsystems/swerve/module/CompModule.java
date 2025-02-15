@@ -6,11 +6,8 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -32,23 +29,24 @@ public class CompModule implements ModuleInterface {
   private final CANcoder turnEncoder;
 
   private final VoltageOut voltageOut = new VoltageOut(0.0);
-  private final VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
-  private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
-  private final TorqueCurrentFOC torqueControl = new TorqueCurrentFOC(0.0);
-  private final PositionTorqueCurrentFOC positionTorqueCurrentFOC = new PositionTorqueCurrentFOC(0.0);
-  private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(0.0);
+  private final MotionMagicTorqueCurrentFOC positionTorqueCurrentFOC =
+      new MotionMagicTorqueCurrentFOC(0.0);
+  private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC =
+      new VelocityTorqueCurrentFOC(0.0);
 
   private final StatusSignal<Angle> drivePosition;
   private final StatusSignal<AngularVelocity> driveVelocity;
   private final StatusSignal<Voltage> driveMotorAppliedVoltage;
   private final StatusSignal<Current> driveMotorCurrent;
+  private final StatusSignal<Current> driveMotorTorque;
+  private final StatusSignal<Double> driveMotorReference;
 
   private final StatusSignal<Angle> turnEncoderAbsolutePosition;
   private final StatusSignal<AngularVelocity> turnEncoderVelocity;
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
-
-  // private final BaseStatusSignal[] periodicallyRefreshedSignals;
+  private final StatusSignal<Current> turnMotorTorqueCurrent;
+  private final StatusSignal<Double> turnMotorReference;
 
   public CompModule(ModuleConfig moduleConfig) {
     driveMotor =
@@ -73,7 +71,6 @@ public class CompModule implements ModuleInterface {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
-    driveConfig.TorqueCurrent.TorqueNeutrlDeadband = 0.0001;
     // driveConfig/
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
@@ -109,34 +106,73 @@ public class CompModule implements ModuleInterface {
     driveVelocity = driveMotor.getVelocity();
     driveMotorAppliedVoltage = driveMotor.getMotorVoltage();
     driveMotorCurrent = driveMotor.getSupplyCurrent();
+    driveMotorReference = driveMotor.getClosedLoopReference();
+    driveMotorTorque = driveMotor.getTorqueCurrent();
 
     turnEncoderAbsolutePosition = turnEncoder.getAbsolutePosition();
     turnEncoderVelocity = turnEncoder.getVelocity();
     turnMotorAppliedVolts = turnMotor.getMotorVoltage();
     turnMotorCurrent = turnMotor.getSupplyCurrent();
+    turnMotorTorqueCurrent = turnMotor.getTorqueCurrent();
+    turnMotorReference = turnMotor.getClosedLoopReference();
 
     driveMotor.setPosition(0.0);
     turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        250.0, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
+        250.0,
+        drivePosition,
+        turnEncoderAbsolutePosition,
+        driveVelocity,
+        driveMotorTorque,
+        driveMotorReference,
+        turnEncoderVelocity,
+        turnMotorAppliedVolts,
+        turnMotorCurrent,
+        turnMotorReference,
+        turnMotorTorqueCurrent);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    BaseStatusSignal.waitForAll(0.020, drivePosition, turnEncoderAbsolutePosition, driveVelocity);
+    BaseStatusSignal.waitForAll(
+        0.01,
+        drivePosition,
+        turnEncoderAbsolutePosition,
+        driveVelocity,
+        driveMotorTorque,
+        driveMotorReference,
+        turnEncoderVelocity,
+        turnMotorAppliedVolts,
+        turnMotorCurrent,
+        turnMotorReference,
+        turnMotorTorqueCurrent);
 
     inputs.isConnected =
         BaseStatusSignal.isAllGood(
-            drivePosition, turnEncoderAbsolutePosition, driveVelocity, turnEncoderVelocity);
+            drivePosition,
+            turnEncoderAbsolutePosition,
+            driveVelocity,
+            turnEncoderVelocity,
+            driveMotorTorque,
+            driveMotorReference,
+            turnEncoderVelocity,
+            turnMotorAppliedVolts,
+            turnMotorCurrent,
+            turnMotorReference,
+            turnMotorTorqueCurrent);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
     inputs.drivePosition = -drivePosition.getValueAsDouble();
+    inputs.driveDesiredPosition = driveMotorReference.getValueAsDouble();
+    inputs.driveTorqueCurrent = driveMotorTorque.getValueAsDouble();
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
     inputs.turnVelocity = turnEncoderVelocity.getValueAsDouble();
+    inputs.turnDesiredPosition = turnMotorReference.getValueAsDouble();
+    inputs.turnTorqueCurrent = turnMotorTorqueCurrent.getValueAsDouble();
   }
 
   @Override
@@ -163,9 +199,14 @@ public class CompModule implements ModuleInterface {
             * ModuleConstants.DRIVE_GEAR_RATIO
             / ModuleConstants.WHEEL_CIRCUMFERENCE_METERS;
 
-    driveMotor.setControl(velocityRequest.withVelocity(RotationsPerSecond.of(desiredDriveRPS)));
+    driveMotor.setControl(
+        velocityTorqueCurrentFOC
+            .withVelocity(RotationsPerSecond.of(desiredDriveRPS))
+            .withUseTimesync(true));
     turnMotor.setControl(
-        mmPositionRequest.withPosition(Rotations.of(desiredState.angle.getRotations())));
+        positionTorqueCurrentFOC
+            .withPosition(Rotations.of(desiredState.angle.getRotations()))
+            .withUseTimesync(true));
   }
 
   public double getTurnRotations() {
