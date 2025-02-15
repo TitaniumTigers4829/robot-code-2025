@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.coralIntake;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -8,22 +8,22 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.Constants.HardwareConstants;
 
-public class PhysicalIntake implements IntakeInterface {
-  private final TalonFX motor = new TalonFX(IntakeConstants.INTAKE_MOTOR_ID);
+public class PhysicalCoralIntake implements CoralIntakeInterface {
+  private final TalonFX motor = new TalonFX(CoralIntakeConstants.INTAKE_MOTOR_ID);
   private final StatusSignal<AngularVelocity> intakeVelocity = motor.getVelocity();
   private final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
-  public PhysicalIntake() {
+  public PhysicalCoralIntake() {
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
 
-    intakeConfig.CurrentLimits.StatorCurrentLimit = IntakeConstants.INTAKE_STATOR_LIMIT;
+    intakeConfig.CurrentLimits.StatorCurrentLimit = CoralIntakeConstants.INTAKE_STATOR_LIMIT;
     intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
-        IntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
-    intakeConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.INTAKE_SUPPLY_LIMIT;
+        CoralIntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
+    intakeConfig.CurrentLimits.SupplyCurrentLimit = CoralIntakeConstants.INTAKE_SUPPLY_LIMIT;
     intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
-        IntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
+        CoralIntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
     motor.getConfigurator().apply(intakeConfig);
   }

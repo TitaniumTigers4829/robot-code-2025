@@ -8,10 +8,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 
 public final class Constants {
- public static final double loopPeriodSecs = 0.02;
+  public static final double loopPeriodSecs = 0.02;
   private static RobotType robotType = RobotType.DEV_ROBOT;
   public static final boolean tuningMode = false;
 

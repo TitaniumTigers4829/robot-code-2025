@@ -22,14 +22,18 @@ import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
+import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
+import frc.robot.subsystems.coralIntake.SimulatedICoralntake;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
@@ -64,9 +68,8 @@ public class Robot extends LoggedRobot {
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
-  private final AlgaePivotSubsystem algaePivotSubsystem =
-      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+  private final CoralIntakeSubsystem coralIntakeSubsystem;
+  private final AlgaePivotSubsystem algaePivotSubsystem;
 
   private final SimWorld simWorld;
 
@@ -122,7 +125,7 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
     switch (Constants.getRobot()) {
-      case COMP_ROBOT -> {
+      case COMP_ROBOT-> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -133,9 +136,11 @@ public class Robot extends LoggedRobot {
                 new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         simWorld = null;
       }
-      case DEV_ROBOT -> {
+      case DEV_ROBOT-> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -146,9 +151,13 @@ public class Robot extends LoggedRobot {
                 new PhysicalModule(SwerveConstants.devModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {
+          
+        });
         simWorld = null;
       }
-      case SWERVE_ROBOT -> {
+      case SWERVE_ROBOT-> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
@@ -159,10 +168,12 @@ public class Robot extends LoggedRobot {
                 new PhysicalModule(SwerveConstants.aquilaModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface(){});
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         simWorld = null;
       }
 
-      case SIM_ROBOT -> {
+      case SIM_ROBOT-> {
         /* Sim robot, instantiate physics sim IO implementations */
         simWorld = new SimWorld();
         swerveDrive =
@@ -176,9 +187,11 @@ public class Robot extends LoggedRobot {
         visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
         swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
         elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedICoralntake());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
       }
 
-      default -> {
+      default-> {
         visionSubsystem = new VisionSubsystem(new VisionInterface() {});
         /* Replayed robot, disable IO implementations */
 
@@ -191,6 +204,13 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {},
                 new ModuleInterface() {});
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {
+          
+        });
+
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {
+          
+        });
         simWorld = null;
       }
     }

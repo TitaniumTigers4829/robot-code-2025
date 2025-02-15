@@ -2,16 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.coralIntake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.intake.IntakeInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
-public class IntakeSubsystem extends SubsystemBase {
-  private IntakeInterface intakeInterface;
+public class CoralIntakeSubsystem extends SubsystemBase {
+  private CoralIntakeInterface intakeInterface;
   private IntakeInputsAutoLogged inputs = new IntakeInputsAutoLogged();
 
-  public IntakeSubsystem(IntakeInterface intakeInterface) {
+  public CoralIntakeSubsystem(CoralIntakeInterface intakeInterface) {
     this.intakeInterface = intakeInterface;
   }
 

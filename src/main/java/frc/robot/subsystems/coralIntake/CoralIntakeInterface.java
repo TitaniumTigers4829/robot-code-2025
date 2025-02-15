@@ -1,8 +1,8 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.coralIntake;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IntakeInterface {
+public interface CoralIntakeInterface {
 
   @AutoLog
   public static class IntakeInputs {

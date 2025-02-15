@@ -1,20 +1,20 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 
 public class Eject extends Command {
-  private final IntakeSubsystem intakeSubsystem;
+  private final CoralIntakeSubsystem intakeSubsystem;
 
-  public Eject(IntakeSubsystem intakeSubsystem) {
+  public Eject(CoralIntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(this.intakeSubsystem);
   }
 
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeSpeed(IntakeConstants.EJECT_SPEED);
+    intakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
   }
 
   @Override

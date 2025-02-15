@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.coralIntake;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -7,7 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
-public class SimulatedIntake implements IntakeInterface {
+public class SimulatedICoralntake implements CoralIntakeInterface {
   DCMotorSim simIntake =
       new DCMotorSim(
           LinearSystemId.createDCMotorSystem(DCMotor.getFalcon500(1), 0.01, 1),
@@ -15,7 +15,7 @@ public class SimulatedIntake implements IntakeInterface {
 
   private double intakeAppliedVolts = 0.0;
 
-  public SimulatedIntake() {}
+  public SimulatedICoralntake() {}
 
   @Override
   public void updateInputs(IntakeInputs intakeInputs) {

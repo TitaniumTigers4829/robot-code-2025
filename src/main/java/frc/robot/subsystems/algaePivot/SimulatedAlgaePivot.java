@@ -12,33 +12,33 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants.HardwareConstants;
 
 public class SimulatedAlgaePivot implements AlgaePivotInterface {
-  private final double algaeGearing = AlgaeConstants.ALGAE_GEAR_RATIO;
-  private final double algaePivotMass = AlgaeConstants.ALGAE_MOMENT_INERTIA;
-  private final double algaePivotLength = AlgaeConstants.ALGAE_PIVOT_LENGTH;
+  private final double algaeGearing = AlgaePivotConstants.ALGAE_GEAR_RATIO;
+  private final double algaePivotMass = AlgaePivotConstants.ALGAE_MOMENT_INERTIA;
+  private final double algaePivotLength = AlgaePivotConstants.ALGAE_PIVOT_LENGTH;
   private SingleJointedArmSim algaePivotSim =
       new SingleJointedArmSim(
           DCMotor.getKrakenX60(1),
           algaeGearing,
           algaePivotMass,
           algaePivotLength,
-          Radians.of(AlgaeConstants.MIN_ANGLE).in(Rotations),
-          Radians.of(AlgaeConstants.MAX_ANGLE).in(Rotations),
+          Radians.of(AlgaePivotConstants.MIN_ANGLE).in(Rotations),
+          Radians.of(AlgaePivotConstants.MAX_ANGLE).in(Rotations),
           true,
-          Radians.of(AlgaeConstants.ANGLE_ZERO).in(Rotations));
+          Radians.of(AlgaePivotConstants.ANGLE_ZERO).in(Rotations));
 
   private final double armKS = 0.0;
-  private final double armKG = AlgaeConstants.PIVOT_G;
+  private final double armKG = AlgaePivotConstants.PIVOT_G;
   private final double armKV = 0.0;
   private final ArmFeedforward armFeedForward = new ArmFeedforward(armKS, armKG, armKV);
   private final Constraints algaeConstraints =
       new Constraints(
-          AlgaeConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND,
-          AlgaeConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND);
+          AlgaePivotConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND,
+          AlgaePivotConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND);
   private final ProfiledPIDController algaePivotController =
       new ProfiledPIDController(
-          Radians.of(AlgaeConstants.PIVOT_P).in(Rotations),
-          Radians.of(AlgaeConstants.PIVOT_I).in(Rotations),
-          Radians.of(AlgaeConstants.PIVOT_D).in(Rotations),
+          Radians.of(AlgaePivotConstants.PIVOT_P).in(Rotations),
+          Radians.of(AlgaePivotConstants.PIVOT_I).in(Rotations),
+          Radians.of(AlgaePivotConstants.PIVOT_D).in(Rotations),
           algaeConstraints);
 
   private double appliedVolts = 0.0;

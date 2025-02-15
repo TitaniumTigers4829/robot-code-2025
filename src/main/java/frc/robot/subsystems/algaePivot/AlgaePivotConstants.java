@@ -2,7 +2,7 @@ package frc.robot.subsystems.algaePivot;
 
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-public class AlgaeConstants {
+public class AlgaePivotConstants {
   public static final int ALGAE_PIVOT_MOTOR_ID = 0;
   public static final int ALGAE_ENCODER_MOTOR_ID = 0;
 
