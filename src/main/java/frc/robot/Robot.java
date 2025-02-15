@@ -2,14 +2,12 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -17,10 +15,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.elevator.ZeroElevator;
-import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -180,7 +176,8 @@ public class Robot extends LoggedRobot {
     // autoFactory =
     //     new AutoFactory(
     //         swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-    //         swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+    //         swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to
+    // the
     //         (SwerveSample sample) -> {
     //           FollowSwerveSampleCommand followCommand =
     //               new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
@@ -209,7 +206,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     // Switch thread to high priority to improve loop timing
     Threads.setCurrentThreadPriority(true, 99);
-    
+
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
     // finished or interrupted commands, and running subsystem periodic() methods.
@@ -308,9 +305,9 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
-    operatorController.x().whileTrue(Commands.none());
+    // operatorController.b().whileTrue(Commands.none());
+    // operatorController.y().whileTrue(Commands.none());
+    // operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
@@ -321,18 +318,17 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //Elevator Safety
-    if (SwerveDrive.getRoll() >= ElevatorConstants.MAX_ANGLE_X //gyro safety
-    || SwerveDrive.getRoll() <= ElevatorConstants.MIN_ANGLE_X
-    || SwerveDrive.getPitch() >= ElevatorConstants.MAX_ANGLE_Y
-    || SwerveDrive.getPitch() <= ElevatorConstants.MIN_ANGLE_Y
-    || SwerveDrive.accelX() >= ElevatorConstants.MAX_ACCEL_X  //accel safety
-    || SwerveDrive.accelY() >= ElevatorConstants.MAX_ACCEL_Y) //TODO if robot is not in climbing state, then do this (AND logic)
+    // Elevator Safety
+    if (swerveDrive.getRoll() >= ElevatorConstants.MAX_ANGLE_X // gyro safety
+        || swerveDrive.getRoll() <= ElevatorConstants.MIN_ANGLE_X
+        || swerveDrive.getPitch() >= ElevatorConstants.MAX_ANGLE_Y
+        || swerveDrive.getPitch()
+            <= ElevatorConstants
+                .MIN_ANGLE_Y) // TODO if robot is not in climbing state, then do this (AND logic)
     {
-    elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem));//maybe works
+      // elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem)); // maybe works
+      elevatorSubsystem.setElevatorPosition(0);
     }
-    
- 
   }
 
   /** This function is called once when test mode is enabled. */

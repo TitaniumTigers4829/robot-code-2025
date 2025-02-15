@@ -5,7 +5,6 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import java.util.function.DoubleSupplier;
 
@@ -18,11 +17,9 @@ public class ManualElevator extends Command {
    *
    * @param elevatorSubsystem Elevator subsystem
    * @param position Position in meters
-   * 
    * @param joystickY = Double Supplier for the joystick
    */
-  public ManualElevator(
-      ElevatorSubsystem elevatorSubsystem, DoubleSupplier joystickY) {
+  public ManualElevator(ElevatorSubsystem elevatorSubsystem, DoubleSupplier joystickY) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.joystickY = joystickY;
 
@@ -38,8 +35,8 @@ public class ManualElevator extends Command {
   @Override
   public void execute() {
     elevatorSubsystem.setElevatorPosition(joystickY.getAsDouble());
-    }
-  
+  }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
