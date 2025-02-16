@@ -1,13 +1,13 @@
-package frc.robot.commands.intake;
+package frc.robot.commands.coralIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 
-public class Eject extends Command {
+public class EjectCoral extends Command {
   private final CoralIntakeSubsystem intakeSubsystem;
 
-  public Eject(CoralIntakeSubsystem intakeSubsystem) {
+  public EjectCoral(CoralIntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(this.intakeSubsystem);
   }

@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algaePivot.AlgaePivotConstants;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 
-public class SetAlgaePivotWithPID extends Command {
+public class SetAlgaePivotPosition extends Command {
   private final AlgaePivotSubsystem algaePivotSubsystem;
 
-  public SetAlgaePivotWithPID(AlgaePivotSubsystem algaePivotSubsystem) {
+  public SetAlgaePivotPosition(AlgaePivotSubsystem algaePivotSubsystem) {
     this.algaePivotSubsystem = algaePivotSubsystem;
     addRequirements(algaePivotSubsystem);
   }

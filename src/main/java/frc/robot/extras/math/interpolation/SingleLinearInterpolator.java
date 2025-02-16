@@ -1,7 +1,7 @@
 // TigerLib 2023
 // Do not edit this code unless you know what you're doing
 
-package frc.robot.extras.math.interpolators;
+package frc.robot.extras.math.interpolation;
 
 public final class SingleLinearInterpolator {
 

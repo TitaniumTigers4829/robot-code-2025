@@ -1,7 +1,7 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.extras.math.interpolators.MultiLinearInterpolator;
+import frc.robot.extras.math.interpolation.MultiLinearInterpolator;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionConstants;

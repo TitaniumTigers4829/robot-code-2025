@@ -123,17 +123,56 @@ public class GeomUtil {
     return new Rectangle(wpilibRectangle.getXWidth(), wpilibRectangle.getYWidth());
   }
 
-  // /**
-  //  * Gets the x and y velocities of a ChassisSpeeds
-  //  *
-  //  * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
-  //  * @return a Translation2d containing the velocities in the x and y direction in meters per
-  // second
-  //  */
-  // public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds)
-  // {
-  //   return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-  // }
+  /**
+   * Gets the x and y velocities of a ChassisSpeeds
+   *
+   * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
+   * @return a Translation2d containing the velocities in the x and y direction in meters per second
+   */
+  public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
+    return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  }
+
+  /**
+   * Gets the x and y velocities of a ChassisSpeeds
+   *
+   * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
+   * @return a Velocity2d containing the velocities in the x and y direction in meters per second
+   */
+  public static Velocity2d getChassisSpeedsVelocityComponent(ChassisSpeeds chassisSpeeds) {
+    return new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  }
+
+  /**
+   * Gets a dyn4j torque value as a wpilib unit
+   *
+   * @param torque the dyn4j torque to convert
+   * @return the converted torque value as a wpilib Unit of {@link Torque}.
+   */
+  public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
+    return NewtonMeters.of(torque.getTorque());
+  }
+
+  /**
+   * Gets a dyn4j force value as a wpilib unit
+   *
+   * @param force the dyn4j force to convert
+   * @return the converted force value as a wpilib Unit of {@link Force}.
+   */
+  public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
+    return Newtons.of(force.getForce().getMagnitude());
+  }
+
+  /**
+   * Gets a dyn4j mass value as a wpilib unit
+   *
+   * @param mass the dyn4j mass to convert
+   * @return the converted mass value as a pair of a wpilib Unit of {@link Mass} and a Unit of
+   *     {@link MomentOfInertia}.
+   */
+  public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
+    return Pair.of(Kilograms.of(mass.getMass()), KilogramSquareMeters.of(mass.getInertia()));
+  }
 
   /**
    * Checks if all translations in the input are within a certain threshold in meters.
@@ -211,21 +250,5 @@ public class GeomUtil {
       }
     }
     return true; // Return true if all pairs are within the thresholds
-  }
-
-  public static Velocity2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
-    return new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
-  }
-
-  public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
-    return NewtonMeters.of(torque.getTorque());
-  }
-
-  public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
-    return Newtons.of(force.getForce().getMagnitude());
-  }
-
-  public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
-    return Pair.of(Kilograms.of(mass.getMass()), KilogramSquareMeters.of(mass.getInertia()));
   }
 }
