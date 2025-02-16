@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final double loopPeriodSecs = 0.02;
   private static RobotType robotType = RobotType.SIM_ROBOT;
-  public static final boolean tuningMode = false;
+  public static final boolean tuningMode = true;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -21,7 +21,7 @@ public final class Constants {
    */
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
-    if (!disableHAL && RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+    if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
       new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
           .set(true);
       robotType = RobotType.COMP_ROBOT;
@@ -60,12 +60,6 @@ public final class Constants {
     DEV_ROBOT,
     COMP_ROBOT,
     SWERVE_ROBOT
-  }
-
-  public static boolean disableHAL = false;
-
-  public static void disableHAL() {
-    disableHAL = true;
   }
 
   /** Checks whether the correct robot is selected when deploying. */
