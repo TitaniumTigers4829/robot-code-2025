@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -19,11 +18,13 @@ import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -57,7 +58,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
   private final ElevatorSubsystem elevatorSubsystem;
@@ -69,7 +69,7 @@ public class Robot extends LoggedRobot {
       new AlgaePivotSubsystem(new PhysicalAlgaePivot());
 
   private final SimWorld simWorld;
-
+  // private final ZeroElevator zeroElevator = new ZeroElevator();
   public AutoFactory autoFactory;
   public final AutoChooser autoChooser;
   public Autos autos;
@@ -179,7 +179,7 @@ public class Robot extends LoggedRobot {
     autoFactory =
         new AutoFactory(
             swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to
             (SwerveSample sample) -> {
               FollowSwerveSampleCommand followCommand =
                   new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
@@ -307,17 +307,30 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
-    operatorController.x().whileTrue(Commands.none());
+    // operatorController.b().whileTrue(Commands.none());
+    // operatorController.y().whileTrue(Commands.none());
+    // operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+    // Manual zero
+    operatorController.leftBumper().whileTrue(new ZeroElevator(elevatorSubsystem));
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    // Elevator Safety
+    if (Math.abs(swerveDrive.getRoll()) >= ElevatorConstants.MAX_ROLL_ANGLE // gyro safety
+        || Math.abs(swerveDrive.getPitch())
+            >= ElevatorConstants
+                .MAX_PITCH_ANGLE) // TODO if robot is not in climbing state, then do this (AND
+    // logic)
+    {
+      // elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem)); // maybe works
+      elevatorSubsystem.setElevatorPosition(0);
+    }
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override

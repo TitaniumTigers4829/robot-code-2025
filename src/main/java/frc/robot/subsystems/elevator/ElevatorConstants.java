@@ -11,7 +11,7 @@ public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
   public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 28;
 
-  public static final double ELEVATOR_P = 1;
+  public static final double ELEVATOR_P = 2;
   public static final double ELEVATOR_I = 0;
   public static final double ELEVATOR_D = 0;
   public static final double ELEVATOR_S = 0;
@@ -40,4 +40,10 @@ public class ElevatorConstants {
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
+
+  // The limits for the gyro
+  public static final double MAX_ROLL_ANGLE = 30; // degrees
+  public static final double MAX_PITCH_ANGLE = 20; // degrees
+  // public static final double MAX_ACCEL_X = 69;
+  // public static final double MAX_ACCEL_Y = 432423;
 }

@@ -310,6 +310,14 @@ public class SwerveDrive extends SubsystemBase {
     return gyroInputs.yawDegrees;
   }
 
+  public double getPitch() {
+    return gyroInputs.pitchDegrees;
+  }
+
+  public double getRoll() {
+    return gyroInputs.rollDegrees;
+  }
+
   /**
    * Gets the rate of rotation of the robot.
    *

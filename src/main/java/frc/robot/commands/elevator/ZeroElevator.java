@@ -5,25 +5,17 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import java.util.function.DoubleSupplier;
 
-public class ManualElevator extends Command {
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class ZeroElevator extends Command {
+  /** Creates a new ZeroElevator. */
   ElevatorSubsystem elevatorSubsystem;
-  DoubleSupplier joystickY;
 
-  /**
-   * Creates a new ManualElevator.
-   *
-   * @param elevatorSubsystem Elevator subsystem
-   * @param position Position in meters
-   * @param joystickY = Double Supplier for the joystick
-   */
-  public ManualElevator(ElevatorSubsystem elevatorSubsystem, DoubleSupplier joystickY) {
-    this.elevatorSubsystem = elevatorSubsystem;
-    this.joystickY = joystickY;
-
+  public ZeroElevator(ElevatorSubsystem elevatorSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
+    this.elevatorSubsystem = elevatorSubsystem;
     addRequirements(elevatorSubsystem);
   }
 
@@ -34,14 +26,12 @@ public class ManualElevator extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    elevatorSubsystem.setElevatorPosition(joystickY.getAsDouble());
+    elevatorSubsystem.setElevatorPosition(ElevatorConstants.MIN_HEIGHT); // zeroes it
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    elevatorSubsystem.setVolts(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
