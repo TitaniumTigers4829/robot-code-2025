@@ -1,6 +1,6 @@
-package frc.robot.extras.util.mathutils;
+package frc.robot.extras.math.mathutils;
 
-import static frc.robot.extras.util.mathutils.MeasureMath.*;
+import static frc.robot.extras.math.mathutils.MeasureMath.*;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.AngularAcceleration;

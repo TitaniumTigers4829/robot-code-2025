@@ -1,4 +1,4 @@
-package frc.robot.extras.util;
+package frc.robot.extras.math.mathutils;
 
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;

@@ -1,10 +1,10 @@
-package frc.robot.extras.util.mathutils;
+package frc.robot.extras.math.mathutils;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import java.util.Random;
 
-public class SimCommonMath {
+public class SimMath {
   private static final Random random = new Random();
 
   /**

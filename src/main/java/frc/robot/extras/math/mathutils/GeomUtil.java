@@ -1,4 +1,4 @@
-package frc.robot.extras.util.mathutils;
+package frc.robot.extras.math.mathutils;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -12,7 +12,8 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.util.geometry.Velocity2d;
+import frc.robot.extras.math.forces.Velocity2d;
+
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Rotation;
 import org.dyn4j.geometry.Transform;

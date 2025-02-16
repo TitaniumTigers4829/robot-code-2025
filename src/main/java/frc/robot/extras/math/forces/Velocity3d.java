@@ -1,4 +1,4 @@
-package frc.robot.extras.util.geometry;
+package frc.robot.extras.math.forces;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 

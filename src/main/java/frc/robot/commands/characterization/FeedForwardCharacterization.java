@@ -4,8 +4,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.extras.regression.MultipleLinearRegression;
-import frc.robot.extras.regression.PolynomialRegression;
+import frc.robot.extras.math.regression.MultipleLinearRegression;
+import frc.robot.extras.math.regression.PolynomialRegression;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;

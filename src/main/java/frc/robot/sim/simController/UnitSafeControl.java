@@ -35,8 +35,9 @@ import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import frc.robot.extras.math.mathutils.MeasureMath;
 import frc.robot.extras.util.ProceduralStructGenerator;
-import frc.robot.extras.util.mathutils.MeasureMath;
+
 import org.littletonrobotics.junction.Logger;
 
 /**

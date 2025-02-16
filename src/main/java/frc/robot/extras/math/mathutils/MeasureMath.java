@@ -1,4 +1,4 @@
-package frc.robot.extras.util.mathutils;
+package frc.robot.extras.math.mathutils;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Kilograms;
