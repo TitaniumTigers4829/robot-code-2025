@@ -79,196 +79,196 @@ public class Robot extends LoggedRobot {
   private AutoFactory autoFactory;
   private AutoChooser autoChooser;
   private Autos autos;
-  
-    public Robot() {
-      checkGit();
-      setupLogging();
-      setupSubsystems();
-      setupAuto();
+
+  public Robot() {
+    checkGit();
+    setupLogging();
+    setupSubsystems();
+    setupAuto();
+  }
+
+  /** This function is called periodically during all modes. */
+  @Override
+  public void robotPeriodic() {
+    // Switch thread to high priority to improve loop timing
+    Threads.setCurrentThreadPriority(true, 99);
+
+    // Runs the Scheduler. This is responsible for polling buttons, adding
+    // newly-scheduled commands, running already-scheduled commands, removing
+    // finished or interrupted commands, and running subsystem periodic() methods.
+    // This must be called from the robot's periodic block in order for anything in
+    // the Command-based framework to work.
+    CommandScheduler.getInstance().run();
+
+    // Return to normal thread priority
+    Threads.setCurrentThreadPriority(false, 10);
+  }
+
+  /** This function is called once when the robot is disabled. */
+  @Override
+  public void disabledInit() {}
+
+  /** This function is called periodically when disabled. */
+  @Override
+  public void disabledPeriodic() {}
+
+  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
+  @Override
+  public void autonomousInit() {
+    swerveDrive.resetEstimatedPose(
+        new Pose2d(
+            swerveDrive.getEstimatedPose().getX(),
+            swerveDrive.getEstimatedPose().getY(),
+            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+  }
+
+  /** This function is called periodically during autonomous. */
+  @Override
+  public void autonomousPeriodic() {}
+
+  /** This function is called once when teleop is enabled. */
+  @Override
+  public void teleopInit() {
+    configureDriverController();
+    configureOperatorController();
+  }
+
+  private void configureDriverController() {
+    // Driver Left Stick
+    DoubleSupplier driverLeftStick[] =
+        new DoubleSupplier[] {
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[0],
+          () ->
+              JoystickUtil.modifyAxisPolar(
+                  driverController::getLeftX, driverController::getLeftY, 3)[1]
+        };
+
+    // DRIVER BUTTONS
+    Command driveCommand =
+        new DriveCommand(
+            swerveDrive,
+            visionSubsystem,
+            // Translation in the Y direction
+            driverLeftStick[1],
+            // Translation in the X direction
+            driverLeftStick[0],
+            // Rotation
+            () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
+            // Robot relative
+            () -> !driverController.rightBumper().getAsBoolean(),
+            // Rotation speed
+            () -> driverController.leftBumper().getAsBoolean());
+    swerveDrive.setDefaultCommand(driveCommand);
+
+    // Resets the robot angle in the odometry, factors in which alliance the robot is on
+    driverController
+        .povRight()
+        .onTrue(
+            new InstantCommand(
+                () ->
+                    swerveDrive.resetEstimatedPose(
+                        new Pose2d(
+                            swerveDrive.getEstimatedPose().getX(),
+                            swerveDrive.getEstimatedPose().getY(),
+                            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
+
+    // Reset robot odometry based on the most recent vision pose measurement from april tags
+    // This should be pressed when looking at an april tag
+    driverController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    // FieldConstants has all reef poses
+    driverController
+        .a()
+        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+    driverController
+        .b()
+        .whileTrue(
+            new StaticCharacterization(
+                swerveDrive,
+                swerveDrive::runCharacterization,
+                swerveDrive::getCharacterizationVelocity));
+  }
+
+  private void configureOperatorController() {
+    operatorController.b().whileTrue(new Intake(coralIntakeSubsystem));
+    operatorController.y().whileTrue(new Eject(coralIntakeSubsystem));
+    operatorController.x().whileTrue(Commands.none());
+    operatorController
+        .a()
+        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+  }
+
+  private void checkGit() {
+    // Record metadata
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
+    // This tells you if you have uncommitted changes in your project
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
     }
-  
-    /** This function is called periodically during all modes. */
-    @Override
-    public void robotPeriodic() {
-      // Switch thread to high priority to improve loop timing
-      Threads.setCurrentThreadPriority(true, 99);
-  
-      // Runs the Scheduler. This is responsible for polling buttons, adding
-      // newly-scheduled commands, running already-scheduled commands, removing
-      // finished or interrupted commands, and running subsystem periodic() methods.
-      // This must be called from the robot's periodic block in order for anything in
-      // the Command-based framework to work.
-      CommandScheduler.getInstance().run();
-  
-      // Return to normal thread priority
-      Threads.setCurrentThreadPriority(false, 10);
+  }
+
+  private void setupLogging() {
+    // Set up data receivers & replay source
+    switch (Constants.getMode()) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        // Gets data from network tables
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        {
+          // Replaying a log, set up replay source
+          setUseTiming(false); // Run as fast as possible
+          String logPath = LogFileUtil.findReplayLog();
+          Logger.setReplaySource(new WPILOGReader(logPath));
+          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
     }
-  
-    /** This function is called once when the robot is disabled. */
-    @Override
-    public void disabledInit() {}
-  
-    /** This function is called periodically when disabled. */
-    @Override
-    public void disabledPeriodic() {}
-  
-    /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-    @Override
-    public void autonomousInit() {
-      swerveDrive.resetEstimatedPose(
-          new Pose2d(
-              swerveDrive.getEstimatedPose().getX(),
-              swerveDrive.getEstimatedPose().getY(),
-              Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    }
-  
-    /** This function is called periodically during autonomous. */
-    @Override
-    public void autonomousPeriodic() {}
-  
-    /** This function is called once when teleop is enabled. */
-    @Override
-    public void teleopInit() {
-      configureDriverController();
-      configureOperatorController();
-    }
-  
-    private void configureDriverController() {
-      // Driver Left Stick
-      DoubleSupplier driverLeftStick[] =
-          new DoubleSupplier[] {
-            () ->
-                JoystickUtil.modifyAxisPolar(
-                    driverController::getLeftX, driverController::getLeftY, 3)[0],
-            () ->
-                JoystickUtil.modifyAxisPolar(
-                    driverController::getLeftX, driverController::getLeftY, 3)[1]
-          };
-  
-      // DRIVER BUTTONS
-      Command driveCommand =
-          new DriveCommand(
-              swerveDrive,
-              visionSubsystem,
-              // Translation in the Y direction
-              driverLeftStick[1],
-              // Translation in the X direction
-              driverLeftStick[0],
-              // Rotation
-              () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
-              // Robot relative
-              () -> !driverController.rightBumper().getAsBoolean(),
-              // Rotation speed
-              () -> driverController.leftBumper().getAsBoolean());
-      swerveDrive.setDefaultCommand(driveCommand);
-  
-      // Resets the robot angle in the odometry, factors in which alliance the robot is on
-      driverController
-          .povRight()
-          .onTrue(
-              new InstantCommand(
-                  () ->
-                      swerveDrive.resetEstimatedPose(
-                          new Pose2d(
-                              swerveDrive.getEstimatedPose().getX(),
-                              swerveDrive.getEstimatedPose().getY(),
-                              Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
-  
-      // Reset robot odometry based on the most recent vision pose measurement from april tags
-      // This should be pressed when looking at an april tag
-      driverController
-          .povLeft()
-          .onTrue(
-              new InstantCommand(
-                  () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
-  
-      // FieldConstants has all reef poses
-      driverController
-          .a()
-          .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
-      driverController
-          .b()
-          .whileTrue(
-              new StaticCharacterization(
-                  swerveDrive,
-                  swerveDrive::runCharacterization,
-                  swerveDrive::getCharacterizationVelocity));
-    }
-  
-    private void configureOperatorController() {
-      operatorController.b().whileTrue(new Intake(coralIntakeSubsystem));
-      operatorController.y().whileTrue(new Eject(coralIntakeSubsystem));
-      operatorController.x().whileTrue(Commands.none());
-      operatorController
-          .a()
-          .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
-    }
-  
-    private void checkGit() {
-      // Record metadata
-      Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-      Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-      Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-      Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-      Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-  
-      // This tells you if you have uncommitted changes in your project
-      switch (BuildConstants.DIRTY) {
-        case 0:
-          Logger.recordMetadata("GitDirty", "All changes committed");
-          break;
-        case 1:
-          Logger.recordMetadata("GitDirty", "Uncomitted changes");
-          break;
-        default:
-          Logger.recordMetadata("GitDirty", "Unknown");
-          break;
-      }
-    }
-  
-    private void setupLogging() {
-      // Set up data receivers & replay source
-      switch (Constants.getMode()) {
-        case REAL:
-          // Running on a real robot, log to a USB stick ("/U/logs")
-          Logger.addDataReceiver(new WPILOGWriter());
-          // Gets data from network tables
-          Logger.addDataReceiver(new NT4Publisher());
-          break;
-  
-        case SIM:
-          // Running a physics simulator, log to NT
-          Logger.addDataReceiver(new NT4Publisher());
-          break;
-  
-        case REPLAY:
-          {
-            // Replaying a log, set up replay source
-            setUseTiming(false); // Run as fast as possible
-            String logPath = LogFileUtil.findReplayLog();
-            Logger.setReplaySource(new WPILOGReader(logPath));
-            Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-          }
-      }
-  
-      // Start AdvantageKit logger
-      Logger.start();
-    }
-  
-    private void setupSubsystems() {
-      switch (Constants.getRobot()) {
-        case COMP_ROBOT -> {
-          /* Real robot, instantiate hardware IO implementations */
-          this.swerveDrive =
-              new SwerveDrive(
-                  new PhysicalGyro(),
-                  new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
-                  new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
-                  new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
-                  new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
-          this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
-          this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
-          this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+
+    // Start AdvantageKit logger
+    Logger.start();
+  }
+
+  private void setupSubsystems() {
+    switch (Constants.getRobot()) {
+      case COMP_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        this.swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
+        this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.simWorld = null;
       }
@@ -351,7 +351,8 @@ public class Robot extends LoggedRobot {
     this.autoFactory =
         new AutoFactory(
             this.swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            this.swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
+            this.swerveDrive
+                ::resetEstimatedPose, // A function that resets the current robot pose to the
             (SwerveSample sample) -> {
               FollowSwerveSampleCommand followCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
