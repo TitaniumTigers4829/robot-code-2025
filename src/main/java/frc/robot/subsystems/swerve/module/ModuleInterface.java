@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve.module;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -53,6 +54,10 @@ public interface ModuleInterface {
    * @param voltage Voltage to set the turn motor to.
    */
   default void setTurnVoltage(Voltage voltage) {}
+
+  default void setDriveCurrent(Current current) {}
+
+  default void setTurnCurrent(Current current) {}
 
   /** Stops the motors in the module. */
   default void stopModule() {}

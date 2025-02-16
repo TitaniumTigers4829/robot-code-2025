@@ -207,9 +207,9 @@ public class SwerveDrive extends SubsystemBase {
    *
    * @param volts voltage to set
    */
-  public void runCharacterization(double volts) {
+  public void runCharacterization(double amps) {
     for (SwerveModule module : swerveModules) {
-      module.setVoltage(Volts.of(-volts));
+      module.setCurrent(Amps.of(-amps));
     }
   }
 

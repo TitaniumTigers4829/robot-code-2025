@@ -29,8 +29,9 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   }
 
   @Override
-  public void updateInputs(IntakeInputs intakeInputs) {
+  public void updateInputs(CoralIntakeInputs intakeInputs) {
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
+    intakeInputs.currentAmps = motor.getStatorCurrent().getValueAsDouble();
   }
 
   @Override

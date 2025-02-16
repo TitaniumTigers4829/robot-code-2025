@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
@@ -31,7 +32,7 @@ import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
-import frc.robot.subsystems.coralIntake.SimulatedICoralntake;
+import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -188,7 +189,7 @@ public class Robot extends LoggedRobot {
         visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
         swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
         elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
-        coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedICoralntake());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
         algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
       }
 
@@ -342,6 +343,13 @@ public class Robot extends LoggedRobot {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+    driverController
+        .b()
+        .whileTrue(
+            new StaticCharacterization(
+                swerveDrive,
+                swerveDrive::runCharacterization,
+                swerveDrive::getCharacterizationVelocity));
   }
 
   private void configureOperatorController() {

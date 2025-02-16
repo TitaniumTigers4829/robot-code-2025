@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import frc.robot.Constants;
@@ -38,12 +39,12 @@ public class SwerveModule {
   static {
     switch (Constants.getRobot()) {
       case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT -> {
-        drivekS.initDefault(5.0);
-        drivekV.initDefault(0);
-        drivekP.initDefault(35.0);
-        drivekD.initDefault(0);
-        turnkP.initDefault(4000.0);
-        turnkD.initDefault(50.0);
+        drivekS.initDefault(ModuleConstants.DRIVE_S);
+        drivekV.initDefault(ModuleConstants.DRIVE_V);
+        drivekP.initDefault(ModuleConstants.DRIVE_P);
+        drivekD.initDefault(ModuleConstants.DRIVE_D);
+        turnkP.initDefault(ModuleConstants.TURN_P);
+        turnkD.initDefault(ModuleConstants.TURN_D);
       }
       default -> {
         drivekS.initDefault(0.014);
@@ -81,6 +82,11 @@ public class SwerveModule {
   public void setVoltage(Voltage volts) {
     io.setDriveVoltage(volts);
     io.setTurnVoltage(Volts.zero());
+  }
+
+  public void setCurrent(Current current) {
+    io.setDriveCurrent(current);
+    io.setTurnCurrent(Amps.zero());
   }
 
   /**

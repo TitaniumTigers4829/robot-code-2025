@@ -7,6 +7,7 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -29,6 +30,7 @@ public class PhysicalModule implements ModuleInterface {
   private final CANcoder turnEncoder;
 
   private final VoltageOut voltageOut = new VoltageOut(0.0);
+  private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
   private final MotionMagicTorqueCurrentFOC positionTorqueCurrentFOC =
       new MotionMagicTorqueCurrentFOC(0.0);
   private final VelocityTorqueCurrentFOC velocityTorqueCurrentFOC =
@@ -66,12 +68,12 @@ public class PhysicalModule implements ModuleInterface {
     turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.TIMEOUT_S);
 
     driveConfig = new TalonFXConfiguration();
-    driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
-    driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
-    driveConfig.Slot0.kD = ModuleConstants.DRIVE_D;
-    driveConfig.Slot0.kS = ModuleConstants.DRIVE_S;
-    driveConfig.Slot0.kV = ModuleConstants.DRIVE_V;
-    driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
+    // driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
+    // driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
+    // driveConfig.Slot0.kD = ModuleConstants.DRIVE_D;
+    // driveConfig.Slot0.kS = ModuleConstants.DRIVE_S;
+    // driveConfig.Slot0.kV = ModuleConstants.DRIVE_V;
+    // driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
@@ -84,12 +86,12 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.TIMEOUT_S);
 
     turnConfig = new TalonFXConfiguration();
-    turnConfig.Slot0.kP = ModuleConstants.TURN_P;
-    turnConfig.Slot0.kI = ModuleConstants.TURN_I;
-    turnConfig.Slot0.kD = ModuleConstants.TURN_D;
-    turnConfig.Slot0.kS = ModuleConstants.TURN_S;
-    turnConfig.Slot0.kV = ModuleConstants.TURN_V;
-    turnConfig.Slot0.kA = ModuleConstants.TURN_A;
+    // turnConfig.Slot0.kP = ModuleConstants.TURN_P;
+    // turnConfig.Slot0.kI = ModuleConstants.TURN_I;
+    // turnConfig.Slot0.kD = ModuleConstants.TURN_D;
+    // turnConfig.Slot0.kS = ModuleConstants.TURN_S;
+    // turnConfig.Slot0.kV = ModuleConstants.TURN_V;
+    // turnConfig.Slot0.kA = ModuleConstants.TURN_A;
     turnConfig.Feedback.FeedbackRemoteSensorID = turnEncoder.getDeviceID();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     turnConfig.Feedback.SensorToMechanismRatio = 1.0;
@@ -142,7 +144,7 @@ public class PhysicalModule implements ModuleInterface {
   @Override
   public void updateInputs(ModuleInputs inputs) {
     BaseStatusSignal.waitForAll(
-        0.01,
+        0.00,
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
@@ -187,6 +189,16 @@ public class PhysicalModule implements ModuleInterface {
   @Override
   public void setTurnVoltage(Voltage volts) {
     turnMotor.setControl(voltageOut.withOutput(volts));
+  }
+
+  @Override
+  public void setDriveCurrent(Current current) {
+    driveMotor.setControl(currentOut.withOutput(current));
+  }
+
+  @Override
+  public void setTurnCurrent(Current current) {
+    turnMotor.setControl(currentOut.withOutput(current));
   }
 
   @Override

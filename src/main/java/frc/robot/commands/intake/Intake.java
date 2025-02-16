@@ -9,7 +9,7 @@ public class Intake extends Command {
 
   public Intake(CoralIntakeSubsystem intakeSubsystem) {
     this.intakeSubsystem = intakeSubsystem;
-    addRequirements(this.intakeSubsystem);
+    addRequirements(intakeSubsystem);
   }
 
   @Override

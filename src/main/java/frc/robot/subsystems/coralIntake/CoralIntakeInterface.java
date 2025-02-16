@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CoralIntakeInterface {
 
   @AutoLog
-  public static class IntakeInputs {
+  public static class CoralIntakeInputs {
     public boolean isConnected = true;
     public double intakeVelocity = 0.0;
     public double intakeTemp = 0.0;
@@ -13,7 +13,7 @@ public interface CoralIntakeInterface {
     public double currentAmps = 0.0;
   }
 
-  default void updateInputs(IntakeInputs inputs) {}
+  default void updateInputs(CoralIntakeInputs inputs) {}
 
   default void setIntakeSpeed(double speed) {}
 
