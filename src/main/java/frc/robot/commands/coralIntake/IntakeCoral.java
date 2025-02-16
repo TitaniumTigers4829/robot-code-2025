@@ -5,21 +5,21 @@ import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 
 public class IntakeCoral extends Command {
-  private final CoralIntakeSubsystem intakeSubsystem;
+  private final CoralIntakeSubsystem coralIntakeSubsystem;
 
   public IntakeCoral(CoralIntakeSubsystem intakeSubsystem) {
-    this.intakeSubsystem = intakeSubsystem;
+    this.coralIntakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
   }
 
   @Override
   public void execute() {
-    intakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
   }
 
   @Override
   public void end(boolean interrupted) {
-    intakeSubsystem.setIntakeSpeed(0);
+    coralIntakeSubsystem.setIntakeSpeed(0);
   }
 
   @Override

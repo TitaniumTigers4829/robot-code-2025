@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.coralIntake.EjectCoral;
@@ -90,8 +91,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    // Switch thread to high priority to improve loop timing
-    Threads.setCurrentThreadPriority(true, 99);
+    // Switch thread to high priority and real time to improve loop timing
+    Threads.setCurrentThreadPriority(true, HardwareConstants.HIGH_THREAD_PRIORITY);
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
@@ -100,8 +101,8 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    // Return to normal thread priority
-    Threads.setCurrentThreadPriority(false, 10);
+    // Return to normal thread priority without real time
+    Threads.setCurrentThreadPriority(false, HardwareConstants.LOW_THREAD_PRIORITY);
   }
 
   /** This function is called once when the robot is disabled. */

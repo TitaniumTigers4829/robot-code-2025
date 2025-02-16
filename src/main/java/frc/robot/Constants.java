@@ -93,6 +93,9 @@ public final class Constants {
      * the lowest possible value.
      */
     public static final double MIN_FALCON_DEADBAND = 0.001;
+
+    public static final int HIGH_THREAD_PRIORITY = 99;
+    public static final int LOW_THREAD_PRIORITY = 1;
   }
 
   /**
