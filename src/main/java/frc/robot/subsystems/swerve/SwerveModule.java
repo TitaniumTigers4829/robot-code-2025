@@ -8,6 +8,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.AlertType;
 import frc.robot.Constants;
 import frc.robot.extras.util.LoggedTunableNumber;
 import frc.robot.extras.util.Tracer;
@@ -23,7 +24,7 @@ public class SwerveModule {
   private final ModuleInputsAutoLogged inputs = new ModuleInputsAutoLogged();
 
   private final Alert hardwareFaultAlert;
-  
+
   private static final LoggedTunableNumber drivekS =
       new LoggedTunableNumber("Drive/Module/DrivekS");
   private static final LoggedTunableNumber drivekV =
@@ -59,8 +60,7 @@ public class SwerveModule {
   public SwerveModule(ModuleInterface io, String name) {
     this.io = io;
     this.name = name;
-    this.hardwareFaultAlert =
-        new Alert("Module-" + name + " Hardware Fault", Alert.AlertType.kError);
+    this.hardwareFaultAlert = new Alert("Module-" + name + " Hardware Fault", AlertType.kError);
     this.hardwareFaultAlert.set(false);
   }
 
