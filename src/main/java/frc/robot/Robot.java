@@ -2,6 +2,7 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Threads;
@@ -15,8 +16,10 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.elevator.ZeroElevator;
+import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
@@ -173,21 +176,20 @@ public class Robot extends LoggedRobot {
     }
     autoChooser = new AutoChooser();
     // this sets up the auto factory
-    // autoFactory =
-    //     new AutoFactory(
-    //         swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-    //         swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to
-    // the
-    //         (SwerveSample sample) -> {
-    //           FollowSwerveSampleCommand followCommand =
-    //               new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
-    //           followCommand.execute();
-    //           if (swerveDrive.isTrajectoryFinished(sample)) {
-    //             followCommand.cancel();
-    //           }
-    //         }, // A function that follows a choreo trajectory
-    //         AllianceFlipper.isRed(), // If alliance flipping should be enabled
-    //         swerveDrive); // The drive subsystem
+    autoFactory =
+        new AutoFactory(
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to
+            (SwerveSample sample) -> {
+              FollowSwerveSampleCommand followCommand =
+                  new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
+              followCommand.execute();
+              if (swerveDrive.isTrajectoryFinished(sample)) {
+                followCommand.cancel();
+              }
+            }, // A function that follows a choreo trajectory
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            swerveDrive); // The drive subsystem
 
     autos = new Autos(autoFactory);
 
@@ -319,12 +321,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     // Elevator Safety
-    if (swerveDrive.getRoll() >= ElevatorConstants.MAX_ANGLE_X // gyro safety
-        || swerveDrive.getRoll() <= ElevatorConstants.MIN_ANGLE_X
-        || swerveDrive.getPitch() >= ElevatorConstants.MAX_ANGLE_Y
-        || swerveDrive.getPitch()
-            <= ElevatorConstants
-                .MIN_ANGLE_Y) // TODO if robot is not in climbing state, then do this (AND logic)
+    if (Math.abs(swerveDrive.getRoll()) >= ElevatorConstants.MAX_ROLL_ANGLE // gyro safety
+        || Math.abs(swerveDrive.getPitch())
+            >= ElevatorConstants
+                .MAX_PITCH_ANGLE) // TODO if robot is not in climbing state, then do this (AND
+    // logic)
     {
       // elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem)); // maybe works
       elevatorSubsystem.setElevatorPosition(0);
