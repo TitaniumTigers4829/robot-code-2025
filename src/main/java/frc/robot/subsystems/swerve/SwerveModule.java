@@ -23,6 +23,7 @@ public class SwerveModule {
   private final ModuleInputsAutoLogged inputs = new ModuleInputsAutoLogged();
 
   private final Alert hardwareFaultAlert;
+  
   private static final LoggedTunableNumber drivekS =
       new LoggedTunableNumber("Drive/Module/DrivekS");
   private static final LoggedTunableNumber drivekV =
