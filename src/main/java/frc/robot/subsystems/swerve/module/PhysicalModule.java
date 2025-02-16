@@ -65,7 +65,7 @@ public class PhysicalModule implements ModuleInterface {
     CANcoderConfiguration turnEncoderConfig = new CANcoderConfiguration();
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
-    turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.TIMEOUT_S);
+    turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     driveConfig = new TalonFXConfiguration();
     // driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
@@ -83,7 +83,7 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.CurrentLimits.StatorCurrentLimit = ModuleConstants.DRIVE_STATOR_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.TIMEOUT_S);
+    driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     turnConfig = new TalonFXConfiguration();
     // turnConfig.Slot0.kP = ModuleConstants.TURN_P;
@@ -106,7 +106,7 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.TIMEOUT_S);
+    turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     drivePosition = driveMotor.getPosition();
     driveVelocity = driveMotor.getVelocity();

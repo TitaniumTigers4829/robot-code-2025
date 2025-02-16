@@ -78,7 +78,7 @@ public class SimWorld {
 
   /** Constructs a new simulation world. */
   public SimWorld() {
-    arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.TIMEOUT_S), 5);
+    arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.LOOP_TIME_SECONDS), 5);
     simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
 
     aprilTagSim = new VisionSystemSim("AprilTags");

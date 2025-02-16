@@ -48,7 +48,7 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface {
 
     algaeEncoderConfig.MagnetSensor.MagnetOffset = -AlgaePivotConstants.ANGLE_ZERO;
     algaeEncoderConfig.MagnetSensor.SensorDirection = AlgaePivotConstants.ALGAE_ENCODER_REVERSED;
-    algaeEncoder.getConfigurator().apply(algaeEncoderConfig, HardwareConstants.TIMEOUT_S);
+    algaeEncoder.getConfigurator().apply(algaeEncoderConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     algaeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     algaeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

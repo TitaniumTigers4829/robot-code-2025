@@ -45,7 +45,7 @@ public class SimulatedAlgaePivot implements AlgaePivotInterface {
 
   @Override
   public void updateInputs(AlgaePivotInputs inputs) {
-    algaePivotSim.update(HardwareConstants.TIMEOUT_S);
+    algaePivotSim.update(HardwareConstants.LOOP_TIME_SECONDS);
 
     inputs.algaeVelocity = Units.radiansToRotations(algaePivotSim.getVelocityRadPerSec());
     inputs.algaeAngle = Units.radiansToRotations(algaePivotSim.getAngleRads());

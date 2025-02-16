@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  public static final double loopPeriodSecs = 0.02;
   private static RobotType robotType = RobotType.SIM_ROBOT;
   public static final boolean tuningMode = false;
 
@@ -87,7 +86,7 @@ public final class Constants {
    * singular subsystem.
    */
   public static final class HardwareConstants {
-    public static final double TIMEOUT_S = 0.02;
+    public static final double LOOP_TIME_SECONDS = 0.02;
 
     public static final double STATUS_SIGNAL_FREQUENCY = 50;
 
