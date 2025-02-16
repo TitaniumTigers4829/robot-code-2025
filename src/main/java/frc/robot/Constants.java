@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
   public static final double loopPeriodSecs = 0.02;
-  private static RobotType robotType = RobotType.DEV_ROBOT;
+  private static RobotType robotType = RobotType.SIM_ROBOT;
   public static final boolean tuningMode = false;
 
   @SuppressWarnings("resource")

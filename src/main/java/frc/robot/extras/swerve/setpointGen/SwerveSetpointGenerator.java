@@ -1,6 +1,6 @@
-package frc.robot.extras.setpointGen;
+package frc.robot.extras.swerve.setpointGen;
 
-import static frc.robot.extras.setpointGen.SPGCalcs.*;
+import static frc.robot.extras.swerve.setpointGen.SPGCalcs.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
