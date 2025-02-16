@@ -7,6 +7,10 @@ import frc.robot.extras.logging.LoggedTunableNumber;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
+/**
+ * Characterizes the Subsystem using a current input (setter) and a velocity supplier (getter). This
+ * will help tune kS for TorqueCurrentFOC control modes.
+ */
 public class StaticCharacterization extends Command {
   private static final LoggedTunableNumber currentRampFactor =
       new LoggedTunableNumber("StaticCharacterization/CurrentRampPerSec", 1.0);
