@@ -14,6 +14,11 @@ public final class Constants {
   private static RobotType robotType = RobotType.SIM_ROBOT;
   public static final boolean tuningMode = false;
 
+  /**
+   * Gets if the robot type is valid, if not it will default to COMP_ROBOT
+   *
+   * @return the currently used RobotType
+   */
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
     if (!disableHAL && RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
@@ -24,6 +29,12 @@ public final class Constants {
     return robotType;
   }
 
+  /**
+   * Gets the mode of the robot based on the RobotType and the state of {@link RobotBase}, if the
+   * robot isn't real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
+   *
+   * @return the currently used Mode
+   */
   public static Mode getMode() {
     return switch (robotType) {
       case DEV_ROBOT, COMP_ROBOT, SWERVE_ROBOT -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
@@ -31,6 +42,7 @@ public final class Constants {
     };
   }
 
+  /** An enum to select the robot's mode. */
   public enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -42,6 +54,7 @@ public final class Constants {
     REPLAY
   }
 
+  /** An enum to select the currently used robot. */
   public enum RobotType {
     SIM_ROBOT,
     DEV_ROBOT,
