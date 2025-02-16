@@ -28,8 +28,6 @@ public class SwerveModule {
       new LoggedTunableNumber("Drive/Module/DrivekS");
   private static final LoggedTunableNumber drivekV =
       new LoggedTunableNumber("Drive/Module/DrivekV");
-  // private static final LoggedTunableNumber drivekT =
-  //     new LoggedTunableNumber("Drive/Module/DrivekT");
   private static final LoggedTunableNumber drivekP =
       new LoggedTunableNumber("Drive/Module/DrivekP");
   private static final LoggedTunableNumber drivekD =
@@ -50,7 +48,6 @@ public class SwerveModule {
       default -> {
         drivekS.initDefault(0.014);
         drivekV.initDefault(0.134);
-        // drivekT.initDefault(0);
         drivekP.initDefault(0.1);
         drivekD.initDefault(0);
         turnkP.initDefault(10.0);
