@@ -5,9 +5,13 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
-import frc.robot.extras.util.Tracer;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import frc.robot.Constants;
+import frc.robot.extras.logging.LoggedTunableNumber;
+import frc.robot.extras.logging.Tracer;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.module.ModuleInputsAutoLogged;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
@@ -15,26 +19,53 @@ import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
 
-  private final ModuleInterface io;
-  private final String name;
-  private final ModuleInputsAutoLogged inputs = new ModuleInputsAutoLogged();
+  private final ModuleInterface moduleInterface;
+  private final String moduleName;
+  private final ModuleInputsAutoLogged moduleInputs = new ModuleInputsAutoLogged();
 
   private final Alert hardwareFaultAlert;
 
+  private static final LoggedTunableNumber driveS = new LoggedTunableNumber("Drive/Module/DriveS");
+  private static final LoggedTunableNumber driveV = new LoggedTunableNumber("Drive/Module/DriveV");
+  private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/Module/DriveP");
+  private static final LoggedTunableNumber driveD = new LoggedTunableNumber("Drive/Module/DriveD");
+  private static final LoggedTunableNumber turnP = new LoggedTunableNumber("Drive/Module/TurnP");
+  private static final LoggedTunableNumber turnD = new LoggedTunableNumber("Drive/Module/TurnD");
+
+  static {
+    switch (Constants.getRobot()) {
+      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT -> {
+        driveS.initDefault(ModuleConstants.DRIVE_S);
+        driveV.initDefault(ModuleConstants.DRIVE_V);
+        driveP.initDefault(ModuleConstants.DRIVE_P);
+        driveD.initDefault(ModuleConstants.DRIVE_D);
+        turnP.initDefault(ModuleConstants.TURN_P);
+        turnD.initDefault(ModuleConstants.TURN_D);
+      }
+      default -> {
+        driveS.initDefault(0.014);
+        driveV.initDefault(0.134);
+        driveP.initDefault(0.1);
+        driveD.initDefault(0);
+        turnP.initDefault(10.0);
+        turnD.initDefault(0);
+      }
+    }
+  }
+
   public SwerveModule(ModuleInterface io, String name) {
-    this.io = io;
-    this.name = name;
-    this.hardwareFaultAlert =
-        new Alert("Module-" + name + " Hardware Fault", Alert.AlertType.kError);
+    this.moduleInterface = io;
+    this.moduleName = name;
+    this.hardwareFaultAlert = new Alert("Module-" + name + " Hardware Fault", AlertType.kError);
     this.hardwareFaultAlert.set(false);
   }
 
   /** Updates the module's odometry inputs. */
   public void updateOdometryInputs() {
-    io.updateInputs(inputs);
-    Logger.processInputs("Drive/Module-" + name, inputs);
-    Tracer.traceFunc("Module-" + name, () -> io.updateInputs(inputs));
-    this.hardwareFaultAlert.set(!inputs.isConnected);
+    moduleInterface.updateInputs(moduleInputs);
+    Logger.processInputs("Drive/Module-" + moduleName, moduleInputs);
+    Tracer.traceFunc("Module-" + moduleName, () -> moduleInterface.updateInputs(moduleInputs));
+    this.hardwareFaultAlert.set(!moduleInputs.isConnected);
   }
 
   /**
@@ -43,8 +74,13 @@ public class SwerveModule {
    * @param volts the voltage to set the drive motor to
    */
   public void setVoltage(Voltage volts) {
-    io.setDriveVoltage(volts);
-    io.setTurnVoltage(Volts.zero());
+    moduleInterface.setDriveVoltage(volts);
+    moduleInterface.setTurnVoltage(Volts.zero());
+  }
+
+  public void setCurrent(Current current) {
+    moduleInterface.setDriveCurrent(current);
+    moduleInterface.setTurnCurrent(Amps.zero());
   }
 
   /**
@@ -53,7 +89,7 @@ public class SwerveModule {
    * @return the drive voltage of the module
    */
   public double getDriveVoltage() {
-    return inputs.driveAppliedVolts;
+    return moduleInputs.driveAppliedVolts;
   }
 
   /**
@@ -62,7 +98,7 @@ public class SwerveModule {
    * @return the drive velocity of the module
    */
   public double getCharacterizationVelocity() {
-    return inputs.driveVelocity;
+    return moduleInputs.driveVelocity;
   }
 
   /**
@@ -75,15 +111,15 @@ public class SwerveModule {
   public void setOptimizedDesiredState(SwerveModuleState state) {
     state.optimize(getTurnRotation());
     if (state.speedMetersPerSecond < 0.01) {
-      io.stopModule();
+      moduleInterface.stopModule();
     }
-    io.setDesiredState(state);
+    moduleInterface.setDesiredState(state);
     Logger.recordOutput("Drive/desired turn angle", state.angle.getRotations());
   }
 
   /** Stops the module */
   public void stopModule() {
-    io.stopModule();
+    moduleInterface.stopModule();
   }
 
   /**
@@ -92,7 +128,7 @@ public class SwerveModule {
    * @return the turn angle of the module 0 being forward, CCW being positive
    */
   public Rotation2d getTurnRotation() {
-    return inputs.turnAbsolutePosition;
+    return moduleInputs.turnAbsolutePosition;
   }
 
   /**
@@ -101,12 +137,12 @@ public class SwerveModule {
    * @return the turn velocity in rotations per second
    */
   public double getTurnVelocity() {
-    return inputs.turnVelocity;
+    return moduleInputs.turnVelocity;
   }
 
   /** Returns the current drive position of the module in meters. */
   public double getDrivePositionMeters() {
-    return ModuleConstants.DRIVE_TO_METERS * inputs.drivePosition;
+    return ModuleConstants.DRIVE_TO_METERS * moduleInputs.drivePosition;
   }
 
   /**
@@ -115,7 +151,7 @@ public class SwerveModule {
    * @return the drive velocity in meters per second
    */
   public double getDriveVelocityMetersPerSec() {
-    return ModuleConstants.DRIVE_TO_METERS_PER_SECOND * inputs.driveVelocity;
+    return ModuleConstants.DRIVE_TO_METERS_PER_SECOND * moduleInputs.driveVelocity;
   }
 
   /**
@@ -124,7 +160,7 @@ public class SwerveModule {
    * @return a double containing current position of the driving motors in radians.
    */
   public double getDrivePositionRadians() {
-    return io.getDrivePositionRadians();
+    return moduleInterface.getDrivePositionRadians();
   }
 
   public SwerveModuleState getMeasuredState() {
@@ -145,5 +181,17 @@ public class SwerveModule {
    * This is called in the periodic method of the SwerveDrive. It is used to update module values
    * periodically
    */
-  public void periodic() {}
+  public void periodic() {
+
+    // Update tunable numbers
+    if (driveS.hasChanged(hashCode()) || driveV.hasChanged(hashCode())) {
+      moduleInterface.setDriveFF(driveS.get(), driveV.get(), 0.0);
+    }
+    if (driveP.hasChanged(hashCode()) || driveD.hasChanged(hashCode())) {
+      moduleInterface.setDrivePID(driveP.get(), 0, driveD.get());
+    }
+    if (turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
+      moduleInterface.setTurnPID(turnP.get(), 0, turnD.get());
+    }
+  }
 }

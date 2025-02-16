@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.setpointGen.SwerveSetpoint;
-import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.logging.Tracer;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.TimeUtil;
-import frc.robot.extras.util.Tracer;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -207,9 +207,9 @@ public class SwerveDrive extends SubsystemBase {
    *
    * @param volts voltage to set
    */
-  public void runCharacterization(double volts) {
+  public void runCharacterization(double amps) {
     for (SwerveModule module : swerveModules) {
-      module.setVoltage(Volts.of(-volts));
+      module.setCurrent(Amps.of(-amps));
     }
   }
 

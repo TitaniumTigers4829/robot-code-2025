@@ -16,27 +16,34 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.intake.Eject;
+import frc.robot.commands.intake.Intake;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
+import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
+import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
-import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
+import frc.robot.subsystems.swerve.module.PhysicalModule;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.SimulatedVision;
@@ -64,9 +71,8 @@ public class Robot extends LoggedRobot {
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
-  private final AlgaePivotSubsystem algaePivotSubsystem =
-      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+  private final CoralIntakeSubsystem coralIntakeSubsystem;
+  private final AlgaePivotSubsystem algaePivotSubsystem;
 
   private final SimWorld simWorld;
 
@@ -96,20 +102,20 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    switch (Constants.ROBOT_TYPE) {
-      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT:
+    switch (Constants.getMode()) {
+      case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         // Gets data from network tables
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      case SIM_ROBOT:
+      case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
-      default:
+      case REPLAY:
         {
           // Replaying a log, set up replay source
           setUseTiming(false); // Run as fast as possible
@@ -121,24 +127,51 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
-    switch (Constants.ROBOT_TYPE) {
+    switch (Constants.getRobot()) {
       case COMP_ROBOT -> {
         /* Real robot, instantiate hardware IO implementations */
         swerveDrive =
             new SwerveDrive(
                 new PhysicalGyro(),
-                new CompModule(SwerveConstants.moduleConfigs[0]),
-                new CompModule(SwerveConstants.moduleConfigs[1]),
-                new CompModule(SwerveConstants.moduleConfigs[2]),
-                new CompModule(SwerveConstants.moduleConfigs[3]));
+                new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
         elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         simWorld = null;
       }
       case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
-        visionSubsystem = null;
-        elevatorSubsystem = null;
+        /* Real robot, instantiate hardware IO implementations */
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
+        simWorld = null;
+      }
+      case SWERVE_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[3]));
+        visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         simWorld = null;
       }
 
@@ -156,6 +189,8 @@ public class Robot extends LoggedRobot {
         visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
         swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
         elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
+        algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
       }
 
       default -> {
@@ -171,6 +206,10 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {},
                 new ModuleInterface() {});
         elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
+
+        algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
         simWorld = null;
       }
     }
@@ -304,11 +343,18 @@ public class Robot extends LoggedRobot {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+    driverController
+        .b()
+        .whileTrue(
+            new StaticCharacterization(
+                swerveDrive,
+                swerveDrive::runCharacterization,
+                swerveDrive::getCharacterizationVelocity));
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
+    operatorController.b().whileTrue(new Intake(coralIntakeSubsystem));
+    operatorController.y().whileTrue(new Eject(coralIntakeSubsystem));
     operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()

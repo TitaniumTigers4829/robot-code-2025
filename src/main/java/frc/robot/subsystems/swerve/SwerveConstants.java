@@ -5,6 +5,8 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.AquilaConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.DevConstants;
 
 /** Swerve Constants */
 public class SwerveConstants {
@@ -34,52 +36,103 @@ public class SwerveConstants {
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
-    public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 22;
-    public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 24;
-    public static final int REAR_LEFT_DRIVE_MOTOR_ID = 23;
-    public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 21;
+    public static final class AquilaConstants {
+      public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 22;
+      public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 24;
+      public static final int REAR_LEFT_DRIVE_MOTOR_ID = 23;
+      public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 21;
 
-    public static final int FRONT_LEFT_TURN_MOTOR_ID = 5;
-    public static final int FRONT_RIGHT_TURN_MOTOR_ID = 6;
-    public static final int REAR_LEFT_TURN_MOTOR_ID = 8;
-    public static final int REAR_RIGHT_TURN_MOTOR_ID = 7;
+      public static final int FRONT_LEFT_TURN_MOTOR_ID = 5;
+      public static final int FRONT_RIGHT_TURN_MOTOR_ID = 6;
+      public static final int REAR_LEFT_TURN_MOTOR_ID = 8;
+      public static final int REAR_RIGHT_TURN_MOTOR_ID = 7;
 
-    public static final int FRONT_LEFT_CANCODER_ID = 14;
-    public static final int FRONT_RIGHT_CANCODER_ID = 12;
-    public static final int REAR_LEFT_CANCODER_ID = 11;
-    public static final int REAR_RIGHT_CANCODER_ID = 13;
+      public static final int FRONT_LEFT_CANCODER_ID = 14;
+      public static final int FRONT_RIGHT_CANCODER_ID = 12;
+      public static final int REAR_LEFT_CANCODER_ID = 11;
+      public static final int REAR_RIGHT_CANCODER_ID = 13;
 
-    public static final double FRONT_LEFT_ZERO_ANGLE = 0.137939453125;
-    public static final double FRONT_RIGHT_ZERO_ANGLE = -0.420654296875;
-    public static final double REAR_LEFT_ZERO_ANGLE = -0.475341796875;
-    public static final double REAR_RIGHT_ZERO_ANGLE = -0.05078125;
+      public static final double FRONT_LEFT_ZERO_ANGLE = 0.137939453125;
+      public static final double FRONT_RIGHT_ZERO_ANGLE = -0.420654296875;
+      public static final double REAR_LEFT_ZERO_ANGLE = -0.475341796875;
+      public static final double REAR_RIGHT_ZERO_ANGLE = -0.05078125;
 
-    public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
-        SensorDirectionValue.CounterClockwise_Positive;
-    public static final SensorDirectionValue FRONT_RIGHT_CANCODER_REVERSED =
-        SensorDirectionValue.CounterClockwise_Positive;
-    public static final SensorDirectionValue REAR_LEFT_CANCODER_REVERSED =
-        SensorDirectionValue.CounterClockwise_Positive;
-    public static final SensorDirectionValue REAR_RIGHT_CANCODER_REVERSED =
-        SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue FRONT_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
 
-    public static final InvertedValue FRONT_LEFT_TURN_MOTOR_REVERSED =
-        InvertedValue.CounterClockwise_Positive;
-    public static final InvertedValue FRONT_RIGHT_TURN_MOTOR_REVERSED =
-        InvertedValue.CounterClockwise_Positive;
-    public static final InvertedValue REAR_LEFT_TURN_MOTOR_REVERSED =
-        InvertedValue.Clockwise_Positive;
-    public static final InvertedValue REAR_RIGHT_TURN_MOTOR_REVERSED =
-        InvertedValue.Clockwise_Positive;
+      public static final InvertedValue FRONT_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue REAR_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
 
-    public static final InvertedValue FRONT_LEFT_DRIVE_ENCODER_REVERSED =
-        InvertedValue.CounterClockwise_Positive;
-    public static final InvertedValue FRONT_RIGHT_DRIVE_ENCODER_REVERSED =
-        InvertedValue.Clockwise_Positive;
-    public static final InvertedValue REAR_LEFT_DRIVE_ENCODER_REVERSED =
-        InvertedValue.Clockwise_Positive;
-    public static final InvertedValue REAR_RIGHT_DRIVE_ENCODER_REVERSED =
-        InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue FRONT_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+    }
+
+    public static final class DevConstants {
+      public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 6;
+      public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 18;
+      public static final int REAR_LEFT_DRIVE_MOTOR_ID = 23;
+      public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 4;
+
+      public static final int FRONT_LEFT_TURN_MOTOR_ID = 7;
+      public static final int FRONT_RIGHT_TURN_MOTOR_ID = 1;
+      public static final int REAR_LEFT_TURN_MOTOR_ID = 25;
+      public static final int REAR_RIGHT_TURN_MOTOR_ID = 3;
+
+      public static final int FRONT_LEFT_CANCODER_ID = 10;
+      public static final int FRONT_RIGHT_CANCODER_ID = 0;
+      public static final int REAR_LEFT_CANCODER_ID = 11;
+      public static final int REAR_RIGHT_CANCODER_ID = 12;
+
+      public static final double FRONT_LEFT_ZERO_ANGLE = -0.09521484375;
+      public static final double FRONT_RIGHT_ZERO_ANGLE = -0.478271484375;
+      public static final double REAR_LEFT_ZERO_ANGLE = -0.318115234375;
+      public static final double REAR_RIGHT_ZERO_ANGLE = -0.473388671875;
+
+      public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue FRONT_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+
+      public static final InvertedValue FRONT_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.Clockwise_Positive;
+
+      public static final InvertedValue FRONT_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue REAR_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+    }
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
@@ -137,41 +190,79 @@ public class SwerveConstants {
     public static final String THREAD_NAME = "OdometryThread";
   }
 
-  public static final ModuleConfig[] moduleConfigs =
+  public static final ModuleConfig[] aquilaModuleConfigs =
       new ModuleConfig[] {
         new ModuleConfig(
-            DriveConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
-            DriveConstants.FRONT_LEFT_TURN_MOTOR_ID,
-            DriveConstants.FRONT_LEFT_CANCODER_ID,
-            DriveConstants.FRONT_LEFT_ZERO_ANGLE,
-            DriveConstants.FRONT_LEFT_CANCODER_REVERSED,
-            DriveConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
-            DriveConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
+            AquilaConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
+            AquilaConstants.FRONT_LEFT_TURN_MOTOR_ID,
+            AquilaConstants.FRONT_LEFT_CANCODER_ID,
+            AquilaConstants.FRONT_LEFT_ZERO_ANGLE,
+            AquilaConstants.FRONT_LEFT_CANCODER_REVERSED,
+            AquilaConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
+            AquilaConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
         new ModuleConfig(
-            DriveConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
-            DriveConstants.FRONT_RIGHT_TURN_MOTOR_ID,
-            DriveConstants.FRONT_RIGHT_CANCODER_ID,
-            DriveConstants.FRONT_RIGHT_ZERO_ANGLE,
-            DriveConstants.FRONT_RIGHT_CANCODER_REVERSED,
-            DriveConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
-            DriveConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
+            AquilaConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
+            AquilaConstants.FRONT_RIGHT_TURN_MOTOR_ID,
+            AquilaConstants.FRONT_RIGHT_CANCODER_ID,
+            AquilaConstants.FRONT_RIGHT_ZERO_ANGLE,
+            AquilaConstants.FRONT_RIGHT_CANCODER_REVERSED,
+            AquilaConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
+            AquilaConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
         new ModuleConfig(
-            DriveConstants.REAR_LEFT_DRIVE_MOTOR_ID,
-            DriveConstants.REAR_LEFT_TURN_MOTOR_ID,
-            DriveConstants.REAR_LEFT_CANCODER_ID,
-            DriveConstants.REAR_LEFT_ZERO_ANGLE,
-            DriveConstants.REAR_LEFT_CANCODER_REVERSED,
-            DriveConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
-            DriveConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
+            AquilaConstants.REAR_LEFT_DRIVE_MOTOR_ID,
+            AquilaConstants.REAR_LEFT_TURN_MOTOR_ID,
+            AquilaConstants.REAR_LEFT_CANCODER_ID,
+            AquilaConstants.REAR_LEFT_ZERO_ANGLE,
+            AquilaConstants.REAR_LEFT_CANCODER_REVERSED,
+            AquilaConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
+            AquilaConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
         new ModuleConfig(
-            DriveConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
-            DriveConstants.REAR_RIGHT_TURN_MOTOR_ID,
-            DriveConstants.REAR_RIGHT_CANCODER_ID,
-            DriveConstants.REAR_RIGHT_ZERO_ANGLE,
-            DriveConstants.REAR_RIGHT_CANCODER_REVERSED,
-            DriveConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
-            DriveConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
+            AquilaConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
+            AquilaConstants.REAR_RIGHT_TURN_MOTOR_ID,
+            AquilaConstants.REAR_RIGHT_CANCODER_ID,
+            AquilaConstants.REAR_RIGHT_ZERO_ANGLE,
+            AquilaConstants.REAR_RIGHT_CANCODER_REVERSED,
+            AquilaConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
+            AquilaConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
       };
+
+  public static final ModuleConfig[] devModuleConfigs =
+      new ModuleConfig[] {
+        new ModuleConfig(
+            DevConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
+            DevConstants.FRONT_LEFT_TURN_MOTOR_ID,
+            DevConstants.FRONT_LEFT_CANCODER_ID,
+            DevConstants.FRONT_LEFT_ZERO_ANGLE,
+            DevConstants.FRONT_LEFT_CANCODER_REVERSED,
+            DevConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
+            DevConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DevConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
+            DevConstants.FRONT_RIGHT_TURN_MOTOR_ID,
+            DevConstants.FRONT_RIGHT_CANCODER_ID,
+            DevConstants.FRONT_RIGHT_ZERO_ANGLE,
+            DevConstants.FRONT_RIGHT_CANCODER_REVERSED,
+            DevConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
+            DevConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DevConstants.REAR_LEFT_DRIVE_MOTOR_ID,
+            DevConstants.REAR_LEFT_TURN_MOTOR_ID,
+            DevConstants.REAR_LEFT_CANCODER_ID,
+            DevConstants.REAR_LEFT_ZERO_ANGLE,
+            DevConstants.REAR_LEFT_CANCODER_REVERSED,
+            DevConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
+            DevConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            DevConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
+            DevConstants.REAR_RIGHT_TURN_MOTOR_ID,
+            DevConstants.REAR_RIGHT_CANCODER_ID,
+            DevConstants.REAR_RIGHT_ZERO_ANGLE,
+            DevConstants.REAR_RIGHT_CANCODER_REVERSED,
+            DevConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
+            DevConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
+      };
+
+  public static final ModuleConfig[] compModuleConfigs = null;
 
   public record ModuleConfig(
       int driveMotorChannel,
