@@ -1,4 +1,4 @@
-package frc.robot.extras.util;
+package frc.robot.extras.logging;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
