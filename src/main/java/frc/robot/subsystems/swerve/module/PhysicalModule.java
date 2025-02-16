@@ -126,7 +126,7 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        250.0,
+        HardwareConstants.CANIVORE_SIGNAL_FREQUENCY,
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
