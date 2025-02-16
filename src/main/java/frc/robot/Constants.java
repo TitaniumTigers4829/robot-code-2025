@@ -88,7 +88,7 @@ public final class Constants {
   public static final class HardwareConstants {
     public static final double LOOP_TIME_SECONDS = 0.02;
 
-    public static final double STATUS_SIGNAL_FREQUENCY = 50;
+    public static final double STATUS_SIGNAL_FREQUENCY = 250;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";
