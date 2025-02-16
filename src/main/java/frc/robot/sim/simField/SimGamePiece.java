@@ -13,11 +13,10 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.logging.RuntimeLog;
+import frc.robot.extras.math.forces.ProjectileUtil.ProjectileDynamics;
 import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.math.forces.Velocity3d;
-import frc.robot.extras.math.forces.ProjectileUtil.ProjectileDynamics;
 import frc.robot.extras.math.mathutils.GeomUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

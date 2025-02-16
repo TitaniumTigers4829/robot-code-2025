@@ -185,13 +185,13 @@ public class SwerveModule {
 
     // Update tunable numbers
     if (driveS.hasChanged(hashCode()) || driveV.hasChanged(hashCode())) {
-    moduleInterface.setDriveFF(driveS.get(), driveV.get(), 0.0);
+      moduleInterface.setDriveFF(driveS.get(), driveV.get(), 0.0);
     }
     if (driveP.hasChanged(hashCode()) || driveD.hasChanged(hashCode())) {
-    moduleInterface.setDrivePID(driveP.get(), 0, driveD.get());
+      moduleInterface.setDrivePID(driveP.get(), 0, driveD.get());
     }
     if (turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
-    moduleInterface.setTurnPID(turnP.get(), 0, turnD.get());
+      moduleInterface.setTurnPID(turnP.get(), 0, turnD.get());
     }
   }
 }

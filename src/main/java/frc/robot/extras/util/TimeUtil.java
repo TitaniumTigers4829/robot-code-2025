@@ -1,8 +1,7 @@
 package frc.robot.extras.util;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.RobotController;
+import org.littletonrobotics.junction.Logger;
 
 public class TimeUtil {
   /**

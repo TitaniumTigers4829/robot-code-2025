@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.extras.math.regression.MultipleLinearRegression;
 import frc.robot.extras.math.regression.PolynomialRegression;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;

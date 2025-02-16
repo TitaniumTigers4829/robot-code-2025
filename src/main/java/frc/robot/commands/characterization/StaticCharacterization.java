@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.extras.logging.LoggedTunableNumber;
-
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 

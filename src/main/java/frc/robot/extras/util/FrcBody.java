@@ -14,7 +14,6 @@ import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.math.mathutils.GeomUtil;
-
 import org.dyn4j.dynamics.Body;
 
 /** A Dyn4j Body with additional methods for serialization and conversion to WPILib types. */
