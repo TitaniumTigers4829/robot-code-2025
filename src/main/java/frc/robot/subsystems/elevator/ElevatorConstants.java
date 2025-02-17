@@ -40,4 +40,6 @@ public class ElevatorConstants {
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
+
+  public static final double ELEVATOR_FEEDING_STATION_HEIGHT = 0.0;
 }
