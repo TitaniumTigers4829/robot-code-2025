@@ -89,7 +89,7 @@ public class PhysicalElevator implements ElevatorInterface {
     leaderDutyCycle = leaderMotor.getDutyCycle();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        HardwareConstants.STATUS_SIGNAL_FREQUENCY,
+        HardwareConstants.RIO_SIGNAL_FREQUENCY,
         leaderPosition,
         leaderAppliedVoltage,
         followerPosition,

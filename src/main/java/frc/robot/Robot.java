@@ -15,28 +15,36 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.characterization.StaticCharacterization;
+import frc.robot.commands.coralIntake.EjectCoral;
+import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
+import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
+import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
+import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.PhysicalIntake;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
-import frc.robot.subsystems.swerve.module.CompModule;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
+import frc.robot.subsystems.swerve.module.PhysicalModule;
 import frc.robot.subsystems.swerve.module.SimulatedModule;
 import frc.robot.subsystems.vision.PhysicalVision;
 import frc.robot.subsystems.vision.SimulatedVision;
@@ -58,156 +66,33 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
 
-  private final VisionSubsystem visionSubsystem;
-  private final SwerveDrive swerveDrive;
-  private final ElevatorSubsystem elevatorSubsystem;
-
-  private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(new PhysicalIntake());
-  private final AlgaePivotSubsystem algaePivotSubsystem =
-      new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+  private final CommandXboxController operatorController = new CommandXboxController(1);
 
-  private final SimWorld simWorld;
+  private VisionSubsystem visionSubsystem;
+  private SwerveDrive swerveDrive;
+  private ElevatorSubsystem elevatorSubsystem;
+  private CoralIntakeSubsystem coralIntakeSubsystem;
+  private AlgaePivotSubsystem algaePivotSubsystem;
 
-  public AutoFactory autoFactory;
-  public final AutoChooser autoChooser;
-  public Autos autos;
+  private SimWorld simWorld;
+
+  private AutoFactory autoFactory;
+  private AutoChooser autoChooser;
+  private Autos autos;
 
   public Robot() {
-    // Record metadata
-    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-
-    // This tells you if you have uncommitted changes in your project
-    switch (BuildConstants.DIRTY) {
-      case 0:
-        Logger.recordMetadata("GitDirty", "All changes committed");
-        break;
-      case 1:
-        Logger.recordMetadata("GitDirty", "Uncomitted changes");
-        break;
-      default:
-        Logger.recordMetadata("GitDirty", "Unknown");
-        break;
-    }
-
-    // Set up data receivers & replay source
-    switch (Constants.ROBOT_TYPE) {
-      case COMP_ROBOT, DEV_ROBOT, SWERVE_ROBOT:
-        // Running on a real robot, log to a USB stick ("/U/logs")
-        Logger.addDataReceiver(new WPILOGWriter());
-        // Gets data from network tables
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM_ROBOT:
-        // Running a physics simulator, log to NT
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      default:
-        {
-          // Replaying a log, set up replay source
-          setUseTiming(false); // Run as fast as possible
-          String logPath = LogFileUtil.findReplayLog();
-          Logger.setReplaySource(new WPILOGReader(logPath));
-          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-        }
-    }
-
-    // Start AdvantageKit logger
-    Logger.start();
-    switch (Constants.ROBOT_TYPE) {
-      case COMP_ROBOT -> {
-        /* Real robot, instantiate hardware IO implementations */
-        swerveDrive =
-            new SwerveDrive(
-                new PhysicalGyro(),
-                new CompModule(SwerveConstants.moduleConfigs[0]),
-                new CompModule(SwerveConstants.moduleConfigs[1]),
-                new CompModule(SwerveConstants.moduleConfigs[2]),
-                new CompModule(SwerveConstants.moduleConfigs[3]));
-        visionSubsystem = new VisionSubsystem(new PhysicalVision());
-        elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
-        simWorld = null;
-      }
-      case DEV_ROBOT -> {
-        swerveDrive = new SwerveDrive(null, null, null, null, null);
-        visionSubsystem = null;
-        elevatorSubsystem = null;
-        simWorld = null;
-      }
-
-      case SIM_ROBOT -> {
-        /* Sim robot, instantiate physics sim IO implementations */
-        simWorld = new SimWorld();
-        swerveDrive =
-            new SwerveDrive(
-                new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
-                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
-
-        visionSubsystem = new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
-        swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
-        elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
-      }
-
-      default -> {
-        visionSubsystem = new VisionSubsystem(new VisionInterface() {});
-        /* Replayed robot, disable IO implementations */
-
-        /* physics simulations are also not needed */
-        swerveDrive =
-            new SwerveDrive(
-                new GyroInterface() {},
-                new ModuleInterface() {},
-                new ModuleInterface() {},
-                new ModuleInterface() {},
-                new ModuleInterface() {});
-        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
-        simWorld = null;
-      }
-    }
-    autoChooser = new AutoChooser();
-    // this sets up the auto factory
-    autoFactory =
-        new AutoFactory(
-            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
-            (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followCommand =
-                  new FollowSwerveSampleCommand(swerveDrive, visionSubsystem, sample);
-              followCommand.execute();
-              if (swerveDrive.isTrajectoryFinished(sample)) {
-                followCommand.cancel();
-              }
-            }, // A function that follows a choreo trajectory
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
-            swerveDrive); // The drive subsystem
-
-    autos = new Autos(autoFactory);
-
-    autoChooser.addRoutine("Example Auto", () -> autos.exampleAutoRoutine());
-    autoChooser.addRoutine(
-        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> autos.oneMeterTestAutoRoutine());
-    // This updates the auto chooser
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    // This
-    RobotModeTriggers.autonomous().whileTrue(autoChooser.selectedCommandScheduler());
+    checkGit();
+    setupLogging();
+    setupSubsystems();
+    setupAuto();
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
-    // Switch thread to high priority to improve loop timing
-    Threads.setCurrentThreadPriority(true, 99);
+    // Switch thread to high priority and real time to improve loop timing
+    Threads.setCurrentThreadPriority(true, HardwareConstants.HIGH_THREAD_PRIORITY);
 
     // Runs the Scheduler. This is responsible for polling buttons, adding
     // newly-scheduled commands, running already-scheduled commands, removing
@@ -216,8 +101,8 @@ public class Robot extends LoggedRobot {
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    // Return to normal thread priority
-    Threads.setCurrentThreadPriority(false, 10);
+    // Return to normal thread priority without real time
+    Threads.setCurrentThreadPriority(false, HardwareConstants.LOW_THREAD_PRIORITY);
   }
 
   /** This function is called once when the robot is disabled. */
@@ -247,8 +132,6 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     configureDriverController();
     configureOperatorController();
-
-    swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose());
   }
 
   private void configureDriverController() {
@@ -304,15 +187,194 @@ public class Robot extends LoggedRobot {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+    driverController
+        .b()
+        .whileTrue(
+            new StaticCharacterization(
+                swerveDrive,
+                swerveDrive::runCharacterizationCurrent,
+                swerveDrive::getCharacterizationVelocity));
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(Commands.none());
-    operatorController.y().whileTrue(Commands.none());
+    operatorController.b().whileTrue(new IntakeCoral(coralIntakeSubsystem));
+    operatorController.y().whileTrue(new EjectCoral(coralIntakeSubsystem));
     operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+  }
+
+  private void checkGit() {
+    // Record metadata
+    Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+    Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+    Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+    Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+    Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
+    // This tells you if you have uncommitted changes in your project
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        Logger.recordMetadata("GitDirty", "All changes committed");
+        break;
+      case 1:
+        Logger.recordMetadata("GitDirty", "Uncomitted changes");
+        break;
+      default:
+        Logger.recordMetadata("GitDirty", "Unknown");
+        break;
+    }
+  }
+
+  private void setupLogging() {
+    // Set up data receivers & replay source
+    switch (Constants.getMode()) {
+      case REAL:
+        // Running on a real robot, log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter());
+        // Gets data from network tables
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case SIM:
+        // Running a physics simulator, log to NT
+        Logger.addDataReceiver(new NT4Publisher());
+        break;
+
+      case REPLAY:
+        {
+          // Replaying a log, set up replay source
+          setUseTiming(false); // Run as fast as possible
+          String logPath = LogFileUtil.findReplayLog();
+          Logger.setReplaySource(new WPILOGReader(logPath));
+          Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        }
+    }
+
+    // Start AdvantageKit logger
+    Logger.start();
+  }
+
+  private void setupSubsystems() {
+    switch (Constants.getRobot()) {
+      case COMP_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        this.swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.compModuleConfigs[3]));
+        this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
+        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        this.simWorld = null;
+      }
+      case DEV_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        this.swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.devModuleConfigs[3]));
+        this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
+        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
+        this.simWorld = null;
+      }
+      case SWERVE_ROBOT -> {
+        /* Real robot, instantiate hardware IO implementations */
+        this.swerveDrive =
+            new SwerveDrive(
+                new PhysicalGyro(),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[0]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[1]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[2]),
+                new PhysicalModule(SwerveConstants.aquilaModuleConfigs[3]));
+        this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
+        this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+        this.simWorld = null;
+      }
+
+      case SIM_ROBOT -> {
+        /* Sim robot, instantiate physics sim IO implementations */
+        this.simWorld = new SimWorld();
+        this.swerveDrive =
+            new SwerveDrive(
+                new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
+                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
+
+        this.visionSubsystem =
+            new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
+        this.swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
+        this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
+        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
+      }
+
+      default -> {
+        this.visionSubsystem = new VisionSubsystem(new VisionInterface() {});
+        /* Replayed robot, disable IO implementations */
+
+        /* physics simulations are also not needed */
+        this.swerveDrive =
+            new SwerveDrive(
+                new GyroInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {},
+                new ModuleInterface() {});
+        this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
+
+        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+
+        this.simWorld = null;
+      }
+    }
+  }
+
+  private void setupAuto() {
+    this.autoChooser = new AutoChooser();
+    // this sets up the auto factory
+    this.autoFactory =
+        new AutoFactory(
+            this.swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            this.swerveDrive
+                ::resetEstimatedPose, // A function that resets the current robot pose to the
+            (SwerveSample sample) -> {
+              FollowSwerveSampleCommand followCommand =
+                  new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
+              followCommand.execute();
+              if (this.swerveDrive.isTrajectoryFinished(sample)) {
+                followCommand.cancel();
+              }
+            }, // A function that follows a choreo trajectory
+            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            this.swerveDrive); // The drive subsystem
+
+    this.autos = new Autos(autoFactory);
+
+    this.autoChooser.addRoutine("Example Auto", () -> this.autos.exampleAutoRoutine());
+    this.autoChooser.addRoutine(
+        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
+    // This updates the auto chooser
+    SmartDashboard.putData("Auto Chooser", this.autoChooser);
+
+    // This
+    RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
   }
 
   /** This function is called periodically during operator control. */

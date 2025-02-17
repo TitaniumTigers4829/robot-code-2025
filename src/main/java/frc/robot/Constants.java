@@ -5,29 +5,80 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
+  private static RobotType robotType = RobotType.SIM_ROBOT;
+  public static final boolean tuningMode = false;
 
-  public static final class LogPaths {
-    public static final String SYSTEM_PERFORMANCE_PATH = "SystemPerformance/";
-    public static final String PHYSICS_SIMULATION_PATH = "MaplePhysicsSimulation/";
-    public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
+  /**
+   * Gets if the robot type is valid, if not it will default to COMP_ROBOT
+   *
+   * @return the currently used RobotType
+   */
+  @SuppressWarnings("resource")
+  public static RobotType getRobot() {
+    if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+          .set(true);
+      robotType = RobotType.COMP_ROBOT;
+    }
+    return robotType;
   }
 
-  public static final RobotType ROBOT_TYPE = RobotType.SIM_ROBOT;
+  /**
+   * Gets the mode of the robot based on the RobotType and the state of {@link RobotBase}, if the
+   * robot isn't real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
+   *
+   * @return the currently used Mode
+   */
+  public static Mode getMode() {
+    return switch (robotType) {
+      case DEV_ROBOT, COMP_ROBOT, SWERVE_ROBOT -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case SIM_ROBOT -> Mode.SIM;
+    };
+  }
 
-  public static enum RobotType {
+  /** An enum to select the robot's mode. */
+  public enum Mode {
     /** Running on a real robot. */
-    COMP_ROBOT,
+    REAL,
 
     /** Running a physics simulator. */
-    SIM_ROBOT,
+    SIM,
 
     /** Replaying from a log file. */
-    DEV_ROBOT,
+    REPLAY
+  }
 
-    /** Running the swerve robot. */
+  /** An enum to select the currently used robot. */
+  public enum RobotType {
+    SIM_ROBOT,
+    DEV_ROBOT,
+    COMP_ROBOT,
     SWERVE_ROBOT
+  }
+
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (robotType == RobotType.SIM_ROBOT) {
+        System.err.println("Cannot deploy, invalid robot selected: " + robotType);
+        System.exit(1);
+      }
+    }
+  }
+
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (robotType != RobotType.DEV_ROBOT || tuningMode) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
   }
 
   /**
@@ -35,9 +86,10 @@ public final class Constants {
    * singular subsystem.
    */
   public static final class HardwareConstants {
-    public static final double TIMEOUT_S = 0.02;
+    public static final double LOOP_TIME_SECONDS = 0.02;
 
-    public static final double STATUS_SIGNAL_FREQUENCY = 50;
+    public static final double RIO_SIGNAL_FREQUENCY = 100;
+    public static final double CANIVORE_SIGNAL_FREQUENCY = 250;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";
@@ -48,6 +100,9 @@ public final class Constants {
      * the lowest possible value.
      */
     public static final double MIN_FALCON_DEADBAND = 0.001;
+
+    public static final int HIGH_THREAD_PRIORITY = 99;
+    public static final int LOW_THREAD_PRIORITY = 1;
   }
 
   /**
