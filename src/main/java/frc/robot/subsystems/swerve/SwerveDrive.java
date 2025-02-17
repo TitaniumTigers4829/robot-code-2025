@@ -278,12 +278,14 @@ public class SwerveDrive extends SubsystemBase {
   public void followSwerveSample(SwerveSample sample) {
     if (sample != null) {
       Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
+      double moveX = sample.vx - xChoreoController.calculate(pose.getX(), sample.x);
+      double moveY = sample.vy - yChoreoController.calculate(pose.getY(), sample.y);
       double moveTheta =
-          -sample.omega
-              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
+          sample.omega
+              - rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
       drive(moveX, moveY, moveTheta, true);
+    } else {
+      drive(0, 0, 0, true);
     }
   }
 
@@ -291,8 +293,12 @@ public class SwerveDrive extends SubsystemBase {
    * @return if the robot is at the desired swerveSample
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xChoreoController.getGoal().position
-        && swerveSample.y < yChoreoController.getGoal().position;
+    return swerveSample.x - xChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE
+        && swerveSample.y - yChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE
+        && swerveSample.heading - rotationChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE;
   }
 
   /** Runs the SwerveModules periodic methods */

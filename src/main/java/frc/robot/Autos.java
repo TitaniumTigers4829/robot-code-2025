@@ -3,7 +3,9 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.AutoConstants;
 
 public class Autos {
@@ -22,6 +24,9 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
                 oneMeterTrajectory.cmd()));
+    oneMeterTrajectory
+        .done()
+        .onTrue(new RunCommand(() -> SmartDashboard.putBoolean("Trajectory Done", true)));
     return routine;
   }
 

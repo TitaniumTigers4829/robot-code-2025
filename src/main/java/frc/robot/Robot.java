@@ -117,6 +117,8 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    SmartDashboard.putBoolean("Trajectory Done", false);
+
     swerveDrive.resetEstimatedPose(
         new Pose2d(
             swerveDrive.getEstimatedPose().getX(),
@@ -348,6 +350,8 @@ public class Robot extends LoggedRobot {
   }
 
   private void setupAuto() {
+    SmartDashboard.putBoolean("Trajectory Done", false);
+
     this.autoChooser = new AutoChooser();
     // this sets up the auto factory
     this.autoFactory =

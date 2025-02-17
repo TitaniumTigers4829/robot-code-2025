@@ -416,22 +416,22 @@ public final class Constants {
 
     // These used to be in Trajectory Constants
 
-    public static final double MAX_AUTO_SPEED = 5.0;
-    public static final double MAX_AUTO_ACCELERATION = 3;
+    public static final double MAX_AUTO_SPEED = 1.0;
+    public static final double MAX_AUTO_ACCELERATION = 1;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = .5; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = 25; // 1.7
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
-    public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
+    public static final double CHOREO_AUTO_TRANSLATION_D = 1.0;
+    public static final double CHOREO_AUTO_THETA_P = 25; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
-    public static final double CHOREO_AUTO_THETA_D = 0.0;
+    public static final double CHOREO_AUTO_THETA_D = 0;
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 1;
 
-    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.01;
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.05;
 
     public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
 
