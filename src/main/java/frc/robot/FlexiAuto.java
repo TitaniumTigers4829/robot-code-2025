@@ -41,7 +41,8 @@ public class FlexiAuto {
     AutoTrajectory rightPickupToB = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_B_TRAJECTORY);
     AutoTrajectory rightPickupToC = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
     AutoTrajectory rightPickupToD = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_D_TRAJECTORY);
-    AutoTrajectory rightPickupToE = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_E_TRAJECTORY);
+    // AutoTrajectory rightPickupToE =
+    // routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_E_TRAJECTORY);
 
     // TODO: logic
     routine
