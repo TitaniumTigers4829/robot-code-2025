@@ -9,7 +9,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-
 /** Add your docs here. */
 public class PhysicalFlywheel implements FlywheelInterface {
   private VoltageOut voltageOut = new VoltageOut(0.0);

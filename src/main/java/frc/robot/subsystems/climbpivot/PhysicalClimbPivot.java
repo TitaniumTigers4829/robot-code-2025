@@ -4,19 +4,14 @@
 
 package frc.robot.subsystems.climbpivot;
 
-import java.util.Queue;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.swerve.module.ModuleInterface;
+
 
 /** Add your docs here. */
 public class PhysicalClimbPivot implements ClimbPivotInterface {
@@ -25,20 +20,9 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
 
   private final StatusSignal<Voltage> climbMotorAppliedVoltage;
-  private final Queue<Angle> climbMotorAngle;
-
-
-
-
-
+  private final StatusSignal<Angle> climbMotorAngle;
 
   public PhysicalClimbPivot() {
-    climbMotorAppliedVoltage = climbMotor.getMotorVoltage();
-    climbMotorAngle = climbMotor.getClimbPivotPosition;
-
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0);
-      climbMotor.optimizeBusUtilization();
-    
     config.Slot0.kP = PivotConstants.CLIMB_PIVOT_P;
     config.Slot0.kI = PivotConstants.CLIMB_PIVOT_I;
     config.Slot0.kD = PivotConstants.CLIMB_PIVOT_D;
@@ -48,12 +32,18 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
     config.Slot0.kA = PivotConstants.FF_CLIMB_PIVOT_V;
 
     climbMotor.getConfigurator().apply(config);
+
+    climbMotorAppliedVoltage = climbMotor.getMotorVoltage();
+    climbMotorAngle = climbMotor.getPosition();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0);
+    climbMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ClimbPivotInputs inputs) {
-    inputs.position = getClimbPivotPosition();
-    inputs.climbPivotAppliedVolts = climbMotor.getMotorVoltage().getValueAsDouble();
+    inputs.position = climbMotorAngle.getValueAsDouble();
+    inputs.currentVolts = climbMotorAppliedVoltage.getValueAsDouble();
   }
 
   @Override
@@ -64,5 +54,14 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   @Override
   public double getClimbPivotPosition() {
     return climbMotor.getPosition().getValueAsDouble();
+  }
+
+  public double getVolts() {
+    return climbMotor.getMotorVoltage().getValueAsDouble();
+  }
+
+  // cocaine
+  public void setVolts(double volts) {
+    climbMotor.setVoltage(volts);
   }
 }

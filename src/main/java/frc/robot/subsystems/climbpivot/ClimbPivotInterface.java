@@ -19,6 +19,8 @@ public interface ClimbPivotInterface {
 
     /** The voltage currently applied to the climb pivot motor (in volts). */
     public double climbPivotAppliedVolts = 0.0;
+
+    public Object currentVolts;
   }
 
   /**
