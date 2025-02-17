@@ -37,23 +37,27 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setVolts(volts);
   }
 
+  public void setPercentOutput(double output){
+    elevatorInterface.setPercentOutput(output);
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);
     Logger.processInputs("Elevator/", inputs);
   }
 
-  private Command ManualElevator(DoubleSupplier joystickY){
+  public Command ManualElevator(DoubleSupplier joystickY){
     return new StartEndCommand(
       //does this while command is active
-      () -> this.setVolts(joystickY.getAsDouble()), 
+      () -> this.setPercentOutput(joystickY.getAsDouble()), 
       //does this when command ends
-      () -> this.setVolts(0),
+      () -> this.setPercentOutput(0),
       //requirements for command
        this);
   }
 
-  private Command SetElevationPosition(double position){
+  public Command SetElevationPosition(double position){
     return new StartEndCommand(
       //does this while command is active
       () -> this.setElevatorPosition(position), 

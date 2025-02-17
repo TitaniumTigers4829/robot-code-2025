@@ -30,12 +30,13 @@ public class AlgaePivotSubsystem extends SubsystemBase {
     algaePivotInterface.setAlgaeVoltage(voltage);
   }
 
+  @Override
   public void periodic() {
     algaePivotInterface.updateInputs(inputs);
     Logger.processInputs("AlgaePivotSubsystem/", inputs);
   }
 
-  private Command manualAlgaePivot(DoubleSupplier speed) {
+  public Command manualAlgaePivot(DoubleSupplier speed) {
     return new StartEndCommand(
       //does this on start
       () -> this.setAlgaeSpeed(speed.getAsDouble()),
@@ -45,7 +46,7 @@ public class AlgaePivotSubsystem extends SubsystemBase {
       this);
   }
 
-  private Command setAlgaePivotWithPID(){
+  public Command setAlgaePivotWithPID(){
     return new StartEndCommand(
       //does this on start
       () -> this.setAlgaeAngle(AlgaeConstants.ALGAE_PIVOT_ANGLE),

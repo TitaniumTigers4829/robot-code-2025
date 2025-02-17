@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
     Logger.processInputs("IntakeSubsystem/", inputs);
   }
 
-  private Command Intake(){
+  public Command Intake(){
     return new StartEndCommand(
       //sets speed while command is active
       () -> this.setIntakeSpeed(IntakeConstants.INTAKE_SPEED), 
@@ -37,7 +37,7 @@ public class IntakeSubsystem extends SubsystemBase {
       this);
   }
 
-  private Command Eject(){
+  public Command Eject(){
     return new StartEndCommand(
       //sets speed while command is active
       () -> this.setIntakeSpeed(IntakeConstants.EJECT_SPEED), 

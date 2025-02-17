@@ -144,4 +144,10 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getVolts() {
     return leaderAppliedVoltage.getValueAsDouble();
   }
+
+  @Override
+  public void setPercentOutput(double output){
+    leaderMotor.set(output);
+    followerMotor.set(output);
+  }
 }
