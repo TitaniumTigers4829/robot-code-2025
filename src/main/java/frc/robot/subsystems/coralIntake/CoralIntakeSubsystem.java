@@ -10,21 +10,35 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
-  private CoralIntakeInterface intakeInterface;
-  private CoralIntakeInputsAutoLogged inputs = new CoralIntakeInputsAutoLogged();
+  private CoralIntakeInterface coralIntakeInterface;
+  private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
 
-  public CoralIntakeSubsystem(CoralIntakeInterface intakeInterface) {
-    this.intakeInterface = intakeInterface;
+  public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
+    this.coralIntakeInterface = coralIntakeInterface;
   }
 
+  /**
+   * Sets the intake to a desired speed
+   *
+   * @param speed the speed to set.
+   */
   public void setIntakeSpeed(double speed) {
-    intakeInterface.setIntakeSpeed(speed);
+    coralIntakeInterface.setIntakeSpeed(speed);
+  }
+
+  /**
+   * Checks if the coral intake has a coral or not
+   *
+   * @return true if the intake contains a coral game piece.
+   */
+  public boolean hasCoral() {
+    return coralIntakeInputs.hasCoral;
   }
 
   @Override
   public void periodic() {
-    intakeInterface.updateInputs(inputs);
-    Logger.processInputs("IntakeSubsystem/", inputs);
+    coralIntakeInterface.updateInputs(coralIntakeInputs);
+    Logger.processInputs("CoralIntakeSubsystem/", coralIntakeInputs);
   }
 
   public Command Intake(){

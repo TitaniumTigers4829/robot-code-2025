@@ -34,4 +34,10 @@ public interface ElevatorInterface {
   public default double getVolts() {
     return 0.0;
   }
+
+  public default void openLoop(double output) {}
+
+  public default void setPID(double kP, double kI, double kD) {}
+
+  public default void setFF(double kS, double kV, double kA, double kG) {}
 }
