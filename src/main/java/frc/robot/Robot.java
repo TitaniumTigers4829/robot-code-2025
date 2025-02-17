@@ -80,6 +80,7 @@ public class Robot extends LoggedRobot {
   private AutoFactory autoFactory;
   private AutoChooser autoChooser;
   private Autos autos;
+  private FlexiAuto flexiAuto;
 
   public Robot() {
     checkGit();
@@ -366,10 +367,13 @@ public class Robot extends LoggedRobot {
             this.swerveDrive); // The drive subsystem
 
     this.autos = new Autos(autoFactory);
+    this.flexiAuto = new FlexiAuto(autoFactory);
 
     this.autoChooser.addRoutine("Example Auto", () -> this.autos.exampleAutoRoutine());
     this.autoChooser.addRoutine(
         AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
+        this.autoChooser.addRoutine(
+            AutoConstants.FLEXIBLE_AUTO_ROUTINE, () -> this.flexiAuto.flexiAutoRoutine());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
