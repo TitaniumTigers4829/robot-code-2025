@@ -53,10 +53,10 @@ public class SwerveModule {
     }
   }
 
-  public SwerveModule(ModuleInterface io, String name) {
-    this.moduleInterface = io;
-    this.moduleName = name;
-    this.hardwareFaultAlert = new Alert("Module-" + name + " Hardware Fault", AlertType.kError);
+  public SwerveModule(ModuleInterface moduleInterface, String moduleName) {
+    this.moduleInterface = moduleInterface;
+    this.moduleName = moduleName;
+    this.hardwareFaultAlert = new Alert("Module-" + moduleName + " Hardware Fault", AlertType.kError);
     this.hardwareFaultAlert.set(false);
   }
 
