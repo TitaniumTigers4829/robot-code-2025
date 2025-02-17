@@ -22,11 +22,12 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author Jack
  * @author Ishan
  * @author Max
- * @author Carsonish
+ * @author Better Max
+ * @author Carson
  */
 public class PhysicalVision implements VisionInterface {
-  public static final double HORIZONTAL_ANGLE_TO_TARGET = LimelightHelpers.getTX("idk whatto put");//hmmm
-  public static final double VERTICAL_ANGLE_TO_TARGET = LimelightHelpers.getTY("idkwhattoputhere"); //idk how to set the target which it finds its angle from
+  // public double HORIZONTAL_TX_TO_TARGET; //hmmm
+  // public double VERTICAL_TX_TO_TARGET; //idk how to set the target which it finds its angle from
   private Pose2d odometryPose = new Pose2d();
   private double headingDegrees = 0;
   private double headingRateDegreesPerSecond = 0;
@@ -118,6 +119,35 @@ public class PhysicalVision implements VisionInterface {
     }
     // To be safe returns a big distance from the april tags if it can't see any
     return Double.MAX_VALUE;
+  }
+
+  @Override
+  public double getDistanceToTargetTrig(Limelight limelight) {
+    double limelightHeight;
+    double limelightAngle;
+
+    switch (limelight.getName()) {
+      case VisionConstants.BACK_LIMELIGHT_NAME:
+        limelightHeight = VisionConstants.BACK_TRANSFORM.getZ();
+        limelightAngle = VisionConstants.BACK_TRANSFORM.getRotation().getAngle();
+        break;
+      case VisionConstants.FRONT_LEFT_LIMELIGHT_NAME:
+        limelightHeight = VisionConstants.FRONT_LEFT_TRANSFORM.getZ();
+        limelightAngle = VisionConstants.FRONT_LEFT_TRANSFORM.getRotation().getAngle();
+        break;
+      case VisionConstants.FRONT_RIGHT_LIMELIGHT_NAME:
+        limelightHeight = VisionConstants.FRONT_RIGHT_TRANSFORM.getZ();
+        limelightAngle = VisionConstants.FRONT_RIGHT_TRANSFORM.getRotation().getAngle();
+        break;
+      default:
+        limelightHeight = 0.0;
+        limelightAngle = 0.0;
+        break;
+    }
+    double height =
+        LimelightHelpers.getCameraPose3d_TargetSpace(limelight.getName()).getZ() - limelightHeight;
+    double angle = limelightAngle + LimelightHelpers.getTY(limelight.getName());
+    return height / Math.tan(angle);
   }
 
   @Override

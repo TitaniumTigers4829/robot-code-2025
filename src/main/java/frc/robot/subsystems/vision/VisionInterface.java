@@ -105,6 +105,16 @@ public interface VisionInterface {
   }
 
   /**
+   * Gets the distance from a specified limelight to the target it sees using trigonometry.
+   *
+   * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return distance to the target in meters
+   */
+  default double getDistanceToTargetTrig(Limelight limelight) {
+    return 0.0;
+  }
+
+  /**
    * Gets how many april tags the limelight can see.
    *
    * @param limelight a limelight (BACK, FRONT_LEFT, FRONT_RIGHT).

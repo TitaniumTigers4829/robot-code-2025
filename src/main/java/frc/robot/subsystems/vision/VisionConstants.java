@@ -6,8 +6,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.extras.vision.LimelightHelpers;
-
 import org.photonvision.PhotonCamera;
 
 // import org.photonvision.PhotonCamera;
@@ -120,9 +118,4 @@ public final class VisionConstants {
     {8, 0.5, 0.5, Units.degreesToRadians(180000)}, // 90
     {10, 10.0, 10.0, Units.degreesToRadians(180000)} // 90
   };
-  //trig shit
-
-  public static final double VERTICAL_ANGLE_FROM_MOUNT = 69.0;
-  public static final double TARGET_HEIGHT =  69.0;
-
 }
