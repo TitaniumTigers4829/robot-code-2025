@@ -192,7 +192,7 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             new StaticCharacterization(
                 swerveDrive,
-                swerveDrive::runCharacterization,
+                swerveDrive::runCharacterizationCurrent,
                 swerveDrive::getCharacterizationVelocity));
   }
 

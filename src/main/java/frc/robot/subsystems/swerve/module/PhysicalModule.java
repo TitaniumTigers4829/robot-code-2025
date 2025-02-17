@@ -47,12 +47,12 @@ public class PhysicalModule implements ModuleInterface {
   private final StatusSignal<AngularVelocity> turnEncoderVelocity;
   private final StatusSignal<Voltage> turnMotorAppliedVolts;
   private final StatusSignal<Current> turnMotorCurrent;
-
-  TalonFXConfiguration driveConfig;
-  TalonFXConfiguration turnConfig;
-
   private final StatusSignal<Current> turnMotorTorqueCurrent;
   private final StatusSignal<Double> turnMotorReference;
+
+  private final TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+  private final TalonFXConfiguration turnConfig = new TalonFXConfiguration();
+  private final CANcoderConfiguration turnEncoderConfig = new CANcoderConfiguration();
 
   public PhysicalModule(ModuleConfig moduleConfig) {
     driveMotor =
@@ -62,22 +62,13 @@ public class PhysicalModule implements ModuleInterface {
     turnEncoder =
         new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
 
-    CANcoderConfiguration turnEncoderConfig = new CANcoderConfiguration();
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
     turnEncoder.getConfigurator().apply(turnEncoderConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
-    driveConfig = new TalonFXConfiguration();
-    // driveConfig.Slot0.kP = ModuleConstants.DRIVE_P;
-    // driveConfig.Slot0.kI = ModuleConstants.DRIVE_I;
-    // driveConfig.Slot0.kD = ModuleConstants.DRIVE_D;
-    // driveConfig.Slot0.kS = ModuleConstants.DRIVE_S;
-    // driveConfig.Slot0.kV = ModuleConstants.DRIVE_V;
-    // driveConfig.Slot0.kA = ModuleConstants.DRIVE_A;
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
     driveConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
-    // driveConfig/
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimit = ModuleConstants.DRIVE_STATOR_LIMIT;
@@ -85,13 +76,6 @@ public class PhysicalModule implements ModuleInterface {
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
-    turnConfig = new TalonFXConfiguration();
-    // turnConfig.Slot0.kP = ModuleConstants.TURN_P;
-    // turnConfig.Slot0.kI = ModuleConstants.TURN_I;
-    // turnConfig.Slot0.kD = ModuleConstants.TURN_D;
-    // turnConfig.Slot0.kS = ModuleConstants.TURN_S;
-    // turnConfig.Slot0.kV = ModuleConstants.TURN_V;
-    // turnConfig.Slot0.kA = ModuleConstants.TURN_A;
     turnConfig.Feedback.FeedbackRemoteSensorID = turnEncoder.getDeviceID();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     turnConfig.Feedback.SensorToMechanismRatio = 1.0;

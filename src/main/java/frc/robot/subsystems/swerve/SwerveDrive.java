@@ -203,12 +203,23 @@ public class SwerveDrive extends SubsystemBase {
         VecBuilder.fill(xStandardDeviation, yStandardDeviation, thetaStandardDeviation));
   }
 
-  /**
+   /**
    * Runs characterization on voltage
    *
-   * @param volts voltage to set
+   * @param volts current to set
    */
-  public void runCharacterization(double amps) {
+  public void runCharacterizationVoltage(double volts) {
+    for (SwerveModule module : swerveModules) {
+      module.setVoltage(Volts.of(-volts));
+    }
+  }
+
+  /**
+   * Runs characterization on current
+   *
+   * @param amps current to set
+   */
+  public void runCharacterizationCurrent(double amps) {
     for (SwerveModule module : swerveModules) {
       module.setCurrent(Amps.of(-amps));
     }
