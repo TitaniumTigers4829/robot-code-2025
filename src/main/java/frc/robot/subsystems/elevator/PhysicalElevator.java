@@ -11,7 +11,6 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -68,12 +67,10 @@ public class PhysicalElevator implements ElevatorInterface {
 
     elevatorConfig.Feedback.SensorToMechanismRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
-
     leaderMotor.getConfigurator().apply(elevatorConfig);
 
     elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
-
 
     leaderPosition = leaderMotor.getPosition();
     leaderAppliedVoltage = leaderMotor.getMotorVoltage();
@@ -90,7 +87,6 @@ public class PhysicalElevator implements ElevatorInterface {
         followerAppliedVoltage,
         leaderDutyCycle,
         followerDutyCycle);
-
   }
 
   @Override
@@ -137,26 +133,26 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public void openLoop(double output) {
-      leaderMotor.setControl(dutyCyleOut.withOutput(output));
-      followerMotor.setControl(dutyCyleOut.withOutput(output));
+    leaderMotor.setControl(dutyCyleOut.withOutput(output));
+    followerMotor.setControl(dutyCyleOut.withOutput(output));
   }
 
   @Override
   public void setPID(double kP, double kI, double kD) {
-      elevatorConfig.Slot0.kP = kP;
-      elevatorConfig.Slot0.kI = kI;
-      elevatorConfig.Slot0.kD = kD;
-      leaderMotor.getConfigurator().apply(elevatorConfig);
-      followerMotor.getConfigurator().apply(elevatorConfig);
+    elevatorConfig.Slot0.kP = kP;
+    elevatorConfig.Slot0.kI = kI;
+    elevatorConfig.Slot0.kD = kD;
+    leaderMotor.getConfigurator().apply(elevatorConfig);
+    followerMotor.getConfigurator().apply(elevatorConfig);
   }
 
   @Override
   public void setFF(double kS, double kV, double kA, double kG) {
-      elevatorConfig.Slot0.kS = kS;
-      elevatorConfig.Slot0.kV = kV;
-      elevatorConfig.Slot0.kA = kA;
-      elevatorConfig.Slot0.kG = kG;
-      leaderMotor.getConfigurator().apply(elevatorConfig);
-      followerMotor.getConfigurator().apply(elevatorConfig);
+    elevatorConfig.Slot0.kS = kS;
+    elevatorConfig.Slot0.kV = kV;
+    elevatorConfig.Slot0.kA = kA;
+    elevatorConfig.Slot0.kG = kG;
+    leaderMotor.getConfigurator().apply(elevatorConfig);
+    followerMotor.getConfigurator().apply(elevatorConfig);
   }
 }

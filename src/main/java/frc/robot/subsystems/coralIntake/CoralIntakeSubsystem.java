@@ -17,7 +17,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   /**
    * Sets the intake to a desired speed
-   * 
+   *
    * @param speed the speed to set.
    */
   public void setIntakeSpeed(double speed) {
@@ -26,7 +26,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   /**
    * Checks if the coral intake has a coral or not
-   * 
+   *
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {

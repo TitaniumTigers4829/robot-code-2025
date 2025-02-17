@@ -7,24 +7,27 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.extras.logging.LoggedTunableNumber;
-import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
-
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private ElevatorInterface elevatorInterface;
   private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
 
+  private static final LoggedTunableNumber elevatorS =
+      new LoggedTunableNumber("Elevator/ElevatorS");
+  private static final LoggedTunableNumber elevatorV =
+      new LoggedTunableNumber("Elevator/ElevatorV");
+  private static final LoggedTunableNumber elevatorA =
+      new LoggedTunableNumber("Elevator/ElevatorA");
+  private static final LoggedTunableNumber elevatorG =
+      new LoggedTunableNumber("Elevator/ElevatorG");
+  private static final LoggedTunableNumber elevatorP =
+      new LoggedTunableNumber("Elevator/ElevatorP");
+  private static final LoggedTunableNumber elevatorI =
+      new LoggedTunableNumber("Elevator/ElevatorI");
+  private static final LoggedTunableNumber elevatorD =
+      new LoggedTunableNumber("Elevator/ElevatorD");
 
-  private static final LoggedTunableNumber elevatorS = new LoggedTunableNumber("Elevator/ElevatorS");
-  private static final LoggedTunableNumber elevatorV = new LoggedTunableNumber("Elevator/ElevatorV");
-  private static final LoggedTunableNumber elevatorA = new LoggedTunableNumber("Elevator/ElevatorA");
-  private static final LoggedTunableNumber elevatorG = new LoggedTunableNumber("Elevator/ElevatorG");
-  private static final LoggedTunableNumber elevatorP = new LoggedTunableNumber("Elevator/ElevatorP");
-  private static final LoggedTunableNumber elevatorI = new LoggedTunableNumber("Elevator/ElevatorI");
-  private static final LoggedTunableNumber elevatorD = new LoggedTunableNumber("Elevator/ElevatorD");
-
-  
   static {
     switch (Constants.getRobot()) {
       case COMP_ROBOT, DEV_ROBOT -> {
@@ -78,12 +81,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.updateInputs(inputs);
     Logger.processInputs("Elevator/", inputs);
 
-    
     // Update tunable numbers
-    if (elevatorS.hasChanged(hashCode()) || elevatorV.hasChanged(hashCode()) || elevatorA.hasChanged(hashCode()) || elevatorG.hasChanged(hashCode())) {
+    if (elevatorS.hasChanged(hashCode())
+        || elevatorV.hasChanged(hashCode())
+        || elevatorA.hasChanged(hashCode())
+        || elevatorG.hasChanged(hashCode())) {
       elevatorInterface.setFF(elevatorS.get(), elevatorV.get(), elevatorA.get(), elevatorG.get());
     }
-    if (elevatorP.hasChanged(hashCode()) || elevatorI.hasChanged(hashCode()) || elevatorD.hasChanged(hashCode())) {
+    if (elevatorP.hasChanged(hashCode())
+        || elevatorI.hasChanged(hashCode())
+        || elevatorD.hasChanged(hashCode())) {
       elevatorInterface.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
   }

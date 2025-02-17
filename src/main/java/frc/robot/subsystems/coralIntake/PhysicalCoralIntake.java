@@ -6,8 +6,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
-
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -50,14 +48,30 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeSupplyCurrent = coralIntakeMotor.getSupplyCurrent();
     intakeTemperatureCelsius = coralIntakeMotor.getDeviceTemp();
     intakeAppliedVolts = coralIntakeMotor.getMotorVoltage();
-    BaseStatusSignal.setUpdateFrequencyForAll(HardwareConstants.RIO_SIGNAL_FREQUENCY, intakeVelocity, intakePosition, intakeStatorCurrent, intakeStatorCurrent, intakeSupplyCurrent, intakeTemperatureCelsius, intakeTemperatureCelsius, intakeAppliedVolts);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.RIO_SIGNAL_FREQUENCY,
+        intakeVelocity,
+        intakePosition,
+        intakeStatorCurrent,
+        intakeStatorCurrent,
+        intakeSupplyCurrent,
+        intakeTemperatureCelsius,
+        intakeTemperatureCelsius,
+        intakeAppliedVolts);
     coralIntakeMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(CoralIntakeInputs intakeInputs) {
     BaseStatusSignal.refreshAll(intakeVelocity);
-    intakeInputs.isConnected = BaseStatusSignal.isAllGood(intakeVelocity, intakeStatorCurrent, intakeSupplyCurrent, intakeTemperatureCelsius, intakePosition, intakeAppliedVolts);
+    intakeInputs.isConnected =
+        BaseStatusSignal.isAllGood(
+            intakeVelocity,
+            intakeStatorCurrent,
+            intakeSupplyCurrent,
+            intakeTemperatureCelsius,
+            intakePosition,
+            intakeAppliedVolts);
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
     intakeInputs.intakeStatorCurrentAmps = intakeStatorCurrent.getValueAsDouble();
     intakeInputs.intakeTemp = intakeTemperatureCelsius.getValueAsDouble();
