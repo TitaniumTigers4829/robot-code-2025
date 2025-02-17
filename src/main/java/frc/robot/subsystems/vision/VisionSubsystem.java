@@ -126,21 +126,8 @@ public class VisionSubsystem extends SubsystemBase {
     return visionInterface.isValidMeasurement(limelight);
   }
 
-  /**
-   * @param TARGET_HEIGHT The height of the target in inches
-   * @param TY The vertical angle to the target
-   * @param MA The mount angle
-   */
-  public double getDistanceToTarget(double TARGET_HEIGHT, double TY, double MA) {
-    return (TARGET_HEIGHT / TY + MA); // trig should be right
-  }
 
-  /**
-   * @param TX The
-   * @param TARGET_DISTANCE
-   * @return
-   */
-  public double calculatePoseToTarget(double TX, double TARGET_DISTANCE) {
-    return (TARGET_DISTANCE - TX); // filler this doest work obv
+  public double getDistanceToTargetTrig(Limelight limelight) {
+    return visionInterface.getDistanceToTargetTrig(limelight);
   }
 }
