@@ -80,7 +80,7 @@ public class SwerveModule {
 
   /**
    * Sets the current for the module
-   * 
+   *
    * @param current the current to set the module to
    */
   public void setCurrent(Current current) {
