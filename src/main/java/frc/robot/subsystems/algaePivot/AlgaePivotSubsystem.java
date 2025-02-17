@@ -1,10 +1,8 @@
 package frc.robot.subsystems.algaePivot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.algaePivot.ManualAlgaePivot;
 
 import java.util.function.DoubleSupplier;
 
@@ -41,7 +39,7 @@ public class AlgaePivotSubsystem extends SubsystemBase {
       //does this on start
       () -> this.setAlgaeSpeed(speed.getAsDouble()),
       //does this when command ends
-      () -> this.setAlgaeSpeed(AlgaeConstants.ALGAE_NEUTRAL_SPEED),
+      () -> this.setAlgaeSpeed(AlgaePivotConstants.ALGAE_NEUTRAL_SPEED),
       //requirements for command
       this);
   }
@@ -49,9 +47,9 @@ public class AlgaePivotSubsystem extends SubsystemBase {
   public Command setAlgaePivotWithPID(){
     return new StartEndCommand(
       //does this on start
-      () -> this.setAlgaeAngle(AlgaeConstants.ALGAE_PIVOT_ANGLE),
+      () -> this.setAlgaeAngle(AlgaePivotConstants.ALGAE_PIVOT_ANGLE),
       //does this when command ends
-      () -> this.setAlgaeAngle(AlgaeConstants.ANGLE_ZERO),
+      () -> this.setAlgaeAngle(AlgaePivotConstants.ANGLE_ZERO),
       //requirements for command
       this);
   }

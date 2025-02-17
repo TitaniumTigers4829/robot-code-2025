@@ -18,11 +18,8 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.characterization.StaticCharacterization;
-import frc.robot.commands.coralIntake.EjectCoral;
-import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -197,12 +194,12 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new IntakeCoral(coralIntakeSubsystem));
-    operatorController.y().whileTrue(new EjectCoral(coralIntakeSubsystem));
+    operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
+    operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
     operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
-        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+        .whileTrue(elevatorSubsystem.manualElevator(()->operatorController.getRightY()));
   }
 
   private void checkGit() {
@@ -286,7 +283,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
-
         this.simWorld = null;
       }
       case SWERVE_ROBOT -> {

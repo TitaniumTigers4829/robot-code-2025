@@ -104,37 +104,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
   }
 
-  public Command ManualElevator(DoubleSupplier joystickY){
+  public Command manualElevator(DoubleSupplier joystickY){
     return new StartEndCommand(
       //does this while command is active
-      () -> this.setPercentOutput(joystickY.getAsDouble()), 
+      () -> this.openLoop(joystickY.getAsDouble()), 
       //does this when command ends
-      () -> this.setPercentOutput(0),
+      () -> this.openLoop(0),
       //requirements for command
        this);
   }
 
-  public Command SetElevationPosition(double position){
-    return new StartEndCommand(
-      //does this while command is active
-      () -> this.setElevatorPosition(position), 
-      //does this when command ends
-      () -> this.setElevatorPosition(0),
-      //requirements for command
-       this);
-  }
-
-  public Command ManualElevator(DoubleSupplier joystickY){
-    return new StartEndCommand(
-      //does this while command is active
-      () -> this.setPercentOutput(joystickY.getAsDouble()), 
-      //does this when command ends
-      () -> this.setPercentOutput(0),
-      //requirements for command
-       this);
-  }
-
-  public Command SetElevationPosition(double position){
+  public Command setElevationPosition(double position){
     return new StartEndCommand(
       //does this while command is active
       () -> this.setElevatorPosition(position), 
