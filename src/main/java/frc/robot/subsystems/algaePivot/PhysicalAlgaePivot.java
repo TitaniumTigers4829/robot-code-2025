@@ -33,8 +33,8 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface {
   private final VoltageOut voltageOut;
 
   public PhysicalAlgaePivot() {
-    algaeMotor = new TalonFX(AlgaeConstants.ALGAE_PIVOT_MOTOR_ID);
-    algaeEncoder = new CANcoder(AlgaeConstants.ALGAE_ENCODER_MOTOR_ID);
+    algaeMotor = new TalonFX(AlgaePivotConstants.ALGAE_PIVOT_MOTOR_ID);
+    algaeEncoder = new CANcoder(AlgaePivotConstants.ALGAE_ENCODER_MOTOR_ID);
     algaeMotorConfig = new TalonFXConfiguration();
     algaeEncoderConfig = new CANcoderConfiguration();
     mmPositionRequest = new MotionMagicVoltage(0);
@@ -46,32 +46,32 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface {
     algaeStatorCurrent = algaeMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
 
-    algaeEncoderConfig.MagnetSensor.MagnetOffset = -AlgaeConstants.ANGLE_ZERO;
-    algaeEncoderConfig.MagnetSensor.SensorDirection = AlgaeConstants.ALGAE_ENCODER_REVERSED;
-    algaeEncoder.getConfigurator().apply(algaeEncoderConfig, HardwareConstants.TIMEOUT_S);
+    algaeEncoderConfig.MagnetSensor.MagnetOffset = -AlgaePivotConstants.ANGLE_ZERO;
+    algaeEncoderConfig.MagnetSensor.SensorDirection = AlgaePivotConstants.ALGAE_ENCODER_REVERSED;
+    algaeEncoder.getConfigurator().apply(algaeEncoderConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     algaeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     algaeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     algaeMotorConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
 
-    algaeMotorConfig.Slot0.kP = AlgaeConstants.PIVOT_P;
-    algaeMotorConfig.Slot0.kI = AlgaeConstants.PIVOT_I;
-    algaeMotorConfig.Slot0.kD = AlgaeConstants.PIVOT_D;
-    algaeMotorConfig.Slot0.kG = AlgaeConstants.PIVOT_G;
+    algaeMotorConfig.Slot0.kP = AlgaePivotConstants.PIVOT_P;
+    algaeMotorConfig.Slot0.kI = AlgaePivotConstants.PIVOT_I;
+    algaeMotorConfig.Slot0.kD = AlgaePivotConstants.PIVOT_D;
+    algaeMotorConfig.Slot0.kG = AlgaePivotConstants.PIVOT_G;
     algaeMotorConfig.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
 
     algaeMotorConfig.MotionMagic.MotionMagicAcceleration =
-        AlgaeConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;
+        AlgaePivotConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;
     algaeMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        AlgaeConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
+        AlgaePivotConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
 
     algaeMotorConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
     algaeMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
     algaeMotorConfig.Feedback.FeedbackRemoteSensorID = algaeEncoder.getDeviceID();
 
-    algaeMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaeConstants.MAX_ANGLE;
-    algaeMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = AlgaeConstants.MIN_ANGLE;
+    algaeMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = AlgaePivotConstants.MAX_ANGLE;
+    algaeMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = AlgaePivotConstants.MIN_ANGLE;
     algaeMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
     algaeMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 

@@ -9,7 +9,7 @@ import edu.wpi.first.math.util.Units;
 /** Add your docs here. */
 public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
-  public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 28;
+  public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 62;
 
   public static final double ELEVATOR_P = 1;
   public static final double ELEVATOR_I = 0;
