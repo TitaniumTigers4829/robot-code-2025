@@ -56,7 +56,8 @@ public class SwerveModule {
   public SwerveModule(ModuleInterface moduleInterface, String moduleName) {
     this.moduleInterface = moduleInterface;
     this.moduleName = moduleName;
-    this.hardwareFaultAlert = new Alert("Module-" + moduleName + " Hardware Fault", AlertType.kError);
+    this.hardwareFaultAlert =
+        new Alert("Module-" + moduleName + " Hardware Fault", AlertType.kError);
     this.hardwareFaultAlert.set(false);
   }
 
