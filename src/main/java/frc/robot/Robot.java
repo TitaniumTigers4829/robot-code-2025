@@ -199,7 +199,7 @@ public class Robot extends LoggedRobot {
     operatorController.x().whileTrue(Commands.none());
     operatorController
         .a()
-        .whileTrue(elevatorSubsystem.manualElevator(()->operatorController.getRightY()));
+        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
   }
 
   private void checkGit() {

@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.extras.logging.LoggedTunableNumber;
-
 import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -81,7 +79,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.openLoop(output);
   }
 
-  public void setPercentOutput(double output){
+  public void setPercentOutput(double output) {
     elevatorInterface.setPercentOutput(output);
   }
 
@@ -104,23 +102,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
   }
 
-  public Command manualElevator(DoubleSupplier joystickY){
+  public Command manualElevator(DoubleSupplier joystickY) {
     return new StartEndCommand(
-      //does this while command is active
-      () -> this.openLoop(joystickY.getAsDouble()), 
-      //does this when command ends
-      () -> this.openLoop(0),
-      //requirements for command
-       this);
+        // does this while command is active
+        () -> this.openLoop(joystickY.getAsDouble()),
+        // does this when command ends
+        () -> this.openLoop(0),
+        // requirements for command
+        this);
   }
 
-  public Command setElevationPosition(double position){
+  public Command setElevationPosition(double position) {
     return new StartEndCommand(
-      //does this while command is active
-      () -> this.setElevatorPosition(position), 
-      //does this when command ends
-      () -> this.setElevatorPosition(0),
-      //requirements for command
-       this);
+        // does this while command is active
+        () -> this.setElevatorPosition(position),
+        // does this when command ends
+        () -> this.setElevatorPosition(0),
+        // requirements for command
+        this);
   }
 }

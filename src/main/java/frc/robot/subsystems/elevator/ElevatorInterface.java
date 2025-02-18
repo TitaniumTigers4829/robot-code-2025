@@ -28,7 +28,7 @@ public interface ElevatorInterface {
   public default void setElevatorPosition(double position) {}
 
   public default void setVolts(double volts) {}
-  
+
   public default void setPercentOutput(double output) {}
 
   public default double getVolts() {
