@@ -12,7 +12,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
-
 /** Add your docs here. */
 public class PhysicalClimbPivot implements ClimbPivotInterface {
   public TalonFXConfiguration config;
