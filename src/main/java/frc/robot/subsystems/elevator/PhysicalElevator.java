@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 
@@ -37,6 +38,8 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Voltage> followerAppliedVoltage;
   private final StatusSignal<Double> followerDutyCycle;
   private final StatusSignal<Double> leaderDutyCycle;
+  private final StatusSignal<Current> leaderStatorCurrent;
+  private final StatusSignal<Current> followerStatorCurrent;
 
   private final TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
 
@@ -75,15 +78,14 @@ public class PhysicalElevator implements ElevatorInterface {
 
     followerMotor.getConfigurator().apply(elevatorConfig);
 
-    // elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    // followerMotor.getConfigurator().apply(elevatorConfig);
-
     leaderPosition = leaderMotor.getPosition();
     leaderAppliedVoltage = leaderMotor.getMotorVoltage();
     followerPosition = followerMotor.getPosition();
     followerAppliedVoltage = followerMotor.getMotorVoltage();
     followerDutyCycle = followerMotor.getDutyCycle();
     leaderDutyCycle = leaderMotor.getDutyCycle();
+    leaderStatorCurrent = leaderMotor.getStatorCurrent();
+    followerStatorCurrent = followerMotor.getStatorCurrent();
 
     leaderMotor.setPosition(0.0);
     followerMotor.setPosition(0.0);
@@ -95,7 +97,9 @@ public class PhysicalElevator implements ElevatorInterface {
         followerPosition,
         followerAppliedVoltage,
         leaderDutyCycle,
-        followerDutyCycle);
+        followerDutyCycle,
+        leaderStatorCurrent,
+        followerStatorCurrent);
     leaderMotor.optimizeBusUtilization();
     followerMotor.optimizeBusUtilization();
   }
@@ -108,7 +112,9 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderAppliedVoltage,
         followerAppliedVoltage,
         followerDutyCycle,
-        leaderDutyCycle);
+        leaderDutyCycle,
+        leaderStatorCurrent,
+        followerStatorCurrent);
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
     inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
@@ -116,6 +122,8 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
     inputs.followerDutyCycle = followerDutyCycle.getValueAsDouble();
     inputs.desiredPosition = leaderMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.leaderStatorCurrent = leaderStatorCurrent.getValueAsDouble();
+    inputs.followerStatorCurrent = followerStatorCurrent.getValueAsDouble();
   }
 
   @Override
