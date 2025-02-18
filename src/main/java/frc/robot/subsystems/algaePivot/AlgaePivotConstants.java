@@ -28,4 +28,6 @@ public class AlgaePivotConstants {
   public static final double ALGAE_PIVOT_SPEED = 1.0;
   public static final double ALGAE_VOLTAGE = 1.0;
   public static final double ALGAE_NEUTRAL_SPEED = 0.0;
+
+  public static final double ALGAE_FEEDING_STATION_ANGLE = 0.0;
 }
