@@ -137,12 +137,8 @@ public class PhysicalVision implements VisionInterface {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
-  public boolean isLimelight4(Limelight limelight) {
-    return limelight.isLimelight4();
-  }
-
   private void updateIMUMode(Limelight limelight) {
-    if (isLimelight4(limelight)) {
+    if (limelight.isLimelight4()) {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
         LimelightHelpers.SetIMUMode(limelight.getName(), 2);
