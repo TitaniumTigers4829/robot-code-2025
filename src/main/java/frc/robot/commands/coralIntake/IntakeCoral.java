@@ -14,7 +14,11 @@ public class IntakeCoral extends Command {
 
   @Override
   public void execute() {
-    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+    if (!coralIntakeSubsystem.hasCoral()) {
+      coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+    } else {
+      coralIntakeSubsystem.setIntakeSpeed(0.0);
+    }
   }
 
   @Override
