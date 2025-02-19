@@ -86,18 +86,18 @@ public class SwerveConstants {
     }
 
     public static final class DevConstants {
-      public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 6;
-      public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 18;
-      public static final int REAR_LEFT_DRIVE_MOTOR_ID = 23;
+      public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 1;
+      public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 2;
+      public static final int REAR_LEFT_DRIVE_MOTOR_ID = 3;
       public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 4;
 
-      public static final int FRONT_LEFT_TURN_MOTOR_ID = 7;
-      public static final int FRONT_RIGHT_TURN_MOTOR_ID = 1;
-      public static final int REAR_LEFT_TURN_MOTOR_ID = 25;
-      public static final int REAR_RIGHT_TURN_MOTOR_ID = 3;
+      public static final int FRONT_LEFT_TURN_MOTOR_ID = 5;
+      public static final int FRONT_RIGHT_TURN_MOTOR_ID = 6;
+      public static final int REAR_LEFT_TURN_MOTOR_ID = 7;
+      public static final int REAR_RIGHT_TURN_MOTOR_ID = 8;
 
-      public static final int FRONT_LEFT_CANCODER_ID = 33;
-      public static final int FRONT_RIGHT_CANCODER_ID = 0;
+      public static final int FRONT_LEFT_CANCODER_ID = 9;
+      public static final int FRONT_RIGHT_CANCODER_ID = 10;
       public static final int REAR_LEFT_CANCODER_ID = 11;
       public static final int REAR_RIGHT_CANCODER_ID = 12;
 
@@ -157,9 +157,9 @@ public class SwerveConstants {
     public static final double DRIVE_SUPPLY_LIMIT = 45.0;
     public static final double DRIVE_STATOR_LIMIT = 50.0;
 
-    public static final double TURN_P = 1000.0;
+    public static final double TURN_P = 1.0; // 1000
     public static final double TURN_I = 0.0;
-    public static final double TURN_D = 25.0;
+    public static final double TURN_D = 0.0; // 25
 
     public static final double TURN_S = 0.0;
     public static final double TURN_V = 0.0;
@@ -168,7 +168,7 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_ROTATIONS_PER_SECOND = 30;
     public static final double MAX_ANGULAR_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED = 24;
 
-    public static final double DRIVE_P = .85;
+    public static final double DRIVE_P = 1; // .85
     public static final double DRIVE_I = 0.0;
     public static final double DRIVE_D = 0.0;
 

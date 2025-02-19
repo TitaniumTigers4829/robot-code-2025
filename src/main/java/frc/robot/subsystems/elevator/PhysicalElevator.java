@@ -39,6 +39,7 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Double> leaderDutyCycle;
   private final StatusSignal<Current> leaderStatorCurrent;
   private final StatusSignal<Current> followerStatorCurrent;
+  private final StatusSignal<Double> elevatorReference;
 
   private final TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
 
@@ -85,6 +86,7 @@ public class PhysicalElevator implements ElevatorInterface {
     leaderDutyCycle = leaderMotor.getDutyCycle();
     leaderStatorCurrent = leaderMotor.getStatorCurrent();
     followerStatorCurrent = followerMotor.getStatorCurrent();
+    elevatorReference = leaderMotor.getClosedLoopReference();
 
     leaderMotor.setPosition(0.0);
     followerMotor.setPosition(0.0);
@@ -98,7 +100,8 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderDutyCycle,
         followerDutyCycle,
         leaderStatorCurrent,
-        followerStatorCurrent);
+        followerStatorCurrent,
+        elevatorReference);
     leaderMotor.optimizeBusUtilization();
     followerMotor.optimizeBusUtilization();
   }
@@ -113,14 +116,15 @@ public class PhysicalElevator implements ElevatorInterface {
         followerDutyCycle,
         leaderDutyCycle,
         leaderStatorCurrent,
-        followerStatorCurrent);
+        followerStatorCurrent,
+        elevatorReference);
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
     inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
     inputs.followerMotorPosition = followerPosition.getValueAsDouble();
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
     inputs.followerDutyCycle = followerDutyCycle.getValueAsDouble();
-    inputs.desiredPosition = leaderMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.desiredPosition = elevatorReference.getValueAsDouble();
     inputs.leaderStatorCurrent = leaderStatorCurrent.getValueAsDouble();
     inputs.followerStatorCurrent = followerStatorCurrent.getValueAsDouble();
   }
@@ -152,7 +156,7 @@ public class PhysicalElevator implements ElevatorInterface {
   @Override
   public void openLoop(double output) {
     leaderMotor.setControl(dutyCyleOut.withOutput(output));
-    followerMotor.setControl(dutyCyleOut.withOutput(output));
+    followerMotor.setControl(dutyCyleOut.withOutput(-output));
   }
 
   @Override
