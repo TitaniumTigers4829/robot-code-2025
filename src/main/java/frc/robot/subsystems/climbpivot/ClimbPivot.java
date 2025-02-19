@@ -4,21 +4,20 @@
 
 package frc.robot.subsystems.climbpivot;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
-import frc.robot.subsystems.climbpivot.ClimbPivotInterface.ClimbPivotInputs;
 
 /** This */
 public class ClimbPivot extends SubsystemBase {
   /** Creates a new ClimbPivot. */
   ClimbPivotInterface climbPivotInterface;
-  
- 
+
+  ClimbPivotInputsAutoLogged inputsAutoLogged = new ClimbPivotInputsAutoLogged();
+
   public ClimbPivot(ClimbPivotInterface climbPivotInterface) {
     this.climbPivotInterface = climbPivotInterface;
   }
@@ -46,12 +45,27 @@ public class ClimbPivot extends SubsystemBase {
     climbPivotInterface.setClimbPivotPosition(endAngle);
   }
 
-  @Override
-  public void periodic() {
-    // climbPivotInterface.updateInputs(LoggableInputs inputsAutoLogged);
-    // Logger.processInputs("Climb Pivot/", LoggableInputs inputsAutoLogged);
+  /**
+   * Sets the pivot motor speed manually from -1 to 1
+   *
+   * @param speed the percent speed from -1 to 1
+   */
+  public void manualPivot(double speed) {
+    climbPivotInterface.manualPivot(speed);
   }
 
+  @Override
+  public void periodic() {
+    climbPivotInterface.updateInputs(inputsAutoLogged);
+    Logger.processInputs("Climb Pivot/", inputsAutoLogged);
+  }
+
+  /**
+   * actually pivots the thing to a set angle
+   *
+   * @param setAngle the command that sets it to the angle
+   * @return
+   */
   public Command setAngle() {
     return new StartEndCommand(
             () -> setClimbPivotPosition(PivotConstants.TARGET_POSITION),
@@ -60,14 +74,19 @@ public class ClimbPivot extends SubsystemBase {
         .until(() -> isPivotCloseEnough());
   }
 
-//  public Command manualPivotClimb(XboxController controller, int pivotAxis) {
-//         return new RunCommand(
-//             () -> climbPivotInter(controller.getRawAxis(pivotAxis)), 
-//             this
-//         );
-//  }
+  /**
+   * @param position i dont actually know what this is
+   * @return
+   */
+  public Command manualPivotClimb(DoubleSupplier position) {
+    return new RunCommand(() -> climbPivotInterface.manualPivot(position.getAsDouble()), this);
+  }
 
-  // Private helper method to check if the pivot is close enough to the target position
+  /**
+   * Private helper method to check if the pivot is close enough to the target position
+   *
+   * @return
+   */
   private boolean isPivotCloseEnough() {
     return Math.abs(getClimbPivotPosition() - PivotConstants.TARGET_POSITION)
         < PivotConstants.PIVOT_ACCEPTABLE_ERROR_DEGREES;

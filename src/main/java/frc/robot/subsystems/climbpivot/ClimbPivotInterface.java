@@ -20,7 +20,7 @@ public interface ClimbPivotInterface {
     /** The voltage currently applied to the climb pivot motor (in volts). */
     public double climbPivotAppliedVolts = 0.0;
 
-    public Object currentVolts;
+    public double currentVolts = 0.0;
   }
 
   /**
@@ -41,6 +41,14 @@ public interface ClimbPivotInterface {
   public default double getClimbPivotPosition() {
     return 0.0;
   }
+
+  /**
+   * Manually pivots the climb pivot system to the desired position. This method should be
+   * implemented to control the climb pivot motor to reach the target position.
+   *
+   * @param position
+   */
+  public default void manualPivot(double position) {}
 
   /**
    * Sets the desired position for the climb pivot system. This method should be implemented to

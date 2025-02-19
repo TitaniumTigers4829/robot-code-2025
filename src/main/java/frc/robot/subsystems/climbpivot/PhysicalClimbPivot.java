@@ -7,6 +7,7 @@ package frc.robot.subsystems.climbpivot;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
@@ -17,6 +18,7 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   public TalonFXConfiguration config;
   private TalonFX climbMotor = new TalonFX(PivotConstants.CLIMB_PIVOT_MOTOR_ID);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);
+  DutyCycleOut dutyCycleOut = new DutyCycleOut(0.0);
 
   private final StatusSignal<Voltage> climbMotorAppliedVoltage;
   private final StatusSignal<Angle> climbMotorAngle;
@@ -48,6 +50,12 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   @Override
   public void setClimbPivotPosition(double position) {
     climbMotor.setControl(motionMagicVoltage.withPosition(position));
+  }
+
+  @Override
+  public void manualPivot(double percentSpeed) {
+    climbMotor.set(percentSpeed);
+    // climbMotor.setControl(dutyCycleOut.withOutput(percentSpeed));
   }
 
   @Override

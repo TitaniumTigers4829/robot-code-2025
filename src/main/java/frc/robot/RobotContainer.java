@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.SimulationConstants;
+import frc.robot.commands.climb.ManualPivot;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.extras.simulation.field.SimulatedField;
 import frc.robot.extras.simulation.mechanismSim.swerve.GyroSimulation;
@@ -18,6 +19,7 @@ import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation;
 import frc.robot.extras.simulation.mechanismSim.swerve.SwerveModuleSimulation.WHEEL_GRIP;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.subsystems.climbpivot.ClimbPivot;
+import frc.robot.subsystems.climbpivot.PhysicalClimbPivot;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -38,6 +40,7 @@ public class RobotContainer {
 
   private final VisionSubsystem visionSubsystem;
   private final SwerveDrive swerveDrive;
+  private final ClimbPivot climbPivot;
 
   private final CommandXboxController operatorController = new CommandXboxController(1);
   private final CommandXboxController driverController = new CommandXboxController(0);
@@ -70,12 +73,15 @@ public class RobotContainer {
                 new CompModule(SwerveConstants.moduleConfigs[2]),
                 new CompModule(SwerveConstants.moduleConfigs[3]));
         visionSubsystem = new VisionSubsystem(new PhysicalVision());
+
+        climbPivot = new ClimbPivot(new PhysicalClimbPivot());
       }
       case DEV_ROBOT -> {
         swerveDrive = new SwerveDrive(null, null, null, null, null);
         gyroSimulation = null;
         swerveDriveSimulation = null;
         visionSubsystem = null;
+        climbPivot = null;
       }
 
       case SIM_ROBOT -> {
@@ -114,6 +120,7 @@ public class RobotContainer {
                 new SimulatedModule(swerveDriveSimulation.getModules()[3]));
 
         visionSubsystem = null;
+        climbPivot = null;
         //     new VisionSubsystem(
         //         new SimulatedVision(() -> swerveDriveSimulation.getSimulatedDriveTrainPose()));
 
@@ -129,6 +136,7 @@ public class RobotContainer {
         /* physics simulations are also not needed */
         this.gyroSimulation = null;
         this.swerveDriveSimulation = null;
+        this.climbPivot = null;
         // this.simulatedArena = null;
         swerveDrive =
             new SwerveDrive(
@@ -173,6 +181,7 @@ public class RobotContainer {
 
     Trigger driverLeftBumper = new Trigger(driverController.leftBumper());
 
+    DoubleSupplier operatorRightStickY = operatorController::getRightY;
 
     // DRIVER BUTTONS
     Command driveCommand =
@@ -208,6 +217,12 @@ public class RobotContainer {
     driverLeftDirectionPad.onTrue(
         new InstantCommand(
             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    // driverController.a().whileTrue(climbPivot.setAngle());
+
+    Command manualPivot = new ManualPivot(climbPivot, operatorRightStickY);
+
+    climbPivot.setDefaultCommand(manualPivot);
   }
 
   public Command getAutonomousCommand() {

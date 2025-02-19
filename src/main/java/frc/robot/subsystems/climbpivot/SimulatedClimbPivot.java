@@ -62,4 +62,9 @@ public class SimulatedClimbPivot implements ClimbPivotInterface {
     currentVolts = volts;
     simulatedClimbPivot.setInputVoltage(volts);
   }
+
+  @Override
+  public void manualPivot(double position) {
+    setVolts(position / 12.0);
+  }
 }
