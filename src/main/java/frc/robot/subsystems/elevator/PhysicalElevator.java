@@ -16,6 +16,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 
@@ -25,6 +26,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
   private final DutyCycleOut dutyCyleOut = new DutyCycleOut(0.0);
+  // private final Follower follower;
 
   private final MotionMagicTorqueCurrentFOC mmTorqueRequest = new MotionMagicTorqueCurrentFOC(0.0);
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
@@ -35,11 +37,14 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Voltage> followerAppliedVoltage;
   private final StatusSignal<Double> followerDutyCycle;
   private final StatusSignal<Double> leaderDutyCycle;
+  private final StatusSignal<Current> leaderStatorCurrent;
+  private final StatusSignal<Current> followerStatorCurrent;
 
   private final TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
 
   /** Creates a new PhysicalElevator. */
   public PhysicalElevator() {
+    // follower = new Follower(leaderMotor.getDeviceID(), true);
     elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Limits
@@ -58,7 +63,7 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.CurrentLimits.SupplyCurrentLimitEnable =
         ElevatorConstants.STATOR_CURRENT_LIMIT_ENABLE;
 
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     // configuration
     elevatorConfig.MotionMagic.MotionMagicAcceleration =
         ElevatorConstants.MOTION_MAGIC_MAX_ACCELERATION;
@@ -68,8 +73,8 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Feedback.SensorToMechanismRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
     leaderMotor.getConfigurator().apply(elevatorConfig);
-
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    // followerMotor.setControl(follower);
+    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
 
     leaderPosition = leaderMotor.getPosition();
@@ -78,6 +83,11 @@ public class PhysicalElevator implements ElevatorInterface {
     followerAppliedVoltage = followerMotor.getMotorVoltage();
     followerDutyCycle = followerMotor.getDutyCycle();
     leaderDutyCycle = leaderMotor.getDutyCycle();
+    leaderStatorCurrent = leaderMotor.getStatorCurrent();
+    followerStatorCurrent = followerMotor.getStatorCurrent();
+
+    leaderMotor.setPosition(0.0);
+    followerMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.RIO_SIGNAL_FREQUENCY,
@@ -86,7 +96,11 @@ public class PhysicalElevator implements ElevatorInterface {
         followerPosition,
         followerAppliedVoltage,
         leaderDutyCycle,
-        followerDutyCycle);
+        followerDutyCycle,
+        leaderStatorCurrent,
+        followerStatorCurrent);
+    leaderMotor.optimizeBusUtilization();
+    followerMotor.optimizeBusUtilization();
   }
 
   @Override
@@ -97,7 +111,9 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderAppliedVoltage,
         followerAppliedVoltage,
         followerDutyCycle,
-        leaderDutyCycle);
+        leaderDutyCycle,
+        leaderStatorCurrent,
+        followerStatorCurrent);
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
     inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
@@ -105,6 +121,8 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.followerMotorVoltage = followerAppliedVoltage.getValueAsDouble();
     inputs.followerDutyCycle = followerDutyCycle.getValueAsDouble();
     inputs.desiredPosition = leaderMotor.getClosedLoopReference().getValueAsDouble();
+    inputs.leaderStatorCurrent = leaderStatorCurrent.getValueAsDouble();
+    inputs.followerStatorCurrent = followerStatorCurrent.getValueAsDouble();
   }
 
   @Override

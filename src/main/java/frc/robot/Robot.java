@@ -85,7 +85,7 @@ public class Robot extends LoggedRobot {
     checkGit();
     setupLogging();
     setupSubsystems();
-    setupAuto();
+    // setupAuto();
   }
 
   /** This function is called periodically during all modes. */

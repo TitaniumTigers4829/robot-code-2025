@@ -96,7 +96,7 @@ public class SwerveConstants {
       public static final int REAR_LEFT_TURN_MOTOR_ID = 25;
       public static final int REAR_RIGHT_TURN_MOTOR_ID = 3;
 
-      public static final int FRONT_LEFT_CANCODER_ID = 10;
+      public static final int FRONT_LEFT_CANCODER_ID = 33;
       public static final int FRONT_RIGHT_CANCODER_ID = 0;
       public static final int REAR_LEFT_CANCODER_ID = 11;
       public static final int REAR_RIGHT_CANCODER_ID = 12;
