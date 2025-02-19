@@ -1,38 +1,36 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.subsystems.vision.PhysicalVision;
+import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class PhysicalVisionTest {
-  private NetworkTableInstance inst;
+  private NetworkTableInstance networkTableInstance;
 
   @BeforeEach
   void setUp() {
-    // Create a new NetworkTable instance for testing
-    inst = NetworkTableInstance.create();
+    // Mocks the NetworkTable instance for testing
+    networkTableInstance = NetworkTableInstance.getDefault();
   }
 
   @AfterEach
   void tearDown() {
     // Destroy the instance after the test
-    inst.close();
+    networkTableInstance.close();
   }
 
   @Test
   void testCanSeeAprilTags() {
-    // Mock NetworkTables behavior
-    var table = inst.getTable("Vision");
-    var entry = table.getEntry("aprilTagsVisible");
-    entry.setBoolean(true);
+    NetworkTable table = networkTableInstance.getTable(Limelight.BACK.getName());
+    table.getEntry("tv").setDouble(1.0);
+    table.getEntry("tx").setDouble(0.0);
 
-    // Call the method under test
     PhysicalVision vision = new PhysicalVision();
-    // boolean result = vision.canSeeAprilTags();
 
-    // Assert expected outcome
-    assertTrue(result, "Expected canSeeAprilTags() to return true when aprilTagsVisible is true");
+    assertTrue(vision.canSeeAprilTags(Limelight.BACK));
   }
 }
