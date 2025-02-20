@@ -6,6 +6,10 @@ import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import java.nio.ByteBuffer;
 
+/**
+ * A struct representing a pose estimate from the Megatag system. While this basically just wraps a
+ * {@link PoseEstimate}, it is useful for logging.
+ */
 public class MegatagPoseEstimate implements StructSerializable {
   public static class MegatagPoseEstimateStruct implements Struct<MegatagPoseEstimate> {
     public Pose2d fieldToCamera = Pose2d.kZero;

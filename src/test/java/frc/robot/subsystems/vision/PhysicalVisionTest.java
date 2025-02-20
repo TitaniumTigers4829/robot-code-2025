@@ -65,17 +65,16 @@ public class PhysicalVisionTest {
     // PoseEstimate
     assertEquals(new PoseEstimate(), physicalVision.getMegaTag1PoseEstimate(Limelight.BACK));
 
-    PoseEstimate expectedPoseEstimate =
-        new PoseEstimate(
-            new Pose2d(1.0, 1.0, new Rotation2d()),
-            20.0,
-            20.0,
-            1,
-            5.0,
-            5.0,
-            0.5,
-            new RawFiducial[] {},
-            false);
+    PoseEstimate expectedPoseEstimate = new PoseEstimate(
+        new Pose2d(1.0, 1.0, new Rotation2d()),
+        20.0,
+        20.0,
+        1,
+        5.0,
+        5.0,
+        0.5,
+        new RawFiducial[] {},
+        false);
 
     // Because PoseEstimates are sent over the network tables as just an array of
     // doubles, we have to manually set the values for the test
@@ -88,17 +87,53 @@ public class PhysicalVisionTest {
         // pitch, yaw, but PoseEstimate only uses a Pose2d
         .setDoubleArray(
             new double[] {
-              expectedPoseEstimate.pose.getX(),
-              expectedPoseEstimate.pose.getY(),
-              0.0,
-              0.0,
-              0.0,
-              expectedPoseEstimate.pose.getRotation().getDegrees(),
-              expectedPoseEstimate.latency,
-              expectedPoseEstimate.tagCount,
-              expectedPoseEstimate.tagSpan,
-              expectedPoseEstimate.avgTagDist,
-              expectedPoseEstimate.avgTagArea
+                expectedPoseEstimate.pose.getX(),
+                expectedPoseEstimate.pose.getY(),
+                0.0,
+                0.0,
+                0.0,
+                expectedPoseEstimate.pose.getRotation().getDegrees(),
+                expectedPoseEstimate.latency,
+                expectedPoseEstimate.tagCount,
+                expectedPoseEstimate.tagSpan,
+                expectedPoseEstimate.avgTagDist,
+                expectedPoseEstimate.avgTagArea
             });
   }
+
+  @Test
+  void testGetMegaTag2PoseEstimate() {
+    // This is just a duplicate of the previous test, but for MT2
+    assertEquals(new PoseEstimate(), physicalVision.getMegaTag2PoseEstimate(Limelight.BACK));
+
+    PoseEstimate expectedPoseEstimate = new PoseEstimate(
+        new Pose2d(1.0, 1.0, new Rotation2d()),
+        20.0,
+        20.0,
+        1,
+        5.0,
+        5.0,
+        0.5,
+        new RawFiducial[] {},
+        true);
+
+    backLimelightTable
+        .getEntry("botpose_orb_wpiblue")
+        .setDoubleArray(
+            new double[] {
+                expectedPoseEstimate.pose.getX(),
+                expectedPoseEstimate.pose.getY(),
+                0.0,
+                0.0,
+                0.0,
+                expectedPoseEstimate.pose.getRotation().getDegrees(),
+                expectedPoseEstimate.latency,
+                expectedPoseEstimate.tagCount,
+                expectedPoseEstimate.tagSpan,
+                expectedPoseEstimate.avgTagDist,
+                expectedPoseEstimate.avgTagArea
+            });
+  }
+
+  
 }
