@@ -19,6 +19,8 @@ public interface ElevatorInterface {
     public double desiredPosition = 0.0;
     public double leaderStatorCurrent = 0.0;
     public double followerStatorCurrent = 0.0;
+    public double leaderVelocity = 0.0;
+    public double elevatorError = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}

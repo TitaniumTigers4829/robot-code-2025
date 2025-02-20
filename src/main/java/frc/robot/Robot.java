@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -18,11 +17,10 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.characterization.StaticCharacterization;
-import frc.robot.commands.coralIntake.EjectCoral;
-import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -197,9 +195,9 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new IntakeCoral(coralIntakeSubsystem));
-    operatorController.y().whileTrue(new EjectCoral(coralIntakeSubsystem));
-    operatorController.x().whileTrue(Commands.none());
+    operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, -8.0));
+    operatorController.y().whileTrue(new SetElevatorPosition(elevatorSubsystem, -4.0));
+    operatorController.x().whileTrue(new SetElevatorPosition(elevatorSubsystem, -6.0));
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));

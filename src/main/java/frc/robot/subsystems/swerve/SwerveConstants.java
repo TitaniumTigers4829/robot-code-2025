@@ -122,16 +122,16 @@ public class SwerveConstants {
       public static final InvertedValue REAR_LEFT_TURN_MOTOR_REVERSED =
           InvertedValue.Clockwise_Positive;
       public static final InvertedValue REAR_RIGHT_TURN_MOTOR_REVERSED =
-          InvertedValue.Clockwise_Positive;
+          InvertedValue.CounterClockwise_Positive;
 
       public static final InvertedValue FRONT_LEFT_DRIVE_ENCODER_REVERSED =
-          InvertedValue.Clockwise_Positive;
+          InvertedValue.CounterClockwise_Positive;
       public static final InvertedValue FRONT_RIGHT_DRIVE_ENCODER_REVERSED =
           InvertedValue.CounterClockwise_Positive;
       public static final InvertedValue REAR_LEFT_DRIVE_ENCODER_REVERSED =
           InvertedValue.Clockwise_Positive;
       public static final InvertedValue REAR_RIGHT_DRIVE_ENCODER_REVERSED =
-          InvertedValue.CounterClockwise_Positive;
+          InvertedValue.Clockwise_Positive;
     }
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;

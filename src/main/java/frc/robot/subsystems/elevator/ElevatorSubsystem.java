@@ -68,6 +68,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  public double getVelocity() {
+    return inputs.leaderVelocity;
+  }
+
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
