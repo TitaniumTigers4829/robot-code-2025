@@ -32,6 +32,7 @@ import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -197,7 +198,9 @@ public class Robot extends LoggedRobot {
   private void configureOperatorController() {
     operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, -8.0));
     operatorController.y().whileTrue(new SetElevatorPosition(elevatorSubsystem, -4.0));
-    operatorController.x().whileTrue(new SetElevatorPosition(elevatorSubsystem, -6.0));
+    operatorController
+        .x()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.INTAKE_SETPOINT));
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));

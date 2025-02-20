@@ -40,4 +40,7 @@ public class ElevatorConstants {
   public static final boolean LIMIT_ENABLE = false;
   public static final double REVERSE_LIMIT = 0.10;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
+
+  // Setpoints
+  public static final double INTAKE_SETPOINT = -1.25;
 }
