@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -17,6 +19,9 @@ import frc.robot.Constants.HardwareConstants;
 public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFX coralIntakeMotor;
   private final DigitalInput coralSensor;
+
+  private final Debouncer sensorDebouncer;
+
   private final StatusSignal<AngularVelocity> intakeVelocity;
   private final StatusSignal<Current> intakeSupplyCurrent;
   private final StatusSignal<Current> intakeStatorCurrent;
@@ -29,6 +34,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
     coralSensor = new DigitalInput(0);
 
+    sensorDebouncer = new Debouncer(0.05, DebounceType.kRising);
+
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
@@ -37,7 +44,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
         CoralIntakeConstants.INTAKE_STATOR_LIMIT_ENABLE;
     intakeConfig.CurrentLimits.SupplyCurrentLimit = CoralIntakeConstants.INTAKE_SUPPLY_LIMIT;
-    intakeConfig.CurrentLimits.StatorCurrentLimitEnable =
+    intakeConfig.CurrentLimits.SupplyCurrentLimitEnable =
         CoralIntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
     coralIntakeMotor.getConfigurator().apply(intakeConfig);
@@ -78,7 +85,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeInputs.intakeAppliedVolts = intakeAppliedVolts.getValueAsDouble();
     intakeInputs.intakePosition = intakePosition.getValueAsDouble();
     intakeInputs.intakeSupplyCurrentAmps = intakeSupplyCurrent.getValueAsDouble();
-    intakeInputs.hasCoral = !coralSensor.get(); // true if coral is sensed
+    intakeInputs.hasCoral =
+        sensorDebouncer.calculate(!coralSensor.get()); // true if coral is sensed
   }
 
   @Override

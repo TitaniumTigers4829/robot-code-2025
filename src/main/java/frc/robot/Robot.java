@@ -17,6 +17,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.characterization.StaticCharacterization;
+import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
@@ -150,10 +151,10 @@ public class Robot extends LoggedRobot {
         new DriveCommand(
             swerveDrive,
             visionSubsystem,
-            // Translation in the Y direction
-            driverLeftStick[1],
             // Translation in the X direction
             driverLeftStick[0],
+            // Translation in the Y direction
+            driverLeftStick[1],
             // Rotation
             () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
             // Robot relative
@@ -197,7 +198,7 @@ public class Robot extends LoggedRobot {
 
   private void configureOperatorController() {
     operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, -8.0));
-    operatorController.y().whileTrue(new SetElevatorPosition(elevatorSubsystem, -4.0));
+    operatorController.y().whileTrue(new IntakeCoral(coralIntakeSubsystem));
     operatorController
         .x()
         .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.INTAKE_SETPOINT));
