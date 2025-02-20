@@ -190,7 +190,9 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
+    operatorController
+        .b()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
     operatorController.y().whileTrue(new IntakeCoral(coralIntakeSubsystem));
     operatorController
         .x()
