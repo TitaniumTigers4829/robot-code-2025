@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
-
 import java.nio.ByteBuffer;
 
 public class MegatagPoseEstimate implements StructSerializable {
