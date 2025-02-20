@@ -3,8 +3,8 @@ package frc.robot.sim;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
-import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.mathutils.GeomUtil;
+import frc.robot.extras.logging.RuntimeLog;
+import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;

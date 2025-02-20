@@ -14,10 +14,10 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
-import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.mathutils.MeasureMath;
-import frc.robot.extras.util.mathutils.MeasureMath.XY;
-import frc.robot.extras.util.mathutils.SimCommonMath;
+import frc.robot.extras.logging.RuntimeLog;
+import frc.robot.extras.math.mathutils.MeasureMath;
+import frc.robot.extras.math.mathutils.MeasureMath.XY;
+import frc.robot.extras.math.mathutils.SimMath;
 import frc.robot.sim.configs.SimGyroConfig;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import java.util.function.BiConsumer;
@@ -89,7 +89,7 @@ public class SimGyro {
         actualAngularVelocity
             .plus(averageDriftingMotionless)
             // .plus(getDriftingDueToImpact(actualAngularVelocity))
-            .plus(actualAngularVelocity.times(SimCommonMath.generateRandomNormal(0.0, veloStdDev)));
+            .plus(actualAngularVelocity.times(SimMath.generateRandomNormal(0.0, veloStdDev)));
 
     LinearVelocity lastXV = Meters.of(lastTwist.dx).div(timing.dt());
     LinearVelocity lastYV = Meters.of(lastTwist.dy).div(timing.dt());

@@ -23,7 +23,7 @@ import edu.wpi.first.units.measure.Power;
 import edu.wpi.first.units.measure.Resistance;
 import edu.wpi.first.units.measure.Torque;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.extras.util.mathutils.MeasureMath;
+import frc.robot.extras.math.mathutils.MeasureMath;
 
 /**
  * An extended version of the DCMotor class that provides additional methods for calculating motor

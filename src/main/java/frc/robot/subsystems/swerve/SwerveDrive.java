@@ -19,10 +19,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.setpointGen.SwerveSetpoint;
-import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.logging.Tracer;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.TimeUtil;
-import frc.robot.extras.util.Tracer;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -161,7 +161,8 @@ public class SwerveDrive extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
     setpoint =
-        setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, HardwareConstants.TIMEOUT_S);
+        setpointGenerator.generateSetpoint(
+            setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -205,11 +206,22 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Runs characterization on voltage
    *
-   * @param volts voltage to set
+   * @param volts current to set
    */
-  public void runCharacterization(double volts) {
+  public void runCharacterizationVoltage(double volts) {
     for (SwerveModule module : swerveModules) {
       module.setVoltage(Volts.of(-volts));
+    }
+  }
+
+  /**
+   * Runs characterization on current
+   *
+   * @param amps current to set
+   */
+  public void runCharacterizationCurrent(double amps) {
+    for (SwerveModule module : swerveModules) {
+      module.setCurrent(Amps.of(-amps));
     }
   }
 
