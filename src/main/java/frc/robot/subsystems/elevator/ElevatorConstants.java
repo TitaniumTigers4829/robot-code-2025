@@ -41,6 +41,9 @@ public class ElevatorConstants {
   public static final double REVERSE_LIMIT = 0.10;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 
-  // Setpoints
-  public static final double INTAKE_SETPOINT = -1.25;
+  // Elevator setpoints
+  public static final double LEVEL_1 = 59;
+  public static final double LEVEL_2 = 118;
+  public static final double LEVEL_3 = 177;
+  public static final double LEVEL_FEEDER = -1.25;
 }
