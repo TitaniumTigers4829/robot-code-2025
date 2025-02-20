@@ -27,7 +27,7 @@ import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
-import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot
+import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
 import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
@@ -190,11 +190,11 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, -8.0));
+    operatorController.b().whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
     operatorController.y().whileTrue(new IntakeCoral(coralIntakeSubsystem));
     operatorController
         .x()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.INTAKE_SETPOINT));
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_1));
     operatorController.rightBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
     operatorController
         .a()
