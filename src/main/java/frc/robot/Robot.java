@@ -16,7 +16,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
-import frc.robot.commands.characterization.StaticCharacterization;
+import frc.robot.commands.coralIntake.EjectCoral;
 import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
@@ -140,10 +140,10 @@ public class Robot extends LoggedRobot {
         new DoubleSupplier[] {
           () ->
               JoystickUtil.modifyAxisPolar(
-                  driverController::getLeftX, driverController::getLeftY, 3)[0],
+                  driverController::getLeftX, driverController::getLeftY, 3)[1],
           () ->
               JoystickUtil.modifyAxisPolar(
-                  driverController::getLeftX, driverController::getLeftY, 3)[1]
+                  driverController::getLeftX, driverController::getLeftY, 3)[0]
         };
 
     // DRIVER BUTTONS
@@ -187,13 +187,6 @@ public class Robot extends LoggedRobot {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
-    driverController
-        .b()
-        .whileTrue(
-            new StaticCharacterization(
-                swerveDrive,
-                swerveDrive::runCharacterizationCurrent,
-                swerveDrive::getCharacterizationVelocity));
   }
 
   private void configureOperatorController() {
@@ -202,6 +195,8 @@ public class Robot extends LoggedRobot {
     operatorController
         .x()
         .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.INTAKE_SETPOINT));
+    operatorController.rightBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
+
     operatorController
         .a()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
