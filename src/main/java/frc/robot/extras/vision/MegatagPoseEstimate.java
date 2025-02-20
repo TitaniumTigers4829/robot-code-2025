@@ -3,6 +3,8 @@ package frc.robot.extras.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
+
 import java.nio.ByteBuffer;
 
 public class MegatagPoseEstimate implements StructSerializable {
@@ -80,7 +82,7 @@ public class MegatagPoseEstimate implements StructSerializable {
 
   public MegatagPoseEstimate() {}
 
-  public static MegatagPoseEstimate fromLimelight(LimelightHelpers.PoseEstimate poseEstimate) {
+  public static MegatagPoseEstimate fromLimelight(PoseEstimate poseEstimate) {
     MegatagPoseEstimate rv = new MegatagPoseEstimate();
     rv.fieldToCamera = poseEstimate.pose;
     if (rv.fieldToCamera == null) rv.fieldToCamera = Pose2d.kZero;

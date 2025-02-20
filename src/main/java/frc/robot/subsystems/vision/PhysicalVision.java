@@ -7,8 +7,8 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.ThreadManager;
-import frc.robot.extras.vision.LimelightHelpers;
-import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
+import frc.robot.extras.vision.TigerHelpers;
+import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
@@ -82,8 +82,8 @@ public class PhysicalVision implements VisionInterface {
     // First checks if it can see an april tag, then checks if it is fully in frame as
     // the limelight can see an april tag but not have it fully in frame, leading to
     // inaccurate pose estimates
-    if (LimelightHelpers.getTV(limelight.getName())) {
-      return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
+    if (TigerHelpers.getTV(limelight.getName())) {
+      return Math.abs(TigerHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
   }
@@ -218,7 +218,7 @@ public class PhysicalVision implements VisionInterface {
    *     return 0 for x, y, and theta
    */
   public PoseEstimate getMegaTag1PoseEstimate(Limelight limelight) {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
+    return TigerHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
   }
 
   /**
@@ -230,7 +230,7 @@ public class PhysicalVision implements VisionInterface {
    *     return 0 for x, y, and theta
    */
   public PoseEstimate getMegaTag2PoseEstimate(Limelight limelight) {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
+    return TigerHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
   }
 
   /**
@@ -287,7 +287,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight network table contains the key "tv"
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
+    return TigerHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
   /**
@@ -327,7 +327,7 @@ public class PhysicalVision implements VisionInterface {
       // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
       // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
       // we don't send those values to the limelight (hence the 0's).
-      LimelightHelpers.SetRobotOrientation(
+      TigerHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
       updatePoseEstimate(limelight);
     } else {
