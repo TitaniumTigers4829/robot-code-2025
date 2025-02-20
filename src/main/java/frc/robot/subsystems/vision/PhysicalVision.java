@@ -16,10 +16,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * This class is the implementation of the VisionInterface for the physical
- * robot. It uses the
- * ThreadManager to make threads to run the code for processing the vision data
- * from the limelights
- * asynchonously.
+ * robot. It uses the ThreadManager to make threads to run the code for
+ * processing the vision data from the limelights asynchonously.
  *
  * @author Jack
  * @author Ishan
@@ -81,10 +79,9 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public boolean canSeeAprilTags(Limelight limelight) {
     // First checks if it can see an april tag, then checks if it is fully in frame
-    // as
-    // the limelight can see an april tag but not have it fully in frame, leading to
-    // inaccurate pose estimates
-    if (TigerHelpers.getTV(limelight.getName())) {
+    // as the limelight can see an april tag but not have it fully in frame, leading
+    // to inaccurate pose estimates
+    if (isLimelightConnected(limelight)) {
       return Math.abs(TigerHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
@@ -168,8 +165,7 @@ public class PhysicalVision implements VisionInterface {
 
   /**
    * If the robot is not enabled, update the pose using MegaTag1 and after it is
-   * enabled, run {@link
-   * #enabledPoseUpdate(int)}
+   * enabled, run {@link #enabledPoseUpdate(int)}
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
@@ -181,8 +177,7 @@ public class PhysicalVision implements VisionInterface {
 
   /**
    * If the robot is not enabled, update the pose using MegaTag1 and after it is
-   * enabled, run {@link
-   * #enabledPoseUpdate(int)}
+   * enabled, run {@link #enabledPoseUpdate(int)}
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
@@ -203,16 +198,12 @@ public class PhysicalVision implements VisionInterface {
   public void checkAndUpdatePose(Limelight limelight) {
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
       // Megatag 2 uses the gyro orientation to solve for the rotation of the
-      // calculated pose.
-      // This creates a much more stable and accurate pose when translating, but when
-      // rotating
-      // but the pose will not be consistent due to latency between receiving and
-      // sending
-      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate,
-      // roll,
-      // and rollRate. Generally we don't need to use pitch or roll in our pose
-      // estimate, so
-      // we don't send those values to the limelight (hence the 0's).
+      // calculated pose. This creates a much more stable and accurate pose when
+      // translating, but when rotating but the pose will not be consistent due to
+      // latency between receiving and sending measurements. The parameters are
+      // melightName, yaw, yawRate, pitch, pitchRate, roll, and rollRate. Generally we
+      // don't need to use pitch or roll in our pose estimate, so we don't send those
+      // values to the limelight (hence the 0's).
       TigerHelpers.SetRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
       updatePoseEstimate(limelight);
@@ -223,8 +214,7 @@ public class PhysicalVision implements VisionInterface {
 
   /**
    * Gets the MegaTag1 pose of the robot calculated by specified limelight via any
-   * April Tags it
-   * sees
+   * April Tags it sees.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The MegaTag1 pose of the robot, if the limelight can't see any April
@@ -237,8 +227,7 @@ public class PhysicalVision implements VisionInterface {
 
   /**
    * Gets the MegaTag2 pose of the robot calculated by specified limelight via any
-   * April Tags it
-   * sees
+   * April Tags it sees.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The MegaTag2 pose of the robot, if the limelight can't see any April
@@ -250,23 +239,10 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks if the pose estimate exists and whether it is within the field
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the pose estimate exists within the field and the pose
-   *         estimate is not null
-   */
-  public boolean isValidPoseEstimate(Limelight limelight) {
-    return getPoseFromAprilTags(limelight) != null
-        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
-  }
-
-  /**
    * Checks if there is a large discrepancy between two poses. This is used to
-   * determine if the
-   * estimated megatag 1 and 2 pose are within a certain threshold, whether or not
-   * they are within
-   * this threshold helps determine which pose to use.
+   * determine if the estimated megatag 1 and 2 pose are within a certain
+   * threshold, whether or not they are within this threshold helps determine
+   * which pose to use.
    *
    * @param limelight                  A limelight (BACK, FRONT_LEFT,
    *                                   FRONT_RIGHT).
@@ -294,7 +270,21 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight network table contains the key "tv"
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return TigerHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
+    return TigerHelpers.getTV(limelight.getName());
+  }
+
+  /**
+   * Stops the thread for the specified limelight.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   */
+  public void stopLimelightThread(Limelight limelight) {
+    threadManager.stopThread(limelight.getName());
+  }
+
+  /** Shuts down all the threads. */
+  public void endAllThreads() {
+    threadManager.shutdownAllThreads();
   }
 
   /**
@@ -311,6 +301,18 @@ public class PhysicalVision implements VisionInterface {
         VisionConstants.MAX_ROTATION_DELTA_DEGREES,
         getPoseFromAprilTags(limelight),
         pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
+  }
+
+  /**
+   * Checks if the pose estimate exists and whether it is within the field.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the pose estimate exists within the field and the pose
+   *         estimate is not null
+   */
+  private boolean isValidPoseEstimate(Limelight limelight) {
+    return getPoseFromAprilTags(limelight) != new Pose2d()
+        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
   }
 
   /**
@@ -340,16 +342,14 @@ public class PhysicalVision implements VisionInterface {
 
   /**
    * Sets up port forwarding for the specified Limelight. This method forwards a
-   * range of ports from
-   * the robot to the Limelight, allowing network communication between the robot
-   * and the Limelight.
+   * range of ports from the robot to the Limelight, allowing network
+   * communication between the robot and the Limelight.
    *
    * <p>
    * Each Limelight is assigned a unique port offset based on its ID. The method
-   * forwards ports
-   * 5800 to 5809 for each Limelight, with the port offset applied to each port
-   * number. For example,
-   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
+   * forwards ports 5800 to 5809 for each Limelight, with the port offset applied
+   * to each port number. For example, if the Limelight ID is 1, the ports 5810 to
+   * 5819 will be forwarded.
    *
    * @param limelight The Limelight for which to set up port forwarding.
    */
@@ -359,20 +359,6 @@ public class PhysicalVision implements VisionInterface {
       PortForwarder.add(
           port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
     }
-  }
-
-  /**
-   * Stops the thread for the specified limelight.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   */
-  public void stopLimelightThread(Limelight limelight) {
-    threadManager.stopThread(limelight.getName());
-  }
-
-  /** Shuts down all the threads. */
-  public void endAllThreads() {
-    threadManager.shutdownAllThreads();
   }
 
 }
