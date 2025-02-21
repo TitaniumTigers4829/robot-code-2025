@@ -44,7 +44,7 @@ public class PhysicalVision implements VisionInterface {
 
   public PhysicalVision() {
     for (Limelight limelight : Limelight.values()) {
-      // Setupt port forwarding for each limelight
+      // Setup port forwarding for each limelight
       setupPortForwarding(limelight);
       // Start a threaded task to check and update the pose for each Limelight
       threadManager.startTask(
@@ -74,6 +74,8 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+
+      // inputs.isMegaTag2[limelight.getId()] = limelightEstimates.get(0).
     }
   }
 
@@ -135,6 +137,18 @@ public class PhysicalVision implements VisionInterface {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
+  private void updateIMUMode(Limelight limelight) {
+    if (limelight.isLimelight4()) {
+      if (DriverStation.isEnabled()) {
+        // Enable internal IMU for better pose accuracy when enabled
+        LimelightHelpers.SetIMUMode(limelight.getName(), 2);
+      } else {
+        // Disable internal IMU when robot is disabled
+        LimelightHelpers.SetIMUMode(limelight.getName(), 1);
+      }
+    }
+  }
+
   /**
    * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
    * the robot to the Limelight, allowing network communication between the robot and the Limelight.
@@ -191,6 +205,7 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
+
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }
@@ -320,17 +335,26 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void checkAndUpdatePose(Limelight limelight) {
-    if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
-      // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-      // This creates a much more stable and accurate pose when translating, but when rotating
-      // but the pose will not be consistent due to latency between receiving and sending
-      // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
-      // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
-      // we don't send those values to the limelight (hence the 0's).
-      LimelightHelpers.SetRobotOrientation(
-          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-      updatePoseEstimate(limelight);
-    } else {
+    try {
+      if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
+        // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
+        // This creates a much more stable and accurate pose when translating, but when rotating
+        // but the pose will not be consistent due to latency between receiving and sending
+        // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
+        // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
+        // we don't send those values to the limelight (hence the 0's).
+        LimelightHelpers.SetRobotOrientation(
+            limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+        updateIMUMode(limelight);
+        updatePoseEstimate(limelight);
+        LimelightHelpers.Flush();
+      } else {
+        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      }
+    } catch (Exception e) {
+      System.err.printf(
+          "Error updating pose for limelight %s: %s%n", limelight.getName(), e.getMessage());
+      // Optionally, clear or mark the estimate as invalid.
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
     }
   }
