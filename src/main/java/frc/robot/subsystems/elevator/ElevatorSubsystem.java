@@ -86,6 +86,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void setPercentOutput(double output) {
     elevatorInterface.setPercentOutput(output);
   }
+
   public boolean isAtSetpoint() {
     return inputs.elevatorError < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
   }
@@ -112,6 +113,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       elevatorInterface.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
   }
+
   public Command manualElevator(DoubleSupplier joystickY) {
     return new StartEndCommand(
         // does this while command is active

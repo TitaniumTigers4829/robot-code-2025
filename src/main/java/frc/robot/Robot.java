@@ -18,7 +18,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
-import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.extras.util.AllianceFlipper;
@@ -191,7 +190,8 @@ public class Robot extends LoggedRobot {
                 Commands.parallel(
                         new AutoAlign(
                             swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
-                        elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_3)
+                        elevatorSubsystem
+                            .setElevationPosition(ElevatorConstants.LEVEL_3)
                             .until((() -> elevatorSubsystem.isAtSetpoint())))
                     .andThen(coralIntakeSubsystem.ejectCoral())
                     .until(() -> !coralIntakeSubsystem.hasCoral())
@@ -213,21 +213,21 @@ public class Robot extends LoggedRobot {
         .x()
         .whileTrue(
             Commands.sequence(
-                Commands.deadline(
-                        elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
-                        Commands.run(
-                            () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
-                    .until(() -> elevatorSubsystem.isAtSetpoint())
-                    .andThen(new EjectCoral(coralIntakeSubsystem))
-                    .until(() -> !coralIntakeSubsystem.hasCoral())
-                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
-    operatorController.leftBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
+                    Commands.deadline(
+                            elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
+                            Commands.run(
+                                () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
+                        .until(() -> elevatorSubsystem.isAtSetpoint())
+                        .andThen(coralIntakeSubsystem.ejectCoral()))
+                .until(() -> !coralIntakeSubsystem.hasCoral())
+                .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
+    operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
+        .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_FEEDER));
     operatorController
         .rightBumper()
-        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
