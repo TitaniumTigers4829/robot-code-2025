@@ -90,7 +90,7 @@ public final class VisionConstants {
 
   public static final double LL3_FOV_MARGIN_OF_ERROR = 26;
   public static final double LL3G_FOV_MARGIN_OF_ERROR = 36;
-  public static final double LL4_FOV_MARGIN_OF_ERROR = 0 - 9;
+  public static final double LL4_FOV_MARGIN_OF_ERROR = 34.5;
 
   public static final double MAX_TRANSLATION_DELTA_METERS = 0.8;
   public static final double MAX_ROTATION_DELTA_DEGREES = 50.0;
@@ -108,7 +108,7 @@ public final class VisionConstants {
   public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 1;
   public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
   public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 2;
-  public static final String ELEVATOR_LIMELIGHT_NAME = "limelight-elevator";
+  public static final String ELEVATOR_LIMELIGHT_NAME = "limelight-elevate";
   public static final int ELEVATOR_LIMELIGHT_NUMBER = 3;
 
   // Constants for port forwarding
