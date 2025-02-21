@@ -10,9 +10,15 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SetElevatorPosition extends Command {
   ElevatorSubsystem elevatorSubsystem;
+
   double position;
 
-  /** Creates a new SetElevatorPosition. */
+  /**
+   * Creates a new SetElevatorPosition.
+   *
+   * @param elevatorSubsystem The subsystem used by this command.
+   * @param position The position to set the elevator to in meters.
+   */
   public SetElevatorPosition(ElevatorSubsystem elevatorSubsystem, double position) {
     this.elevatorSubsystem = elevatorSubsystem;
     this.position = position;
@@ -34,7 +40,7 @@ public class SetElevatorPosition extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    elevatorSubsystem.setElevatorPosition(0);
+    // elevatorSubsystem.setElevatorPosition(0);
   }
 
   // Returns true when the command should end.

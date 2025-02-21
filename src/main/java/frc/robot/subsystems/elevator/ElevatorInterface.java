@@ -17,6 +17,10 @@ public interface ElevatorInterface {
     public double leaderDutyCycle = 0.0;
     public double followerDutyCycle = 0.0;
     public double desiredPosition = 0.0;
+    public double leaderStatorCurrent = 0.0;
+    public double followerStatorCurrent = 0.0;
+    public double leaderVelocity = 0.0;
+    public double elevatorError = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}
@@ -32,4 +36,12 @@ public interface ElevatorInterface {
   public default double getVolts() {
     return 0.0;
   }
+
+  public default void openLoop(double output) {}
+
+  public default void setPID(double kP, double kI, double kD) {}
+
+  public default void setFF(double kS, double kV, double kA, double kG) {}
+
+  public default void resetElevatorPosition(double position) {}
 }

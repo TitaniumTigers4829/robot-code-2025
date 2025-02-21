@@ -2,30 +2,81 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
+  private static RobotType robotType = RobotType.DEV_ROBOT;
+  public static final boolean tuningMode = true;
 
-  public static final class LogPaths {
-    public static final String SYSTEM_PERFORMANCE_PATH = "SystemPerformance/";
-    public static final String PHYSICS_SIMULATION_PATH = "MaplePhysicsSimulation/";
-    public static final String APRIL_TAGS_VISION_PATH = "Vision/AprilTags/";
+  /**
+   * Gets if the robot type is valid, if not it will default to COMP_ROBOT
+   *
+   * @return the currently used RobotType
+   */
+  @SuppressWarnings("resource")
+  public static RobotType getRobot() {
+    // if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+    //   new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+    //       .set(true);
+    //   robotType = RobotType.COMP_ROBOT;
+    // }
+    return robotType;
   }
 
-  public static final RobotType ROBOT_TYPE = RobotType.COMP_ROBOT;
+  /**
+   * Gets the mode of the robot based on the RobotType and the state of {@link RobotBase}, if the
+   * robot isn't real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
+   *
+   * @return the currently used Mode
+   */
+  public static Mode getMode() {
+    return switch (robotType) {
+      case DEV_ROBOT, COMP_ROBOT, SWERVE_ROBOT -> RobotBase.isReal() ? Mode.REAL : Mode.REPLAY;
+      case SIM_ROBOT -> Mode.SIM;
+    };
+  }
 
-  public static enum RobotType {
+  /** An enum to select the robot's mode. */
+  public enum Mode {
     /** Running on a real robot. */
-    COMP_ROBOT,
+    REAL,
 
     /** Running a physics simulator. */
-    SIM_ROBOT,
+    SIM,
 
     /** Replaying from a log file. */
-    DEV_ROBOT,
+    REPLAY
+  }
 
-    /** Running the swerve robot. */
+  /** An enum to select the currently used robot. */
+  public enum RobotType {
+    SIM_ROBOT,
+    DEV_ROBOT,
+    COMP_ROBOT,
     SWERVE_ROBOT
+  }
+
+  /** Checks whether the correct robot is selected when deploying. */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+      if (robotType == RobotType.SIM_ROBOT) {
+        System.err.println("Cannot deploy, invalid robot selected: " + robotType);
+        System.exit(1);
+      }
+    }
+  }
+
+  /** Checks that the default robot is selected and tuning mode is disabled. */
+  public static class CheckPullRequest {
+    public static void main(String... args) {
+      if (robotType != RobotType.DEV_ROBOT || tuningMode) {
+        System.err.println("Do not merge, non-default constants are configured.");
+        System.exit(1);
+      }
+    }
   }
 
   /**
@@ -33,9 +84,10 @@ public final class Constants {
    * singular subsystem.
    */
   public static final class HardwareConstants {
-    public static final double TIMEOUT_S = 0.02;
+    public static final double LOOP_TIME_SECONDS = 0.02;
 
-    public static final double STATUS_SIGNAL_FREQUENCY = 50;
+    public static final double RIO_SIGNAL_FREQUENCY = 100;
+    public static final double CANIVORE_SIGNAL_FREQUENCY = 250;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";
@@ -46,6 +98,9 @@ public final class Constants {
      * the lowest possible value.
      */
     public static final double MIN_FALCON_DEADBAND = 0.001;
+
+    public static final int HIGH_THREAD_PRIORITY = 99;
+    public static final int LOW_THREAD_PRIORITY = 1;
   }
 
   /**
@@ -267,6 +322,121 @@ public final class Constants {
     public static final double RED_FEEDER_STATION_PLACE_X = 0;
     public static final double RED_FEEDER_STATION_PLACE_Y = 0;
     public static final Rotation2d RED_FEEDER_STATION_ROTATION = Rotation2d.fromDegrees(-90);
+  }
+
+  /** This is where we place constants related to Auto and any auto-related features */
+  public static final class AutoConstants {
+
+    // Different Pre-defined Auto Routines
+    public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
+    public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
+    public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
+    // This does not exist yet :(
+
+    // All Trajectories are created on the blue alliance and are flipped in the code
+    // Right and Left are always from the perspective of the driver station
+    // letters represent nodes on the coral according to FIRST's official system:
+
+    //  Left      /-----------------------|
+    //          /        K--J             |
+    //         |       L------I           |
+    // Driver  |     A----------H         |
+    // Station |     B----------G         |
+    //         |       C------F           |
+    //          \        D--E             |
+    //  Right     \-----------------------|
+
+    // Example 1 Meter Trajectory
+    public static final String ONE_METER_TRAJECTORY = "Trajectories/ONEMETERRRR";
+
+    // Right Start
+    public static final String RIGHT_START_TO_E_TRAJECTORY = "Trajectories/Right-Start-to-E";
+    public static final String RIGHT_START_TO_F_TRAJECTORY = "Trajectories/Right-Start-to-F";
+    public static final String RIGHT_START_TO_G_TRAJECTORY = "Trajectories/Right-Start-to-G";
+    // Mid Start
+    public static final String MID_START_TO_E_TRAJECTORY = "Trajectories/Mid-Start-to-E";
+    public static final String MID_START_TO_F_TRAJECTORY = "Trajectories/Mid-Start-to-F";
+    public static final String MID_START_TO_G_TRAJECTORY = "Trajectories/Mid-Start-to-G";
+    public static final String MID_START_TO_H_TRAJECTORY = "Trajectories/Mid-Start-to-H";
+    public static final String MID_START_TO_I_TRAJECTORY = "Trajectories/Mid-Start-to-I";
+    public static final String MID_START_TO_J_TRAJECTORY = "Trajectories/Mid-Start-to-J";
+    // Left Start
+    public static final String LEFT_START_TO_I_TRAJECTORY = "Trajectories/Left-Start-to-I";
+    public static final String LEFT_START_TO_H_TRAJECTORY = "Trajectories/Left-Start-to-H";
+    public static final String LEFT_START_TO_J_TRAJECTORY = "Trajectories/Left-Start-to-J";
+
+    // Reef to Right Pickup
+    public static final String A_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/A-to-Right-Pickup";
+    public static final String B_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/B-to-Right-Pickup";
+    public static final String C_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/C-to-Right-Pickup";
+    public static final String D_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/D-to-Right-Pickup";
+    public static final String E_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/E-to-Right-Pickup";
+    public static final String F_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/F-to-Right-Pickup";
+    public static final String G_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/G-to-Right-Pickup";
+    // Reef to Left Pickup
+    public static final String H_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/H-to-Left-Pickup";
+    public static final String I_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/I-to-Left-Pickup";
+    public static final String J_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/J-to-Left-Pickup";
+    public static final String K_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/K-to-Left-Pickup";
+    public static final String L_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/L-to-Left-Pickup";
+    public static final String A_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/A-to-Left-Pickup";
+    public static final String B_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/B-to-Left-Pickup";
+    // Right Pickup to Reef
+    public static final String RIGHT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Right-Pickup-to-A";
+    public static final String RIGHT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Right-Pickup-to-B";
+    public static final String RIGHT_PICKUP_TO_C_TRAJECTORY = "Trajectories/Right-Pickup-to-C";
+    public static final String RIGHT_PICKUP_TO_D_TRAJECTORY = "Trajectories/Right-Pickup-to-D";
+    public static final String RIGHT_PICKUP_TO_E_TRAJECTORY = "Trajectories/Right-Pickup-to-E";
+    public static final String RIGHT_PICKUP_TO_F_TRAJECTORY = "Trajectories/Right-Pickup-to-F";
+    public static final String RIGHT_PICKUP_TO_G_TRAJECTORY = "Trajectories/Right-Pickup-to-G";
+    // Left Pickup to Reef
+    public static final String LEFT_PICKUP_TO_H_TRAJECTORY = "Trajectories/Left-Pickup-to-H";
+    public static final String LEFT_PICKUP_TO_I_TRAJECTORY = "Trajectories/Left-Pickup-to-I";
+    public static final String LEFT_PICKUP_TO_J_TRAJECTORY = "Trajectories/Left-Pickup-to-J";
+    public static final String LEFT_PICKUP_TO_K_TRAJECTORY = "Trajectories/Left-Pickup-to-K";
+    public static final String LEFT_PICKUP_TO_L_TRAJECTORY = "Trajectories/Left-Pickup-to-L";
+    public static final String LEFT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Left-Pickup-to-A";
+    public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
+
+    // Auto Align Constants
+    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.02;
+    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
+    public static final double AUTO_ALIGN_ROTATION_P = 5;
+    public static final double AUTO_ALIGN_ROTATION_I = 0;
+    public static final double AUTO_ALIGN_ROTATION_D = 0;
+    public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
+        new Constraints(4 * Math.PI, 6 * Math.PI);
+
+    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0;
+    public static final double AUTO_ALIGN_TRANSLATION_I = 0;
+    public static final double AUTO_ALIGN_TRANSLATION_D = 0;
+    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
+
+    // These used to be in Trajectory Constants
+
+    public static final double MAX_AUTO_SPEED = 5.0;
+    public static final double MAX_AUTO_ACCELERATION = 3;
+
+    public static final double CHOREO_AUTO_TRANSLATION_P = .5; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_I = 0;
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
+    public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
+    public static final double CHOREO_AUTO_THETA_I = 0; // 5
+    public static final double CHOREO_AUTO_THETA_D = 0.0;
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
+
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
+
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.01;
+
+    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
+
+    // Constraint for the motion profiled robot angle controller
+    public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =
+        new TrapezoidProfile.Constraints(
+            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
   }
 
   public static final class JoystickConstants {

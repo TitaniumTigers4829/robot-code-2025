@@ -8,22 +8,29 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import org.photonvision.PhotonCamera;
 
-// import org.photonvision.PhotonCamera;
-
 public final class VisionConstants {
   public enum Limelight {
-    BACK(0, VisionConstants.BACK_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR), // We have one LL3G
-    FRONT_LEFT(1, VisionConstants.FRONT_LEFT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR),
-    FRONT_RIGHT(2, VisionConstants.FRONT_RIGHT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR);
+    BACK(
+        BACK_LIMELIGHT_NUMBER,
+        BACK_LIMELIGHT_NAME,
+        LL3G_FOV_MARGIN_OF_ERROR,
+        false), // We have one LL3G
+    FRONT_LEFT(
+        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR, false),
+    FRONT_RIGHT(
+        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR, false),
+    ELEVATOR(ELEVATOR_LIMELIGHT_NUMBER, ELEVATOR_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true);
 
     private final int id;
     private final String name;
     private final double accurateFOV;
+    private final boolean isLimelight4;
 
-    Limelight(int id, String name, double accurateFOV) {
+    Limelight(int id, String name, double accurateFOV, boolean isLimelight4) {
       this.id = id;
       this.name = name;
       this.accurateFOV = accurateFOV;
+      this.isLimelight4 = isLimelight4;
     }
 
     public int getId() {
@@ -36,6 +43,10 @@ public final class VisionConstants {
 
     public double getAccurateFOV() {
       return accurateFOV;
+    }
+
+    public boolean isLimelight4() {
+      return isLimelight4;
     }
 
     public static Limelight fromId(int id) {
@@ -57,12 +68,14 @@ public final class VisionConstants {
   public static final Transform3d FRONT_RIGHT_TRANSFORM =
       new Transform3d(
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, -35));
+  public static final Transform3d ELEVATOR_TRANSFORM = new Transform3d();
 
   public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
   public static final PhotonCamera FRONT_LEFT_CAMERA =
       new PhotonCamera(Limelight.FRONT_LEFT.getName());
   public static final PhotonCamera FRONT_RIGHT_CAMERA =
       new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  public static final PhotonCamera ELEVATOR_CAMERA = new PhotonCamera(Limelight.ELEVATOR.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
@@ -70,12 +83,14 @@ public final class VisionConstants {
 
   public static final AprilTagFieldLayout FIELD_LAYOUT =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
   public static final double VISION_X_POS_TRUST = 0.5; // meters
   public static final double VISION_Y_POS_TRUST = 0.5; // meters
   public static final double VISION_ANGLE_TRUST = Units.degreesToRadians(50); // radians
 
   public static final double LL3_FOV_MARGIN_OF_ERROR = 26;
   public static final double LL3G_FOV_MARGIN_OF_ERROR = 36;
+  public static final double LL4_FOV_MARGIN_OF_ERROR = 34.5;
 
   public static final double MAX_TRANSLATION_DELTA_METERS = 0.8;
   public static final double MAX_ROTATION_DELTA_DEGREES = 50.0;
@@ -93,6 +108,8 @@ public final class VisionConstants {
   public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 1;
   public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
   public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 2;
+  public static final String ELEVATOR_LIMELIGHT_NAME = "limelight-elevate";
+  public static final int ELEVATOR_LIMELIGHT_NUMBER = 3;
 
   // Constants for port forwarding
   public static final int BASE_PORT = 5800;

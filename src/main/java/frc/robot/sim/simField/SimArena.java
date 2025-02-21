@@ -11,10 +11,10 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
+import frc.robot.extras.logging.RuntimeLog;
+import frc.robot.extras.math.forces.ProjectileUtil;
+import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.extras.util.FrcBody;
-import frc.robot.extras.util.ProjectileUtil;
-import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.mathutils.GeomUtil;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.ArrayList;
@@ -175,7 +175,7 @@ public abstract class SimArena {
    * autonomous mode.
    *
    * <p>It should be implemented differently for each season-specific subclass of {@link SimArena}
-   * to reflect the unique game piece placements for that season's game.
+   * to reflect the unique game piece placements for that seaso's game.
    */
   protected abstract void placeGamePiecesOnField();
 

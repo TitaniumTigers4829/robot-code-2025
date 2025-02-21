@@ -2,8 +2,10 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,14 +18,15 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.AutoConstants;mBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.extras.setpointGen.SwerveSetpoint;
-import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.logging.Tracer;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.RepulsorFieldPlanner;
 import frc.robot.extras.util.RepulsorFieldPlanner.RepulsorSample;
 import frc.robot.extras.util.TimeUtil;
-import frc.robot.extras.util.Tracer;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -40,6 +43,24 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
+  private final ProfiledPIDController xChoreoController =
+      new ProfiledPIDController(
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
+  private final ProfiledPIDController yChoreoController =
+      new ProfiledPIDController(
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
+          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
+  private final ProfiledPIDController rotationChoreoController =
+      new ProfiledPIDController(
+          AutoConstants.CHOREO_AUTO_THETA_P,
+          AutoConstants.CHOREO_AUTO_THETA_I,
+          AutoConstants.CHOREO_AUTO_THETA_D,
+          AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -118,6 +139,12 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
+    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
+    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
+    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
+
+    rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
+
     gyroDisconnectedAlert.set(false);
   }
 
@@ -128,7 +155,7 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput(
         "SystemPerformance/OdometryFetchingTimeMS", (TimeUtil.getRealTimeSeconds() - t0) * 1000);
     // Runs the SwerveModules periodic methods
-    for (SwerveModule module : swerveModules) module.periodic();
+    modulesPeriodic();
   }
 
   /**
@@ -146,7 +173,7 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-    setpoint = setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, 0.02);
+    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -164,10 +191,18 @@ public class SwerveDrive extends SubsystemBase {
     return setpoint.chassisSpeeds();
   }
 
-  /*
-   * Updates the pose estimator with the pose calculated from the april tags. How much it
-   * contributes to the pose estimation is set by setPoseEstimatorVisionConfidence.
+  public void drive(ChassisSpeeds speeds) {
+    drive(
+        -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond, false);
+  }
+
+  /**
+   * Allows PID on the chassis rotation.
    *
+   * @param speeds The ChassisSpeeds of the drive to set.
+   * @param rotationControl The control on the drive rotatio /* Updates the pose estimator with the
+   *     pose calculated from the april tags. How much it contributes to the pose estimation is set
+   *     by setPoseEstimatorVisionConfidence.
    * @param visionMeasurement The pose calculated from the april tags
    * @param currentTimeStampSeconds The time stamp in seconds of when the pose from the april tags
    *     was calculated.
@@ -194,12 +229,45 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Runs characterization on voltage
    *
-   * @param volts voltage to set
+   * @param volts current to set
    */
-  public void runCharacterization(double volts) {
+  public void runCharacterizationVoltage(double volts) {
     for (SwerveModule module : swerveModules) {
       module.setVoltage(Volts.of(-volts));
     }
+  }
+
+  /**
+   * Runs characterization on current
+   *
+   * @param amps current to set
+   */
+  public void runCharacterizationCurrent(double amps) {
+    for (SwerveModule module : swerveModules) {
+      module.setCurrent(Amps.of(-amps));
+    }
+  }
+
+  /**
+   * @param omegaspeed Controls the rotation speed of the drivetrain for characterization.
+   */
+  public void runWheelRadiusCharacterization(double omegaspeed) {
+    drive(0, 0, omegaspeed, false);
+  }
+
+  /**
+   * Gets the wheel radiues characterization position
+   *
+   * @return returns the averaged wheel positions.
+   */
+  public double[] getWheelRadiusCharacterizationPosition() {
+    double[] wheelPositions = new double[swerveModules.length];
+
+    // Iterate over all the swerve modules, get their positions and add them to the array
+    for (SwerveModule module : swerveModules) {
+      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
+    }
+    return wheelPositions;
   }
 
   /**
@@ -225,7 +293,44 @@ public class SwerveDrive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.isConnected);
   }
 
-  public boolean isChassisSpeedsZeroed(ChassisSpeeds speeds) {
+  /**
+   * Moves the robot to a sample(one point) of a swerve Trajectory provided by Choreo
+   *
+   * @param sample trajectory
+   */
+  public void followSwerveSample(SwerveSample sample) {
+    if (sample != null) {
+      Pose2d pose = getEstimatedPose();
+      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
+      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
+      double moveTheta =
+          -sample.omega
+              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
+      drive(moveX, moveY, moveTheta, true);
+    }
+  }
+
+  /**
+   * @return if the robot is at the desired swerveSample
+   */
+  public boolean isTrajectoryFinished(SwerveSample swerveSample) {
+    return swerveSample.x < xChoreoController.getGoal().position
+        && swerveSample.y < yChoreoController.getGoal().position;
+  }
+
+  /** Runs the SwerveModules periodic methods */
+  private void modulesPeriodic() {
+    for (SwerveModule module : swerveModules) module.periodic();
+  }
+
+  /**
+   * Returns if the robot speed is to zero when zeroed
+   *
+   * @return is robot moving along x
+   * @return is robot moving along y
+   * @return is robot rotating
+   */
+  public boolean getZeroedSpeeds(ChassisSpeeds speeds) {
     return speeds.vxMetersPerSecond == 0
         && speeds.vyMetersPerSecond == 0
         && speeds.omegaRadiansPerSecond == 0;
