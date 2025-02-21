@@ -71,6 +71,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  public double getVelocity() {
+    return inputs.leaderVelocity;
+  }
+
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
@@ -81,6 +85,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public void setPercentOutput(double output) {
     elevatorInterface.setPercentOutput(output);
+  }
+  public boolean isAtSetpoint() {
+    return inputs.elevatorError < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
+  }
+
+  public void resetPosition(double position) {
+    elevatorInterface.resetElevatorPosition(position);
   }
 
   @Override
@@ -101,7 +112,6 @@ public class ElevatorSubsystem extends SubsystemBase {
       elevatorInterface.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
   }
-
   public Command manualElevator(DoubleSupplier joystickY) {
     return new StartEndCommand(
         // does this while command is active

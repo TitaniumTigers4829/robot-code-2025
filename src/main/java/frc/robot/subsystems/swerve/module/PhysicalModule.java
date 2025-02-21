@@ -56,11 +56,10 @@ public class PhysicalModule implements ModuleInterface {
 
   public PhysicalModule(ModuleConfig moduleConfig) {
     driveMotor =
-        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
-    turnMotor =
-        new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
+    turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
     turnEncoder =
-        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
 
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
@@ -73,13 +72,14 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimit = ModuleConstants.DRIVE_STATOR_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    // driveConfig.MotorOutput.ControlTimesyncFreqHz = 50;
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     turnConfig.Feedback.FeedbackRemoteSensorID = turnEncoder.getDeviceID();
     turnConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
     turnConfig.Feedback.SensorToMechanismRatio = 1.0;
-    turnConfig.Feedback.RotorToSensorRatio = 11;
+    turnConfig.Feedback.RotorToSensorRatio = ModuleConstants.TURN_GEAR_RATIO;
     turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     turnConfig.MotorOutput.Inverted = moduleConfig.turnReversed();
     turnConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
@@ -90,6 +90,7 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    // turnConfig.MotorOutput.ControlTimesyncFreqHz = 50;
     turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     drivePosition = driveMotor.getPosition();
@@ -110,7 +111,7 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        HardwareConstants.CANIVORE_SIGNAL_FREQUENCY,
+        HardwareConstants.RIO_SIGNAL_FREQUENCY,
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
@@ -123,12 +124,12 @@ public class PhysicalModule implements ModuleInterface {
         turnMotorTorqueCurrent);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
+    turnEncoder.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    BaseStatusSignal.waitForAll(
-        0.00,
+    BaseStatusSignal.refreshAll(
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
@@ -157,12 +158,16 @@ public class PhysicalModule implements ModuleInterface {
     inputs.drivePosition = -drivePosition.getValueAsDouble();
     inputs.driveDesiredPosition = driveMotorReference.getValueAsDouble();
     inputs.driveTorqueCurrent = driveMotorTorque.getValueAsDouble();
+    inputs.driveError =
+        Math.abs(driveMotorReference.getValueAsDouble() - driveMotorTorque.getValueAsDouble());
 
     inputs.turnAbsolutePosition =
         Rotation2d.fromRotations(turnEncoderAbsolutePosition.getValueAsDouble());
     inputs.turnVelocity = turnEncoderVelocity.getValueAsDouble();
     inputs.turnDesiredPosition = turnMotorReference.getValueAsDouble();
     inputs.turnTorqueCurrent = turnMotorTorqueCurrent.getValueAsDouble();
+    inputs.turnError =
+        Math.abs(turnMotorReference.getValueAsDouble() - turnMotorTorqueCurrent.getValueAsDouble());
   }
 
   @Override
@@ -196,11 +201,13 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.setControl(
         velocityTorqueCurrentFOC
             .withVelocity(RotationsPerSecond.of(desiredDriveRPS))
-            .withUseTimesync(true));
+            .withUseTimesync(true)
+            .withOverrideCoastDurNeutral(true));
     turnMotor.setControl(
         positionTorqueCurrentFOC
             .withPosition(Rotations.of(desiredState.angle.getRotations()))
-            .withUseTimesync(true));
+            .withUseTimesync(true)
+            .withOverrideCoastDurNeutral(true));
   }
 
   public double getTurnRotations() {

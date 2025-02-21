@@ -5,13 +5,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
-  public static final boolean tuningMode = false;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
+  public static final boolean tuningMode = true;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -20,11 +18,11 @@ public final class Constants {
    */
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
-    if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
-      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
-          .set(true);
-      robotType = RobotType.COMP_ROBOT;
-    }
+    // if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+    //   new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+    //       .set(true);
+    //   robotType = RobotType.COMP_ROBOT;
+    // }
     return robotType;
   }
 
@@ -182,10 +180,10 @@ public final class Constants {
             Units.inchesToMeters(137.345),
             new Rotation2d(Units.degreesToRadians(240)));
     public static final Pose2d BLUE_REEF_TWELEVE =
-        new Pose2d(
-            Units.inchesToMeters(160.797),
-            Units.inchesToMeters(143.814),
-            new Rotation2d(Units.degreesToRadians(240)));
+        new Pose2d(3.66, 2.79, Rotation2d.fromDegrees(60.0));
+    // Units.inchesToMeters(160.797),
+    // Units.inchesToMeters(143.814),
+    // new Rotation2d(Units.degreesToRadians(240)));
 
     public static final Pose2d RED_REEF_ONE =
         new Pose2d(

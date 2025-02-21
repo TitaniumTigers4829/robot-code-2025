@@ -12,12 +12,12 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import org.littletonrobotics.junction.Logger;
 
 /* Auto Align takes in Pose2d and moves robot to it */
 public class AutoAlign extends DriveCommandBase {
 
   private final SwerveDrive swerveDrive;
-  private final VisionSubsystem visionSubsystem;
 
   private Pose2d targetPose;
 
@@ -53,7 +53,6 @@ public class AutoAlign extends DriveCommandBase {
     super(swerveDrive, visionSubsystem);
     this.targetPose = targetPose;
     this.swerveDrive = swerveDrive;
-    this.visionSubsystem = visionSubsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(swerveDrive, visionSubsystem);
     // Enables continuous input for the rotation controller
@@ -80,16 +79,22 @@ public class AutoAlign extends DriveCommandBase {
         MathUtil.applyDeadband(
             yTranslationController.calculate(yPoseError, 0),
             AutoConstants.AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT);
-    double turnOutput =
-        MathUtil.applyDeadband(
-            rotationController.calculate(thetaPoseError, 0),
-            AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
+    double turnOutput;
+    if (!(thetaPoseError == 0)) {
+      turnOutput =
+          MathUtil.applyDeadband(
+              rotationController.calculate(thetaPoseError, 0),
+              AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
+    } else {
+      turnOutput = 0;
+    }
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             xOutput, yOutput, turnOutput, swerveDrive.getOdometryRotation2d());
 
+    Logger.recordOutput("Drive/target pose", targetPose);
     // Drives the robot towards the target pose
     swerveDrive.drive(
         chassisSpeeds.vxMetersPerSecond,
