@@ -18,12 +18,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
-import frc.robot.commands.coralIntake.EjectCoral;
-import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.ManualElevator;
-import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -194,37 +190,44 @@ public class Robot extends LoggedRobot {
                 Commands.parallel(
                         new AutoAlign(
                             swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
-                        new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_3)
+                        elevatorSubsystem
+                            .setElevationPosition(ElevatorConstants.LEVEL_3)
                             .until((() -> elevatorSubsystem.isAtSetpoint())))
-                    .andThen(new EjectCoral(coralIntakeSubsystem))
+                    .andThen(coralIntakeSubsystem.ejectCoral())
                     .until(() -> !coralIntakeSubsystem.hasCoral())
                     .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
   }
 
   private void configureOperatorController() {
+    operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
+    operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
+    operatorController.x().whileTrue(Commands.none());
+    operatorController
+        .a()
+        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
     operatorController
         .b()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
-    operatorController.y().whileTrue(new IntakeCoral(coralIntakeSubsystem));
+        .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_2));
+    operatorController.y().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
         .x()
         .whileTrue(
             Commands.sequence(
-                Commands.deadline(
-                        new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_4),
-                        Commands.run(
-                            () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
-                    .until(() -> elevatorSubsystem.isAtSetpoint())
-                    .andThen(new EjectCoral(coralIntakeSubsystem))
-                    .until(() -> !coralIntakeSubsystem.hasCoral())
-                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
-    operatorController.leftBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
+                    Commands.deadline(
+                            elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
+                            Commands.run(
+                                () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
+                        .until(() -> elevatorSubsystem.isAtSetpoint())
+                        .andThen(coralIntakeSubsystem.ejectCoral()))
+                .until(() -> !coralIntakeSubsystem.hasCoral())
+                .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
+    operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
+        .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_FEEDER));
     operatorController
         .rightBumper()
-        .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
@@ -311,7 +314,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
-
         this.simWorld = null;
       }
       case SWERVE_ROBOT -> {
