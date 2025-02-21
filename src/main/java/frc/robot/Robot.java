@@ -17,12 +17,12 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
-import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.coralIntake.EjectCoral;
 import frc.robot.commands.coralIntake.IntakeCoral;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -34,6 +34,7 @@ import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -85,7 +86,7 @@ public class Robot extends LoggedRobot {
     checkGit();
     setupLogging();
     setupSubsystems();
-    setupAuto();
+    // setupAuto();
   }
 
   /** This function is called periodically during all modes. */
@@ -140,10 +141,10 @@ public class Robot extends LoggedRobot {
         new DoubleSupplier[] {
           () ->
               JoystickUtil.modifyAxisPolar(
-                  driverController::getLeftX, driverController::getLeftY, 3)[0],
+                  driverController::getLeftX, driverController::getLeftY, 3)[1],
           () ->
               JoystickUtil.modifyAxisPolar(
-                  driverController::getLeftX, driverController::getLeftY, 3)[1]
+                  driverController::getLeftX, driverController::getLeftY, 3)[0]
         };
 
     // DRIVER BUTTONS
@@ -151,10 +152,10 @@ public class Robot extends LoggedRobot {
         new DriveCommand(
             swerveDrive,
             visionSubsystem,
-            // Translation in the Y direction
-            driverLeftStick[1],
             // Translation in the X direction
             driverLeftStick[0],
+            // Translation in the Y direction
+            driverLeftStick[1],
             // Rotation
             () -> JoystickUtil.modifyAxis(driverController::getRightX, 3),
             // Robot relative
@@ -187,22 +188,35 @@ public class Robot extends LoggedRobot {
     driverController
         .a()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
-    driverController
-        .b()
-        .whileTrue(
-            new StaticCharacterization(
-                swerveDrive,
-                swerveDrive::runCharacterizationCurrent,
-                swerveDrive::getCharacterizationVelocity));
   }
 
   private void configureOperatorController() {
-    operatorController.b().whileTrue(new IntakeCoral(coralIntakeSubsystem));
-    operatorController.y().whileTrue(new EjectCoral(coralIntakeSubsystem));
-    operatorController.x().whileTrue(Commands.none());
+    operatorController
+        .b()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2));
+    operatorController.y().whileTrue(new IntakeCoral(coralIntakeSubsystem));
+    operatorController
+        .x()
+        .whileTrue(
+            Commands.sequence(
+                Commands.deadline(
+                        new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_4),
+                        Commands.run(
+                            () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
+                    .until(() -> elevatorSubsystem.isAtSetpoint())
+                    .andThen(new EjectCoral(coralIntakeSubsystem))
+                    .until(() -> !coralIntakeSubsystem.hasCoral())
+                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
+    operatorController.leftBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
     operatorController
         .a()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_FEEDER));
+    operatorController
+        .rightBumper()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+    operatorController
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
   }
 
   private void checkGit() {

@@ -68,12 +68,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  public double getVelocity() {
+    return inputs.leaderVelocity;
+  }
+
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
 
   public void openLoop(double output) {
     elevatorInterface.openLoop(output);
+  }
+
+  public boolean isAtSetpoint() {
+    return inputs.elevatorError < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
+  }
+
+  public void resetPosition(double position) {
+    elevatorInterface.resetElevatorPosition(position);
   }
 
   @Override

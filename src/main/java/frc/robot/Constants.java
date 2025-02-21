@@ -5,13 +5,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
   private static RobotType robotType = RobotType.DEV_ROBOT;
-  public static final boolean tuningMode = false;
+  public static final boolean tuningMode = true;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -20,11 +18,11 @@ public final class Constants {
    */
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
-    if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
-      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
-          .set(true);
-      robotType = RobotType.COMP_ROBOT;
-    }
+    // if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+    //   new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+    //       .set(true);
+    //   robotType = RobotType.COMP_ROBOT;
+    // }
     return robotType;
   }
 

@@ -14,7 +14,10 @@ public interface CoralIntakeInterface {
     public double intakePosition = 0.0;
     public double intakeSupplyCurrentAmps = 0.0;
     public boolean hasCoral = false;
+    public double intakeDutyCycle = 0.0;
   }
+
+  default void setIntakeVoltage(double volts) {}
 
   default void updateInputs(CoralIntakeInputs inputs) {}
 
