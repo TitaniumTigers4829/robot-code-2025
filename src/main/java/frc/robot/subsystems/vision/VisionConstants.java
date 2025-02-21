@@ -97,7 +97,7 @@ public final class VisionConstants {
   public static final double MAX_AMBIGUITY_THRESHOLD = .45;
 
   public static final double MEGA_TAG_2_DISTANCE_THRESHOLD = 1.5;
-  public static final double MEGA_TAG_2_MAX_HEADING_RATE = 38; // degrees/s
+  public static final double MEGA_TAG_2_MAX_HEADING_RATE = 100; // degrees/s
 
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = .5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;
