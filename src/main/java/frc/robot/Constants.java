@@ -409,20 +409,20 @@ public final class Constants {
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
 
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0; // 4
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
 
     // These used to be in Trajectory Constants
 
-    public static final double MAX_AUTO_SPEED = 1.0;
-    public static final double MAX_AUTO_ACCELERATION = 1;
+    public static final double MAX_AUTO_SPEED = 3;
+    public static final double MAX_AUTO_ACCELERATION = 5;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 25; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = 0.1; //
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 1.0;
-    public static final double CHOREO_AUTO_THETA_P = 25; // 5
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0;
+    public static final double CHOREO_AUTO_THETA_P = 5; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
     public static final double CHOREO_AUTO_THETA_D = 0;
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
@@ -431,7 +431,7 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 1;
 
-    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.05;
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.005;
 
     public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
 

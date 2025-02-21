@@ -356,16 +356,16 @@ public class Robot extends LoggedRobot {
     // this sets up the auto factory
     this.autoFactory =
         new AutoFactory(
-            this.swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            this.swerveDrive
-                ::resetEstimatedPose, // A function that resets the current robot pose to the
+            () ->
+                this.swerveDrive
+                    .getEstimatedPose(), // A function that returns the current robot pose
+            (Pose2d pose) ->
+                this.swerveDrive.resetEstimatedPose(
+                    pose), // A function that resets the current robot pose to the
             (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followCommand =
+              FollowSwerveSampleCommand followSwerveSampleCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
-              followCommand.execute();
-              if (this.swerveDrive.isTrajectoryFinished(sample)) {
-                followCommand.cancel();
-              }
+              followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
