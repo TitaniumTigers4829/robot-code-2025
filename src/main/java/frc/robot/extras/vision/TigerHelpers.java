@@ -451,6 +451,7 @@ public class TigerHelpers {
    */
   public static void setNTInstance(NetworkTableInstance ntInstance) {
     TigerHelpers.ntInstance = ntInstance;
+    clearCaches();
   }
 
   /**
@@ -460,6 +461,14 @@ public class TigerHelpers {
    */
   public static NetworkTableInstance getNTInstance() {
     return ntInstance;
+  }
+
+  /**
+   * Clears any static caches held in TigerHelpers. This should be called in your test setup (or
+   * teardown) to ensure a fresh state between tests.
+   */
+  public static void clearCaches() {
+    doubleArrayEntries.clear();
   }
 
   public static Boolean validPoseEstimate(PoseEstimate pose) {
@@ -869,30 +878,46 @@ public class TigerHelpers {
    *
    * @param poseEstimate the pose estimate to set
    * @param limelightName the name of the Limelight
-   * @param botpose the type of botpose to set
+   * @param botpose the type of botpose to set (e.g., BLUE_MEGATAG1)
    */
   public static void setBotPoseEstimate(
       PoseEstimate poseEstimate, String limelightName, Botpose botpose) {
     NetworkTableEntry entry = getLimelightNTTableEntry(limelightName, botpose.getEntryName());
-    // Sets the pose data in the network table double array
-    // The array is: [x, y, z, roll, pitch, yaw, latency, tagCount, tagSpan, avgTagDist, avgTagArea]
-    // units in meters, degrees, and milliseconds
-    entry.setDoubleArray(
-        new double[] {
-          poseEstimate.pose.getX(),
-          poseEstimate.pose.getY(),
-          0.0, // z
-          0.0, // roll
-          0.0, // pitch
-          poseEstimate.pose.getRotation().getDegrees(),
-          poseEstimate.latency,
-          poseEstimate.tagCount,
-          poseEstimate.tagSpan,
-          poseEstimate.avgTagDist,
-          poseEstimate.avgTagArea
-        });
+    // Because network tables don't support 2D arrays, we need to flatten the data into a 1D array
 
-    // TODO: Add raw fiducials to the network table
+    // Calculates array size: 11 (for PoseEstimate data) + 7 * number of fiducials (for each raw
+    // fiducial)
+    int fiducialCount = poseEstimate.rawFiducials.length;
+    double[] data = new double[11 + 7 * fiducialCount];
+
+    // Populates the PoseEstimate, matching unpackBotPoseEstimate
+    data[0] = poseEstimate.pose.getX(); // x
+    data[1] = poseEstimate.pose.getY(); // y
+    data[2] = 0.0; // z (Pose2d doesn't use this)
+    data[3] = 0.0; // roll (not used)
+    data[4] = 0.0; // pitch (not used)
+    data[5] = poseEstimate.pose.getRotation().getDegrees(); // yaw
+    data[6] = poseEstimate.latency; // latency
+    data[7] = fiducialCount; // tagCount (must match fiducials length)
+    data[8] = poseEstimate.tagSpan; // tagSpan
+    data[9] = poseEstimate.avgTagDist; // avgTagDist
+    data[10] = poseEstimate.avgTagArea; // avgTagArea
+
+    // Add data for each fiducial
+    for (int i = 0; i < fiducialCount; i++) {
+      int baseIndex = 11 + (i * 7);
+      RawFiducial fid = poseEstimate.rawFiducials[i];
+      data[baseIndex] = fid.id; // id (cast to double)
+      data[baseIndex + 1] = fid.txnc; // txnc
+      data[baseIndex + 2] = fid.tync; // tync
+      data[baseIndex + 3] = fid.ta; // ta
+      data[baseIndex + 4] = fid.distToCamera; // distToCamera
+      data[baseIndex + 5] = fid.distToRobot; // distToRobot
+      data[baseIndex + 6] = fid.ambiguity; // ambiguity
+    }
+
+    // Write the array to NetworkTables
+    entry.setDoubleArray(data);
   }
 
   /**
@@ -905,6 +930,32 @@ public class TigerHelpers {
    */
   public static void setBotPoseEstimate(PoseEstimate poseEstimate, String limelightName) {
     setBotPoseEstimate(poseEstimate, limelightName, Botpose.BLUE_MEGATAG1);
+  }
+
+  /**
+   * Sets the network table entry for the raw fiducials. This is useful for setting values for unit
+   * testing.
+   *
+   * @param rawFiducials the array of raw fiducials to set
+   * @param limelightName the name of the Limelight
+   */
+  public static void setRawFiducials(RawFiducial[] rawFiducials, String limelightName) {
+    NetworkTableEntry entry = getLimelightNTTableEntry(limelightName, "rawfiducials");
+    double[] data = new double[rawFiducials.length * 7];
+
+    for (int i = 0; i < rawFiducials.length; i++) {
+      int baseIndex = i * 7;
+      RawFiducial fid = rawFiducials[i];
+      data[baseIndex] = (double) fid.id;
+      data[baseIndex + 1] = fid.txnc;
+      data[baseIndex + 2] = fid.tync;
+      data[baseIndex + 3] = fid.ta;
+      data[baseIndex + 4] = fid.distToCamera;
+      data[baseIndex + 5] = fid.distToRobot;
+      data[baseIndex + 6] = fid.ambiguity;
+    }
+
+    entry.setDoubleArray(data);
   }
 
   /**

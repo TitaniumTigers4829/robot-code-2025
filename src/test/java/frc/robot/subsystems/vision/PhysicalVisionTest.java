@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.vision.TigerHelpers;
 import frc.robot.extras.vision.TigerHelpers.Botpose;
 import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
@@ -121,124 +122,131 @@ public class PhysicalVisionTest {
     assertEquals(Double.MAX_VALUE, physicalVision.getLimelightAprilTagDistance(Limelight.BACK));
     assertEquals(0.0, physicalVision.getAmbiguity(Limelight.BACK));
 
+    // We have to set these values so that canSeeAprilTags returns true
+    backLimelightTable.getEntry("tv").setDouble(1.0);
+    backLimelightTable.getEntry("tx").setDouble(Limelight.BACK.getAccurateFOV() - 1);
+
+    RawFiducial[] expectedRawFiducials = {new RawFiducial(1, 0, 0, 1, 1, 1, 0.2)};
+
     PoseEstimate expectedPoseEstimate =
         new PoseEstimate(
             new Pose2d(1.0, 1.0, new Rotation2d()),
             20.0,
             20.0,
-            0,
+            expectedRawFiducials.length,
             5.0,
             5.0,
             0.5,
-            // new RawFiducial[] {new RawFiducial(1, 0, 0, 1, 1, 1, 0.2)},
-            new RawFiducial[] {},
+            expectedRawFiducials,
             false);
 
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
 
-    // // For simplictity, we're just going to use the disabledPoseUpdate method to set
-    // // the limelightEstimates as it doesn't have any logic in it like
-    // // enabledPoseUpdate
+    // For simplictity, we're just going to use the disabledPoseUpdate method to set
+    // the limelightEstimates as it doesn't have any logic in it like
+    // enabledPoseUpdate
     physicalVision.disabledPoseUpdate(Limelight.BACK);
-    // assertEquals(expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.BACK));
-    // assertEquals(
-    //     expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.BACK));
-    // assertEquals(
-    //     expectedPoseEstimate.latency, physicalVision.getLatencySeconds(Limelight.BACK), 0.0);
-    // assertEquals(
-    //     expectedPoseEstimate.avgTagDist,
-    //     physicalVision.getLimelightAprilTagDistance(Limelight.BACK),
-    //     0.0);
-    // assertEquals(
-    //     expectedPoseEstimate.rawFiducials[0].ambiguity,
-    //     physicalVision.getAmbiguity(Limelight.BACK),
-    //     0.0);
+    assertEquals(expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.BACK));
+    assertEquals(
+        expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.BACK));
+    // We have to divide by 1000 because the timestamp is in milliseconds
+    assertEquals(
+        expectedPoseEstimate.latency / 1000.0,
+        physicalVision.getLatencySeconds(Limelight.BACK),
+        0.0);
+    assertEquals(
+        expectedPoseEstimate.avgTagDist,
+        physicalVision.getLimelightAprilTagDistance(Limelight.BACK),
+        0.0);
+    assertEquals(
+        expectedPoseEstimate.rawFiducials[0].ambiguity,
+        physicalVision.getAmbiguity(Limelight.BACK),
+        0.0);
   }
 
   @Test
   void testIsValidMeasurement() {
-    // // If the pose hasn't been updated, it should return false
-    // assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    // If the pose hasn't been updated, it should return false
+    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
 
-    // // If the pose is not empty, within the field, is confident, and not
-    // // teleporting, then it should be true
-    // PoseEstimate expectedPoseEstimate =
-    //     new PoseEstimate(
-    //         new Pose2d(
-    //             FieldConstants.FIELD_LENGTH_METERS / 2.0,
-    //             FieldConstants.FIELD_WIDTH_METERS / 2.0,
-    //             new Rotation2d()),
-    //         20.0,
-    //         20.0,
-    //         1,
-    //         5.0,
-    //         5.0,
-    //         0.5,
-    //         new RawFiducial[] {
-    //           new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
-    //         },
-    //         false);
+    // If the pose is not empty, within the field, is confident, and not
+    // teleporting, then it should be true
+    PoseEstimate expectedPoseEstimate =
+        new PoseEstimate(
+            new Pose2d(
+                FieldConstants.FIELD_LENGTH_METERS * 0.5,
+                FieldConstants.FIELD_WIDTH_METERS * 0.5,
+                new Rotation2d()),
+            20.0,
+            20.0,
+            1,
+            5.0,
+            5.0,
+            0.5,
+            new RawFiducial[] {
+              new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
+            },
+            false);
 
-    // backLimelightTable
-    //     .getEntry("botpose_wpiblue")
-    //     .setDoubleArray(
-    //         new double[] {
-    //           expectedPoseEstimate.pose.getX(),
-    //           expectedPoseEstimate.pose.getY(),
-    //           0.0,
-    //           0.0,
-    //           0.0,
-    //           expectedPoseEstimate.pose.getRotation().getDegrees(),
-    //           expectedPoseEstimate.latency,
-    //           expectedPoseEstimate.tagCount,
-    //           expectedPoseEstimate.tagSpan,
-    //           expectedPoseEstimate.avgTagDist,
-    //           expectedPoseEstimate.avgTagArea
-    //         });
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
 
-    // // Update the limeightEstimates
-    // physicalVision.disabledPoseUpdate(Limelight.BACK);
+    backLimelightTable.getEntry("tv").setDouble(1.0);
+    backLimelightTable.getEntry("tx").setDouble(Limelight.BACK.getAccurateFOV() - 1);
 
-    // assertTrue(physicalVision.isValidMeasurement(Limelight.BACK));
+    // Update the limeightEstimates
+    physicalVision.disabledPoseUpdate(Limelight.BACK);
 
-    // // If we make the make the ambiguity high, it should return false
-    // expectedPoseEstimate =
-    //     new PoseEstimate(
-    //         new Pose2d(
-    //             FieldConstants.FIELD_LENGTH_METERS * 0.5,
-    //             FieldConstants.FIELD_WIDTH_METERS * 0.5,
-    //             new Rotation2d()),
-    //         20.0,
-    //         20.0,
-    //         1,
-    //         5.0,
-    //         5.0,
-    //         0.5,
-    //         new RawFiducial[] {
-    //           new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 1.1)
-    //         },
-    //         false);
-    // physicalVision.disabledPoseUpdate(Limelight.BACK);
-    // assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    // We call isValidMeasurement a bunch here to fill up the isTeleporting moving average
+    for (int i = 0; i < VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE; i++) {
+      physicalVision.isValidMeasurement(Limelight.BACK);
+    }
 
-    // // If we make it start teleporting, it should return false
-    // expectedPoseEstimate =
-    //     new PoseEstimate(
-    //         new Pose2d(
-    //             FieldConstants.FIELD_LENGTH_METERS * 0.75,
-    //             FieldConstants.FIELD_WIDTH_METERS * 0.75,
-    //             new Rotation2d()),
-    //         20.0,
-    //         20.0,
-    //         1,
-    //         5.0,
-    //         5.0,
-    //         0.5,
-    //         new RawFiducial[] {
-    //           new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
-    //         },
-    //         false);
-    // physicalVision.disabledPoseUpdate(Limelight.BACK);
-    // assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    assertTrue(physicalVision.isValidMeasurement(Limelight.BACK));
+
+    // If we make the make the ambiguity high, it should return false
+    expectedPoseEstimate =
+        new PoseEstimate(
+            new Pose2d(
+                FieldConstants.FIELD_LENGTH_METERS * 0.5,
+                FieldConstants.FIELD_WIDTH_METERS * 0.5,
+                new Rotation2d()),
+            20.0,
+            20.0,
+            1,
+            5.0,
+            5.0,
+            0.5,
+            new RawFiducial[] {
+              new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 1.1)
+            },
+            false);
+
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+
+    physicalVision.disabledPoseUpdate(Limelight.BACK);
+    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+
+    // If we make it start teleporting, it should return false
+    expectedPoseEstimate =
+        new PoseEstimate(
+            new Pose2d(
+                FieldConstants.FIELD_LENGTH_METERS * 0.75,
+                FieldConstants.FIELD_WIDTH_METERS * 0.75,
+                new Rotation2d()),
+            20.0,
+            20.0,
+            1,
+            5.0,
+            5.0,
+            0.5,
+            new RawFiducial[] {
+              new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
+            },
+            false);
+
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+
+    physicalVision.disabledPoseUpdate(Limelight.BACK);
+    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
   }
 }
