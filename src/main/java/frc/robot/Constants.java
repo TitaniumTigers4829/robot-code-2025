@@ -180,10 +180,10 @@ public final class Constants {
             Units.inchesToMeters(137.345),
             new Rotation2d(Units.degreesToRadians(240)));
     public static final Pose2d BLUE_REEF_TWELEVE =
-        new Pose2d(
-            Units.inchesToMeters(160.797),
-            Units.inchesToMeters(143.814),
-            new Rotation2d(Units.degreesToRadians(240)));
+        new Pose2d(3.66, 2.79, Rotation2d.fromDegrees(60.0));
+    // Units.inchesToMeters(160.797),
+    // Units.inchesToMeters(143.814),
+    // new Rotation2d(Units.degreesToRadians(240)));
 
     public static final Pose2d RED_REEF_ONE =
         new Pose2d(

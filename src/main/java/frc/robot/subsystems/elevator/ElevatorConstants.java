@@ -46,7 +46,7 @@ public class ElevatorConstants {
   // Elevator setpoints
   public static final double LEVEL_1 = -2.4;
   public static final double LEVEL_2 = -3.5;
-  public static final double LEVEL_3 = -5.57;
+  public static final double LEVEL_3 = -5.845;
   public static final double LEVEL_4 = -9.5;
   public static final double LEVEL_FEEDER = -1.25;
 }

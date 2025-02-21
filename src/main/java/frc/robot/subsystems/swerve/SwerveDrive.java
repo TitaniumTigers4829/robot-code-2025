@@ -78,7 +78,7 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
           DriveConstants.MODULE_TRANSLATIONS,
-          DCMotor.getKrakenX60(1).withReduction(ModuleConstants.DRIVE_GEAR_RATIO),
+          DCMotor.getFalcon500(1).withReduction(7.13),
           DCMotor.getFalcon500(1).withReduction(11),
           60,
           58,

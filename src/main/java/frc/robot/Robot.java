@@ -5,6 +5,7 @@ import choreo.auto.AutoFactory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -131,6 +132,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    DriverStation.silenceJoystickConnectionWarning(true);
     configureDriverController();
     configureOperatorController();
   }
@@ -187,7 +189,16 @@ public class Robot extends LoggedRobot {
     // FieldConstants has all reef poses
     driverController
         .a()
-        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.RED_REEF_ONE));
+        .whileTrue(
+            Commands.sequence(
+                Commands.parallel(
+                        new AutoAlign(
+                            swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
+                        new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_3)
+                            .until((() -> elevatorSubsystem.isAtSetpoint())))
+                    .andThen(new EjectCoral(coralIntakeSubsystem))
+                    .until(() -> !coralIntakeSubsystem.hasCoral())
+                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
   }
 
   private void configureOperatorController() {
