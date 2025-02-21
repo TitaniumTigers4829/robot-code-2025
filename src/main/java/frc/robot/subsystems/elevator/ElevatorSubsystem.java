@@ -80,6 +80,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.openLoop(output);
   }
 
+  public boolean isAtSetpoint() {
+    return inputs.elevatorError < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);

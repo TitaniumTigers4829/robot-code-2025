@@ -35,6 +35,8 @@ public class ElevatorConstants {
   public static final double MOTION_MAGIC_MAX_ACCELERATION = 160;
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100;
 
+  public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
+
   // limit
   public static final double LIMIT = -9.68;
   public static final boolean LIMIT_ENABLE = false;
@@ -42,8 +44,9 @@ public class ElevatorConstants {
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 
   // Elevator setpoints
-  public static final double LEVEL_1 = 59;
-  public static final double LEVEL_2 = 118;
-  public static final double LEVEL_3 = 177;
+  public static final double LEVEL_1 = -2.4;
+  public static final double LEVEL_2 = -3.5;
+  public static final double LEVEL_3 = -5.57;
+  public static final double LEVEL_4 = -9.5;
   public static final double LEVEL_FEEDER = -1.25;
 }
