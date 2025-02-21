@@ -7,9 +7,10 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.ThreadManager;
-import frc.robot.extras.vision.LimelightHelpers;
-import frc.robot.extras.vision.LimelightHelpers.PoseEstimate;
 import frc.robot.extras.vision.MegatagPoseEstimate;
+import frc.robot.extras.vision.TigerHelpers;
+import frc.robot.extras.vision.TigerHelpers.Botpose;
+import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -81,11 +82,11 @@ public class PhysicalVision implements VisionInterface {
 
   @Override
   public boolean canSeeAprilTags(Limelight limelight) {
-    // First checks if it can see an april tag, then checks if it is fully in frame as
-    // the limelight can see an april tag but not have it fully in frame, leading to
-    // inaccurate pose estimates
-    if (LimelightHelpers.getTV(limelight.getName())) {
-      return Math.abs(LimelightHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
+    // First checks if it can see an april tag, then checks if it is fully in frame
+    // as the limelight can see an april tag but not have it fully in frame, leading
+    // to inaccurate pose estimates
+    if (isLimelightConnected(limelight)) {
+      return Math.abs(TigerHelpers.getTX(limelight.getName())) <= limelight.getAccurateFOV();
     }
     return false;
   }
@@ -150,26 +151,6 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
-   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
-   *
-   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
-   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
-   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
-   *
-   * @param limelight The Limelight for which to set up port forwarding.
-   */
-  private void setupPortForwarding(Limelight limelight) {
-    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
-    for (int port = VisionConstants.BASE_PORT;
-        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
-        port++) {
-      PortForwarder.add(
-          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
-    }
-  }
-
-  /**
    * Gets the pose update of the specified limelight while the robot is enabled.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
@@ -177,17 +158,18 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    // if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-    //     && (!isLargeDiscrepancyBetweenTwoPoses(
-    //             limelight,
-    //             VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-    //             VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-    //             megatag1Estimate.pose,
-    //             megatag2Estimate.pose)
-    //         || getLimelightAprilTagDistance(limelight)
-    //             > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
-    //   limelightEstimates.set(
-    //       limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    // if (Math.abs(headingRateDegreesPerSecond) <
+    // VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+    // && (!isLargeDiscrepancyBetweenTwoPoses(
+    // limelight,
+    // VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+    // VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+    // megatag1Estimate.pose,
+    // megatag2Estimate.pose)
+    // || getLimelightAprilTagDistance(limelight)
+    // > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+    // limelightEstimates.set(
+    // limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
     // } else
     if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
@@ -225,38 +207,49 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
+   * This checks is there is new pose detected by a limelight, and if so, updates the pose estimate
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   */
+  public void checkAndUpdatePose(Limelight limelight) {
+    if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
+      // Megatag 2 uses the gyro orientation to solve for the rotation of the
+      // calculated pose. This creates a much more stable and accurate pose when
+      // translating, but when rotating but the pose will not be consistent due to
+      // latency between receiving and sending measurements. The parameters are
+      // melightName, yaw, yawRate, pitch, pitchRate, roll, and rollRate. Generally we
+      // don't need to use pitch or roll in our pose estimate, so we don't send those
+      // values to the limelight (hence the 0's).
+      TigerHelpers.SetRobotOrientation(
+          limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
+      updatePoseEstimate(limelight);
+    } else {
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+    }
+  }
+
+  /**
    * Gets the MegaTag1 pose of the robot calculated by specified limelight via any April Tags it
-   * sees
+   * sees.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The MegaTag1 pose of the robot, if the limelight can't see any April Tags, it will
    *     return 0 for x, y, and theta
    */
   public PoseEstimate getMegaTag1PoseEstimate(Limelight limelight) {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelight.getName());
+    return TigerHelpers.getBotPoseEstimate(limelight.getName(), Botpose.BLUE_MEGATAG1);
   }
 
   /**
    * Gets the MegaTag2 pose of the robot calculated by specified limelight via any April Tags it
-   * sees
+   * sees.
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return The MegaTag2 pose of the robot, if the limelight can't see any April Tags, it will
    *     return 0 for x, y, and theta
    */
   public PoseEstimate getMegaTag2PoseEstimate(Limelight limelight) {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelight.getName());
-  }
-
-  /**
-   * Checks if the pose estimate exists and whether it is within the field
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the pose estimate exists within the field and the pose estimate is not null
-   */
-  public boolean isValidPoseEstimate(Limelight limelight) {
-    return getPoseFromAprilTags(limelight) != null
-        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
+    return TigerHelpers.getBotPoseEstimate(limelight.getName(), Botpose.BLUE_MEGATAG2);
   }
 
   /**
@@ -282,81 +275,13 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks whether the pose estimate is within the field
-   *
-   * @param poseEstimate The pose estimate to check
-   */
-  private boolean isWithinFieldBounds(Pose2d poseEstimate) {
-    double minX = DriveConstants.TRACK_WIDTH / 2.0;
-    double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
-    double minY = DriveConstants.WHEEL_BASE / 2.0;
-    double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
-    return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
-        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
-  }
-
-  /**
    * Checks if the specified limelight is connected
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the limelight network table contains the key "tv"
+   * @return True if the limelight is connected
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return LimelightHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
-  }
-
-  /**
-   * Checks if the robot is teleporting based on the pose estimate from the limelight
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the robot is teleporting, false otherwise
-   */
-  private synchronized boolean isTeleporting(Limelight limelight) {
-    return !GeomUtil.arePosesWithinThreshold(
-        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
-        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        getPoseFromAprilTags(limelight),
-        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
-  }
-
-  /**
-   * Checks if the limelight is confident in its pose estimate
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the limelight is confident in its pose estimate, false otherwise
-   */
-  private boolean isConfident(Limelight limelight) {
-    return getAmbiguity(limelight) <= VisionConstants.MAX_AMBIGUITY_THRESHOLD;
-  }
-
-  /**
-   * This checks is there is new pose detected by a limelight, and if so, updates the pose estimate
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   */
-  public void checkAndUpdatePose(Limelight limelight) {
-    try {
-      if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
-        // Megatag 2 uses the gyro orientation to solve for the rotation of the calculated pose.
-        // This creates a much more stable and accurate pose when translating, but when rotating
-        // but the pose will not be consistent due to latency between receiving and sending
-        // measurements. The parameters are melightName, yaw, yawRate, pitch, pitchRate, roll,
-        // and rollRate. Generally we don't need to use pitch or roll in our pose estimate, so
-        // we don't send those values to the limelight (hence the 0's).
-        LimelightHelpers.SetRobotOrientation(
-            limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
-        updateIMUMode(limelight);
-        updatePoseEstimate(limelight);
-        LimelightHelpers.Flush();
-      } else {
-        limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-      }
-    } catch (Exception e) {
-      System.err.printf(
-          "Error updating pose for limelight %s: %s%n", limelight.getName(), e.getMessage());
-      // Optionally, clear or mark the estimate as invalid.
-      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
-    }
+    return TigerHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
   }
 
   /**
@@ -371,5 +296,147 @@ public class PhysicalVision implements VisionInterface {
   /** Shuts down all the threads. */
   public void endAllThreads() {
     threadManager.shutdownAllThreads();
+  }
+
+  /**
+   * Checks if the robot is teleporting based on the pose estimate from the limelight. This method
+   * needs to be synchronized to prevent race conditions when accessing the
+   * pose2dMovingAverageFilter.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the robot is teleporting, false otherwise
+   */
+  private synchronized boolean isTeleporting(Limelight limelight) {
+    return !GeomUtil.arePosesWithinThreshold(
+        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
+        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
+        getPoseFromAprilTags(limelight),
+        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
+  }
+
+  /**
+   * Checks if the pose estimate exists and whether it is within the field.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the pose estimate exists within the field and the pose estimate is not null
+   */
+  private boolean isValidPoseEstimate(Limelight limelight) {
+    return getPoseFromAprilTags(limelight) != new Pose2d()
+        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
+  }
+
+  /**
+   * Checks whether the pose estimate is within the field
+   *
+   * @param poseEstimate The pose estimate to check
+   */
+  private boolean isWithinFieldBounds(Pose2d poseEstimate) {
+    double minX = DriveConstants.TRACK_WIDTH / 2.0;
+    double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
+    double minY = DriveConstants.WHEEL_BASE / 2.0;
+    double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
+    return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
+        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
+  }
+
+  /**
+   * Checks if the limelight is confident in its pose estimate
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the limelight is confident in its pose estimate, false otherwise
+   */
+  private boolean isConfident(Limelight limelight) {
+    return getAmbiguity(limelight) <= VisionConstants.MAX_AMBIGUITY_THRESHOLD;
+  }
+
+  /**
+   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
+   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
+   *
+   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
+   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
+   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
+   *
+   * @param limelight The Limelight for which to set up port forwarding.
+   */
+  private void setupPortForwarding(Limelight limelight) {
+    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
+    for (int port = VisionConstants.BASE_PORT;
+        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
+        port++) {
+      PortForwarder.add(
+          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
+    }
+  }
+
+  /**
+   * Checks if the robot is teleporting based on the pose estimate from the limelight. This method
+   * needs to be synchronized to prevent race conditions when accessing the
+   * pose2dMovingAverageFilter.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the robot is teleporting, false otherwise
+   */
+  private synchronized boolean isTeleporting(Limelight limelight) {
+    return !GeomUtil.arePosesWithinThreshold(
+        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
+        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
+        getPoseFromAprilTags(limelight),
+        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
+  }
+
+  /**
+   * Checks if the pose estimate exists and whether it is within the field.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the pose estimate exists within the field and the pose estimate is not null
+   */
+  private boolean isValidPoseEstimate(Limelight limelight) {
+    return getPoseFromAprilTags(limelight) != new Pose2d()
+        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
+  }
+
+  /**
+   * Checks whether the pose estimate is within the field
+   *
+   * @param poseEstimate The pose estimate to check
+   */
+  private boolean isWithinFieldBounds(Pose2d poseEstimate) {
+    double minX = DriveConstants.TRACK_WIDTH / 2.0;
+    double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
+    double minY = DriveConstants.WHEEL_BASE / 2.0;
+    double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
+    return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
+        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
+  }
+
+  /**
+   * Checks if the limelight is confident in its pose estimate
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @return True if the limelight is confident in its pose estimate, false otherwise
+   */
+  private boolean isConfident(Limelight limelight) {
+    return getAmbiguity(limelight) <= VisionConstants.MAX_AMBIGUITY_THRESHOLD;
+  }
+
+  /**
+   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
+   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
+   *
+   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
+   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
+   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
+   *
+   * @param limelight The Limelight for which to set up port forwarding.
+   */
+  private void setupPortForwarding(Limelight limelight) {
+    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
+    for (int port = VisionConstants.BASE_PORT;
+        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
+        port++) {
+      PortForwarder.add(
+          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
+    }
   }
 }
