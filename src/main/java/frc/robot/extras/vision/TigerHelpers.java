@@ -1,4 +1,4 @@
-// TigerHelpers v1.0 (REQUIRES LLOS 2025.0 OR LATER)
+// TigerHelpers v1.02 (REQUIRES LLOS 2025.0 OR LATER)
 
 package frc.robot.extras.vision;
 
@@ -84,6 +84,20 @@ public class TigerHelpers {
       this.distToRobot = distToRobot;
       this.ambiguity = ambiguity;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null || getClass() != obj.getClass()) return false;
+      RawFiducial other = (RawFiducial) obj;
+      return id == other.id
+          && Double.compare(txnc, other.txnc) == 0
+          && Double.compare(tync, other.tync) == 0
+          && Double.compare(ta, other.ta) == 0
+          && Double.compare(distToCamera, other.distToCamera) == 0
+          && Double.compare(distToRobot, other.distToRobot) == 0
+          && Double.compare(ambiguity, other.ambiguity) == 0;
+    }
   }
 
   /** Represents a 3D Pose Estimate. */
@@ -158,14 +172,49 @@ public class TigerHelpers {
       if (this == obj) return true;
       if (obj == null || getClass() != obj.getClass()) return false;
       PoseEstimate that = (PoseEstimate) obj;
-      return Double.compare(that.timestampSeconds, timestampSeconds) == 0
-          && Double.compare(that.latency, latency) == 0
+      // We don't compare the timestampSeconds as it isn't relevant for equality and makes
+      // unit testing harder
+      return Double.compare(that.latency, latency) == 0
           && tagCount == that.tagCount
           && Double.compare(that.tagSpan, tagSpan) == 0
           && Double.compare(that.avgTagDist, avgTagDist) == 0
           && Double.compare(that.avgTagArea, avgTagArea) == 0
           && pose.equals(that.pose)
           && Arrays.equals(rawFiducials, that.rawFiducials);
+    }
+
+    @Override
+    public String toString() {
+      // Convert rawFiducials to a string of just their IDs
+      StringBuilder fiducialIds = new StringBuilder("[");
+      for (int i = 0; i < rawFiducials.length; i++) {
+        fiducialIds.append(rawFiducials[i].id);
+        if (i < rawFiducials.length - 1) {
+          fiducialIds.append(", ");
+        }
+      }
+      fiducialIds.append("]");
+
+      return "PoseEstimate{"
+          + "pose="
+          + pose
+          + ", timestampSeconds="
+          + timestampSeconds
+          + ", latency="
+          + latency
+          + ", tagCount="
+          + tagCount
+          + ", tagSpan="
+          + tagSpan
+          + ", avgTagDist="
+          + avgTagDist
+          + ", avgTagArea="
+          + avgTagArea
+          + ", rawFiducials="
+          + fiducialIds
+          + ", isMegaTag2="
+          + isMegaTag2
+          + '}';
     }
   }
 
@@ -305,7 +354,7 @@ public class TigerHelpers {
     return inData[position];
   }
 
-  private static PoseEstimate getBotPoseEstimate(
+  private static PoseEstimate unpackBotPoseEstimate(
       String limelightName, String entryName, boolean isMegaTag2) {
     DoubleArrayEntry poseEntry =
         TigerHelpers.getLimelightDoubleArrayEntry(limelightName, entryName);
@@ -316,7 +365,7 @@ public class TigerHelpers {
 
     if (poseArray.length == 0) {
       // Handle the case where no data is available
-      return null; // or some default PoseEstimate
+      return new PoseEstimate();
     }
 
     Pose2d pose = toPose2D(poseArray);
@@ -394,16 +443,35 @@ public class TigerHelpers {
     return rawFiducials;
   }
 
+  private static NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
+
+  /**
+   * Sets the NetworkTableInstance to use for Limelight communication. Normally it it uses the
+   * default instance. This is useful for unit testing when you might need multiple instances.
+   */
+  public static void setNTInstance(NetworkTableInstance ntInstance) {
+    TigerHelpers.ntInstance = ntInstance;
+  }
+
+  /**
+   * Gets the NetworkTableInstance used for Limelight communication.
+   *
+   * @return The NetworkTableInstance used for Limelight communication
+   */
+  public static NetworkTableInstance getNTInstance() {
+    return ntInstance;
+  }
+
   public static Boolean validPoseEstimate(PoseEstimate pose) {
     return pose != null && pose.rawFiducials != null && pose.rawFiducials.length != 0;
   }
 
   public static NetworkTable getLimelightNTTable(String tableName) {
-    return NetworkTableInstance.getDefault().getTable(sanitizeName(tableName));
+    return ntInstance.getTable(sanitizeName(tableName));
   }
 
   public static void Flush() {
-    NetworkTableInstance.getDefault().flush();
+    ntInstance.flush();
   }
 
   public static NetworkTableEntry getLimelightNTTableEntry(String tableName, String entryName) {
@@ -520,39 +588,7 @@ public class TigerHelpers {
     return getLimelightNTDouble(limelightName, "cl");
   }
 
-  /**
-   * Switch to getBotPose
-   *
-   * @param limelightName
-   * @return
-   */
-  @Deprecated
-  public static double[] getBotpose(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose");
-  }
-
-  /**
-   * Switch to getBotPose_wpiRed
-   *
-   * @param limelightName
-   * @return
-   */
-  @Deprecated
-  public static double[] getBotpose_wpiRed(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose_wpired");
-  }
-
-  /**
-   * Switch to getBotPose_wpiBlue
-   *
-   * @param limelightName
-   * @return
-   */
-  @Deprecated
-  public static double[] getBotpose_wpiBlue(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose_wpiblue");
-  }
-
+  // TODO: deprecate these methods (all the way down to the enum)
   public static double[] getBotPose(String limelightName) {
     return getLimelightNTDoubleArray(limelightName, "botpose");
   }
@@ -579,10 +615,6 @@ public class TigerHelpers {
 
   public static double[] getTargetPose_RobotSpace(String limelightName) {
     return getLimelightNTDoubleArray(limelightName, "targetpose_robotspace");
-  }
-
-  public static double[] getTargetColor(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "tc");
   }
 
   public static double getFiducialID(String limelightName) {
@@ -674,13 +706,52 @@ public class TigerHelpers {
   }
 
   /**
+   * This enum represents the different types of botpose data that can be retrieved from the
+   * Limelight.
+   */
+  public enum Botpose {
+    BLUE_MEGATAG1("botpose_wpiblue", false),
+    BLUE_MEGATAG2("botpose_orb_wpiblue", true),
+    RED_MEGATAG1("botpose_wpired", false),
+    RED_MEGATAG2("botpose_orb_wpired", true),
+    ;
+
+    private final String entryName;
+    private final boolean isMegaTag2;
+
+    Botpose(String entryName, boolean isMegaTag2) {
+      this.entryName = entryName;
+      this.isMegaTag2 = isMegaTag2;
+    }
+
+    /**
+     * Gets the entry name for the botpose type. This is the name of the network table entry that
+     * contains the botpose data.
+     *
+     * @return The network table entry name
+     */
+    public String getEntryName() {
+      return entryName;
+    }
+
+    /**
+     * Gets if the botpose is calculated using MegaTag2.
+     *
+     * @return True if the botpose is calculated using MegaTag2, false if using MegaTag1
+     */
+    public boolean isMegaTag2() {
+      return isMegaTag2;
+    }
+  }
+
+  /**
    * Gets the Pose2d for easy use with Odometry vision pose estimator (addVisionMeasurement)
    *
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static Pose2d getBotPose2d_wpiBlue(String limelightName) {
-
     double[] result = getBotPose_wpiBlue(limelightName);
     return toPose2D(result);
   }
@@ -692,8 +763,9 @@ public class TigerHelpers {
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static PoseEstimate getBotPoseEstimate_wpiBlue(String limelightName) {
-    return getBotPoseEstimate(limelightName, "botpose_wpiblue", false);
+    return unpackBotPoseEstimate(limelightName, "botpose_wpiblue", false);
   }
 
   /**
@@ -704,8 +776,9 @@ public class TigerHelpers {
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static PoseEstimate getBotPoseEstimate_wpiBlue_MegaTag2(String limelightName) {
-    return getBotPoseEstimate(limelightName, "botpose_orb_wpiblue", true);
+    return unpackBotPoseEstimate(limelightName, "botpose_orb_wpiblue", true);
   }
 
   /**
@@ -714,8 +787,8 @@ public class TigerHelpers {
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static Pose2d getBotPose2d_wpiRed(String limelightName) {
-
     double[] result = getBotPose_wpiRed(limelightName);
     return toPose2D(result);
   }
@@ -727,8 +800,9 @@ public class TigerHelpers {
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static PoseEstimate getBotPoseEstimate_wpiRed(String limelightName) {
-    return getBotPoseEstimate(limelightName, "botpose_wpired", false);
+    return unpackBotPoseEstimate(limelightName, "botpose_wpired", false);
   }
 
   /**
@@ -738,20 +812,99 @@ public class TigerHelpers {
    * @param limelightName
    * @return
    */
+  @Deprecated
   public static PoseEstimate getBotPoseEstimate_wpiRed_MegaTag2(String limelightName) {
-    return getBotPoseEstimate(limelightName, "botpose_orb_wpired", true);
+    return unpackBotPoseEstimate(limelightName, "botpose_orb_wpired", true);
   }
 
   /**
-   * Gets the Pose2d for easy use with Odometry vision pose estimator (addVisionMeasurement)
+   * Gets the specified Pose2d for easy use with Odometry vision pose estimator
+   * (addVisionMeasurement).
    *
-   * @param limelightName
-   * @return
+   * @param limelightName the name of the Limelight
+   * @param botpose the type of botpose to get
+   * @return the Pose2d of the robot relative to the origin specified by the botpose
+   */
+  public static Pose2d getBotPose2d(String limelightName, Botpose botpose) {
+    double[] result = getLimelightNTDoubleArray(limelightName, botpose.getEntryName());
+    return toPose2D(result);
+  }
+
+  /**
+   * Gets the Pose2d with the blue-side origin for use with Odometry vision pose estimator
+   * (addVisionMeasurement).
+   *
+   * @param limelightName the name of the Limelight
+   * @return the Pose2d of the robot relative to the blue-side origin
    */
   public static Pose2d getBotPose2d(String limelightName) {
+    return getBotPose2d(limelightName, Botpose.BLUE_MEGATAG1);
+  }
 
-    double[] result = getBotPose(limelightName);
-    return toPose2D(result);
+  /**
+   * Gets the PoseEstimate for the specified {@link Botpose} type.
+   *
+   * @param limelightName the name of the Limelight
+   * @param botpose the type of botpose to get
+   * @return the PoseEstimate object
+   */
+  public static PoseEstimate getBotPoseEstimate(String limelightName, Botpose botpose) {
+    return unpackBotPoseEstimate(limelightName, botpose.getEntryName(), botpose.isMegaTag2());
+  }
+
+  /**
+   * Gets the PoseEstimate with the blue-side origin using MegaTag1.
+   *
+   * @param limelightName the name of the Limelight
+   * @return the PoseEstimate object
+   */
+  public static PoseEstimate getBotPoseEstimate(String limelightName) {
+    return getBotPoseEstimate(limelightName, Botpose.BLUE_MEGATAG1);
+  }
+
+  /**
+   * Sets the network table entry for the botpose data. This is useful for setting values for unit
+   * testing. The {@link PoseEstimate} does not contain values for the z coordinate, roll, and
+   * pitch, so these will be set to 0.
+   *
+   * @param poseEstimate the pose estimate to set
+   * @param limelightName the name of the Limelight
+   * @param botpose the type of botpose to set
+   */
+  public static void setBotPoseEstimate(
+      PoseEstimate poseEstimate, String limelightName, Botpose botpose) {
+    NetworkTableEntry entry = getLimelightNTTableEntry(limelightName, botpose.getEntryName());
+    // Sets the pose data in the network table double array
+    // The array is: [x, y, z, roll, pitch, yaw, latency, tagCount, tagSpan, avgTagDist, avgTagArea]
+    // units in meters, degrees, and milliseconds
+    entry.setDoubleArray(
+        new double[] {
+          poseEstimate.pose.getX(),
+          poseEstimate.pose.getY(),
+          0.0, // z
+          0.0, // roll
+          0.0, // pitch
+          poseEstimate.pose.getRotation().getDegrees(),
+          poseEstimate.latency,
+          poseEstimate.tagCount,
+          poseEstimate.tagSpan,
+          poseEstimate.avgTagDist,
+          poseEstimate.avgTagArea
+        });
+
+    // TODO: Add raw fiducials to the network table
+  }
+
+  /**
+   * Sets the network table entry for the blue-side, MegaTag1 botpose data. This is useful for
+   * setting values for unit testing. The {@link PoseEstimate} does not contain values for the z
+   * coordinate, roll, and pitch, so these will be set to 0.
+   *
+   * @param poseEstimate
+   * @param limelightName
+   */
+  public static void setBotPoseEstimate(PoseEstimate poseEstimate, String limelightName) {
+    setBotPoseEstimate(poseEstimate, limelightName, Botpose.BLUE_MEGATAG1);
   }
 
   /**
