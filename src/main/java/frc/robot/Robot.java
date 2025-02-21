@@ -199,9 +199,14 @@ public class Robot extends LoggedRobot {
         .x()
         .whileTrue(
             Commands.sequence(
-                new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_4)
+                Commands.deadline(
+                        new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_4),
+                        Commands.run(
+                            () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
                     .until(() -> elevatorSubsystem.isAtSetpoint())
-                    .andThen(new EjectCoral(coralIntakeSubsystem))));
+                    .andThen(new EjectCoral(coralIntakeSubsystem))
+                    .until(() -> !coralIntakeSubsystem.hasCoral())
+                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
     operatorController.leftBumper().whileTrue(new EjectCoral(coralIntakeSubsystem));
     operatorController
         .a()
@@ -209,6 +214,9 @@ public class Robot extends LoggedRobot {
     operatorController
         .rightBumper()
         .whileTrue(new ManualElevator(elevatorSubsystem, () -> operatorController.getLeftY()));
+    operatorController
+        .rightTrigger()
+        .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
   }
 
   private void checkGit() {

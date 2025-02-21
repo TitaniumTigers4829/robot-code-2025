@@ -27,7 +27,7 @@ public class ElevatorConstants {
   public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);
   public static final boolean SIMULATE_GRAVITY = true;
 
-  public static final double STATOR_CURRENT_LIMIT = 80;
+  public static final double STATOR_CURRENT_LIMIT = 100;
   public static final double SUPPLY_CURRENT_LIMIT = 0;
   public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
   public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = false;

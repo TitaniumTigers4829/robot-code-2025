@@ -84,6 +84,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     return inputs.elevatorError < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
   }
 
+  public void resetPosition(double position) {
+    elevatorInterface.resetElevatorPosition(position);
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);

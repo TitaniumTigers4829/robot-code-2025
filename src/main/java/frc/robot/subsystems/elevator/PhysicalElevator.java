@@ -169,6 +169,12 @@ public class PhysicalElevator implements ElevatorInterface {
   }
 
   @Override
+  public void resetElevatorPosition(double position) {
+    leaderMotor.setPosition(position);
+    followerMotor.setPosition(position);
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     elevatorConfig.Slot0.kP = kP;
     elevatorConfig.Slot0.kI = kI;

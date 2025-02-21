@@ -42,4 +42,6 @@ public interface ElevatorInterface {
   public default void setPID(double kP, double kI, double kD) {}
 
   public default void setFF(double kS, double kV, double kA, double kG) {}
+
+  public default void resetElevatorPosition(double position) {}
 }
