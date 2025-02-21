@@ -142,10 +142,10 @@ public class PhysicalVision implements VisionInterface {
     if (limelight.isLimelight4()) {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
-        LimelightHelpers.SetIMUMode(limelight.getName(), 2);
+        TigerHelpers.SetIMUMode(limelight.getName(), 2);
       } else {
         // Disable internal IMU when robot is disabled
-        LimelightHelpers.SetIMUMode(limelight.getName(), 1);
+        TigerHelpers.SetIMUMode(limelight.getName(), 1);
       }
     }
   }
@@ -296,77 +296,6 @@ public class PhysicalVision implements VisionInterface {
   /** Shuts down all the threads. */
   public void endAllThreads() {
     threadManager.shutdownAllThreads();
-  }
-
-  /**
-   * Checks if the robot is teleporting based on the pose estimate from the limelight. This method
-   * needs to be synchronized to prevent race conditions when accessing the
-   * pose2dMovingAverageFilter.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the robot is teleporting, false otherwise
-   */
-  private synchronized boolean isTeleporting(Limelight limelight) {
-    return !GeomUtil.arePosesWithinThreshold(
-        VisionConstants.MAX_TRANSLATION_DELTA_METERS,
-        VisionConstants.MAX_ROTATION_DELTA_DEGREES,
-        getPoseFromAprilTags(limelight),
-        pose2dMovingAverageFilter.calculate(getPoseFromAprilTags(limelight)));
-  }
-
-  /**
-   * Checks if the pose estimate exists and whether it is within the field.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the pose estimate exists within the field and the pose estimate is not null
-   */
-  private boolean isValidPoseEstimate(Limelight limelight) {
-    return getPoseFromAprilTags(limelight) != new Pose2d()
-        && isWithinFieldBounds(getPoseFromAprilTags(limelight));
-  }
-
-  /**
-   * Checks whether the pose estimate is within the field
-   *
-   * @param poseEstimate The pose estimate to check
-   */
-  private boolean isWithinFieldBounds(Pose2d poseEstimate) {
-    double minX = DriveConstants.TRACK_WIDTH / 2.0;
-    double maxX = FieldConstants.FIELD_LENGTH_METERS - DriveConstants.TRACK_WIDTH / 2.0;
-    double minY = DriveConstants.WHEEL_BASE / 2.0;
-    double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
-    return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
-        && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
-  }
-
-  /**
-   * Checks if the limelight is confident in its pose estimate
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @return True if the limelight is confident in its pose estimate, false otherwise
-   */
-  private boolean isConfident(Limelight limelight) {
-    return getAmbiguity(limelight) <= VisionConstants.MAX_AMBIGUITY_THRESHOLD;
-  }
-
-  /**
-   * Sets up port forwarding for the specified Limelight. This method forwards a range of ports from
-   * the robot to the Limelight, allowing network communication between the robot and the Limelight.
-   *
-   * <p>Each Limelight is assigned a unique port offset based on its ID. The method forwards ports
-   * 5800 to 5809 for each Limelight, with the port offset applied to each port number. For example,
-   * if the Limelight ID is 1, the ports 5810 to 5819 will be forwarded.
-   *
-   * @param limelight The Limelight for which to set up port forwarding.
-   */
-  private void setupPortForwarding(Limelight limelight) {
-    int portOffset = VisionConstants.PORT_OFFSET * limelight.getId();
-    for (int port = VisionConstants.BASE_PORT;
-        port < VisionConstants.BASE_PORT + VisionConstants.PORT_RANGE;
-        port++) {
-      PortForwarder.add(
-          port + portOffset, limelight.getName() + VisionConstants.LIMELIGHT_DOMAIN, port);
-    }
   }
 
   /**
