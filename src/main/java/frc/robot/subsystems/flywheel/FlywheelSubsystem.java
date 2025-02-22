@@ -12,12 +12,10 @@ public class FlywheelSubsystem extends SubsystemBase {
   /** Creates a new FlywheelSubsystem. */
   FlywheelInterface flywheelInterface;
 
-  FlywheelInputsAutoLogged inputsAutoLogged;
   FlywheelInputsAutoLogged inputs = new FlywheelInputsAutoLogged();
 
   public FlywheelSubsystem(FlywheelInterface flywheelInterface) {
     this.flywheelInterface = flywheelInterface;
-    inputsAutoLogged = new FlywheelInputsAutoLogged();
   }
 
   public double getFlywheelSpeed() {

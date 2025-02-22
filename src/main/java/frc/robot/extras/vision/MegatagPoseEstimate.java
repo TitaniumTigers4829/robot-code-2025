@@ -3,8 +3,13 @@ package frc.robot.extras.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
+import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import java.nio.ByteBuffer;
 
+/**
+ * A struct representing a pose estimate from the Megatag system. While this basically just wraps a
+ * {@link PoseEstimate}, it is useful for logging.
+ */
 public class MegatagPoseEstimate implements StructSerializable {
   public static class MegatagPoseEstimateStruct implements Struct<MegatagPoseEstimate> {
     public Pose2d fieldToCamera = Pose2d.kZero;
@@ -47,8 +52,9 @@ public class MegatagPoseEstimate implements StructSerializable {
       rv.latency = bb.getDouble();
       rv.avgTagArea = bb.getDouble();
       rv.fiducialIds = new int[0];
+      rv.ambiguity = bb.getDouble();
       rv.avgTagDist = bb.getDouble();
-      rv.timestampSeconds = bb.getInt();
+      rv.timestampSeconds = bb.getDouble();
       return rv;
     }
 
@@ -73,12 +79,13 @@ public class MegatagPoseEstimate implements StructSerializable {
   public double latency;
   public double avgTagArea;
   public int[] fiducialIds;
+  public double ambiguity;
   public int tagCount;
   public double avgTagDist;
 
   public MegatagPoseEstimate() {}
 
-  public static MegatagPoseEstimate fromLimelight(LimelightHelpers.PoseEstimate poseEstimate) {
+  public static MegatagPoseEstimate fromLimelight(PoseEstimate poseEstimate) {
     MegatagPoseEstimate rv = new MegatagPoseEstimate();
     rv.fieldToCamera = poseEstimate.pose;
     if (rv.fieldToCamera == null) rv.fieldToCamera = Pose2d.kZero;
@@ -88,8 +95,10 @@ public class MegatagPoseEstimate implements StructSerializable {
     rv.avgTagDist = poseEstimate.avgTagDist;
     rv.tagCount = poseEstimate.tagCount;
     rv.fiducialIds = new int[poseEstimate.rawFiducials.length];
+    rv.ambiguity = 0.0;
     for (int i = 0; i < rv.fiducialIds.length; ++i) {
       rv.fiducialIds[i] = poseEstimate.rawFiducials[i].id;
+      rv.ambiguity = poseEstimate.rawFiducials[i].ambiguity;
     }
 
     return rv;
