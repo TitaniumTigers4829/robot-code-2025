@@ -1,4 +1,4 @@
-package frc.robot.subsystems.funnyPivot;
+package frc.robot.subsystems.funnelPivot;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;

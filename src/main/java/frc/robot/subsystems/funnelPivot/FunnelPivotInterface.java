@@ -1,4 +1,4 @@
-package frc.robot.subsystems.funnyPivot;
+package frc.robot.subsystems.funnelPivot;
 
 import org.littletonrobotics.junction.AutoLog;
 

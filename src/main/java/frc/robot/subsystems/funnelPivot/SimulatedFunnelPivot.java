@@ -1,4 +1,4 @@
-package frc.robot.subsystems.funnyPivot;
+package frc.robot.subsystems.funnelPivot;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;

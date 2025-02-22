@@ -1,4 +1,4 @@
-package frc.robot.subsystems.funnyPivot;
+package frc.robot.subsystems.funnelPivot;
 
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
