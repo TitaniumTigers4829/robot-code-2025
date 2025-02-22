@@ -38,7 +38,7 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
 
   @Override
   public void updateInputs(FunnelPivotInputs inputs) {
-    funnelPivotSim.update(HardwareConstants.TIMEOUT_S);
+    funnelPivotSim.update(HardwareConstants.LOOP_TIME_SECONDS);
 
     inputs.funnelVelocity = Units.radiansToRotations(funnelPivotSim.getAngleRads());
     inputs.funnelAngle = Units.radiansToRotations(funnelPivotSim.getVelocityRadPerSec());

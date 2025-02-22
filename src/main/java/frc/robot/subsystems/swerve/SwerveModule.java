@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
@@ -167,16 +168,6 @@ public class SwerveModule {
    */
   public double getDrivePositionRadians() {
     return moduleInterface.getDrivePositionRadians();
-  }
-
-  /**
-   * Gets the current state of the swerve module (the current drive velocity and turn angle).
-   *
-   * @return a new {@link SwerveModuleState} containing the drive velocity in m/s and a {@link
-   *     Rotation2d} of the turn motors' angle
-   */
-  public double getDrivePositionRadians() {
-    return Units.rotationsToRadians(inputs.drivePosition);
   }
 
   public SwerveModuleState getMeasuredState() {

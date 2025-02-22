@@ -216,9 +216,6 @@ public class PhysicalModule implements ModuleInterface {
         .getRotations();
   }
 
-  /** Does characterization shit */
-  public void characterizeWheelRadius() {}
-
   @Override
   public double getDrivePositionRadians() {
     drivePosition.refresh();
