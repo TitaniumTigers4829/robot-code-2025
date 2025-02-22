@@ -478,7 +478,7 @@ public class SwerveDrive extends SubsystemBase {
         moduleDeltas = getModulesDelta(modulePositions);
 
     // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the
-    // // modules.
+    // modules.
     if (gyroInputs.isConnected) {
       rawGyroRotation = getGyroRotation2d();
     } else {

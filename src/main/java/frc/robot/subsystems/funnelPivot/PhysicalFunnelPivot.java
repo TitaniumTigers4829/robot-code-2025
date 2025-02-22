@@ -38,8 +38,6 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
 
-    // funnelEncoder.getConfigurator().apply(funnelEncoderConfig, HardwareConstants.TIMEOUT_S);
-
     funnelMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     funnelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     funnelMotorConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
@@ -54,11 +52,6 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
         FunnelConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;
     funnelMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
         FunnelConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
-
-    funnelMotorConfig.ClosedLoopGeneral.ContinuousWrap = true;
-
-    // funnelMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    // funnelMotorConfig.Feedback.FeedbackRemoteSensorID = funnelEncoder.getDeviceID();
 
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = FunnelConstants.MAX_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
