@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climbpivot.ClimbPivotInputsAutoLogged;
-
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
