@@ -44,9 +44,21 @@ public class ElevatorConstants {
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 
   // Elevator setpoints
-  public static final double LEVEL_1 = -2.4;
-  public static final double LEVEL_2 = -3.5;
-  public static final double LEVEL_3 = -5.845;
-  public static final double LEVEL_4 = -9.5;
-  public static final double LEVEL_FEEDER = -1.25;
+  public enum ElevatorSetpoints {
+    L1(-2.4),
+    L2(-3.5),
+    L3(-5.845),
+    L4(-9.5),
+    FEEDER(-1.24560546875);
+
+    private final double position;
+
+    ElevatorSetpoints(double position) {
+      this.position = position;
+    }
+
+    public double getPosition() {
+      return position;
+    }
+  }
 }

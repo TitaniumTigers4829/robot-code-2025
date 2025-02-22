@@ -180,7 +180,7 @@ public final class Constants {
             Units.inchesToMeters(137.345),
             new Rotation2d(Units.degreesToRadians(240)));
     public static final Pose2d BLUE_REEF_TWELEVE =
-        new Pose2d(3.66, 2.79, Rotation2d.fromDegrees(60.0));
+        new Pose2d(3.70, 2.83, Rotation2d.fromDegrees(62.50));
     // Units.inchesToMeters(160.797),
     // Units.inchesToMeters(143.814),
     // new Rotation2d(Units.degreesToRadians(240)));
@@ -399,7 +399,7 @@ public final class Constants {
     public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
-    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.02;
+    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
     public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
     public static final double AUTO_ALIGN_ROTATION_P = 5;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
@@ -407,10 +407,10 @@ public final class Constants {
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
 
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 4;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
-    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
+    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
 
     // These used to be in Trajectory Constants
 

@@ -43,7 +43,7 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Current> followerStatorCurrent;
   private final StatusSignal<Double> elevatorReference;
   private final StatusSignal<AngularVelocity> leaderVelocity;
-  private final StatusSignal<Double> elevatorError;
+  private final double elevatorError;
 
   private final TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
 
@@ -92,7 +92,9 @@ public class PhysicalElevator implements ElevatorInterface {
     followerStatorCurrent = followerMotor.getStatorCurrent();
     elevatorReference = leaderMotor.getClosedLoopReference();
     leaderVelocity = leaderMotor.getVelocity();
-    elevatorError = leaderMotor.getClosedLoopError();
+    elevatorError =
+        leaderMotor.getClosedLoopReference().getValueAsDouble()
+            - leaderMotor.getPosition().getValueAsDouble();
 
     leaderMotor.setPosition(0.0);
     followerMotor.setPosition(0.0);
@@ -108,8 +110,7 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderStatorCurrent,
         followerStatorCurrent,
         elevatorReference,
-        leaderVelocity,
-        elevatorError);
+        leaderVelocity);
     leaderMotor.optimizeBusUtilization();
     followerMotor.optimizeBusUtilization();
   }
@@ -126,8 +127,7 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderStatorCurrent,
         followerStatorCurrent,
         elevatorReference,
-        leaderVelocity,
-        elevatorError);
+        leaderVelocity);
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
     inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
@@ -138,7 +138,7 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.leaderStatorCurrent = leaderStatorCurrent.getValueAsDouble();
     inputs.followerStatorCurrent = followerStatorCurrent.getValueAsDouble();
     inputs.leaderVelocity = leaderVelocity.getValueAsDouble();
-    inputs.elevatorError = elevatorError.getValueAsDouble();
+    inputs.elevatorError = elevatorError;
   }
 
   @Override

@@ -41,31 +41,39 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return coralIntakeInputs.hasCoral;
   }
 
+  public void intakeCoral(double speed) {
+    if (!hasCoral()) {
+      setIntakeSpeed(speed);
+    } else {
+      setIntakeSpeed(0.0);
+    }
+  }
+
   @Override
   public void periodic() {
     coralIntakeInterface.updateInputs(coralIntakeInputs);
     Logger.processInputs("CoralIntakeSubsystem/", coralIntakeInputs);
   }
 
-  public Command intakeCoral() {
-    if (!this.hasCoral()) {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
-          // sets speed when command ends
-          () -> this.setIntakeSpeed(0),
-          // requirements for command
-          this);
-    } else {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> this.setIntakeSpeed(0.0),
-          // sets speed when command ends
-          () -> this.setIntakeSpeed(0),
-          // requirements for command
-          this);
-    }
-  }
+  // public Command intakeCoral() {
+  //   if (!this.hasCoral()) {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   } else {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(0.0),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   }
+  // }
 
   public Command ejectCoral() {
     return new StartEndCommand(

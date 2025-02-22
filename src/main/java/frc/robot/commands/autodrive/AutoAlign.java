@@ -67,8 +67,7 @@ public class AutoAlign extends DriveCommandBase {
     Pose2d drivePose = swerveDrive.getEstimatedPose();
     double xPoseError = targetPose.getX() - drivePose.getX();
     double yPoseError = targetPose.getY() - drivePose.getY();
-    double thetaPoseError =
-        targetPose.getRotation().getRadians() - drivePose.getRotation().getRadians();
+    double thetaPoseError = targetPose.getRotation().minus(drivePose.getRotation()).getRadians();
 
     // Uses the PID controllers to calculate the drive output
     double xOutput =
@@ -80,19 +79,15 @@ public class AutoAlign extends DriveCommandBase {
             yTranslationController.calculate(yPoseError, 0),
             AutoConstants.AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT);
     double turnOutput;
-    if (!(thetaPoseError == 0)) {
-      turnOutput =
-          MathUtil.applyDeadband(
-              rotationController.calculate(thetaPoseError, 0),
-              AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
-    } else {
-      turnOutput = 0;
-    }
+    turnOutput =
+        MathUtil.applyDeadband(
+            rotationController.calculate(thetaPoseError, 0),
+            AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            xOutput, yOutput, turnOutput, swerveDrive.getOdometryRotation2d());
+            xOutput, yOutput, 0.0, swerveDrive.getOdometryRotation2d());
 
     Logger.recordOutput("Drive/target pose", targetPose);
     // Drives the robot towards the target pose
@@ -112,6 +107,8 @@ public class AutoAlign extends DriveCommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return yTranslationController.atGoal()
+        // && rotationController.atGoal()
+        && xTranslationController.atGoal();
   }
 }

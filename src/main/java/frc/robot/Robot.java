@@ -20,6 +20,7 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
+import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -27,11 +28,12 @@ import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
 import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants;
+import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -184,47 +186,65 @@ public class Robot extends LoggedRobot {
 
     // FieldConstants has all reef poses
     driverController
+        .y()
+        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE));
+    driverController
         .a()
         .whileTrue(
             Commands.sequence(
-                Commands.parallel(
-                        new AutoAlign(
-                            swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
-                        elevatorSubsystem
-                            .setElevationPosition(ElevatorConstants.LEVEL_3)
-                            .until((() -> elevatorSubsystem.isAtSetpoint())))
-                    .andThen(coralIntakeSubsystem.ejectCoral())
-                    .until(() -> !coralIntakeSubsystem.hasCoral())
-                    .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0))));
-  }
+                new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
 
-  private void configureOperatorController() {
-    operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
-    operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
-    operatorController.x().whileTrue(Commands.none());
-    operatorController
-        .a()
-        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
-    operatorController
-        .b()
-        .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_2));
-    operatorController.y().whileTrue(coralIntakeSubsystem.intakeCoral());
-    operatorController
+    driverController
         .x()
         .whileTrue(
             Commands.sequence(
-                    Commands.deadline(
-                            elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
-                            Commands.run(
-                                () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
-                        .until(() -> elevatorSubsystem.isAtSetpoint())
-                        .andThen(coralIntakeSubsystem.ejectCoral()))
-                .until(() -> !coralIntakeSubsystem.hasCoral())
-                .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
+                    () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
+                    coralIntakeSubsystem)));
+    // .until(() -> coralIntakeSubsystem.hasCoral())));
+    // Commands.sequence(
+    //     // Commands.parallel(
+    //     // new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
+    //     // .andThen
+    //     new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2)
+    //         // .until(() -> elevatorSubsystem.isAtSetpoint(Elevator
+    // Constants.LEVEL_2))
+    //         .andThen(coralIntakeSubsystem.ejectCoral())));
+
+    // .until(() -> !coralIntakeSubsystem.hasCoral())
+    // .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
+  }
+
+  private void configureOperatorController() {
+    // operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
+    // operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
+    // operatorController.x().whileTrue(Commands.none());
+    // operatorController
+    //     .a()
+    //     .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
+    // operatorController
+    //     .b()
+    //     .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_2));
+    // operatorController.y().whileTrue(coralIntakeSubsystem.intakeCoral());
+    // operatorController
+    //     .x()
+    //     .whileTrue(
+    //         Commands.sequence(
+    //                 Commands.deadline(
+    //                         elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
+    //                         Commands.run(
+    //                             () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
+    //                     .until(() -> elevatorSubsystem.isAtSetpoint())
+    //                     .andThen(coralIntakeSubsystem.ejectCoral()))
+    //             .until(() -> !coralIntakeSubsystem.hasCoral())
+    //             .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
     operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
-    operatorController
-        .a()
-        .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_FEEDER));
+    // operatorController
+    //     .a()
+    //     .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_FEEDER));
     operatorController
         .rightBumper()
         .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
