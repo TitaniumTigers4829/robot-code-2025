@@ -2,13 +2,10 @@ package frc.robot.subsystems.funnelPivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -41,7 +38,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
 
-    //funnelEncoder.getConfigurator().apply(funnelEncoderConfig, HardwareConstants.TIMEOUT_S);
+    // funnelEncoder.getConfigurator().apply(funnelEncoderConfig, HardwareConstants.TIMEOUT_S);
 
     funnelMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     funnelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

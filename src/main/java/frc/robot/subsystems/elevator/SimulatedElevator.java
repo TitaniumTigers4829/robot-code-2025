@@ -7,7 +7,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
-import frc.robot.extras.simulation.mechanismSim.elevatorSim.SlantedElevatorSim;
+import frc.robot.sim.simMechanism.SlantedElevatorSim;
 
 public class SimulatedElevator implements ElevatorInterface {
   private final SlantedElevatorSim m_elevatorSim;
@@ -26,8 +26,8 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.MIN_HEIGHT,
             ElevatorConstants.MAX_HEIGHT,
             ElevatorConstants.SIMULATE_GRAVITY,
-            ElevatorConstants.MIN_HEIGHT,
-            0);
+            ElevatorConstants.INCLINE_ANGLE_RADIANS,
+            ElevatorConstants.MIN_HEIGHT);
     m_pidController =
         new PIDController(
             ElevatorConstants.ELEVATOR_P,
@@ -40,7 +40,7 @@ public class SimulatedElevator implements ElevatorInterface {
             ElevatorConstants.ELEVATOR_V,
             ElevatorConstants.ELEVATOR_A);
     currentVolts = 0.0;
-    desiredPosition = 0.0;
+    desiredPosition = 1.0;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class SimulatedElevator implements ElevatorInterface {
     inputs.followerMotorPosition = m_elevatorSim.getPositionMeters();
     inputs.leaderMotorVoltage = currentVolts;
     inputs.followerMotorVoltage = currentVolts;
-    inputs.desiredPosition = desiredPosition;
+    inputs.desiredPosition = 1;
   }
 
   @Override
@@ -60,7 +60,7 @@ public class SimulatedElevator implements ElevatorInterface {
 
   @Override
   public void setElevatorPosition(double position) {
-    desiredPosition = position;
+    // desiredPosition = position;
     m_pidController.setSetpoint(position);
     double output = m_pidController.calculate(getElevatorPosition(), position);
     // double feedforward = m_feedforward.calculate(m_pidController.getSetpoint());

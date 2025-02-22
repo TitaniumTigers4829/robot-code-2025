@@ -9,7 +9,7 @@ import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.Newtons;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static frc.robot.extras.util.mathutils.MeasureMath.*;
+import static frc.robot.extras.math.mathutils.MeasureMath.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -22,10 +22,10 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.util.RuntimeLog;
-import frc.robot.extras.util.mathutils.MassMath.PhysicsMass;
-import frc.robot.extras.util.mathutils.MeasureMath;
-import frc.robot.extras.util.mathutils.MeasureMath.XY;
+import frc.robot.extras.logging.RuntimeLog;
+import frc.robot.extras.math.mathutils.MassMath.PhysicsMass;
+import frc.robot.extras.math.mathutils.MeasureMath;
+import frc.robot.extras.math.mathutils.MeasureMath.XY;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simController.SimMotorController;
@@ -35,6 +35,7 @@ import java.util.Arrays;
 import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;
 
+/** The class which simulates the swerve drive. */
 public class SimSwerve extends SimDriveTrain {
   protected final SimEnvTiming timing;
   protected final SimSwerveModule[] moduleSimulations;
@@ -53,8 +54,7 @@ public class SimSwerve extends SimDriveTrain {
    * Creates a Swerve Drive Simulation.
    *
    * <p>This constructor initializes a swerve drive simulation with the given robot mass, bumper
-   * dimensions, module simulations, module translations, gyro simulation, and initial pose on the
-   * field.
+   * dimensions, module simulations, module translations, gyro simulation.
    *
    * @param config a {@link SimSwerveConfig} instance containing the configurations of * this
    *     drivetrain
@@ -113,6 +113,7 @@ public class SimSwerve extends SimDriveTrain {
     super.simTick();
   }
 
+  /** Simulates the friction on the swerve modules. */
   private void simulateModuleFriction() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
     final ChassisSpeeds chassisSpeeds = this.getChassisWorldSpeeds();
@@ -130,9 +131,12 @@ public class SimSwerve extends SimDriveTrain {
       yFrictionAccel = yFrictionAccel.plus(pack.getFirst().y());
       angularFrictionAccel = angularFrictionAccel.plus(pack.getSecond());
 
-      Logger.recordOutput("Forces/Friction/module" + i + "/frictionForce", frictionForce);
-      Logger.recordOutput("Forces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
-      Logger.recordOutput("Forces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/frictionForce", frictionForce);
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
     }
 
     // clamp the friction acceleration to prevent the robot from accelerating in the opposite
@@ -146,8 +150,8 @@ public class SimSwerve extends SimDriveTrain {
         ChassisSpeeds.fromRobotRelativeSpeeds(wheelSpeeds, chassisRotation);
     final ChassisSpeeds unwantedSpeeds = newWheelSpeeds.minus(chassisSpeeds);
 
-    Logger.recordOutput("Friction/wheelSpeeds", wheelSpeeds);
-    Logger.recordOutput("Friction/unwantedSpeeds", unwantedSpeeds);
+    Logger.recordOutput("Forces/SwerveForces/Friction/wheelSpeeds", wheelSpeeds);
+    Logger.recordOutput("Forces/SwerveForces/Friction/unwantedSpeeds", unwantedSpeeds);
 
     final LinearAcceleration xAccelNeededToStop =
         MeasureMath.negate(MetersPerSecond.of(unwantedSpeeds.vxMetersPerSecond)).div(timing.dt());
@@ -156,20 +160,26 @@ public class SimSwerve extends SimDriveTrain {
     final AngularAcceleration angularAccelNeededToStop =
         MeasureMath.negate(RadiansPerSecond.of(unwantedSpeeds.omegaRadiansPerSecond))
             .div(timing.dt());
-    Logger.recordOutput("Forces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
-    Logger.recordOutput("Forces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
+
+    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
+    Logger.recordOutput(
+        "Forces/SwerveForces/Friction/angularFrictionAccelPreClamp", angularFrictionAccel);
+
     xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
     yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
     angularFrictionAccel = MeasureMath.clamp(angularFrictionAccel, angularAccelNeededToStop);
 
-    Logger.recordOutput("Forces/Friction/xAccelNeededToStop", xAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/yAccelNeededToStop", yAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
-    Logger.recordOutput("Forces/Friction/xFrictionAccel", xFrictionAccel);
-    Logger.recordOutput("Forces/Friction/yFrictionAccel", yFrictionAccel);
-    Logger.recordOutput("Forces/Friction/angularFrictionAccel", angularFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/xAccelNeededToStop", xAccelNeededToStop);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yAccelNeededToStop", yAccelNeededToStop);
+    Logger.recordOutput(
+        "Forces/SwerveForces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
 
-    // convert the friction acceleration to forces and torques and apply them to the chassis
+    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccel", xFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccel", yFrictionAccel);
+    Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccel", angularFrictionAccel);
+
+    // Convert the frictional acceleration to forces and torques and apply them to the chassis.
     final Force xFrictionForce = chassisMass.forceDueToAcceleration(xFrictionAccel);
     final Force yFrictionForce = chassisMass.forceDueToAcceleration(yFrictionAccel);
     final Torque angularFrictionTorque = chassisMass.torqueDueToAcceleration(angularFrictionAccel);
@@ -177,6 +187,7 @@ public class SimSwerve extends SimDriveTrain {
     chassis.applyTorque(angularFrictionTorque.in(NewtonMeters));
   }
 
+  /** Simulates the propulsion forces on the swerve modules. */
   private void simulateModulePropulsion() {
     final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
 
@@ -185,6 +196,8 @@ public class SimSwerve extends SimDriveTrain {
     Force propulsionForceX = Newtons.zero();
     Force propulsionForceY = Newtons.zero();
     Torque propulsionTorque = NewtonMeters.zero();
+
+    //
     for (final SimSwerveModule module : moduleSimulations) {
       final XY<Distance> forcePosition = XY.of(module.translation().rotateBy(chassisRotation));
       final XY<Force> propulsion = module.force(chassisRotation);
@@ -196,8 +209,10 @@ public class SimSwerve extends SimDriveTrain {
       propulsionForceY = propulsionForceY.plus(pack.getFirst().y());
       propulsionTorque = propulsionTorque.plus(pack.getSecond());
 
-      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
-      Logger.recordOutput("Forces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
+      Logger.recordOutput(
+          "Forces/SwerveForces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
     }
 
     // The rotor inertia can very depending on how the modules are driving the chassis.
@@ -213,9 +228,9 @@ public class SimSwerve extends SimDriveTrain {
       final double yPropulsionRatio = propulsionForceYMag / propulsionForceTotalMag;
       final double translationRatio = Math.hypot(xPropulsionRatio, yPropulsionRatio);
 
-      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
-      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
-      Logger.recordOutput("Forces/RotorInertia/translationRatio", translationRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", translationRatio);
 
       // Calculate the rotor inertia based on the propulsion ratios
       this.rotorInertia =
@@ -225,27 +240,46 @@ public class SimSwerve extends SimDriveTrain {
     } else {
       this.rotorInertia = rotorInertiaWhenTranslating;
 
-      Logger.recordOutput("Forces/RotorInertia/xPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/RotorInertia/yPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/RotorInertia/translationRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", 0.0);
+      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", 0.0);
     }
 
-    Logger.recordOutput("Forces/Propulsion/propulsionTorque", propulsionTorque);
+    Logger.recordOutput("Forces/SwerveForces/Propulsion/propulsionTorque", propulsionTorque);
     Logger.recordOutput(
-        "Forces/Propulsion/propulsionForce", new XY<>(propulsionForceX, propulsionForceY));
+        "Forces/SwerveForces/Propulsion/propulsionForce",
+        new XY<>(propulsionForceX, propulsionForceY));
 
     chassis.applyForce(new Vector2(propulsionForceX.in(Newtons), propulsionForceY.in(Newtons)));
     chassis.applyTorque(propulsionTorque.in(NewtonMeters));
   }
 
+  /**
+   * Gets the swerve modules.
+   *
+   * @return the current moduleSimulations.
+   */
   public SimSwerveModule[] getModules() {
     return moduleSimulations;
   }
 
+  /**
+   * Gets the gyro.
+   *
+   * @return the current gyroSimulation.
+   */
   public SimGyro getGyro() {
     return this.gyroSimulation;
   }
 
+  /**
+   * Uses {@link SimMotorController}'s to control the moduleSimulations.
+   *
+   * @param moduleId the id of the module.
+   * @param driveController the drive controller.
+   * @param steerController the steer controller.
+   * @return this SimSwerve instance.
+   */
   public SimSwerve withSetModuleControllers(
       int moduleId, SimMotorController driveController, SimMotorController steerController) {
     moduleSimulations[moduleId].teardown();
@@ -261,6 +295,11 @@ public class SimSwerve extends SimDriveTrain {
     return this;
   }
 
+  /**
+   * Gets the current sim timing.
+   *
+   * @return the current {@link SimEnvTiming}.
+   */
   public SimEnvTiming timing() {
     return timing;
   }
