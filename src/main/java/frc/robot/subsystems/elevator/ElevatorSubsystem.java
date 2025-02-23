@@ -31,6 +31,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
+  
+  public double elevatorStatorCurrent() {
+    return elevatorInterface.elevatorStatorCurrent();
+  }
 
   @Override
   public void periodic() {

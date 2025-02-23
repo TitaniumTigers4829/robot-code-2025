@@ -26,11 +26,13 @@ public class ElevatorConstants {
   public static final double MAX_HEIGHT = 3;
   public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);
   public static final boolean SIMULATE_GRAVITY = true;
-
+  //stator and supply
   public static final double STATOR_CURRENT_LIMIT = 0;
   public static final double SUPPLY_CURRENT_LIMIT = 0;
   public static final boolean STATOR_CURRENT_LIMIT_ENABLE = false;
   public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = false;
+  public static final double MAX_STATOR_THRESHOLD = 59343494;
+  public static final double MIN_STATOR_THRESHOLD = 59343494;
 
   public static final double MOTION_MAGIC_MAX_ACCELERATION = 2;
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 2;

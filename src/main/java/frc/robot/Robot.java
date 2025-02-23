@@ -324,13 +324,18 @@ public class Robot extends LoggedRobot {
     if (Math.abs(swerveDrive.getRoll()) >= ElevatorConstants.MAX_ROLL_ANGLE // gyro safety
         || Math.abs(swerveDrive.getPitch())
             >= ElevatorConstants
-                .MAX_PITCH_ANGLE) // TODO if robot is not in climbing state, then do this (AND
-    // logic)
+                .MAX_PITCH_ANGLE) 
     {
       // elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem)); // maybe works
       elevatorSubsystem.setElevatorPosition(0);
     }
-  }
+    //extra elevator safety
+
+    //homing
+    
+
+    }
+  
 
   /** This function is called once when test mode is enabled. */
   @Override

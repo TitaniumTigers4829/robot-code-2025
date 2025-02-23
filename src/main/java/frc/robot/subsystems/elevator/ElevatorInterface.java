@@ -18,7 +18,10 @@ public interface ElevatorInterface {
     public double followerDutyCycle = 0.0;
     public double desiredPosition = 0.0;
   }
-
+  
+  public default double elevatorStatorCurrent() {
+    return 0.0;
+  }
   public default void updateInputs(ElevatorInputs inputs) {}
 
   public default double getElevatorPosition() {

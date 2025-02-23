@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 
@@ -30,6 +31,7 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Voltage> followerAppliedVoltage;
   private final StatusSignal<Double> followerDutyCycle;
   private final StatusSignal<Double> leaderDutyCycle;
+  private final StatusSignal<Current> elevatorStatorCurrent;
 
   private double desiredPosition;
 
@@ -87,7 +89,7 @@ public class PhysicalElevator implements ElevatorInterface {
     followerAppliedVoltage = followerMotor.getMotorVoltage();
     followerDutyCycle = followerMotor.getDutyCycle();
     leaderDutyCycle = leaderMotor.getDutyCycle();
-
+    elevatorStatorCurrent = leaderMotor.getStatorCurrent();
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.STATUS_SIGNAL_FREQUENCY,
         leaderPosition,
@@ -98,6 +100,27 @@ public class PhysicalElevator implements ElevatorInterface {
         followerDutyCycle);
 
     desiredPosition = 0.0;
+  }
+
+  public void homing() {
+   if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD) {
+      setElevatorPosition(-ElevatorConstants.MIN_HEIGHT);
+      setElevatorPosition(ElevatorConstants.MIN_HEIGHT);
+      followerMotor.set(0);
+      leaderMotor.set(0);
+      //zero encoder positions
+      leaderMotor.setPosition(0);
+      followerMotor.setPosition(0); } 
+   }
+  public void setElevatorHeights() {
+    if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()>= 0.1) {
+      leaderMotor.setPosition(-ElevatorConstants.MAX_HEIGHT);
+      followerMotor.setPosition(ElevatorConstants.MAX_HEIGHT); //IDK PROB DOESNT WORK JESUS FIX IT}
+    else if (leaderMotor.getStatorCurrent().getValueAsDouble() <= ElevatorConstants.MIN_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()<= -0.1) {
+      leaderMotor.setPosition(-ElevatorConstants.MIN_HEIGHT);
+      followerMotor.setPosition(ElevatorConstants.MIN_HEIGHT); 
+  }
+
   }
 
   @Override
