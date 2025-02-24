@@ -1,4 +1,4 @@
-// TigerHelpers v1.02 (REQUIRES LLOS 2025.0 OR LATER)
+// TigerHelpers v1.03 (REQUIRES LLOS 2025.0 OR LATER)
 
 package frc.robot.extras.vision;
 
@@ -68,6 +68,22 @@ public class TigerHelpers {
      */
     public double ambiguity = 0;
 
+    /**
+     * Initializes a RawFidicual with the provided values. This represents data from reading a
+     * single april tag.
+     *
+     * @param id The id of the april tag
+     * @param txnc The horizontal offset of the target from the Limelight's principle pixel (the
+     *     images central pixel) in degrees.
+     * @param tync The vertical offset of the target from the Limelight's principle pixel (the
+     *     images central pixel) in degrees.
+     * @param ta The area of the target in the Limelight's view as a percentage of the total image
+     *     area.
+     * @param distToCamera The distance from the Limelight to the april tag in meters.
+     * @param distToRobot The distance from the robot to the april tag in meters.
+     * @param ambiguity The ambiguity of the april tag. This ranges from 0 to 1, a lower values
+     *     meaning less ambiguous.
+     */
     public RawFiducial(
         int id,
         double txnc,
@@ -100,7 +116,10 @@ public class TigerHelpers {
     }
   }
 
-  /** Represents a 3D Pose Estimate. */
+  /**
+   * Represents a Limelight pose estimate from Limelight's NetworkTables output. This is for any
+   * botpose estimate, so MegaTag1 or MegaTag2
+   */
   public static class PoseEstimate {
     /** The estimated 2D pose of the robot, including position and rotation. */
     public Pose2d pose;
@@ -123,7 +142,7 @@ public class TigerHelpers {
      */
     public double avgTagDist;
 
-    /** The average area, in meters squared, of april tags used to calculate the pose estimate. */
+    /** The average area, in square meters, of april tags used to calculate the pose estimate. */
     public double avgTagArea;
 
     /** An array of RawFiducial used to calculate the pose estimate. */
@@ -132,7 +151,7 @@ public class TigerHelpers {
     /** true if the pose estimate is calculated using MegaTag2, false if using MegaTag1. */
     public boolean isMegaTag2;
 
-    /** Initializes a PoseEstimate object with default values */
+    /** Initializes an "empty" PoseEstimate object with default values */
     public PoseEstimate() {
       this.pose = new Pose2d();
       this.timestampSeconds = 0;
@@ -145,6 +164,24 @@ public class TigerHelpers {
       this.isMegaTag2 = false;
     }
 
+    /**
+     * Initializes a PoseEstimate object with the provided data.
+     *
+     * @param pose The estimated 2D pose of the robot, including position and rotation.
+     * @param timestampSeconds The timestamp of the pose estimate in seconds since the Limelight
+     *     booted up.
+     * @param latency The latency of the pose estimate in milliseconds.
+     * @param tagCount The number of april tags used to calculate the pose estimate.
+     * @param tagSpan The max distance, in meters, between april tags used to calculate the pose
+     *     estimate.
+     * @param avgTagDist The average distance, in meters, between the Limelight and the april tags
+     *     used to calculate the pose estimate.
+     * @param avgTagArea The average area, in square meters, of april tags used to calculate the
+     *     pose estimate.
+     * @param rawFiducials An array of RawFiducial used to calculate the pose estimate.
+     * @param isMegaTag2 true if the pose estimate is calculated using MegaTag2, false if using
+     *     MegaTag1.
+     */
     public PoseEstimate(
         Pose2d pose,
         double timestampSeconds,
@@ -218,7 +255,9 @@ public class TigerHelpers {
     }
   }
 
-  /** Encapsulates the state of an internal Limelight IMU. */
+  /**
+   * Encapsulates the state of an internal Limelight IMU. This includes gyro and accelerometer data.
+   */
   public static class IMUData {
     public double robotYaw;
     public double roll;
@@ -231,7 +270,7 @@ public class TigerHelpers {
     public double accelY;
     public double accelZ;
 
-    /** Initializes an IMUData object with default values */
+    /** Initializes an "empty" IMUData object with default values */
     public IMUData() {
       this.robotYaw = 0;
       this.roll = 0;
@@ -248,22 +287,39 @@ public class TigerHelpers {
     /**
      * Initializes an IMUData object with the provided IMU data array.
      *
-     * @param imuData Array containing IMU data [robotYaw, roll, pitch, yaw, gyroX, gyroY, gyroZ,
-     *     accelX, accelY, accelZ]
+     * @param robotYaw The yaw of the robot in degrees
+     * @param roll The roll of the robot in degrees
+     * @param pitch The pitch of the robot in degrees
+     * @param yaw The yaw of the IMU in degrees
+     * @param gyroX The x-axis gyro value in degrees per second
+     * @param gyroY The y-axis gyro value in degrees per second
+     * @param gyroZ The z-axis gyro value in degrees per second TODO: figure out what units the
+     *     accelerometer values are in (maybe Gs?)
+     * @param accelX The x-axis accelerometer value in meters per second squared
+     * @param accelY The y-axis accelerometer value in meters per second squared
+     * @param accelZ The z-axis accelerometer value in meters per second squared
      */
-    public IMUData(double[] imuData) {
-      if (imuData != null && imuData.length >= 10) {
-        this.robotYaw = imuData[0];
-        this.roll = imuData[1];
-        this.pitch = imuData[2];
-        this.yaw = imuData[3];
-        this.gyroX = imuData[4];
-        this.gyroY = imuData[5];
-        this.gyroZ = imuData[6];
-        this.accelX = imuData[7];
-        this.accelY = imuData[8];
-        this.accelZ = imuData[9];
-      }
+    public IMUData(
+        double robotYaw,
+        double roll,
+        double pitch,
+        double yaw,
+        double gyroX,
+        double gyroY,
+        double gyroZ,
+        double accelX,
+        double accelY,
+        double accelZ) {
+      this.robotYaw = robotYaw;
+      this.roll = roll;
+      this.pitch = pitch;
+      this.yaw = yaw;
+      this.gyroX = gyroX;
+      this.gyroY = gyroY;
+      this.gyroZ = gyroZ;
+      this.accelX = accelX;
+      this.accelY = accelY;
+      this.accelZ = accelZ;
     }
   }
 
@@ -413,11 +469,12 @@ public class TigerHelpers {
   /**
    * Gets the latest raw fiducial/AprilTag detection results from NetworkTables.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Array of RawFiducial objects containing detection details
    */
   public static RawFiducial[] getRawFiducials(String limelightName) {
-    NetworkTableEntry entry = TigerHelpers.getLimelightNTTableEntry(limelightName, "rawfiducials");
+    NetworkTableEntry entry =
+        TigerHelpers.getLimelightNetworkTableEntry(limelightName, "rawfiducials");
     double[] rawFiducialArray = entry.getDoubleArray(new double[0]);
     int valsPerEntry = 7;
     if (rawFiducialArray.length % valsPerEntry != 0) {
@@ -443,15 +500,16 @@ public class TigerHelpers {
     return rawFiducials;
   }
 
-  private static NetworkTableInstance ntInstance = NetworkTableInstance.getDefault();
+  private static NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
 
   /**
    * Sets the NetworkTableInstance to use for Limelight communication. Normally it it uses the
    * default instance. This is useful for unit testing when you might need multiple instances.
    */
-  public static void setNTInstance(NetworkTableInstance ntInstance) {
-    TigerHelpers.ntInstance = ntInstance;
+  public static void setNetworkTableInstance(NetworkTableInstance networkTableInstance) {
+    TigerHelpers.networkTableInstance = networkTableInstance;
     clearCaches();
+    flushNetworkTable();
   }
 
   /**
@@ -459,8 +517,8 @@ public class TigerHelpers {
    *
    * @return The NetworkTableInstance used for Limelight communication
    */
-  public static NetworkTableInstance getNTInstance() {
-    return ntInstance;
+  public static NetworkTableInstance getNetworkTableInstance() {
+    return networkTableInstance;
   }
 
   /**
@@ -471,76 +529,129 @@ public class TigerHelpers {
     doubleArrayEntries.clear();
   }
 
-  public static Boolean validPoseEstimate(PoseEstimate pose) {
-    return pose != null && pose.rawFiducials != null && pose.rawFiducials.length != 0;
+  /**
+   * Flushes the NetworkTables to ensure that any newly updated entry is immediately sent to the
+   * network.
+   */
+  public static void flushNetworkTable() {
+    networkTableInstance.flush();
   }
 
-  public static NetworkTable getLimelightNTTable(String tableName) {
-    return ntInstance.getTable(sanitizeName(tableName));
+  /**
+   * Gets the NetworkTable for a Limelight camera.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @return NetworkTable for the Limelight
+   */
+  public static NetworkTable getLimelightNetworkTable(String tableName) {
+    return networkTableInstance.getTable(sanitizeName(tableName));
   }
 
-  public static void Flush() {
-    ntInstance.flush();
+  /**
+   * Gets a NetworkTableEntry from a Limelight camera.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to get
+   * @return NetworkTableEntry for the entry name
+   */
+  public static NetworkTableEntry getLimelightNetworkTableEntry(
+      String tableName, String entryName) {
+    return getLimelightNetworkTable(tableName).getEntry(entryName);
   }
 
-  public static NetworkTableEntry getLimelightNTTableEntry(String tableName, String entryName) {
-    return getLimelightNTTable(tableName).getEntry(entryName);
-  }
-
+  /**
+   * Gets a DoubleArrayEntry from a Limelight camera. This is useful for getting raw pose data.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to get
+   * @return DoubleArrayEntry for the entry name
+   */
   public static DoubleArrayEntry getLimelightDoubleArrayEntry(String tableName, String entryName) {
     String key = tableName + "/" + entryName;
     return doubleArrayEntries.computeIfAbsent(
         key,
         k -> {
-          NetworkTable table = getLimelightNTTable(tableName);
+          NetworkTable table = getLimelightNetworkTable(tableName);
           return table.getDoubleArrayTopic(entryName).getEntry(new double[0]);
         });
   }
 
-  public static double getLimelightNTDouble(String tableName, String entryName) {
-    return getLimelightNTTableEntry(tableName, entryName).getDouble(0.0);
-  }
-
-  public static void setLimelightNTDouble(String tableName, String entryName, double val) {
-    getLimelightNTTableEntry(tableName, entryName).setDouble(val);
-  }
-
-  public static void setLimelightNTDoubleArray(String tableName, String entryName, double[] val) {
-    getLimelightNTTableEntry(tableName, entryName).setDoubleArray(val);
-  }
-
-  public static double[] getLimelightNTDoubleArray(String tableName, String entryName) {
-    return getLimelightNTTableEntry(tableName, entryName).getDoubleArray(new double[0]);
+  /**
+   * Gets a NetworkTableEntry from a Limelight camera as a double.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to get
+   * @return double value of the entry
+   */
+  public static double getLimelightNetworkTableDouble(String tableName, String entryName) {
+    return getLimelightNetworkTableEntry(tableName, entryName).getDouble(0.0);
   }
 
   /**
-   * Does the Limelight have a valid target?
+   * Sets a NetworkTableEntry from a Limelight camera as a double.
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to set
+   * @param val Value to set the entry to
+   */
+  public static void setLimelightNetworkTableDouble(
+      String tableName, String entryName, double val) {
+    getLimelightNetworkTableEntry(tableName, entryName).setDouble(val);
+  }
+
+  /**
+   * Sets a NetworkTableEntry from a Limelight camera as a double array. If you want to the network
+   * table array for a {@link PoseEstimate}, use {@link #setBotPoseEstimate(PoseEstimate, String)},
+   * if for the {@link RawFiducial}s use {@link #setRawFiducials(RawFiducial[], String)}.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to set
+   * @param val Value to set the entry to
+   */
+  public static void setLimelightNetworkTableDoubleArray(
+      String tableName, String entryName, double[] val) {
+    getLimelightNetworkTableEntry(tableName, entryName).setDoubleArray(val);
+  }
+
+  /**
+   * Gets a NetworkTableEntry from a Limelight camera as a double array.
+   *
+   * @param tableName The name of the Limelight set in the UI ("" for default)
+   * @param entryName Name of the entry to get
+   * @return double array value of the entry
+   */
+  public static double[] getLimelightNetworkTableDoubleArray(String tableName, String entryName) {
+    return getLimelightNetworkTableEntry(tableName, entryName).getDoubleArray(new double[0]);
+  }
+
+  /**
+   * Gets if the Limelight have a valid target?
+   *
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return True if a valid target is present, false otherwise
    */
   public static boolean getTV(String limelightName) {
-    return 1.0 == getLimelightNTDouble(limelightName, "tv");
+    return 1.0 == getLimelightNetworkTableDouble(limelightName, "tv");
   }
 
   /**
    * Gets the horizontal offset from the crosshair to the target in degrees.
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Horizontal offset angle in degrees
    */
   public static double getTX(String limelightName) {
-    return getLimelightNTDouble(limelightName, "tx");
+    return getLimelightNetworkTableDouble(limelightName, "tx");
   }
 
   /**
    * Gets the vertical offset from the crosshair to the target in degrees.
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Vertical offset angle in degrees
    */
   public static double getTY(String limelightName) {
-    return getLimelightNTDouble(limelightName, "ty");
+    return getLimelightNetworkTableDouble(limelightName, "ty");
   }
 
   /**
@@ -548,11 +659,11 @@ public class TigerHelpers {
    * most accurate 2d metric if you are using a calibrated camera and you don't need adjustable
    * crosshair functionality.
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Horizontal offset angle in degrees
    */
   public static double getTXNC(String limelightName) {
-    return getLimelightNTDouble(limelightName, "txnc");
+    return getLimelightNetworkTableDouble(limelightName, "txnc");
   }
 
   /**
@@ -560,172 +671,203 @@ public class TigerHelpers {
    * most accurate 2d metric if you are using a calibrated camera and you don't need adjustable
    * crosshair functionality.
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Vertical offset angle in degrees
    */
   public static double getTYNC(String limelightName) {
-    return getLimelightNTDouble(limelightName, "tync");
+    return getLimelightNetworkTableDouble(limelightName, "tync");
   }
 
   /**
    * Gets the target area as a percentage of the image (0-100%).
    *
-   * @param limelightName Name of the Limelight camera ("" for default)
-   * @return Target area percentage (0-100)
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @return Target area percentage (0-100%)
    */
   public static double getTA(String limelightName) {
-    return getLimelightNTDouble(limelightName, "ta");
+    return getLimelightNetworkTableDouble(limelightName, "ta");
   }
 
   /**
    * Gets the pipeline's processing latency contribution.
    *
-   * @param limelightName Name of the Limelight camera
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pipeline latency in milliseconds
    */
   public static double getLatencyPipeline(String limelightName) {
-    return getLimelightNTDouble(limelightName, "tl");
+    return getLimelightNetworkTableDouble(limelightName, "tl");
   }
 
   /**
    * Gets the capture latency.
    *
-   * @param limelightName Name of the Limelight camera
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Capture latency in milliseconds
    */
   public static double getLatencyCapture(String limelightName) {
-    return getLimelightNTDouble(limelightName, "cl");
+    return getLimelightNetworkTableDouble(limelightName, "cl");
   }
 
   // TODO: deprecate these methods (all the way down to the enum)
   public static double[] getBotPose(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose");
+    return getLimelightNetworkTableDoubleArray(limelightName, "botpose");
   }
 
   public static double[] getBotPose_wpiRed(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose_wpired");
+    return getLimelightNetworkTableDoubleArray(limelightName, "botpose_wpired");
   }
 
   public static double[] getBotPose_wpiBlue(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose_wpiblue");
+    return getLimelightNetworkTableDoubleArray(limelightName, "botpose_wpiblue");
   }
 
   public static double[] getBotPose_TargetSpace(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "botpose_targetspace");
+    return getLimelightNetworkTableDoubleArray(limelightName, "botpose_targetspace");
   }
 
   public static double[] getCameraPose_TargetSpace(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "camerapose_targetspace");
+    return getLimelightNetworkTableDoubleArray(limelightName, "camerapose_targetspace");
   }
 
   public static double[] getTargetPose_CameraSpace(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "targetpose_cameraspace");
+    return getLimelightNetworkTableDoubleArray(limelightName, "targetpose_cameraspace");
   }
 
   public static double[] getTargetPose_RobotSpace(String limelightName) {
-    return getLimelightNTDoubleArray(limelightName, "targetpose_robotspace");
+    return getLimelightNetworkTableDoubleArray(limelightName, "targetpose_robotspace");
   }
 
   public static double getFiducialID(String limelightName) {
-    return getLimelightNTDouble(limelightName, "tid");
+    return getLimelightNetworkTableDouble(limelightName, "tid");
   }
 
   public static Pose3d getBotPose3d(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose");
+    double[] poseArray = getLimelightNetworkTableDoubleArray(limelightName, "botpose");
     return toPose3D(poseArray);
   }
 
   /**
    * (Not Recommended) Gets the robot's 3D pose in the WPILib Red Alliance Coordinate System.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the robot's position and orientation in Red Alliance field
    *     space
    */
+  @Deprecated
   public static Pose3d getBotPose3d_wpiRed(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose_wpired");
+    double[] poseArray = getLimelightNetworkTableDoubleArray(limelightName, "botpose_wpired");
     return toPose3D(poseArray);
   }
 
   /**
    * (Recommended) Gets the robot's 3D pose in the WPILib Blue Alliance Coordinate System.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the robot's position and orientation in Blue Alliance field
    *     space
    */
+  @Deprecated
   public static Pose3d getBotPose3d_wpiBlue(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose_wpiblue");
+    double[] poseArray = getLimelightNetworkTableDoubleArray(limelightName, "botpose_wpiblue");
     return toPose3D(poseArray);
   }
 
   /**
    * Gets the robot's 3D pose with respect to the currently tracked target's coordinate system.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the robot's position and orientation relative to the target
    */
+  @Deprecated
   public static Pose3d getBotPose3d_TargetSpace(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "botpose_targetspace");
+    double[] poseArray = getLimelightNetworkTableDoubleArray(limelightName, "botpose_targetspace");
     return toPose3D(poseArray);
   }
 
   /**
    * Gets the camera's 3D pose with respect to the currently tracked target's coordinate system.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the camera's position and orientation relative to the target
    */
+  @Deprecated
   public static Pose3d getCameraPose3d_TargetSpace(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "camerapose_targetspace");
+    double[] poseArray =
+        getLimelightNetworkTableDoubleArray(limelightName, "camerapose_targetspace");
     return toPose3D(poseArray);
   }
 
   /**
    * Gets the target's 3D pose with respect to the camera's coordinate system.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the target's position and orientation relative to the camera
    */
+  @Deprecated
   public static Pose3d getTargetPose3d_CameraSpace(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "targetpose_cameraspace");
+    double[] poseArray =
+        getLimelightNetworkTableDoubleArray(limelightName, "targetpose_cameraspace");
     return toPose3D(poseArray);
   }
 
   /**
    * Gets the target's 3D pose with respect to the robot's coordinate system.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the target's position and orientation relative to the robot
    */
+  @Deprecated
   public static Pose3d getTargetPose3d_RobotSpace(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "targetpose_robotspace");
+    double[] poseArray =
+        getLimelightNetworkTableDoubleArray(limelightName, "targetpose_robotspace");
     return toPose3D(poseArray);
   }
 
   /**
    * Gets the camera's 3D pose with respect to the robot's coordinate system.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return Pose3d object representing the camera's position and orientation relative to the robot
    */
+  @Deprecated
   public static Pose3d getCameraPose3d_RobotSpace(String limelightName) {
-    double[] poseArray = getLimelightNTDoubleArray(limelightName, "camerapose_robotspace");
+    double[] poseArray =
+        getLimelightNetworkTableDoubleArray(limelightName, "camerapose_robotspace");
     return toPose3D(poseArray);
   }
 
   /**
    * This enum represents the different types of botpose data that can be retrieved from the
-   * Limelight.
+   * Limelight. Each constant corresponds to a specific NetworkTables entry name and indicates
+   * whether it uses the MegaTag2 algorithm or the original MegaTag1 algorithm for pose estimation.
    */
   public enum Botpose {
+    /**
+     * Botpose data for the blue alliance using the MegaTag1 algorithm. Retrieved from the
+     * "botpose_wpiblue" NetworkTables entry.
+     */
     BLUE_MEGATAG1("botpose_wpiblue", false),
+
+    /**
+     * Botpose data for the blue alliance using the MegaTag2 algorithm. Retrieved from the
+     * "botpose_orb_wpiblue" NetworkTables entry.
+     */
     BLUE_MEGATAG2("botpose_orb_wpiblue", true),
+
+    /**
+     * Botpose data for the red alliance using the MegaTag1 algorithm. Retrieved from the
+     * "botpose_wpired" NetworkTables entry.
+     */
     RED_MEGATAG1("botpose_wpired", false),
-    RED_MEGATAG2("botpose_orb_wpired", true),
-    ;
+
+    /**
+     * Botpose data for the red alliance using the MegaTag2 algorithm. Retrieved from the
+     * "botpose_orb_wpired" NetworkTables entry.
+     */
+    RED_MEGATAG2("botpose_orb_wpired", true);
 
     private final String entryName;
+
     private final boolean isMegaTag2;
 
     Botpose(String entryName, boolean isMegaTag2) {
@@ -780,7 +922,7 @@ public class TigerHelpers {
   /**
    * Gets the MegaTag2 Pose2d and timestamp for use with WPILib pose estimator
    * (addVisionMeasurement) in the WPILib Blue alliance coordinate system. Make sure you are calling
-   * setRobotOrientation() before calling this method.
+   * {setRobotOrientation()} before calling this method.
    *
    * @param limelightName
    * @return
@@ -830,12 +972,12 @@ public class TigerHelpers {
    * Gets the specified Pose2d for easy use with Odometry vision pose estimator
    * (addVisionMeasurement).
    *
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param botpose the type of botpose to get
    * @return the Pose2d of the robot relative to the origin specified by the botpose
    */
   public static Pose2d getBotPose2d(String limelightName, Botpose botpose) {
-    double[] result = getLimelightNTDoubleArray(limelightName, botpose.getEntryName());
+    double[] result = getLimelightNetworkTableDoubleArray(limelightName, botpose.getEntryName());
     return toPose2D(result);
   }
 
@@ -843,7 +985,7 @@ public class TigerHelpers {
    * Gets the Pose2d with the blue-side origin for use with Odometry vision pose estimator
    * (addVisionMeasurement).
    *
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return the Pose2d of the robot relative to the blue-side origin
    */
   public static Pose2d getBotPose2d(String limelightName) {
@@ -853,7 +995,7 @@ public class TigerHelpers {
   /**
    * Gets the PoseEstimate for the specified {@link Botpose} type.
    *
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param botpose the type of botpose to get
    * @return the PoseEstimate object
    */
@@ -864,7 +1006,7 @@ public class TigerHelpers {
   /**
    * Gets the PoseEstimate with the blue-side origin using MegaTag1.
    *
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return the PoseEstimate object
    */
   public static PoseEstimate getBotPoseEstimate(String limelightName) {
@@ -877,14 +1019,12 @@ public class TigerHelpers {
    * pitch, so these will be set to 0.
    *
    * @param poseEstimate the pose estimate to set
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param botpose the type of botpose to set (e.g., BLUE_MEGATAG1)
    */
   public static void setBotPoseEstimate(
       PoseEstimate poseEstimate, String limelightName, Botpose botpose) {
-    NetworkTableEntry entry = getLimelightNTTableEntry(limelightName, botpose.getEntryName());
     // Because network tables don't support 2D arrays, we need to flatten the data into a 1D array
-
     // Calculates array size: 11 (for PoseEstimate data) + 7 * number of fiducials (for each raw
     // fiducial)
     int fiducialCount = poseEstimate.rawFiducials.length;
@@ -917,7 +1057,20 @@ public class TigerHelpers {
     }
 
     // Write the array to NetworkTables
-    entry.setDoubleArray(data);
+    setLimelightNetworkTableDoubleArray(limelightName, botpose.getEntryName(), data);
+  }
+
+  /**
+   * Checks if a PoseEstimate is valid. If this is true, it means the PoseEstimate is has valid data
+   * from at least one april tag.
+   *
+   * @param poseEstimate The PoseEstimate to check
+   * @return True if the PoseEstimate is valid, false otherwise
+   */
+  public static boolean validPoseEstimate(PoseEstimate poseEstimate) {
+    return poseEstimate != null
+        && poseEstimate.rawFiducials != null
+        && poseEstimate.rawFiducials.length != 0;
   }
 
   /**
@@ -925,8 +1078,8 @@ public class TigerHelpers {
    * setting values for unit testing. The {@link PoseEstimate} does not contain values for the z
    * coordinate, roll, and pitch, so these will be set to 0.
    *
-   * @param poseEstimate
-   * @param limelightName
+   * @param poseEstimate the pose estimate to set
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    */
   public static void setBotPoseEstimate(PoseEstimate poseEstimate, String limelightName) {
     setBotPoseEstimate(poseEstimate, limelightName, Botpose.BLUE_MEGATAG1);
@@ -937,10 +1090,10 @@ public class TigerHelpers {
    * testing.
    *
    * @param rawFiducials the array of raw fiducials to set
-   * @param limelightName the name of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    */
   public static void setRawFiducials(RawFiducial[] rawFiducials, String limelightName) {
-    NetworkTableEntry entry = getLimelightNTTableEntry(limelightName, "rawfiducials");
+    NetworkTableEntry entry = getLimelightNetworkTableEntry(limelightName, "rawfiducials");
     double[] data = new double[rawFiducials.length * 7];
 
     for (int i = 0; i < rawFiducials.length; i++) {
@@ -959,29 +1112,48 @@ public class TigerHelpers {
   }
 
   /**
-   * Gets the current IMU data from NetworkTables. IMU data is formatted as [robotYaw, Roll, Pitch,
-   * Yaw, gyroX, gyroY, gyroZ, accelX, accelY, accelZ]. Returns all zeros if data is invalid or
+   * Gets the current IMU data from NetworkTables. IMU data is formatted as [robotYaw, roll, pitch,
+   * yaw, gyroX, gyroY, gyroZ, accelX, accelY, accelZ]. Returns all zeros if data is invalid or
    * unavailable.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @return IMUData object containing all current IMU data
    */
   public static IMUData getIMUData(String limelightName) {
-    double[] imuData = getLimelightNTDoubleArray(limelightName, "imu");
+    double[] imuData = getLimelightNetworkTableDoubleArray(limelightName, "imu");
     if (imuData == null || imuData.length < 10) {
       return new IMUData(); // Returns object with all zeros
     }
-    return new IMUData(imuData);
-  }
-
-  public static void setPriorityTagID(String limelightName, int ID) {
-    setLimelightNTDouble(limelightName, "priorityid", ID);
+    return new IMUData(
+        imuData[0],
+        imuData[1],
+        imuData[2],
+        imuData[3],
+        imuData[4],
+        imuData[5],
+        imuData[6],
+        imuData[7],
+        imuData[8],
+        imuData[9]);
   }
 
   /**
-   * Sets the crop window for the camera. The crop window in the UI must be completely open.
+   * Sets the priority tag ID for the Limelight camera. This is used to prioritize a specific tag
+   * for detection, which can be useful for tracking a specific target.
    *
-   * @param limelightName Name of the Limelight camera
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @param ID ID of the tag to prioritize
+   */
+  public static void setPriorityTagID(String limelightName, int ID) {
+    setLimelightNetworkTableDouble(limelightName, "priorityid", ID);
+  }
+
+  /**
+   * Sets the crop window for the camera. The crop window in the UI must be completely open. This
+   * can be useful for increasing the Limelight's frame rate as the camera will only process the
+   * cropped area.
+   *
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param cropXMin Minimum X value (-1 to 1)
    * @param cropXMax Maximum X value (-1 to 1)
    * @param cropYMin Minimum Y value (-1 to 1)
@@ -994,23 +1166,30 @@ public class TigerHelpers {
     entries[1] = cropXMax;
     entries[2] = cropYMin;
     entries[3] = cropYMax;
-    setLimelightNTDoubleArray(limelightName, "crop", entries);
+    setLimelightNetworkTableDoubleArray(limelightName, "crop", entries);
   }
 
-  /** Sets 3D offset point for easy 3D targeting. */
+  /**
+   * Sets the offset of the april tag tracking point,
+   *
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @param offsetX Offset in the X direction in meters
+   * @param offsetY Offset in the Y direction in meters
+   * @param offsetZ Offset in the Z direction in meters
+   */
   public static void setFiducial3DOffset(
       String limelightName, double offsetX, double offsetY, double offsetZ) {
     double[] entries = new double[3];
     entries[0] = offsetX;
     entries[1] = offsetY;
     entries[2] = offsetZ;
-    setLimelightNTDoubleArray(limelightName, "fiducial_offset_set", entries);
+    setLimelightNetworkTableDoubleArray(limelightName, "fiducial_offset_set", entries);
   }
 
   /**
    * Sets robot orientation values used by MegaTag2 localization algorithm.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param yaw Robot yaw in degrees. 0 = robot facing red alliance wall in FRC
    * @param yawRate (Unnecessary) Angular velocity of robot yaw in degrees per second
    * @param pitch (Unnecessary) Robot pitch in degrees
@@ -1018,7 +1197,7 @@ public class TigerHelpers {
    * @param roll (Unnecessary) Robot roll in degrees
    * @param rollRate (Unnecessary) Angular velocity of robot roll in degrees per second
    */
-  public static void SetRobotOrientation(
+  public static void setRobotOrientation(
       String limelightName,
       double yaw,
       double yawRate,
@@ -1026,32 +1205,6 @@ public class TigerHelpers {
       double pitchRate,
       double roll,
       double rollRate) {
-    SetRobotOrientation_INTERNAL(
-        limelightName, yaw, yawRate, pitch, pitchRate, roll, rollRate, true);
-  }
-
-  public static void SetRobotOrientation_NoFlush(
-      String limelightName,
-      double yaw,
-      double yawRate,
-      double pitch,
-      double pitchRate,
-      double roll,
-      double rollRate) {
-    SetRobotOrientation_INTERNAL(
-        limelightName, yaw, yawRate, pitch, pitchRate, roll, rollRate, false);
-  }
-
-  private static void SetRobotOrientation_INTERNAL(
-      String limelightName,
-      double yaw,
-      double yawRate,
-      double pitch,
-      double pitchRate,
-      double roll,
-      double rollRate,
-      boolean flush) {
-
     double[] entries = new double[6];
     entries[0] = yaw;
     entries[1] = yawRate;
@@ -1059,64 +1212,125 @@ public class TigerHelpers {
     entries[3] = pitchRate;
     entries[4] = roll;
     entries[5] = rollRate;
-    setLimelightNTDoubleArray(limelightName, "robot_orientation_set", entries);
-    if (flush) {
-      Flush();
+    setLimelightNetworkTableDoubleArray(limelightName, "robot_orientation_set", entries);
+    flushNetworkTable();
+  }
+
+  /**
+   * Enum representing different IMU usage modes for robot orientation or localization. Defines how
+   * internal and external IMUs are utilized, including seeding and convergence assistance.
+   */
+  public enum IMUMode {
+    /**
+     * Use only an external IMU orientation set by setRobotOrientation() for orientation data. No
+     * interaction with the internal IMU.
+     */
+    EXTERNAL_IMU(0),
+
+    /**
+     * Use an external IMU orientation set by setRobotOrientation() as the primary source and seed
+     * the internal IMU with its data. This should be used for "zeroing" the internal IMU. The
+     * internal IMU is initialized or calibrated using external IMU values.
+     */
+    EXTERNAL_IMU_SEED_INTERNAL(1),
+
+    /** Use only the internal IMU for orientation data. No reliance on an external IMU. */
+    INTERNAL_IMU(2),
+
+    /**
+     * Use the internal IMU with MT1-assisted convergence. MegaTag1 provides additional data to
+     * improve internal IMU accuracy or stability.
+     */
+    INTERNAL_MT1_ASSISTED(3),
+
+    /**
+     * Use the internal IMU with external IMU-assisted convergence. The external IMU provides
+     * supplementary data to enhance internal IMU performance.
+     */
+    INTERNAL_EXTERNAL_ASSISTED(4);
+
+    private final int modeValue;
+
+    IMUMode(int modeValue) {
+      this.modeValue = modeValue;
+    }
+
+    /**
+     * Returns the integer value associated with this IMU mode.
+     *
+     * @return The mode value (0 for EXTERNAL_IMU, 1 for EXTERNAL_IMU_SEED_INTERNAL, etc.)
+     */
+    public int getModeValue() {
+      return modeValue;
+    }
+
+    /**
+     * Returns the IMUMode corresponding to the given integer value.
+     *
+     * @param value The integer value to convert to an IMUMode
+     * @return The matching IMUMode, or null if no match is found
+     */
+    public static IMUMode fromValue(int value) {
+      for (IMUMode mode : IMUMode.values()) {
+        if (mode.modeValue == value) {
+          return mode;
+        }
+      }
+      return null;
     }
   }
 
   /**
    * Configures the IMU mode for MegaTag2 Localization
    *
-   * @param limelightName Name/identifier of the Limelight
-   * @param mode IMU mode.
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @param imuMode The IMU mode to set, uses the {@link IMUMode} enum.
    */
-  public static void SetIMUMode(String limelightName, int mode) {
-    setLimelightNTDouble(limelightName, "imumode_set", mode);
+  public static void setIMUMode(String limelightName, IMUMode imuMode) {
+    setLimelightNetworkTableDouble(limelightName, "imumode_set", imuMode.getModeValue());
   }
 
   /**
    * Sets the 3D point-of-interest offset for the current fiducial pipeline.
    * https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-3d#point-of-interest-tracking
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param x X offset in meters
    * @param y Y offset in meters
    * @param z Z offset in meters
    */
-  public static void SetFidcuial3DOffset(String limelightName, double x, double y, double z) {
-
+  public static void setFidcuial3DOffset(String limelightName, double x, double y, double z) {
     double[] entries = new double[3];
     entries[0] = x;
     entries[1] = y;
     entries[2] = z;
-    setLimelightNTDoubleArray(limelightName, "fiducial_offset_set", entries);
+    setLimelightNetworkTableDoubleArray(limelightName, "fiducial_offset_set", entries);
   }
 
   /**
    * Overrides the valid AprilTag IDs that will be used for localization. Tags not in this list will
    * be ignored for robot pose estimation.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param validIDs Array of valid AprilTag IDs to track
    */
-  public static void SetFiducialIDFiltersOverride(String limelightName, int[] validIDs) {
+  public static void setFiducialIDFiltersOverride(String limelightName, int[] validIDs) {
     double[] validIDsDouble = new double[validIDs.length];
     for (int i = 0; i < validIDs.length; i++) {
       validIDsDouble[i] = validIDs[i];
     }
-    setLimelightNTDoubleArray(limelightName, "fiducial_id_filters_set", validIDsDouble);
+    setLimelightNetworkTableDoubleArray(limelightName, "fiducial_id_filters_set", validIDsDouble);
   }
 
   /**
    * Sets the downscaling factor for AprilTag detection. Increasing downscale can improve
    * performance at the cost of potentially reduced detection range.
    *
-   * @param limelightName Name/identifier of the Limelight
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param downscale Downscale factor. Valid values: 1.0 (no downscale), 1.5, 2.0, 3.0, 4.0. Set to
    *     0 for pipeline control.
    */
-  public static void SetFiducialDownscalingOverride(String limelightName, float downscale) {
+  public static void setFiducialDownscalingOverride(String limelightName, float downscale) {
     int d = 0; // pipeline
     if (downscale == 1.0) {
       d = 1;
@@ -1133,13 +1347,13 @@ public class TigerHelpers {
     if (downscale == 4) {
       d = 5;
     }
-    setLimelightNTDouble(limelightName, "fiducial_downscale_set", d);
+    setLimelightNetworkTableDouble(limelightName, "fiducial_downscale_set", d);
   }
 
   /**
    * Sets the camera pose relative to the robot.
    *
-   * @param limelightName Name of the Limelight camera
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
    * @param forward Forward offset in meters
    * @param side Side offset in meters
    * @param up Up offset in meters
@@ -1147,7 +1361,7 @@ public class TigerHelpers {
    * @param pitch Pitch angle in degrees
    * @param yaw Yaw angle in degrees
    */
-  public static void setCameraPose_RobotSpace(
+  public static void setCameraPoseRobotSpace(
       String limelightName,
       double forward,
       double side,
@@ -1162,6 +1376,6 @@ public class TigerHelpers {
     entries[3] = roll;
     entries[4] = pitch;
     entries[5] = yaw;
-    setLimelightNTDoubleArray(limelightName, "camerapose_robotspace_set", entries);
+    setLimelightNetworkTableDoubleArray(limelightName, "camerapose_robotspace_set", entries);
   }
 }

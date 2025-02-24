@@ -205,7 +205,7 @@ public class PhysicalVision implements VisionInterface {
       // melightName, yaw, yawRate, pitch, pitchRate, roll, and rollRate. Generally we
       // don't need to use pitch or roll in our pose estimate, so we don't send those
       // values to the limelight (hence the 0's).
-      TigerHelpers.SetRobotOrientation(
+      TigerHelpers.setRobotOrientation(
           limelight.getName(), headingDegrees, headingRateDegreesPerSecond, 0, 0, 0, 0);
       updatePoseEstimate(limelight);
     } else {
@@ -266,7 +266,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight is connected
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return TigerHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
+    return TigerHelpers.getLimelightNetworkTable(limelight.getName()).containsKey("tv");
   }
 
   /**

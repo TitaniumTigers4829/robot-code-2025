@@ -181,9 +181,9 @@ public class SimulatedVision extends PhysicalVision {
    */
   private NetworkTable getLimelightTable(Limelight limelight) {
     return switch (limelight) {
-      case BACK -> TigerHelpers.getLimelightNTTable(Limelight.BACK.getName());
-      case FRONT_LEFT -> TigerHelpers.getLimelightNTTable(Limelight.FRONT_LEFT.getName());
-      case FRONT_RIGHT -> TigerHelpers.getLimelightNTTable(Limelight.FRONT_RIGHT.getName());
+      case BACK -> TigerHelpers.getLimelightNetworkTable(Limelight.BACK.getName());
+      case FRONT_LEFT -> TigerHelpers.getLimelightNetworkTable(Limelight.FRONT_LEFT.getName());
+      case FRONT_RIGHT -> TigerHelpers.getLimelightNetworkTable(Limelight.FRONT_RIGHT.getName());
       default -> throw new IllegalArgumentException("Invalid limelight " + limelight);
     };
   }

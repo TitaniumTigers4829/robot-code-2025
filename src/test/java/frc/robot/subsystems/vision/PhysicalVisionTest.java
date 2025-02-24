@@ -25,7 +25,7 @@ public class PhysicalVisionTest {
   void setUp() {
     // Mocks the NetworkTable instance for testing
     networkTableInstance = NetworkTableInstance.create();
-    TigerHelpers.setNTInstance(networkTableInstance);
+    TigerHelpers.setNetworkTableInstance(networkTableInstance);
     backLimelightTable = networkTableInstance.getTable(Limelight.BACK.getName());
     physicalVision = new PhysicalVision();
   }
