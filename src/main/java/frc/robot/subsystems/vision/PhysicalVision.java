@@ -35,17 +35,22 @@ public class PhysicalVision implements VisionInterface {
   /**
    * The pose estimates from the limelights in the following order (BACK, FRONT_LEFT, FRONT_RIGHT)
    */
-  private final AtomicReferenceArray<MegatagPoseEstimate> limelightEstimates =
-      new AtomicReferenceArray<>(
-          new MegatagPoseEstimate[] {
-            new MegatagPoseEstimate(), new MegatagPoseEstimate(), new MegatagPoseEstimate()
-          });
+  private final AtomicReferenceArray<MegatagPoseEstimate> limelightEstimates;
+
+  //  =
+  // new AtomicReferenceArray<>(
+  //     new MegatagPoseEstimate[] {
+  //       new MegatagPoseEstimate(), new MegatagPoseEstimate(), new MegatagPoseEstimate(), new
+  // MegatagPoseEstimate()
+  //     });
 
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
 
   public PhysicalVision() {
+    limelightEstimates = new AtomicReferenceArray<>(Limelight.values().length);
     for (Limelight limelight : Limelight.values()) {
-      // Setupt port forwarding for each limelight
+      limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      // Setup port forwarding for each limelight
       setupPortForwarding(limelight);
       // Start a threaded task to check and update the pose for each Limelight
       threadManager.startTask(
@@ -75,6 +80,8 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+
+      // inputs.isMegaTag2[limelight.getId()] = limelightEstimates.get(0).
     }
   }
 
@@ -136,6 +143,32 @@ public class PhysicalVision implements VisionInterface {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
   }
 
+  private void updateIMUMode(Limelight limelight) {
+    if (limelight.isLimelight4()) {
+      if (DriverStation.isEnabled()) {
+        // Enable internal IMU for better pose accuracy when enabled
+        TigerHelpers.SetIMUMode(limelight.getName(), 4);
+        TigerHelpers.getLimelightNTTable(limelight.getName()).getEntry("throttle_set").setNumber(5);
+        limelightEstimates.set(
+            limelight.getId(),
+            MegatagPoseEstimate.fromLimelight(
+                TigerHelpers.getBotPoseEstimate(
+                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
+      } else {
+        // Disable internal IMU when robot is disabled
+        TigerHelpers.SetIMUMode(limelight.getName(), 1);
+        TigerHelpers.getLimelightNTTable(limelight.getName())
+            .getEntry("throttle_set")
+            .setNumber(175);
+        limelightEstimates.set(
+            limelight.getId(),
+            MegatagPoseEstimate.fromLimelight(
+                TigerHelpers.getBotPoseEstimate(
+                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
+      }
+    }
+  }
+
   /**
    * Gets the pose update of the specified limelight while the robot is enabled.
    *
@@ -144,20 +177,18 @@ public class PhysicalVision implements VisionInterface {
   public void enabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1Estimate = getMegaTag1PoseEstimate(limelight);
     PoseEstimate megatag2Estimate = getMegaTag2PoseEstimate(limelight);
-    // if (Math.abs(headingRateDegreesPerSecond) <
-    // VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
-    // && (!isLargeDiscrepancyBetweenTwoPoses(
-    // limelight,
-    // VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
-    // VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-    // megatag1Estimate.pose,
-    // megatag2Estimate.pose)
-    // || getLimelightAprilTagDistance(limelight)
-    // > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
-    // limelightEstimates.set(
-    // limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
-    // } else
-    if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    if (Math.abs(headingRateDegreesPerSecond) < VisionConstants.MEGA_TAG_2_MAX_HEADING_RATE
+        && (!isLargeDiscrepancyBetweenTwoPoses(
+                limelight,
+                VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
+                VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
+                megatag1Estimate.pose,
+                megatag2Estimate.pose)
+            || getLimelightAprilTagDistance(limelight)
+                > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
+      limelightEstimates.set(
+          limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
     } else {
@@ -173,6 +204,7 @@ public class PhysicalVision implements VisionInterface {
    */
   public void disabledPoseUpdate(Limelight limelight) {
     PoseEstimate megatag1PoseEstimate = getMegaTag1PoseEstimate(limelight);
+
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
   }

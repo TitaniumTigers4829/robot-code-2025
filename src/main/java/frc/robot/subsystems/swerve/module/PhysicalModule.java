@@ -72,7 +72,7 @@ public class PhysicalModule implements ModuleInterface {
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimit = ModuleConstants.DRIVE_STATOR_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveConfig.MotorOutput.ControlTimesyncFreqHz = 250;
+    // driveConfig.MotorOutput.ControlTimesyncFreqHz = 50;
 
     driveMotor.getConfigurator().apply(driveConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
@@ -90,7 +90,7 @@ public class PhysicalModule implements ModuleInterface {
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.CurrentLimits.SupplyCurrentLimit = 20;
     turnConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
-    turnConfig.MotorOutput.ControlTimesyncFreqHz = 250;
+    // turnConfig.MotorOutput.ControlTimesyncFreqHz = 50;
     turnMotor.getConfigurator().apply(turnConfig, HardwareConstants.LOOP_TIME_SECONDS);
 
     drivePosition = driveMotor.getPosition();
@@ -111,7 +111,7 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        HardwareConstants.CANIVORE_SIGNAL_FREQUENCY,
+        HardwareConstants.RIO_SIGNAL_FREQUENCY,
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
@@ -124,12 +124,12 @@ public class PhysicalModule implements ModuleInterface {
         turnMotorTorqueCurrent);
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
+    turnEncoder.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
-    BaseStatusSignal.waitForAll(
-        0.00,
+    BaseStatusSignal.refreshAll(
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
