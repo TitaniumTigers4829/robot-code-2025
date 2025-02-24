@@ -431,7 +431,8 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 1;
 
-    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE = 0.005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE = 0.005;
 
     public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
 

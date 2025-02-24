@@ -126,8 +126,8 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
+    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE);
+    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE);
     rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
@@ -290,9 +290,9 @@ public class SwerveDrive extends SubsystemBase {
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
     return swerveSample.x - xChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE
         && swerveSample.y - yChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE
         && swerveSample.heading - rotationChoreoController.getGoal().position
             <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE;
   }
