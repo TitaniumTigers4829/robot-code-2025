@@ -149,9 +149,7 @@ public class PhysicalVision implements VisionInterface {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
         TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
-        TigerHelpers.getLimelightNetworkTable(limelight.getName())
-            .getEntry("throttle_set")
-            .setNumber(5);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.ENABLED_THROTTLE);
         limelightEstimates.set(
             limelight.getId(),
             MegatagPoseEstimate.fromLimelight(
@@ -160,9 +158,7 @@ public class PhysicalVision implements VisionInterface {
       } else {
         // Disable internal IMU when robot is disabled
         TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
-        TigerHelpers.getLimelightNetworkTable(limelight.getName())
-            .getEntry("throttle_set")
-            .setNumber(175);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.DISABLED_THROTTLE);
         limelightEstimates.set(
             limelight.getId(),
             MegatagPoseEstimate.fromLimelight(

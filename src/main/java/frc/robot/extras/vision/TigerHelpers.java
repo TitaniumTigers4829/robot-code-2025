@@ -1314,6 +1314,18 @@ public class TigerHelpers {
   }
 
   /**
+   * Sets the throttle for the Limelight camera. This is used to reduce the camera's processing
+   * load, which can be useful for decreasing temperatures.
+   *
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @param throttle Number of frames to skip between each processed frame. 0 = process every frame,
+   *     1 = process every other frame, etc.
+   */
+  public static void setLimelightThrottle(String limelightName, int throttle) {
+    setLimelightNetworkTableDouble(limelightName, "throttle_set", throttle);
+  }
+
+  /**
    * Sets the 3D point-of-interest offset for the current fiducial pipeline.
    * https://docs.limelightvision.io/docs/docs-limelight/pipeline-apriltag/apriltag-3d#point-of-interest-tracking
    *
