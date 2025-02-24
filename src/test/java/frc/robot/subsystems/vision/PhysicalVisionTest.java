@@ -249,4 +249,7 @@ public class PhysicalVisionTest {
     physicalVision.disabledPoseUpdate(Limelight.BACK);
     assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
   }
+
+  @Test
+  void testSet
 }

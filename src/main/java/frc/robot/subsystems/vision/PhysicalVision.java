@@ -10,6 +10,7 @@ import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.extras.vision.TigerHelpers;
 import frc.robot.extras.vision.TigerHelpers.Botpose;
+import frc.robot.extras.vision.TigerHelpers.IMUMode;
 import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
@@ -147,8 +148,8 @@ public class PhysicalVision implements VisionInterface {
     if (limelight.isLimelight4()) {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
-        TigerHelpers.SetIMUMode(limelight.getName(), 4);
-        TigerHelpers.getLimelightNTTable(limelight.getName()).getEntry("throttle_set").setNumber(5);
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
+        TigerHelpers.getLimelightNetworkTable(limelight.getName()).getEntry("throttle_set").setNumber(5);
         limelightEstimates.set(
             limelight.getId(),
             MegatagPoseEstimate.fromLimelight(
@@ -156,8 +157,8 @@ public class PhysicalVision implements VisionInterface {
                     limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
       } else {
         // Disable internal IMU when robot is disabled
-        TigerHelpers.SetIMUMode(limelight.getName(), 1);
-        TigerHelpers.getLimelightNTTable(limelight.getName())
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
+        TigerHelpers.getLimelightNetworkTable(limelight.getName())
             .getEntry("throttle_set")
             .setNumber(175);
         limelightEstimates.set(
