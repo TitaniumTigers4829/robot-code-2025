@@ -8,19 +8,19 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class getCoralFeedingStation extends Command {
-  private final CoralIntakeSubsystem coralIntakeSubsystem;
-  private final ElevatorSubsystem elevatorSubsystem;
+public class scoreCoralAtL4 extends Command{
   private final AlgaePivotSubsystem algaePivotSubsystem;
+  private final ElevatorSubsystem elevatorSubsystem;
+  private final CoralIntakeSubsystem coralIntakeSubsystem;;
 
-  public getCoralFeedingStation(
-      CoralIntakeSubsystem coralIntakeSubsystem,
+  public scoreCoralAtL4(
+      AlgaePivotSubsystem algaePivotSubsystem,
       ElevatorSubsystem elevatorSubsystem,
-      AlgaePivotSubsystem algaePivotSubsystem) {
-    this.coralIntakeSubsystem = coralIntakeSubsystem;
-    this.elevatorSubsystem = elevatorSubsystem;
+      CoralIntakeSubsystem coralIntakeSubsystem) {
     this.algaePivotSubsystem = algaePivotSubsystem;
-    addRequirements(coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem);
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.coralIntakeSubsystem = coralIntakeSubsystem;
+    addRequirements(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem);
   }
 
   @Override
@@ -29,23 +29,19 @@ public class getCoralFeedingStation extends Command {
 
   @Override
   // Called every time the scheduler runs while the command is scheduled
-  public void execute() {
-    elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
-    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
-    algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
+  public void execute(){
+    elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L4_HEIGHT);
+    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
+    algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L4_ANGLE);
   }
 
-  @Override
-  // Called once the command ends or is interrupted
-  public void end(boolean interrupted) {
+  public void end(boolean interrupted){
     elevatorSubsystem.setElevatorPosition(0);
     coralIntakeSubsystem.setIntakeSpeed(0);
     algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ANGLE_ZERO);
   }
 
-  @Override
-  // Returns true when the command should end
-  public boolean isFinished() {
+  public boolean isFinished(){
     return false;
   }
 }

@@ -42,4 +42,8 @@ public class ElevatorConstants {
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 
   public static final double ELEVATOR_FEEDING_STATION_HEIGHT = 0.0;
+  public static final double ELEVATOR_TROPH_LEVEL_HEIGHT = 0.0;
+  public static final double ELEVATOR_L2_HEIGHT = 0.0;
+  public static final double ELEVATOR_L3_HEIGHT = 0.0;
+  public static final double ELEVATOR_L4_HEIGHT = 0.0;
 }
