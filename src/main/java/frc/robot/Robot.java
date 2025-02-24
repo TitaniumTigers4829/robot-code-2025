@@ -18,6 +18,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ScoreL4;
@@ -38,6 +39,8 @@ import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
@@ -74,6 +77,7 @@ public class Robot extends LoggedRobot {
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private AlgaePivotSubsystem algaePivotSubsystem;
+  private LEDSubsystem ledSubsystem;
 
   private SimWorld simWorld;
 
@@ -185,6 +189,10 @@ public class Robot extends LoggedRobot {
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
 
     // FieldConstants has all reef poses
+    driverController
+        .rightTrigger()
+        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     driverController
         .y()
         .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE));
@@ -334,6 +342,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
+        this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
       }
       case SWERVE_ROBOT -> {
@@ -391,6 +400,7 @@ public class Robot extends LoggedRobot {
         this.simWorld = null;
       }
     }
+    ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
   private void setupAuto() {

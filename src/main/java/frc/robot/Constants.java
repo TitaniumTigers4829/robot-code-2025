@@ -401,7 +401,7 @@ public final class Constants {
     // Auto Align Constants
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
     public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
-    public static final double AUTO_ALIGN_ROTATION_P = 5;
+    public static final double AUTO_ALIGN_ROTATION_P = 10.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =

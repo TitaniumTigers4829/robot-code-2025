@@ -156,7 +156,7 @@ public class PhysicalVision implements VisionInterface {
                     limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
       } else {
         // Disable internal IMU when robot is disabled
-        TigerHelpers.SetIMUMode(limelight.getName(), 3);
+        TigerHelpers.SetIMUMode(limelight.getName(), 1);
         TigerHelpers.getLimelightNTTable(limelight.getName())
             .getEntry("throttle_set")
             .setNumber(175);

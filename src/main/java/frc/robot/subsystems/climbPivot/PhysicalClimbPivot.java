@@ -55,7 +55,6 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   @Override
   public void manualPivot(double percentSpeed) {
     climbMotor.set(percentSpeed);
-    // climbMotor.setControl(dutyCycleOut.withOutput(percentSpeed));
   }
 
   @Override

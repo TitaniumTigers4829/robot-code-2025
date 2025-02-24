@@ -80,14 +80,14 @@ public class AutoAlign extends DriveCommandBase {
             AutoConstants.AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT);
     double turnOutput;
     turnOutput =
-        MathUtil.applyDeadband(
-            rotationController.calculate(thetaPoseError, 0),
-            AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
+        // MathUtil.applyDeadband(
+        rotationController.calculate(thetaPoseError, 0);
+    // AutoConstants.AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT);
 
     // Gets the chassis speeds for the robot using the odometry rotation (not alliance relative)
     ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            xOutput, yOutput, 0.0, swerveDrive.getOdometryRotation2d());
+            xOutput, yOutput, turnOutput, swerveDrive.getOdometryRotation2d());
 
     Logger.recordOutput("Drive/target pose", targetPose);
     // Drives the robot towards the target pose
