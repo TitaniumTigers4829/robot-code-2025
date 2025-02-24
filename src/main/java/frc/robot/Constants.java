@@ -416,25 +416,29 @@ public final class Constants {
 
     // These used to be in Trajectory Constants
 
-    public static final double MAX_AUTO_SPEED = 3;
-    public static final double MAX_AUTO_ACCELERATION = 5;
+    public static final double MAX_AUTO_SPEED = 2;
+    public static final double MAX_AUTO_ACCELERATION = 2;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 0.1; //
-    public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0;
-    public static final double CHOREO_AUTO_THETA_P = 5; // 5
-    public static final double CHOREO_AUTO_THETA_I = 0; // 5
+    public static final double CHOREO_AUTO_X_TRANSLATION_P = 0.25;
+    public static final double CHOREO_AUTO_X_TRANSLATION_I = 0;
+    public static final double CHOREO_AUTO_X_TRANSLATION_D = 0;
+    public static final double CHOREO_AUTO_Y_TRANSLATION_P = 0.25;
+    public static final double CHOREO_AUTO_Y_TRANSLATION_I = 0;
+    public static final double CHOREO_AUTO_Y_TRANSLATION_D = 0;
+    public static final double CHOREO_AUTO_THETA_P = 2;
+    public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
+
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 1;
 
-    public static final double CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE = 0.005;
-    public static final double CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE = 0.005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE = 0.0005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE = 0.0005;
 
-    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
+    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.001;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =

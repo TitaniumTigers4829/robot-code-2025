@@ -46,6 +46,7 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
 
     return routine;
   }

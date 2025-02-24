@@ -41,15 +41,15 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final ProfiledPIDController xChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_X_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_X_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_X_TRANSLATION_D,
           AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController yChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
@@ -279,9 +279,8 @@ public class SwerveDrive extends SubsystemBase {
     Pose2d pose = getEstimatedPose();
     double moveX = sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
     double moveY = sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
-    double moveTheta =
-        sample.omega
-            + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
+    double moveTheta = sample.omega;
+    // + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
     drive(moveX, moveY, moveTheta, true);
   }
 

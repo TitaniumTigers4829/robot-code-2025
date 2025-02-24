@@ -118,12 +118,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     SmartDashboard.putBoolean("Trajectory Done", false);
-
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
   }
 
   /** This function is called periodically during autonomous. */
