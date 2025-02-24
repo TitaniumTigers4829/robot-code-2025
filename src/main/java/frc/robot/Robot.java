@@ -208,7 +208,7 @@ public class Robot extends LoggedRobot {
     operatorController.rightTrigger().whileTrue(new scoreCoralAtL2(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
     operatorController.leftTrigger().whileTrue(new scoreCoralAtTroph(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
     operatorController.rightBumper().whileTrue(new scoreCoralAtL3(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
-    operatorController.leftBumper().whileTrue(new scoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem))
+    operatorController.leftBumper().whileTrue(new scoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
