@@ -15,6 +15,8 @@ import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class PhysicalVisionTest {
   private NetworkTableInstance networkTableInstance;
@@ -250,6 +252,15 @@ public class PhysicalVisionTest {
     assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
   }
 
-  @Test
-  void testSet
+  @ParameterizedTest
+  @ValueSource(doubles = {30.0, 270.0, -50.0, 451.5})
+  void testSetOdometryInfo(double headingDegrees) {
+    physicalVision.setOdometryInfo(headingDegrees, 0, new Pose2d());
+    physicalVision.checkAndUpdatePose(Limelight.BACK);
+
+    assertEquals(
+        headingDegrees,
+        TigerHelpers.getLimelightNetworkTableDoubleArray(
+            Limelight.BACK.getName(), "robot_orientation_set")[0]);
+  }
 }

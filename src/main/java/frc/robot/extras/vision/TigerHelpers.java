@@ -1217,6 +1217,17 @@ public class TigerHelpers {
   }
 
   /**
+   * Sets robot yaw used by MegaTag2 localization algorithm. Puts 0 for all other orientation
+   * values.
+   *
+   * @param limelightName The name of the Limelight set in the UI ("" for default)
+   * @param yaw Robot yaw in degrees. 0 = robot facing red alliance wall in FRC
+   */
+  public static void setRobotOrientation(String limelightName, double yaw) {
+    setRobotOrientation(limelightName, yaw, 0, 0, 0, 0, 0);
+  }
+
+  /**
    * Enum representing different IMU usage modes for robot orientation or localization. Defines how
    * internal and external IMUs are utilized, including seeding and convergence assistance.
    */
@@ -1278,6 +1289,18 @@ public class TigerHelpers {
       }
       return null;
     }
+  }
+
+  /**
+   * Configures the IMU mode for MegaTag2 Localization. This method is deprecated, use {@link
+   * #setIMUMode(String, IMUMode)} instead.
+   *
+   * @param limelightName Name/identifier of the Limelight
+   * @param imuMode IMU mode, 0-4.
+   */
+  @Deprecated
+  public static void setIMUMode(String limelightName, int imuMode) {
+    setLimelightNetworkTableDouble(limelightName, "imumode_set", imuMode);
   }
 
   /**
