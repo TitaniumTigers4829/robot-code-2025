@@ -137,7 +137,7 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
 
-    public static final double MAX_SPEED_METERS_PER_SECOND = 6.95;
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.5; // 6.95
     public static final double MAX_SHOOT_SPEED_METERS_PER_SECOND = 3;
 
     public static final double HEADING_ACCEPTABLE_ERROR_RADIANS = Units.degreesToRadians(2.5);
