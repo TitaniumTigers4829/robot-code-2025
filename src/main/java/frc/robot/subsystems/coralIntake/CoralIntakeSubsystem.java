@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.coralIntake;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -24,6 +26,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.setIntakeSpeed(speed);
   }
 
+  public void gripCoral(double grippiness) {
+    if (hasCoral()) {
+      coralIntakeInterface.setIntakeVoltage(grippiness);
+    }
+  }
+
   /**
    * Checks if the coral intake has a coral or not
    *
@@ -33,9 +41,47 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return coralIntakeInputs.hasCoral;
   }
 
+  public void intakeCoral(double speed) {
+    if (!hasCoral()) {
+      setIntakeSpeed(speed);
+    } else {
+      setIntakeSpeed(0.0);
+    }
+  }
+
   @Override
   public void periodic() {
     coralIntakeInterface.updateInputs(coralIntakeInputs);
     Logger.processInputs("CoralIntakeSubsystem/", coralIntakeInputs);
+  }
+
+  // public Command intakeCoral() {
+  //   if (!this.hasCoral()) {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   } else {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(0.0),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   }
+  // }
+
+  public Command ejectCoral() {
+    return new StartEndCommand(
+        // sets speed while command is active
+        () -> this.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
+        // sets speed when command ends
+        () -> this.setIntakeSpeed(0),
+        // requirements for command
+        this);
   }
 }

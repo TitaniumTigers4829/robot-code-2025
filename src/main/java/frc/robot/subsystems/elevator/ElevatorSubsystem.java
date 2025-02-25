@@ -4,9 +4,13 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.extras.logging.LoggedTunableNumber;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -68,12 +72,29 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  public double getVelocity() {
+    return inputs.leaderVelocity;
+  }
+
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
 
   public void openLoop(double output) {
     elevatorInterface.openLoop(output);
+  }
+
+  public void setPercentOutput(double output) {
+    elevatorInterface.setPercentOutput(output);
+  }
+
+  public boolean isAtSetpoint(double position) {
+    return Math.abs(position - inputs.leaderMotorPosition)
+        < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
+  }
+
+  public void resetPosition(double position) {
+    elevatorInterface.resetElevatorPosition(position);
   }
 
   @Override
@@ -93,5 +114,26 @@ public class ElevatorSubsystem extends SubsystemBase {
         || elevatorD.hasChanged(hashCode())) {
       elevatorInterface.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
+  }
+
+  public Command manualElevator(DoubleSupplier joystickY) {
+    return new RunCommand(
+        // does this while command is active
+        () -> this.openLoop(joystickY.getAsDouble())
+        // requirements for command
+        );
+  }
+
+  public Command setElevationPosition(double position) {
+    return new FunctionalCommand(
+        // initialization function
+        () -> {},
+        // execution function
+        () -> this.setElevatorPosition(position),
+        // end function
+        interrupted -> this.setElevatorPosition(position),
+        // isFinished function
+        () -> isAtSetpoint(position),
+        this);
   }
 }

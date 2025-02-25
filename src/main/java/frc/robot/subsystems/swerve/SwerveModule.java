@@ -169,12 +169,6 @@ public class SwerveModule {
     return moduleInterface.getDrivePositionRadians();
   }
 
-  /**
-   * Gets the current state of the swerve module (the current drive velocity and turn angle).
-   *
-   * @return a new {@link SwerveModuleState} containing the drive velocity in m/s and a {@link
-   *     Rotation2d} of the turn motors' angle
-   */
   public SwerveModuleState getMeasuredState() {
     return new SwerveModuleState(getDriveVelocityMetersPerSec(), getTurnRotation());
   }
