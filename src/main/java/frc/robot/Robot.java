@@ -212,43 +212,9 @@ public class Robot extends LoggedRobot {
                     () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
                     () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
                     coralIntakeSubsystem)));
-    // .until(() -> coralIntakeSubsystem.hasCoral())));
-    // Commands.sequence(
-    //     // Commands.parallel(
-    //     // new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
-    //     // .andThen
-    //     new SetElevatorPosition(elevatorSubsystem, ElevatorConstants.LEVEL_2)
-    //         // .until(() -> elevatorSubsystem.isAtSetpoint(Elevator
-    // Constants.LEVEL_2))
-    //         .andThen(coralIntakeSubsystem.ejectCoral())));
-
-    // .until(() -> !coralIntakeSubsystem.hasCoral())
-    // .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
   }
 
   private void configureOperatorController() {
-    // operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
-    // operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
-    // operatorController.x().whileTrue(Commands.none());
-    // operatorController
-    //     .a()
-    //     .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
-    // operatorController
-    //     .b()
-    //     .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_2));
-    // operatorController.y().whileTrue(coralIntakeSubsystem.intakeCoral());
-    // operatorController
-    //     .x()
-    //     .whileTrue(
-    //         Commands.sequence(
-    //                 Commands.deadline(
-    //                         elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_4),
-    //                         Commands.run(
-    //                             () -> coralIntakeSubsystem.gripCoral(-6), coralIntakeSubsystem))
-    //                     .until(() -> elevatorSubsystem.isAtSetpoint())
-    //                     .andThen(coralIntakeSubsystem.ejectCoral()))
-    //             .until(() -> !coralIntakeSubsystem.hasCoral())
-    //             .finallyDo(() -> coralIntakeSubsystem.setIntakeSpeed(0.0)));
     operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
     // operatorController
     //     .a()
