@@ -7,6 +7,8 @@ package frc.robot.subsystems.coralIntake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.coralIntake.CoralIntakeInterface.CoralIntakeInputs;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
@@ -38,7 +40,15 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {
-    return coralIntakeInputs.hasCoral;
+    return coralIntakeInputs.hasCoral || checkHasCoralWhenSensorCooked();
+  }
+
+  public boolean checkHasCoralWhenSensorCooked() {
+    if ((coralIntakeInputs.intakeStatorCurrentAmps) > CoralIntakeConstants.INTAKE_STATOR_LIMIT) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public void intakeCoral(double speed) {
