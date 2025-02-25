@@ -23,8 +23,8 @@ public class SimulatedCoralntake implements CoralIntakeInterface {
 
     intakeInputs.intakeVelocity =
         RadiansPerSecond.of(simIntake.getAngularVelocityRadPerSec()).in(RotationsPerSecond);
-    intakeInputs.currentAmps = simIntake.getCurrentDrawAmps();
-    intakeInputs.appliedVolts = intakeAppliedVolts;
+    intakeInputs.intakeStatorCurrentAmps = simIntake.getCurrentDrawAmps();
+    intakeInputs.intakeAppliedVolts = intakeAppliedVolts;
   }
 
   @Override

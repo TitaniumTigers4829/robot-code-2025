@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.elevator;
 
 import org.littletonrobotics.junction.AutoLog;
@@ -17,6 +13,10 @@ public interface ElevatorInterface {
     public double leaderDutyCycle = 0.0;
     public double followerDutyCycle = 0.0;
     public double desiredPosition = 0.0;
+    public double leaderStatorCurrent = 0.0;
+    public double followerStatorCurrent = 0.0;
+    public double leaderVelocity = 0.0;
+    public double elevatorError = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}
@@ -29,7 +29,17 @@ public interface ElevatorInterface {
 
   public default void setVolts(double volts) {}
 
+  public default void setPercentOutput(double output) {}
+
   public default double getVolts() {
     return 0.0;
   }
+
+  public default void openLoop(double output) {}
+
+  public default void setPID(double kP, double kI, double kD) {}
+
+  public default void setFF(double kS, double kV, double kA, double kG) {}
+
+  public default void resetElevatorPosition(double position) {}
 }
