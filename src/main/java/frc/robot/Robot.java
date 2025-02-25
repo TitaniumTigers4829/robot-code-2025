@@ -216,9 +216,6 @@ public class Robot extends LoggedRobot {
 
   private void configureOperatorController() {
     operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
-    // operatorController
-    //     .a()
-    //     .whileTrue(elevatorSubsystem.setElevationPosition(ElevatorConstants.LEVEL_FEEDER));
     operatorController
         .rightBumper()
         .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
