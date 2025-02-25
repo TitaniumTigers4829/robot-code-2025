@@ -5,6 +5,8 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
+import frc.robot.Constants.RobotType;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.AquilaConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.DevConstants;
 
@@ -19,9 +21,10 @@ public class SwerveConstants {
     // Wheel base and track width are measured by the center of the swerve modules, not the frame of
     // the robot
     // Distance between centers of right and left wheels on robot
-    public static final double TRACK_WIDTH = Units.inchesToMeters(22);
+    public static final double TRACK_WIDTH = 
+    Constants.getRobot() == RobotType.DEV_ROBOT ? Units.inchesToMeters(22) : Units.inchesToMeters(21.25);
     // Distance between front and back wheels on robot
-    public static final double WHEEL_BASE = Units.inchesToMeters(22);
+    public static final double WHEEL_BASE =  Constants.getRobot() == RobotType.DEV_ROBOT ? Units.inchesToMeters(22) : Units.inchesToMeters(21.25);
     public static final double DRIVE_BASE_DIAMETER =
         Math.sqrt(Math.pow(DriveConstants.TRACK_WIDTH, 2) + Math.pow(DriveConstants.WHEEL_BASE, 2));
 
@@ -137,7 +140,7 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
 
-    public static final double MAX_SPEED_METERS_PER_SECOND = 4.5; // 6.95
+    public static final double MAX_SPEED_METERS_PER_SECOND = Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 6.95
     public static final double MAX_SHOOT_SPEED_METERS_PER_SECOND = 3;
 
     public static final double HEADING_ACCEPTABLE_ERROR_RADIANS = Units.degreesToRadians(2.5);
@@ -145,7 +148,8 @@ public class SwerveConstants {
   }
 
   public class ModuleConstants {
-    public static final double DRIVE_GEAR_RATIO = 7.13; // 4.59
+    public static final double DRIVE_GEAR_RATIO =
+    Constants.getRobot() == RobotType.DEV_ROBOT ?  7.13 : 4.59; // 4.59
     public static final double TURN_GEAR_RATIO = 11.3142;
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3.774788522800778);
 
