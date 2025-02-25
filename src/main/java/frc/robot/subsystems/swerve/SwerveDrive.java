@@ -277,8 +277,8 @@ public class SwerveDrive extends SubsystemBase {
    */
   public void followSwerveSample(SwerveSample sample) {
     Pose2d pose = getEstimatedPose();
-    double moveX = sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
-    double moveY = sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
+    double moveX = sample.vx; // + xChoreoController.calculate(pose.getX(), sample.x);
+    double moveY = sample.vy; // + yChoreoController.calculate(pose.getY(), sample.y);
     double moveTheta = sample.omega;
     // + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
     drive(moveX, moveY, moveTheta, true);
