@@ -93,14 +93,6 @@ public class SwerveDrive extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
 
-  private final Timer inactiveTimer = new Timer();
-
-  private boolean isMoving; // Tracks if the robot is moving
-
-  private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
-
-  private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
-
   public SwerveDrive(
       GyroInterface gyroIO,
       ModuleInterface frontLeftModuleIO,
@@ -448,14 +440,9 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  // Check if the robot has been inactive for 3 seconds
-  public boolean isThreeSecsInactive() {
-    if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
-      return true; // 3 seconds of inactivity
-    }
-    return false; // Still moving or not enough time passed
-  }
-
+  /**
+   * Sets the modules to form an X stance.
+   */
   public void setXStance() {
     Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
     for (int i = 0; i < 4; i++) {
@@ -543,6 +530,11 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  /**
+   * Checks if the robot is within a certain distance of a setpoint.
+   *
+   * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
+   */
   public Trigger isAtSetpoint() {
     return new Trigger(
         () ->
@@ -551,17 +543,16 @@ public class SwerveDrive extends SubsystemBase {
                     || Math.abs(ySetpointController.getError()) < 0.08));
   }
 
+  /**
+   * Follows a repulsor field to a goal.
+   * 
+   * @param goal the goal to follow the repulsor field to.
+   */
   public void followRepulsorField(Pose2d goal) {
-    // Commands.sequence(
-    //         runOnce(
-    //             () -> {
-    //               repulsorFieldPlanner.setGoal(goal.getTranslation());
     xController.reset();
     yController.reset();
     headingController.reset();
-    //             }),
-    //         run(
-    //             () -> {
+
     Logger.recordOutput("Repulsor/Goal", goal);
 
     // Sets the goal of the repulsor
@@ -598,17 +589,13 @@ public class SwerveDrive extends SubsystemBase {
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
     drive(outputRobotRelative.unaryMinus(), false);
-    //         }))
-    // .until(
-    //     () -> {
-    // Transform2d error = goal.minus(getEstimatedPose());
-    // if (error.getTranslation().getNorm() < .01 && Math.abs(error.getRotation().getDegrees()) < 5)
-    // {
-    //   drive(new ChassisSpeeds(), false);
-    // }
-    //     });
   }
 
+  /**
+   * Checks if the robot is within a certain distance of the reef.
+   * 
+   * @return a trigger that is true when the robot is within 0.5 meters of the reef.
+   */
   public Trigger isReefInRange() {
     return new Trigger(
         () ->
@@ -620,9 +607,12 @@ public class SwerveDrive extends SubsystemBase {
                 < 0.5);
   }
 
+  /**
+   * Aligns the robot to the reef.
+   * 
+   * @param left whether to align to the left or right reef.
+   */
   public void reefAlign(Boolean left) {
-    // return defer(
-    // () ->
     followRepulsorField(
         ReefLocations.getSelectedLocation(
             poseEstimator.getEstimatedPosition().getTranslation(), left));
