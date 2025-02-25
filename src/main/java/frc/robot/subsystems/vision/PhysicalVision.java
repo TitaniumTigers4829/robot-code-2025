@@ -38,13 +38,7 @@ public class PhysicalVision implements VisionInterface {
    */
   private final AtomicReferenceArray<MegatagPoseEstimate> limelightEstimates;
 
-  //  =
-  // new AtomicReferenceArray<>(
-  //     new MegatagPoseEstimate[] {
-  //       new MegatagPoseEstimate(), new MegatagPoseEstimate(), new MegatagPoseEstimate(), new
-  // MegatagPoseEstimate()
-  //     });
-
+  /** The thread manager for the vision threads */
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
 
   public PhysicalVision() {
@@ -81,8 +75,6 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
-
-      // inputs.isMegaTag2[limelight.getId()] = limelightEstimates.get(0).
     }
   }
 
@@ -142,30 +134,6 @@ public class PhysicalVision implements VisionInterface {
   @Override
   public boolean isValidMeasurement(Limelight limelight) {
     return isValidPoseEstimate(limelight) && isConfident(limelight) && !isTeleporting(limelight);
-  }
-
-  private void updateIMUMode(Limelight limelight) {
-    if (limelight.isLimelight4()) {
-      if (DriverStation.isEnabled()) {
-        // Enable internal IMU for better pose accuracy when enabled
-        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
-        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.ENABLED_THROTTLE);
-        limelightEstimates.set(
-            limelight.getId(),
-            MegatagPoseEstimate.fromLimelight(
-                TigerHelpers.getBotPoseEstimate(
-                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
-      } else {
-        // Disable internal IMU when robot is disabled
-        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
-        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.DISABLED_THROTTLE);
-        limelightEstimates.set(
-            limelight.getId(),
-            MegatagPoseEstimate.fromLimelight(
-                TigerHelpers.getBotPoseEstimate(
-                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
-      }
-    }
   }
 
   /**
@@ -234,6 +202,7 @@ public class PhysicalVision implements VisionInterface {
     // latency between receiving and sending measurements.
     TigerHelpers.setRobotOrientation(limelight.getName(), headingDegrees);
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
+      updateIMUMode(limelight);
       updatePoseEstimate(limelight);
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
@@ -286,6 +255,30 @@ public class PhysicalVision implements VisionInterface {
   /** Shuts down all the threads. */
   public void endAllThreads() {
     threadManager.shutdownAllThreads();
+  }
+
+  private void updateIMUMode(Limelight limelight) {
+    if (limelight.hasInternalIMU()) {
+      if (DriverStation.isEnabled()) {
+        // Enable internal IMU for better pose accuracy when enabled
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.ENABLED_THROTTLE);
+        limelightEstimates.set(
+            limelight.getId(),
+            MegatagPoseEstimate.fromLimelight(
+                TigerHelpers.getBotPoseEstimate(
+                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
+      } else {
+        // Disable internal IMU when robot is disabled
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.DISABLED_THROTTLE);
+        limelightEstimates.set(
+            limelight.getId(),
+            MegatagPoseEstimate.fromLimelight(
+                TigerHelpers.getBotPoseEstimate(
+                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
+      }
+    }
   }
 
   /**

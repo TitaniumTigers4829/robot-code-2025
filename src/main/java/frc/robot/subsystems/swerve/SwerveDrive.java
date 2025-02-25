@@ -21,11 +21,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.extras.logging.Tracer;
+import frc.robot.extras.swerve.RepulsorFieldPlanner;
+import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.ReefLocations;
-import frc.robot.extras.util.RepulsorFieldPlanner;
-import frc.robot.extras.util.RepulsorFieldPlanner.RepulsorSample;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
@@ -78,8 +78,8 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
           DriveConstants.MODULE_TRANSLATIONS,
-          DCMotor.getFalcon500(1).withReduction(7.13),
-          DCMotor.getFalcon500(1).withReduction(11),
+          DCMotor.getFalcon500(1).withReduction(ModuleConstants.DRIVE_GEAR_RATIO),
+          DCMotor.getFalcon500(1).withReduction(ModuleConstants.TURN_GEAR_RATIO),
           60,
           58,
           7,
@@ -564,7 +564,11 @@ public class SwerveDrive extends SubsystemBase {
     //             () -> {
     Logger.recordOutput("Repulsor/Goal", goal);
 
+    // Sets the goal of the repulsor
     repulsorFieldPlanner.setGoal(goal.getTranslation());
+
+    // Samples the repulsor field using the current position, max speed, and distance at which to
+    // slow down. This is used with the goal pose to calculate motion towards a setpoint.
     RepulsorSample sample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),

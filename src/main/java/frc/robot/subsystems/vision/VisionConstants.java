@@ -10,11 +10,7 @@ import org.photonvision.PhotonCamera;
 
 public final class VisionConstants {
   public enum Limelight {
-    BACK(
-        BACK_LIMELIGHT_NUMBER,
-        BACK_LIMELIGHT_NAME,
-        LL3G_FOV_MARGIN_OF_ERROR,
-        false), // We have one LL3G
+    BACK(BACK_LIMELIGHT_NUMBER, BACK_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false),
     FRONT_LEFT(
         FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR, false),
     FRONT_RIGHT(
@@ -24,13 +20,13 @@ public final class VisionConstants {
     private final int id;
     private final String name;
     private final double accurateFOV;
-    private final boolean isLimelight4;
+    private final boolean hasInternalIMU;
 
-    Limelight(int id, String name, double accurateFOV, boolean isLimelight4) {
+    Limelight(int id, String name, double accurateFOV, boolean hasInternalIMU) {
       this.id = id;
       this.name = name;
       this.accurateFOV = accurateFOV;
-      this.isLimelight4 = isLimelight4;
+      this.hasInternalIMU = hasInternalIMU;
     }
 
     public int getId() {
@@ -45,8 +41,8 @@ public final class VisionConstants {
       return accurateFOV;
     }
 
-    public boolean isLimelight4() {
-      return isLimelight4;
+    public boolean hasInternalIMU() {
+      return hasInternalIMU;
     }
 
     public static Limelight fromId(int id) {
