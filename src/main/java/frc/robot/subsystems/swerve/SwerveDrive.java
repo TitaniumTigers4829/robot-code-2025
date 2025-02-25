@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -440,9 +439,7 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  /**
-   * Sets the modules to form an X stance.
-   */
+  /** Sets the modules to form an X stance. */
   public void setXStance() {
     Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
     for (int i = 0; i < 4; i++) {
@@ -545,7 +542,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Follows a repulsor field to a goal.
-   * 
+   *
    * @param goal the goal to follow the repulsor field to.
    */
   public void followRepulsorField(Pose2d goal) {
@@ -593,7 +590,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Checks if the robot is within a certain distance of the reef.
-   * 
+   *
    * @return a trigger that is true when the robot is within 0.5 meters of the reef.
    */
   public Trigger isReefInRange() {
@@ -609,7 +606,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Aligns the robot to the reef.
-   * 
+   *
    * @param left whether to align to the left or right reef.
    */
   public void reefAlign(Boolean left) {
