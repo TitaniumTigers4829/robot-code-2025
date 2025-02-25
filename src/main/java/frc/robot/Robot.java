@@ -372,6 +372,8 @@ public class Robot extends LoggedRobot {
         AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
     this.autoChooser.addRoutine(
         AutoConstants.FLEXIBLE_AUTO_ROUTINE, () -> this.flexiAuto.flexiAutoRoutine());
+    this.autoChooser.addRoutine(
+        AutoConstants.TWO_CORAL_AUTO_ROUTINE, () -> this.autos.twoCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 

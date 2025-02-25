@@ -50,4 +50,24 @@ public class Autos {
 
     return routine;
   }
+
+  public AutoRoutine twoCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.TWO_CORAL_AUTO_ROUTINE);
+
+    AutoTrajectory startToCTraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
+
+    // reset odometry and start first trajectory
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                startToCTraj.cmd()));
+    startToCTraj.done().onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.done().onTrue(pickupToCTraj.cmd());
+
+    return routine;
+  }
 }
