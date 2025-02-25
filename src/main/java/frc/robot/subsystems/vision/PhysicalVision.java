@@ -10,6 +10,7 @@ import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.MegatagPoseEstimate;
 import frc.robot.extras.vision.TigerHelpers;
 import frc.robot.extras.vision.TigerHelpers.Botpose;
+import frc.robot.extras.vision.TigerHelpers.IMUMode;
 import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
@@ -147,8 +148,8 @@ public class PhysicalVision implements VisionInterface {
     if (limelight.isLimelight4()) {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
-        TigerHelpers.SetIMUMode(limelight.getName(), 4);
-        TigerHelpers.getLimelightNTTable(limelight.getName()).getEntry("throttle_set").setNumber(5);
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.ENABLED_THROTTLE);
         limelightEstimates.set(
             limelight.getId(),
             MegatagPoseEstimate.fromLimelight(
@@ -156,10 +157,8 @@ public class PhysicalVision implements VisionInterface {
                     limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
       } else {
         // Disable internal IMU when robot is disabled
-        TigerHelpers.SetIMUMode(limelight.getName(), 1);
-        TigerHelpers.getLimelightNTTable(limelight.getName())
-            .getEntry("throttle_set")
-            .setNumber(175);
+        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
+        TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.DISABLED_THROTTLE);
         limelightEstimates.set(
             limelight.getId(),
             MegatagPoseEstimate.fromLimelight(
@@ -229,16 +228,12 @@ public class PhysicalVision implements VisionInterface {
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    */
   public void checkAndUpdatePose(Limelight limelight) {
+    // Megatag 2 uses the gyro orientation to solve for the rotation of the
+    // calculated pose. This creates a much more stable and accurate pose when
+    // translating, but when rotating but the pose will not be consistent due to
+    // latency between receiving and sending measurements.
+    TigerHelpers.setRobotOrientation(limelight.getName(), headingDegrees);
     if (isLimelightConnected(limelight) && canSeeAprilTags(limelight)) {
-      // Megatag 2 uses the gyro orientation to solve for the rotation of the
-      // calculated pose. This creates a much more stable and accurate pose when
-      // translating, but when rotating but the pose will not be consistent due to
-      // latency between receiving and sending measurements. The parameters are
-      // melightName, yaw, yawRate, pitch, pitchRate, roll, and rollRate. Generally we
-      // don't need to use pitch or roll in our pose estimate, so we don't send those
-      // values to the limelight (hence the 0's).
-      TigerHelpers.SetRobotOrientation(limelight.getName(), headingDegrees, 0.0, 0, 0, 0, 0);
-      updateIMUMode(limelight);
       updatePoseEstimate(limelight);
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
@@ -270,35 +265,13 @@ public class PhysicalVision implements VisionInterface {
   }
 
   /**
-   * Checks if there is a large discrepancy between two poses. This is used to determine if the
-   * estimated megatag 1 and 2 pose are within a certain threshold, whether or not they are within
-   * this threshold helps determine which pose to use.
-   *
-   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
-   * @param translationThresholdMeters The translation threshold in meters.
-   * @param rotationThresholdDegrees The rotation threshold in degrees.
-   * @param pose1 The first pose to compare.
-   * @param pose2 The second pose to compare.
-   * @return True if the discrepancy between the two poses is greater than the threshold, false.
-   */
-  public boolean isLargeDiscrepancyBetweenTwoPoses(
-      Limelight limelight,
-      double translationThresholdMeters,
-      double rotationThresholdDegrees,
-      Pose2d pose1,
-      Pose2d pose2) {
-    return !GeomUtil.arePosesWithinThreshold(
-        translationThresholdMeters, rotationThresholdDegrees, pose1, pose2);
-  }
-
-  /**
    * Checks if the specified limelight is connected
    *
    * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
    * @return True if the limelight is connected
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return TigerHelpers.getLimelightNTTable(limelight.getName()).containsKey("tv");
+    return TigerHelpers.getLimelightNetworkTable(limelight.getName()).containsKey("tv");
   }
 
   /**
@@ -354,6 +327,28 @@ public class PhysicalVision implements VisionInterface {
     double maxY = FieldConstants.FIELD_WIDTH_METERS - DriveConstants.WHEEL_BASE / 2.0;
     return (poseEstimate.getX() > minX && poseEstimate.getX() < maxX)
         && (poseEstimate.getY() > minY && poseEstimate.getY() < maxY);
+  }
+
+  /**
+   * Checks if there is a large discrepancy between two poses. This is used to determine if the
+   * estimated megatag 1 and 2 pose are within a certain threshold, whether or not they are within
+   * this threshold helps determine which pose to use.
+   *
+   * @param limelight A limelight (BACK, FRONT_LEFT, FRONT_RIGHT).
+   * @param translationThresholdMeters The translation threshold in meters.
+   * @param rotationThresholdDegrees The rotation threshold in degrees.
+   * @param pose1 The first pose to compare.
+   * @param pose2 The second pose to compare.
+   * @return True if the discrepancy between the two poses is greater than the threshold, false.
+   */
+  private boolean isLargeDiscrepancyBetweenTwoPoses(
+      Limelight limelight,
+      double translationThresholdMeters,
+      double rotationThresholdDegrees,
+      Pose2d pose1,
+      Pose2d pose2) {
+    return !GeomUtil.arePosesWithinThreshold(
+        translationThresholdMeters, rotationThresholdDegrees, pose1, pose2);
   }
 
   /**

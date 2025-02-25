@@ -111,6 +111,10 @@ public final class VisionConstants {
   public static final String ELEVATOR_LIMELIGHT_NAME = "limelight-elevate";
   public static final int ELEVATOR_LIMELIGHT_NUMBER = 3;
 
+  // TODO: these need to be changed, maybe to 10 and 0?
+  public static final int DISABLED_THROTTLE = 175;
+  public static final int ENABLED_THROTTLE = 5;
+
   // Constants for port forwarding
   public static final int BASE_PORT = 5800;
   public static final int PORT_RANGE = 10;
