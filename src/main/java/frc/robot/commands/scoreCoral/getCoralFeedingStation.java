@@ -8,12 +8,12 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class getCoralFeedingStation extends Command {
+public class GetCoralFeedingStation extends Command {
   private final CoralIntakeSubsystem coralIntakeSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final AlgaePivotSubsystem algaePivotSubsystem;
 
-  public getCoralFeedingStation(
+  public GetCoralFeedingStation(
       CoralIntakeSubsystem coralIntakeSubsystem,
       ElevatorSubsystem elevatorSubsystem,
       AlgaePivotSubsystem algaePivotSubsystem) {
@@ -33,6 +33,9 @@ public class getCoralFeedingStation extends Command {
     elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
     coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
     algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
+    if(coralIntakeSubsystem.hasCoral()){
+      coralIntakeSubsystem.setIntakeSpeed(0);
+    }
   }
 
   @Override

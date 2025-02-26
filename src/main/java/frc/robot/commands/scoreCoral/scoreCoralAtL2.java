@@ -8,12 +8,12 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class scoreCoralAtL2 extends Command{
+public class ScoreCoralAtL2 extends Command{
   private final AlgaePivotSubsystem algaePivotSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final CoralIntakeSubsystem coralIntakeSubsystem;;
 
-  public scoreCoralAtL2(
+  public ScoreCoralAtL2(
       AlgaePivotSubsystem algaePivotSubsystem,
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem) {
@@ -30,9 +30,13 @@ public class scoreCoralAtL2 extends Command{
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute(){
-    elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L2_HEIGHT);
-    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
-    algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L2_ANGLE);
+    if(coralIntakeSubsystem.hasCoral()){
+      elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L2_HEIGHT);
+      algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L2_ANGLE);
+      if(elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L2_HEIGHT){
+        coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
+      }
+    }
   }
 
   public void end(boolean interrupted){

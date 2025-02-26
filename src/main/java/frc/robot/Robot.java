@@ -20,11 +20,11 @@ import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.characterization.StaticCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.scoreCoral.getCoralFeedingStation;
-import frc.robot.commands.scoreCoral.scoreCoralAtL2;
-import frc.robot.commands.scoreCoral.scoreCoralAtL3;
-import frc.robot.commands.scoreCoral.scoreCoralAtL4;
-import frc.robot.commands.scoreCoral.scoreCoralAtTroph;
+import frc.robot.commands.scoreCoral.GetCoralFeedingStation;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL2;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL3;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
+import frc.robot.commands.scoreCoral.ScoreCoralAtTroph;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -201,14 +201,14 @@ public class Robot extends LoggedRobot {
   private void configureOperatorController() {
     operatorController.b().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController.y().whileTrue(coralIntakeSubsystem.ejectCoral());
-    operatorController.x().whileTrue(new getCoralFeedingStation(coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem));
+    operatorController.x().whileTrue(new GetCoralFeedingStation(coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem));
     operatorController
         .a()
         .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getRightY()));
-    operatorController.rightTrigger().whileTrue(new scoreCoralAtL2(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
-    operatorController.leftTrigger().whileTrue(new scoreCoralAtTroph(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
-    operatorController.rightBumper().whileTrue(new scoreCoralAtL3(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
-    operatorController.leftBumper().whileTrue(new scoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+    operatorController.rightTrigger().whileTrue(new ScoreCoralAtL2(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+    operatorController.leftTrigger().whileTrue(new ScoreCoralAtTroph(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+    operatorController.rightBumper().whileTrue(new ScoreCoralAtL3(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+    operatorController.leftBumper().whileTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
