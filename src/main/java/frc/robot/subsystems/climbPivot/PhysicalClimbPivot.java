@@ -24,6 +24,7 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
   private final StatusSignal<Angle> climbMotorAngle;
 
   public PhysicalClimbPivot() {
+    config = new TalonFXConfiguration();
     config.Slot0.kP = PivotConstants.CLIMB_PIVOT_P;
     config.Slot0.kI = PivotConstants.CLIMB_PIVOT_I;
     config.Slot0.kD = PivotConstants.CLIMB_PIVOT_D;

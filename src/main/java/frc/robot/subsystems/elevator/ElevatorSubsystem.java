@@ -119,9 +119,9 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command manualElevator(DoubleSupplier joystickY) {
     return new RunCommand(
         // does this while command is active
-        () -> this.openLoop(joystickY.getAsDouble())
+        () -> this.openLoop(joystickY.getAsDouble()),
         // requirements for command
-        );
+        this);
   }
 
   public Command setElevationPosition(double position) {

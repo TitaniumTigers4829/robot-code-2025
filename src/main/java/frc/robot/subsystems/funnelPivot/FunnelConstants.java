@@ -3,8 +3,7 @@ package frc.robot.subsystems.funnelPivot;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 public class FunnelConstants {
-  public static final int FUNNEL_PIVOT_MOTOR_ID = 0 - 9;
-  public static final int FUNNEL_ENCODER_MOTOR_ID = 0 - 9;
+  public static final int FUNNEL_PIVOT_MOTOR_ID = 22;
 
   public static final SensorDirectionValue FUNNEL_ENCODER_REVERSED =
       SensorDirectionValue.Clockwise_Positive;

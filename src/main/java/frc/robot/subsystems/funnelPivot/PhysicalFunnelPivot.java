@@ -55,8 +55,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = FunnelConstants.MAX_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
-    funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-    funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+    funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         100.0,
