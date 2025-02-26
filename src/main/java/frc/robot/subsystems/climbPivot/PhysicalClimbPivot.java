@@ -38,12 +38,13 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
     climbMotorAppliedVoltage = climbMotor.getMotorVoltage();
     climbMotorAngle = climbMotor.getPosition();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, climbMotorAngle);
     climbMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ClimbPivotInputs inputs) {
+    BaseStatusSignal.refreshAll(climbMotorAngle);
     inputs.position = climbMotorAngle.getValueAsDouble();
     inputs.currentVolts = climbMotorAppliedVoltage.getValueAsDouble();
   }

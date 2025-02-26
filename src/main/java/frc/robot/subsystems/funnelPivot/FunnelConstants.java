@@ -7,16 +7,16 @@ public class FunnelConstants {
 
   public static final SensorDirectionValue FUNNEL_ENCODER_REVERSED =
       SensorDirectionValue.Clockwise_Positive;
-  public static final double MAX_VELOCITY_ROTATIONS_PER_SECOND = 0.0;
-  public static final double MAX_ACCELERATION_ROTATIONS_PER_SECOND = 0.0;
+  public static final double MAX_VELOCITY_ROTATIONS_PER_SECOND = 20.0;
+  public static final double MAX_ACCELERATION_ROTATIONS_PER_SECOND = 20.0;
 
   public static final double MAX_ANGLE = 0.0;
   public static final double MIN_ANGLE = 0.0;
 
-  public static final double ANGLE_ZERO = 0.069;
-  public static final double PIVOT_P = 0.0;
+  public static final double ANGLE_ZERO = 0.0;
+  public static final double PIVOT_P = 1.0;
   public static final double PIVOT_I = 0.0;
-  public static final double PIVOT_D = 0.0777777;
+  public static final double PIVOT_D = 0.0;
   public static final double PIVOT_G = 0.0;
 
   public static final double FUNNEL_GEAR_RATIO = 0.375; // 24 to 64 flame unc zimo if wrong
