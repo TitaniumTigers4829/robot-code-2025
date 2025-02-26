@@ -1,6 +1,9 @@
 package frc.robot.subsystems.funnelPivot;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class FunnelSubsystem extends SubsystemBase {
@@ -26,5 +29,9 @@ public class FunnelSubsystem extends SubsystemBase {
   public void periodic() {
     funnelPivotInterface.updateInputs(inputs);
     Logger.processInputs("FunnelPivotSubsystem/", inputs);
+  }
+
+  public Command manualFunnel(DoubleSupplier position) {
+    return new RunCommand(() -> funnelPivotInterface.setFunnelSpeed(position.getAsDouble()), this);
   }
 }
