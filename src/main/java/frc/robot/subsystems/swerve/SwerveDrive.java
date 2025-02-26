@@ -563,7 +563,7 @@ public class SwerveDrive extends SubsystemBase {
             DriveConstants.MAX_SPEED_METERS_PER_SECOND * .8,
             1.5);
 
-    ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
+    ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0.0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
             xController.calculate(
@@ -585,7 +585,7 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    drive(outputRobotRelative, false);
   }
 
   /**

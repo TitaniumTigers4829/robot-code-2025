@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class SimulatedClimbPivot implements ClimbPivotInterface {
   private SingleJointedArmSim simulatedClimbPivot =
-      new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0, 0.001);
+      new SingleJointedArmSim(DCMotor.getFalcon500(2), 1, 0.1, 1.0, 0, 1.0, false, 0.0);
   private PIDController simPID;
   private SimpleMotorFeedforward simFFPID;
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0.0);

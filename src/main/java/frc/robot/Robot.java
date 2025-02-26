@@ -18,16 +18,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.ScoreL1;
-import frc.robot.commands.elevator.ScoreL2;
-import frc.robot.commands.elevator.ScoreL3;
-import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -39,12 +33,10 @@ import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
 import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
-import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -246,16 +238,16 @@ public class Robot extends LoggedRobot {
      */
     // operatorController.a().whileTrue(new ScoreL1(elevatorSubsystem,
     // coralIntakeSubsystem));
-    
+
     // operatorController.x().whileTrue(new ScoreL2(elevatorSubsystem,
     // coralIntakeSubsystem));
 
     // operatorController.b().whileTrue(new ScoreL3(elevatorSubsystem,
     // coralIntakeSubsystem));
-    
+
     // operatorController.y().whileTrue(new ScoreL4(elevatorSubsystem,
     // coralIntakeSubsystem));
-    
+
     // operatorController
     //     .leftBumper()
     //     .whileTrue(
@@ -399,6 +391,7 @@ public class Robot extends LoggedRobot {
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
+        this.ledSubsystem = new LEDSubsystem();
       }
 
       default -> {
