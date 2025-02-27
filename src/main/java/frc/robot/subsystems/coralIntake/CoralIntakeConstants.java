@@ -3,7 +3,7 @@ package frc.robot.subsystems.coralIntake;
 public final class CoralIntakeConstants {
   public static final int CORAL_INTAKE_MOTOR_ID = 30;
 
-  public static final double INTAKE_SPEED = 0.5;
+  public static final double INTAKE_SPEED = 0.35;
   public static final double EJECT_SPEED = 1.0;
 
   // the max amount of stator and supply current allowed in the motor, respectively

@@ -8,7 +8,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
   public static final boolean tuningMode = false;
 
   /**
@@ -328,6 +328,7 @@ public final class Constants {
   public static final class AutoConstants {
 
     // Different Pre-defined Auto Routines
+    public static final String ONE_CORAL_AUTO_ROUTINE = "One-Coral-Auto-Routine";
     public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
     public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
     public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
@@ -417,12 +418,12 @@ public final class Constants {
     public static final double MAX_AUTO_SPEED = 5.0;
     public static final double MAX_AUTO_ACCELERATION = 3;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = .5; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = 1.5; // 1.7
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
-    public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.2;
+    public static final double CHOREO_AUTO_THETA_P = 4.5; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
-    public static final double CHOREO_AUTO_THETA_D = 0.0;
+    public static final double CHOREO_AUTO_THETA_D = 0.4;
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 

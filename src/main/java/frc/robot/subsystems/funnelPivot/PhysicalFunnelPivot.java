@@ -32,7 +32,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     mmPositionRequest = new MotionMagicVoltage(0);
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelMotor.getRotorPosition();
+    funnelAngle = funnelMotor.getPosition();
     funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
@@ -54,6 +54,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+
+    funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
 
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
 

@@ -14,7 +14,7 @@ public class FunnelConstants {
   public static final double MIN_ANGLE = 0.0;
 
   public static final double ANGLE_ZERO = 0.0;
-  public static final double PIVOT_P = 1.0;
+  public static final double PIVOT_P = 100.0;
   public static final double PIVOT_I = 0.0;
   public static final double PIVOT_D = 0.0;
   public static final double PIVOT_G = 0.0;
