@@ -15,8 +15,9 @@ import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private ElevatorInterface elevatorInterface;
+  private VisualSim visualSim;
   private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
-
+  public visualSim.update = getElevatorPosition;
   private static final LoggedTunableNumber elevatorS =
       new LoggedTunableNumber("Elevator/ElevatorS");
   private static final LoggedTunableNumber elevatorV =

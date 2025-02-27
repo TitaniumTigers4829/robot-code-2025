@@ -24,6 +24,8 @@ public class ElevatorConstants {
   public static final double ELEVATOR_CARRIAGE_MASS = 10;
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
+  public static final double ELEVATOR_WIDTH = 0;
+  public static final double ELEVATOR_WHOLE_THING_ACTUAL_HEIGHT = 0;
   public static final double INCLINE_ANGLE_RADIANS = Units.degreesToRadians(8);
   public static final boolean SIMULATE_GRAVITY = true;
 
