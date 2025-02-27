@@ -13,15 +13,7 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   private final double funnelPivotMass = FunnelConstants.FUNNEL_PIVOT_MASS;
   private final double funnelPivotLength = FunnelConstants.FUNNEL_PIVOT_LENGTH;
   private SingleJointedArmSim funnelPivotSim =
-      new SingleJointedArmSim(
-          DCMotor.getKrakenX60(2),
-          funnelGearing,
-          funnelPivotMass,
-          funnelPivotLength,
-          0,
-          0,
-          true,
-          0);
+      new SingleJointedArmSim(DCMotor.getKrakenX60(2), funnelGearing, 1, 1, 0, 0, true, 0);
 
   private final double armKS = 0.0;
   private final double armKG = FunnelConstants.PIVOT_G;
@@ -56,6 +48,6 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   public void setFunnelAngle(double angle) {
     double currentFunnelPivotAngleRots = Units.radiansToRotations(funnelPivotSim.getAngleRads());
     double armFF = armFeedForward.calculate(angle, funnelPivotController.getSetpoint().velocity);
-    setFunnelVoltage(funnelPivotController.calculate(angle, currentFunnelPivotAngleRots) + armFF);
+    setFunnelVoltage(funnelPivotController.calculate(currentFunnelPivotAngleRots, angle) + armFF);
   }
 }

@@ -17,16 +17,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.ScoreL1;
-import frc.robot.commands.elevator.ScoreL2;
-import frc.robot.commands.elevator.ScoreL3;
-import frc.robot.commands.elevator.ScoreL4;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -141,6 +136,8 @@ public class Robot extends LoggedRobot {
             swerveDrive.getEstimatedPose().getX(),
             swerveDrive.getEstimatedPose().getY(),
             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
+    visionSubsystem.setOdometryInfo(
+        swerveDrive.getOdometryRotation2d().getDegrees(), 0, swerveDrive.getEstimatedPose());
   }
 
   /** This function is called periodically during autonomous. */
@@ -209,25 +206,6 @@ public class Robot extends LoggedRobot {
         .rightTrigger()
         .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
     driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
-    driverController
-        .y()
-        .whileTrue(new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE));
-    driverController
-        .a()
-        .whileTrue(
-            Commands.sequence(
-                new AutoAlign(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_TWELEVE),
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
-
-    driverController
-        .x()
-        .whileTrue(
-            Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
-                    () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
-                    coralIntakeSubsystem)));
   }
 
   private void configureOperatorController() {
@@ -240,44 +218,75 @@ public class Robot extends LoggedRobot {
     // JoystickButton alignLeft = new JoystickButton(buttonBoard, 6);
     // JoystickButton alignRight = new JoystickButton(buttonBoard, 7);
 
-    operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
-    operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
+    // operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
+    // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
         .rightBumper()
         .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
-    operatorController
-        .x()
-        .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY() * 0.6));
-    operatorController
-        .y()
-        .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY() * 0.6));
+    // operatorController
+    //     .x()
+    //     .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY() * 0.6));
+    // operatorController
+    //     .y()
+    //     .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
+    // operatorController
+    //     .a()
+    //     .whileTrue(new RunCommand(() -> funnelSubsystem.setFunnelAngle(8.0), funnelSubsystem));
     /* Uncomment below to score the coral with controller, this scores with auto align
      * and I'm pretty sure it doesn't work well yet. (idk)
      *
      * We should probably make the ScoreL commands parallel but for now we're testing.
      */
-    // operatorController.a().whileTrue(Commands.parallel(new RepulsorReef(swerveDrive,
-    // visionSubsystem, operatorController.povLeft().getAsBoolean()), new ScoreL1(elevatorSubsystem,
-    // coralIntakeSubsystem)));
-    // operatorController.y().whileTrue(Commands.parallel(new RepulsorReef(swerveDrive,
-    // visionSubsystem, operatorController.povLeft().getAsBoolean()), new ScoreL2(elevatorSubsystem,
-    // coralIntakeSubsystem)));
-    // operatorController.b().whileTrue(Commands.parallel(new RepulsorReef(swerveDrive,
-    // visionSubsystem, operatorController.povLeft().getAsBoolean()), new ScoreL3(elevatorSubsystem,
-    // coralIntakeSubsystem)));
-    // operatorController.x().whileTrue(Commands.parallel(new RepulsorReef(swerveDrive,
-    // visionSubsystem, operatorController.povLeft().getAsBoolean()), new ScoreL4(elevatorSubsystem,
-    // coralIntakeSubsystem)));
+    operatorController
+        .a()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition()));
 
-    intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
-    outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
-    scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
-    scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
-    scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
-    scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    operatorController
+        .x()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition()));
+
+    operatorController
+        .b()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition()));
+
+    operatorController
+        .y()
+        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+
+    operatorController
+        .leftTrigger()
+        .whileTrue(
+            Commands.runEnd(
+                () -> coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
+                () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
+                coralIntakeSubsystem));
+
+    operatorController
+        .leftBumper()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
+                    () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
+                    coralIntakeSubsystem)));
+
+    operatorController
+        .povUp()
+        .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
+    operatorController
+        .povDown()
+        .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
+
+    // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
+    // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
+    // scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
+    // scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
+    // scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
+    // scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
@@ -405,6 +414,7 @@ public class Robot extends LoggedRobot {
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
+        this.ledSubsystem = new LEDSubsystem();
       }
 
       default -> {
@@ -449,11 +459,15 @@ public class Robot extends LoggedRobot {
             AllianceFlipper.isRed(), // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    this.autos = new Autos(autoFactory);
+    this.autos =
+        new Autos(
+            autoFactory, swerveDrive, visionSubsystem, elevatorSubsystem, coralIntakeSubsystem);
 
     this.autoChooser.addRoutine("Example Auto", () -> this.autos.exampleAutoRoutine());
     this.autoChooser.addRoutine(
         AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
+    this.autoChooser.addRoutine(
+        AutoConstants.ONE_CORAL_AUTO_ROUTINE, () -> this.autos.oneCoralAutoRoutine());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 

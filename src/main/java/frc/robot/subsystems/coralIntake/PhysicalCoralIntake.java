@@ -38,7 +38,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
     coralSensor = new DigitalInput(0);
 
-    sensorDebouncer = new Debouncer(0.050, DebounceType.kRising);
+    sensorDebouncer = new Debouncer(0.070, DebounceType.kRising);
 
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;

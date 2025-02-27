@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 
@@ -25,6 +26,8 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
 
   public PhysicalClimbPivot() {
     config = new TalonFXConfiguration();
+
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.Slot0.kP = PivotConstants.CLIMB_PIVOT_P;
     config.Slot0.kI = PivotConstants.CLIMB_PIVOT_I;
     config.Slot0.kD = PivotConstants.CLIMB_PIVOT_D;
@@ -38,12 +41,13 @@ public class PhysicalClimbPivot implements ClimbPivotInterface {
     climbMotorAppliedVoltage = climbMotor.getMotorVoltage();
     climbMotorAngle = climbMotor.getPosition();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, climbMotorAngle);
     climbMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(ClimbPivotInputs inputs) {
+    BaseStatusSignal.refreshAll(climbMotorAngle);
     inputs.position = climbMotorAngle.getValueAsDouble();
     inputs.currentVolts = climbMotorAppliedVoltage.getValueAsDouble();
   }
