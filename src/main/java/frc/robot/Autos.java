@@ -7,20 +7,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.commands.elevator.IntakeCoral;
-import frc.robot.commands.elevator.ScoreL4;
-import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.commands.drive.DriveCommand;
 
 public class Autos {
   private final AutoFactory autoFactory;
-  private ElevatorSubsystem elevatorSubsystem;
-  private CoralIntakeSubsystem coralIntakeSubsystem;
+
+  // private ElevatorSubsystem elevatorSubsystem;
+  // private CoralIntakeSubsystem coralIntakeSubsystem;
 
   public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
-    this.elevatorSubsystem = elevatorSubsystem;
-    this.coralIntakeSubsystem = coralIntakeSubsystem;
+    // this.elevatorSubsystem = elevatorSubsystem;
+    // this.coralIntakeSubsystem = coralIntakeSubsystem;
   }
 
   public AutoRoutine oneMeterTestAutoRoutine() {
@@ -103,12 +101,50 @@ public class Autos {
 
     cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
 
+    // routine
+    //     .anyActive(eToPickupTraj, cToPickupTraj)
+    //     .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+    // routine
+    //     .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+
+    return routine;
+  }
+
+  public AutoRoutine fourCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.TWO_CORAL_AUTO_ROUTINE);
+
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.D_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_B_TRAJECTORY);
+    // reset odometry and start first trajectory
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj)
-        .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-    routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                startToETraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
+
+    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
+
+    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
+
+    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+
+    pickupToDTraj.done().onTrue(dToPickupTraj.cmd());
+
+    dToPickupTraj.done().onTrue(pickupToBTraj.cmd());
+    // routine
+    //     .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+    //     .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+    // routine
+    //     .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
   }
