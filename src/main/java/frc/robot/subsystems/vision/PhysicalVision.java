@@ -127,6 +127,7 @@ public class PhysicalVision implements VisionInterface {
     double limelightAngle;
 
     switch (limelight.getName()) {
+      // Determines the height and angle of the limelight based on the limelight name
       case VisionConstants.BACK_LIMELIGHT_NAME:
         limelightHeight = VisionConstants.BACK_TRANSFORM.getZ();
         limelightAngle = VisionConstants.BACK_TRANSFORM.getRotation().getAngle();
@@ -144,14 +145,17 @@ public class PhysicalVision implements VisionInterface {
         limelightAngle = 0.0;
         break;
     }
+    // Calculates the height by subtracting the height of the limelight from the height of the target
     double height =
         LimelightHelpers.getCameraPose3d_TargetSpace(limelight.getName()).getZ() - limelightHeight;
+    // Calculates the angle by adding the mounting angle of the limelight to the angle target the target
     double angle = limelightAngle + LimelightHelpers.getTY(limelight.getName());
+    // Uses a basic trig formula implementing the tangent of the angle between the limelight and its target, and the height of the target to determine the distance from the robot
     return height / Math.tan(angle);
   }
-
+  
   @Override
-  public double getAmbiguity(Limelight limelight) {
+  public double getAmbiguity(Limelight limelight) { 
     return limelightEstimates.get(limelight.getId()).ambiguity;
   }
 
