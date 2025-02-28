@@ -42,11 +42,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   }
 
   public boolean checkHasCoralWhenSensorCooked() {
-    if ((coralIntakeInputs.intakeStatorCurrentAmps) > CoralIntakeConstants.INTAKE_STATOR_LIMIT) {
-      return true;
-    } else {
-      return false;
-    }
+    return coralIntakeInputs.intakeStatorCurrentAmps > CoralIntakeConstants.THRESHOLD_VALUE;
   }
 
   public void intakeCoral(double speed) {
