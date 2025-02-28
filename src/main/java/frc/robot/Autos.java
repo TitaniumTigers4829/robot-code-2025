@@ -95,29 +95,20 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj
-        .done()
-        .onTrue(
-            Commands.sequence(
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem), eToPickupTraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
 
-    eToPickupTraj
-        .done()
-        .onTrue(
-            Commands.sequence(
-                new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem), pickupToCTraj.cmd()));
+    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
 
-    pickupToCTraj
-        .done()
-        .onTrue(
-            Commands.sequence(
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem), cToPickupTraj.cmd()));
+    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
 
-    cToPickupTraj
-        .done()
-        .onTrue(
-            Commands.sequence(
-                new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem), pickupToDTraj.cmd()));
+    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+
+    routine
+        .anyActive(eToPickupTraj, cToPickupTraj)
+        .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
   }
