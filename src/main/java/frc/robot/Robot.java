@@ -39,7 +39,6 @@ import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
-import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -90,7 +89,7 @@ public class Robot extends LoggedRobot {
     checkGit();
     setupLogging();
     setupSubsystems();
-    // setupAuto();
+    setupAuto();
   }
 
   /** This function is called periodically during all modes. */
@@ -360,7 +359,7 @@ public class Robot extends LoggedRobot {
         this.simWorld = null;
       }
     }
-    ledSubsystem.setProcess(LEDProcess.DEFAULT);
+    // ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
   private void setupAuto() {
@@ -394,6 +393,8 @@ public class Robot extends LoggedRobot {
         AutoConstants.FLEXIBLE_AUTO_ROUTINE, () -> this.flexiAuto.flexiAutoRoutine());
     this.autoChooser.addRoutine(
         AutoConstants.TWO_CORAL_AUTO_ROUTINE, () -> this.autos.twoCoralAuto());
+    this.autoChooser.addRoutine(
+        AutoConstants.THREE_CORAL_AUTO_ROUTINE, () -> this.autos.threeCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 

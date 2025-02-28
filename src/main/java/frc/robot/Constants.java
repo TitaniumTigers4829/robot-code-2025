@@ -8,7 +8,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.DEV_ROBOT;
+  private static RobotType robotType = RobotType.SIM_ROBOT;
   public static final boolean tuningMode = true;
 
   /**
@@ -332,6 +332,7 @@ public final class Constants {
     public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
     public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
     public static final String TWO_CORAL_AUTO_ROUTINE = "Two-Coral-Auto-Routine";
+    public static final String THREE_CORAL_AUTO_ROUTINE = "Three-Coral-Auto-Routine";
     // This does not exist yet :(
 
     // All Trajectories are created on the blue alliance and are flipped in the code
@@ -413,24 +414,24 @@ public final class Constants {
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
 
-    public static final double MAX_AUTO_SPEED = 2;
-    public static final double MAX_AUTO_ACCELERATION = 2;
+    public static final double MAX_AUTO_SPEED = 3.805;
+    public static final double MAX_AUTO_ACCELERATION = 14.715;
 
-    public static final double CHOREO_AUTO_X_TRANSLATION_P = 10.0;
+    public static final double CHOREO_AUTO_X_TRANSLATION_P = 12;
     public static final double CHOREO_AUTO_X_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_X_TRANSLATION_D = 0;
-    public static final double CHOREO_AUTO_Y_TRANSLATION_P = 10.0;
+    public static final double CHOREO_AUTO_Y_TRANSLATION_P = 12;
     public static final double CHOREO_AUTO_Y_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_Y_TRANSLATION_D = 0;
-    public static final double CHOREO_AUTO_THETA_P = 7.5;
+    public static final double CHOREO_AUTO_THETA_P = 15;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 1;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 1;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
 
     public static final double CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE = 0.0005;
     public static final double CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE = 0.0005;
