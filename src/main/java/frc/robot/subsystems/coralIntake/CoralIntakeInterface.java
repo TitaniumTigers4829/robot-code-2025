@@ -6,7 +6,8 @@ public interface CoralIntakeInterface {
 
   @AutoLog
   public static class CoralIntakeInputs {
-    public boolean isConnected = true;
+    public boolean isMotorConnected = false;
+    public boolean isSensorConnected = false;
     public double intakeVelocity = 0.0;
     public double intakeTemp = 0.0;
     public double intakeAppliedVolts = 0.0;

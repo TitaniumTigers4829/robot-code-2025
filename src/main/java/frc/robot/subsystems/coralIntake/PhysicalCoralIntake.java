@@ -36,7 +36,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
 
   public PhysicalCoralIntake() {
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
-    coralSensor = new DigitalInput(0);
+    coralSensor = new DigitalInput(CoralIntakeConstants.CORAL_SENSOR_ID);
 
     sensorDebouncer = new Debouncer(0.070, DebounceType.kRising);
 
@@ -77,7 +77,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   @Override
   public void updateInputs(CoralIntakeInputs intakeInputs) {
     BaseStatusSignal.refreshAll(intakeVelocity);
-    intakeInputs.isConnected =
+    intakeInputs.isMotorConnected =
         BaseStatusSignal.isAllGood(
             intakeVelocity,
             intakeStatorCurrent,
@@ -86,6 +86,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
             intakePosition,
             intakeAppliedVolts,
             intakeDutyCycle);
+    intakeInputs.isSensorConnected = coralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
     intakeInputs.intakeStatorCurrentAmps = intakeStatorCurrent.getValueAsDouble();
     intakeInputs.intakeTemp = intakeTemperatureCelsius.getValueAsDouble();

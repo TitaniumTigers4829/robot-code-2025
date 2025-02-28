@@ -6,6 +6,8 @@ package frc.robot.subsystems.flywheel;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.flywheel.FlywheelInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 public class FlywheelSubsystem extends SubsystemBase {
