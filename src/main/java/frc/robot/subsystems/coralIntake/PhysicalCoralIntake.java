@@ -86,7 +86,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
             intakePosition,
             intakeAppliedVolts,
             intakeDutyCycle);
-    intakeInputs.isSensorConnected = coralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
+    intakeInputs.isSensorConnected =
+        coralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
     intakeInputs.intakeStatorCurrentAmps = intakeStatorCurrent.getValueAsDouble();
     intakeInputs.intakeTemp = intakeTemperatureCelsius.getValueAsDouble();

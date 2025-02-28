@@ -8,23 +8,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
-// States for the intake process
-private enum IntakeState {
-  IDLE,        // Chilling, not doing anything
-  WAITING,     // Waiting for coral to show up
-  INGESTING,   // Pulling the coral in
-  REVERSING,   // Backing up to position it
-  STOPPED      // All done, motor off
-}
 
-private IntakeState currentState = IntakeState.IDLE;
-private boolean previousSensorState = false;
+  // States for the intake process
+  private enum IntakeState {
+    IDLE, // Chilling, not doing anything
+    WAITING, // Waiting for coral to show up
+    INGESTING, // Pulling the coral in
+    REVERSING, // Backing up to position it
+    STOPPED // All done, motor off
+  }
+
+  private IntakeState currentState = IntakeState.IDLE;
+  private boolean previousSensorState = false;
+
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
   }
