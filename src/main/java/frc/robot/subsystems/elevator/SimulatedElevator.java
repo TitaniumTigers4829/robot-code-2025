@@ -59,6 +59,11 @@ public class SimulatedElevator implements ElevatorInterface {
   }
 
   @Override
+  public void openLoop(double output) {
+    m_elevatorSim.setInputVoltage(output);
+  }
+
+  @Override
   public void setElevatorPosition(double position) {
     // desiredPosition = position;
     m_pidController.setSetpoint(position);

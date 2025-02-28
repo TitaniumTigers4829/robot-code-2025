@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
-
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /** Add your docs here. */
 public class VisualSim {
@@ -27,7 +26,9 @@ public class VisualSim {
   public VisualSim() {
     // Provide a name for the ligament and set an appropriate initial angle (usually 90 degrees for
     // vertical motion)
-    m_elevator = new LoggedMechanismLigament2d("Elevator", kElevatorMinimumLength, 90.0, 5.0, new Color8Bit(Color.kPink));
+    m_elevator =
+        new LoggedMechanismLigament2d(
+            "Elevator", kElevatorMinimumLength, 90.0, 5.0, new Color8Bit(Color.kPink));
 
     root.append(m_elevator);
 
