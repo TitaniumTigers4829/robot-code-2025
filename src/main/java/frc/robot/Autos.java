@@ -7,28 +7,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.commands.drive.DriveCommand;
 
 public class Autos {
   private final AutoFactory autoFactory;
 
-  // private ElevatorSubsystem elevatorSubsystem;
-  // private CoralIntakeSubsystem coralIntakeSubsystem;
-
   public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
-    // this.elevatorSubsystem = elevatorSubsystem;
-    // this.coralIntakeSubsystem = coralIntakeSubsystem;
   }
 
-  public AutoRoutine oneMeterTestAutoRoutine() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.ONE_METER_AUTO_ROUTINE);
-    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.ONE_METER_TRAJECTORY);
+  // Blue Auto Routines
+  public AutoRoutine blueOneMeterTestAutoRoutine() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_ONE_METER_AUTO_ROUTINE);
+    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.BLUE_ONE_METER_TRAJECTORY);
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.ONE_METER_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_ONE_METER_TRAJECTORY),
                 oneMeterTrajectory.cmd()));
     oneMeterTrajectory
         .done()
@@ -36,40 +31,18 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine exampleAutoRoutine() {
+  public AutoRoutine blueTwoCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.EXAMPLE_AUTO_ROUTINE);
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
-
-    // reset odometry and start first trajectory
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-
-    return routine;
-  }
-
-  public AutoRoutine twoCoralAuto() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.TWO_CORAL_AUTO_ROUTINE);
-
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
-
-    // reset odometry and start first trajectory
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
     startToETraj.done().onTrue(eToPickupTraj.cmd());
     eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
@@ -77,74 +50,137 @@ public class Autos {
     return routine;
   }
 
-  public AutoRoutine threeCoralAuto() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.TWO_CORAL_AUTO_ROUTINE);
+  public AutoRoutine blueThreeCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
 
-    // reset odometry and start first trajectory
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
     startToETraj.done().onTrue(eToPickupTraj.cmd());
-
     eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-
     pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-
     cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
 
-    // routine
-    //     .anyActive(eToPickupTraj, cToPickupTraj)
-    //     .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-    // routine
-    //     .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
-
     return routine;
   }
 
-  public AutoRoutine fourCoralAuto() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.TWO_CORAL_AUTO_ROUTINE);
+  public AutoRoutine blueFourCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_D_TRAJECTORY);
-    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.D_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.RIGHT_PICKUP_TO_B_TRAJECTORY);
-    // reset odometry and start first trajectory
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.BLUE_D_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_B_TRAJECTORY);
+
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
     startToETraj.done().onTrue(eToPickupTraj.cmd());
-
     eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-
     pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-
     cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
-
     pickupToDTraj.done().onTrue(dToPickupTraj.cmd());
-
     dToPickupTraj.done().onTrue(pickupToBTraj.cmd());
-    // routine
-    //     .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
-    //     .whileTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-    // routine
-    //     .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+
+    return routine;
+  }
+
+  // Red Auto Routines
+  public AutoRoutine redOneMeterTestAutoRoutine() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_ONE_METER_AUTO_ROUTINE);
+    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.RED_ONE_METER_TRAJECTORY);
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RED_ONE_METER_TRAJECTORY),
+                oneMeterTrajectory.cmd()));
+    oneMeterTrajectory
+        .done()
+        .onTrue(new RunCommand(() -> SmartDashboard.putBoolean("Trajectory Done", true)));
+    return routine;
+  }
+
+  public AutoRoutine redTwoCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE);
+
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
+                startToETraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
+
+    return routine;
+  }
+
+  public AutoRoutine redThreeCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE);
+
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
+                startToETraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+
+    return routine;
+  }
+
+  public AutoRoutine redFourCoralAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE);
+
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.RED_D_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_B_TRAJECTORY);
+
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
+                startToETraj.cmd()));
+    startToETraj.done().onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+    pickupToDTraj.done().onTrue(dToPickupTraj.cmd());
+    dToPickupTraj.done().onTrue(pickupToBTraj.cmd());
 
     return routine;
   }

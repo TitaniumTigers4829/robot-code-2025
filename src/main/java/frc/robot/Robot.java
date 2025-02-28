@@ -384,15 +384,23 @@ public class Robot extends LoggedRobot {
 
     this.autos = new Autos(autoFactory);
 
-    this.autoChooser.addRoutine("Example Auto", () -> this.autos.exampleAutoRoutine());
     this.autoChooser.addRoutine(
-        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
+        AutoConstants.BLUE_ONE_METER_AUTO_ROUTINE, () -> this.autos.blueOneMeterTestAutoRoutine());
     this.autoChooser.addRoutine(
-        AutoConstants.TWO_CORAL_AUTO_ROUTINE, () -> this.autos.twoCoralAuto());
+        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
     this.autoChooser.addRoutine(
-        AutoConstants.THREE_CORAL_AUTO_ROUTINE, () -> this.autos.threeCoralAuto());
+        AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     this.autoChooser.addRoutine(
-        AutoConstants.FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.fourCoralAuto());
+        AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
+        
+    this.autoChooser.addRoutine(
+      AutoConstants.RED_ONE_METER_AUTO_ROUTINE, () -> this.autos.redOneMeterTestAutoRoutine());
+  this.autoChooser.addRoutine(
+      AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+  this.autoChooser.addRoutine(
+      AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
+  this.autoChooser.addRoutine(
+      AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
