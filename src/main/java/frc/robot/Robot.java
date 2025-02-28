@@ -341,6 +341,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
+        this.ledSubsystem = new LEDSubsystem();
       }
 
       default -> {

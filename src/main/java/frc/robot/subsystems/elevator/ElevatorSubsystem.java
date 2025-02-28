@@ -15,9 +15,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class ElevatorSubsystem extends SubsystemBase {
   private ElevatorInterface elevatorInterface;
-  private VisualSim visualSim;
+  private VisualSim visualSim = new VisualSim();
   private ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
-  public visualSim.update = getElevatorPosition;
   private static final LoggedTunableNumber elevatorS =
       new LoggedTunableNumber("Elevator/ElevatorS");
   private static final LoggedTunableNumber elevatorV =
@@ -115,6 +114,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         || elevatorD.hasChanged(hashCode())) {
       elevatorInterface.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
+    visualSim.update(getElevatorPosition());
   }
 
   public Command manualElevator(DoubleSupplier joystickY) {
