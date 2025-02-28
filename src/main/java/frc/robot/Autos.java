@@ -7,12 +7,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.elevator.IntakeCoral;
+import frc.robot.commands.elevator.ScoreL4;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 public class Autos {
   private final AutoFactory autoFactory;
+  private ElevatorSubsystem elevatorSubsystem;
+  private CoralIntakeSubsystem coralIntakeSubsystem;
 
   public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.coralIntakeSubsystem = coralIntakeSubsystem;
   }
 
   public AutoRoutine oneMeterTestAutoRoutine() {
@@ -87,10 +95,29 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+    startToETraj
+        .done()
+        .onTrue(
+            Commands.sequence(
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem), eToPickupTraj.cmd()));
+
+    eToPickupTraj
+        .done()
+        .onTrue(
+            Commands.sequence(
+                new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem), pickupToCTraj.cmd()));
+
+    pickupToCTraj
+        .done()
+        .onTrue(
+            Commands.sequence(
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem), cToPickupTraj.cmd()));
+
+    cToPickupTraj
+        .done()
+        .onTrue(
+            Commands.sequence(
+                new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem), pickupToDTraj.cmd()));
 
     return routine;
   }
