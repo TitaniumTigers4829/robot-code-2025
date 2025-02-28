@@ -34,9 +34,12 @@ public class Autos {
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory startToETraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
 
     routine
         .active()
@@ -53,11 +56,16 @@ public class Autos {
   public AutoRoutine blueThreeCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory startToETraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
 
     routine
         .active()
@@ -76,13 +84,20 @@ public class Autos {
   public AutoRoutine blueFourCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
-    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.BLUE_D_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_B_TRAJECTORY);
+    AutoTrajectory startToETraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory dToPickupTraj =
+        routine.trajectory(AutoConstants.BLUE_D_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToBTraj =
+        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_B_TRAJECTORY);
 
     routine
         .active()
@@ -120,8 +135,10 @@ public class Autos {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE);
 
     AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
 
     routine
         .active()
@@ -139,10 +156,14 @@ public class Autos {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE);
 
     AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj =
+        routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
 
     routine
         .active()
@@ -162,12 +183,18 @@ public class Autos {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE);
 
     AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj = routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
-    AutoTrajectory cToPickupTraj = routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToDTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
-    AutoTrajectory dToPickupTraj = routine.trajectory(AutoConstants.RED_D_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToBTraj = routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_B_TRAJECTORY);
+    AutoTrajectory eToPickupTraj =
+        routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToCTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+    AutoTrajectory cToPickupTraj =
+        routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToDTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
+    AutoTrajectory dToPickupTraj =
+        routine.trajectory(AutoConstants.RED_D_TO_RIGHT_PICKUP_TRAJECTORY);
+    AutoTrajectory pickupToBTraj =
+        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_B_TRAJECTORY);
 
     routine
         .active()

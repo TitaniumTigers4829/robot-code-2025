@@ -392,15 +392,15 @@ public class Robot extends LoggedRobot {
         AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
-        
+
     this.autoChooser.addRoutine(
-      AutoConstants.RED_ONE_METER_AUTO_ROUTINE, () -> this.autos.redOneMeterTestAutoRoutine());
-  this.autoChooser.addRoutine(
-      AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
-  this.autoChooser.addRoutine(
-      AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
-  this.autoChooser.addRoutine(
-      AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
+        AutoConstants.RED_ONE_METER_AUTO_ROUTINE, () -> this.autos.redOneMeterTestAutoRoutine());
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
