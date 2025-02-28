@@ -43,9 +43,9 @@ public abstract class DriveCommandBase extends Command {
         swerveDrive.getOdometryRotation2d().getDegrees(),
         swerveDrive.getGyroRate(),
         swerveDrive.getEstimatedPose());
-    addLimelightVisionMeasurement(Limelight.BACK);
-    addLimelightVisionMeasurement(Limelight.FRONT_LEFT);
-    addLimelightVisionMeasurement(Limelight.FRONT_RIGHT);
+    for (Limelight limelight : Limelight.values()) {
+      addLimelightVisionMeasurement(limelight);
+    }
   }
 
   /**
