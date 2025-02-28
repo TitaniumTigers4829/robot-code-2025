@@ -18,6 +18,7 @@ public interface ModuleInterface {
     public double drivePosition = 0.0;
     public double driveTorqueCurrent = 0.0;
     public double driveDesiredPosition = 0.0;
+    public double driveError = 0.0;
 
     public Rotation2d turnAbsolutePosition = new Rotation2d();
     public double turnVelocity = 0.0;
@@ -25,6 +26,7 @@ public interface ModuleInterface {
     public double turnCurrentAmps = 0.0;
     public double turnTorqueCurrent = 0.0;
     public double turnDesiredPosition = 0.0;
+    public double turnError = 0.0;
   }
 
   /**

@@ -5,12 +5,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
   public static final boolean tuningMode = false;
 
   /**
@@ -20,11 +18,11 @@ public final class Constants {
    */
   @SuppressWarnings("resource")
   public static RobotType getRobot() {
-    if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
-      new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
-          .set(true);
-      robotType = RobotType.COMP_ROBOT;
-    }
+    // if (RobotBase.isReal() && robotType == RobotType.SIM_ROBOT) {
+    //   new Alert("Invalid robot selected, using competition robot as default.", AlertType.kError)
+    //       .set(true);
+    //   robotType = RobotType.COMP_ROBOT;
+    // }
     return robotType;
   }
 
@@ -182,10 +180,10 @@ public final class Constants {
             Units.inchesToMeters(137.345),
             new Rotation2d(Units.degreesToRadians(240)));
     public static final Pose2d BLUE_REEF_TWELEVE =
-        new Pose2d(
-            Units.inchesToMeters(160.797),
-            Units.inchesToMeters(143.814),
-            new Rotation2d(Units.degreesToRadians(240)));
+        new Pose2d(3.70, 2.83, Rotation2d.fromDegrees(62.50));
+    // Units.inchesToMeters(160.797),
+    // Units.inchesToMeters(143.814),
+    // new Rotation2d(Units.degreesToRadians(240)));
 
     public static final Pose2d RED_REEF_ONE =
         new Pose2d(
@@ -330,6 +328,7 @@ public final class Constants {
   public static final class AutoConstants {
 
     // Different Pre-defined Auto Routines
+    public static final String ONE_CORAL_AUTO_ROUTINE = "One-Coral-Auto-Routine";
     public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
     public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
     public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
@@ -401,30 +400,30 @@ public final class Constants {
     public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
-    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.02;
+    public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
     public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
-    public static final double AUTO_ALIGN_ROTATION_P = 5;
+    public static final double AUTO_ALIGN_ROTATION_P = 10.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
 
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4.0;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 4;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
-    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(3, 4);
+    public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
 
     // These used to be in Trajectory Constants
 
     public static final double MAX_AUTO_SPEED = 5.0;
     public static final double MAX_AUTO_ACCELERATION = 3;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = .5; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = 1.5; // 1.7
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
-    public static final double CHOREO_AUTO_THETA_P = 0.0; // 5
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.2;
+    public static final double CHOREO_AUTO_THETA_P = 4.5; // 5
     public static final double CHOREO_AUTO_THETA_I = 0; // 5
-    public static final double CHOREO_AUTO_THETA_D = 0.0;
+    public static final double CHOREO_AUTO_THETA_D = 0.4;
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
         new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
 

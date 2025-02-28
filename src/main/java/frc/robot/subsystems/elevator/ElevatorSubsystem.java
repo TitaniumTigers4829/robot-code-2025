@@ -5,6 +5,8 @@
 package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -71,6 +73,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.setElevatorPosition(position);
   }
 
+  public double getVelocity() {
+    return inputs.leaderVelocity;
+  }
+
   public void setVolts(double volts) {
     elevatorInterface.setVolts(volts);
   }
@@ -81,6 +87,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public void setPercentOutput(double output) {
     elevatorInterface.setPercentOutput(output);
+  }
+
+  public boolean isAtSetpoint(double position) {
+    return Math.abs(position - inputs.leaderMotorPosition)
+        < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
+  }
+
+  public void resetPosition(double position) {
+    elevatorInterface.resetElevatorPosition(position);
   }
 
   @Override
@@ -103,22 +118,23 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public Command manualElevator(DoubleSupplier joystickY) {
-    return new StartEndCommand(
+    return new RunCommand(
         // does this while command is active
         () -> this.openLoop(joystickY.getAsDouble()),
-        // does this when command ends
-        () -> this.openLoop(0),
         // requirements for command
         this);
   }
 
   public Command setElevationPosition(double position) {
-    return new StartEndCommand(
-        // does this while command is active
+    return new FunctionalCommand(
+        // initialization function
+        () -> {},
+        // execution function
         () -> this.setElevatorPosition(position),
-        // does this when command ends
-        () -> this.setElevatorPosition(0),
-        // requirements for command
+        // end function
+        interrupted -> this.setElevatorPosition(position),
+        // isFinished function
+        () -> isAtSetpoint(position),
         this);
   }
 }

@@ -26,6 +26,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.setIntakeSpeed(speed);
   }
 
+  public void gripCoral(double grippiness) {
+    if (hasCoral()) {
+      coralIntakeInterface.setIntakeVoltage(grippiness);
+    }
+  }
+
   /**
    * Checks if the coral intake has a coral or not
    *
@@ -33,6 +39,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    */
   public boolean hasCoral() {
     return coralIntakeInputs.hasCoral;
+  }
+
+  public void intakeCoral(double speed) {
+    if (!hasCoral()) {
+      setIntakeSpeed(speed);
+    } else {
+      setIntakeSpeed(0.0);
+    }
   }
 
   @Override

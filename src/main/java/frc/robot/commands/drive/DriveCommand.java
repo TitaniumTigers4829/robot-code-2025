@@ -10,7 +10,7 @@ public class DriveCommand extends DriveCommandBase {
 
   private final SwerveDrive driveSubsystem;
 
-  private final DoubleSupplier leftJoystickY, leftJoystickX, rightJoystickX;
+  private final DoubleSupplier leftJoystickX, leftJoystickY, rightJoystickX;
   private final BooleanSupplier isFieldRelative, isHighRotation;
   private double angularSpeed;
 
@@ -28,8 +28,8 @@ public class DriveCommand extends DriveCommandBase {
   public DriveCommand(
       SwerveDrive driveSubsystem,
       VisionSubsystem visionSubsystem,
-      DoubleSupplier leftJoystickY,
       DoubleSupplier leftJoystickX,
+      DoubleSupplier leftJoystickY,
       DoubleSupplier rightJoystickX,
       BooleanSupplier isFieldRelative,
       BooleanSupplier isHighRotation) {
@@ -60,8 +60,8 @@ public class DriveCommand extends DriveCommandBase {
 
     // Drives the robot by scaling the joystick inputs
     driveSubsystem.drive(
-        leftJoystickY.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
         leftJoystickX.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+        leftJoystickY.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
         rightJoystickX.getAsDouble() * angularSpeed,
         isFieldRelative.getAsBoolean());
 
