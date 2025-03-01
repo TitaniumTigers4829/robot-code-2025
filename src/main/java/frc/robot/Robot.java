@@ -106,6 +106,15 @@ public class Robot extends LoggedRobot {
     setupLogging();
     setupSubsystems();
     // setupAuto();
+    ledSubsystem = new LEDSubsystem();
+    ledSubsystem.setColor(LEDSubsystem.LEDConstants.RED);
+    if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
+      ledSubsystem.setColor(LEDSubsystem.Color.BLUE);
+
+      if (isRed) {
+        return LEDProcess.LEDConstants.RED;
+      } else {
+        return LEDProcess.LEDConstants.BLUE;
   }
 
   /** This function is called periodically during all modes. */
