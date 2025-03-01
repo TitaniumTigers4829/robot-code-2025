@@ -101,6 +101,8 @@ public final class Constants {
 
     public static final int HIGH_THREAD_PRIORITY = 99;
     public static final int LOW_THREAD_PRIORITY = 1;
+
+    public static final double BATTERY_INTERNAL_RESISTANCE = 0.015; // Ohms
   }
 
   /**

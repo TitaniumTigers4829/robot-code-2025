@@ -60,7 +60,8 @@ public class SimulatedElevator implements ElevatorInterface {
 
   @Override
   public void openLoop(double output) {
-    m_elevatorSim.setInputVoltage(output);
+    currentVolts = output;
+    m_elevatorSim.setInputVoltage(output * 12.0);
   }
 
   @Override
