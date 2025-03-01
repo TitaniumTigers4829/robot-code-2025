@@ -521,10 +521,10 @@ public final class Constants {
 
     public static final double CHOREO_AUTO_X_TRANSLATION_P = 10;
     public static final double CHOREO_AUTO_X_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_X_TRANSLATION_D = 0;
+    public static final double CHOREO_AUTO_X_TRANSLATION_D = 0.25;
     public static final double CHOREO_AUTO_Y_TRANSLATION_P = 10;
     public static final double CHOREO_AUTO_Y_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_Y_TRANSLATION_D = 0;
+    public static final double CHOREO_AUTO_Y_TRANSLATION_D = 0.25;
     public static final double CHOREO_AUTO_THETA_P = 7.5;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
