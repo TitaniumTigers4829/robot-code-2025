@@ -9,6 +9,7 @@ import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.sim.simController.ClosedLoop;
+import frc.robot.sim.simController.MotorSimRunner;
 import frc.robot.sim.simController.UnitSafeControl.AngularPIDFeedback;
 import frc.robot.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
 import frc.robot.sim.simController.UnitSafeControl.FlywheelFeedforward;
@@ -23,9 +24,15 @@ public class SimulatedModule implements ModuleInterface {
   private final ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> driveLoop;
   private final ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> steerLoop;
 
+  private final MotorSimRunner driveSimRunner; 
+  private final MotorSimRunner steerSimRunner;
+
   public SimulatedModule(int moduleId, SimSwerve simSwerve) {
     driveMotor = new UnitSafeMotorController();
     steerMotor = new UnitSafeMotorController();
+
+    driveSimRunner = new MotorSimRunner(driveMotor, null, null);
+    steerSimRunner = new MotorSimRunner(steerMotor, null, null);
 
     driveLoop =
         ClosedLoop.forVoltageAngularVelocity(
