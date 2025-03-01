@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Robot;
 import frc.robot.extras.logging.Tracer;
 import frc.robot.extras.swerve.RepulsorFieldPlanner;
 import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
@@ -585,7 +586,9 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    outputRobotRelative =
+        Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
+    drive(outputRobotRelative, false);
   }
 
   /**
