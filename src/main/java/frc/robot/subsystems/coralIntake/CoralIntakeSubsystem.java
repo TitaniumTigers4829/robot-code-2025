@@ -24,7 +24,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   }
 
   private IntakeState currentState = IntakeState.IDLE;
-  private boolean previousSensorState = false;
+  private boolean usedToHaveCoral = false;
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
@@ -55,7 +55,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   public void intakeCoral(double speed) {
     if (currentState == IntakeState.IDLE || currentState == IntakeState.STOPPED) {
       currentState = IntakeState.WAITING;
-      previousSensorState = hasCoral(); // Set the starting sensor state
+      usedToHaveCoral = hasCoral(); // Set the starting sensor state
     }
     // if (coralIntakeInputs.isSensorConnected && !hasCoral()) {
     //   DoublePressTracker.doublePress(getHasCoralTrigger());
@@ -75,13 +75,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.updateInputs(coralIntakeInputs);
     Logger.processInputs("CoralIntakeSubsystem/", coralIntakeInputs);
 
-    // Check if coral is detected
-    boolean currentSensorState = coralIntakeInputs.hasCoral;
+    boolean currentlyHasCoral = hasCoral();
 
     // Run the state machine
     switch (currentState) {
       case WAITING:
-        if (!previousSensorState && currentSensorState) {
+        if (!usedToHaveCoral && currentlyHasCoral) {
           // Coral just got detected: start pulling it in
           coralIntakeInterface.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
           currentState = IntakeState.INGESTING;
@@ -89,7 +88,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case INGESTING:
-        if (previousSensorState && !currentSensorState) {
+        if (usedToHaveCoral && !currentlyHasCoral) {
           // Coral’s gone from the sensor: reverse to position it
           coralIntakeInterface.setIntakeSpeed(-CoralIntakeConstants.INTAKE_SPEED);
           currentState = IntakeState.REVERSING;
@@ -97,7 +96,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case REVERSING:
-        if (!previousSensorState && currentSensorState) {
+        if (!usedToHaveCoral && currentlyHasCoral) {
           // Coral’s back in place: stop the motor
           coralIntakeInterface.setIntakeSpeed(0);
           currentState = IntakeState.STOPPED;
@@ -114,7 +113,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     }
 
     // Remember the sensor state for next time
-    previousSensorState = currentSensorState;
+    usedToHaveCoral = currentlyHasCoral;
   }
 
   public Command intakeCoral() {
