@@ -14,8 +14,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
 
+  // private static final LoggedTunableNumber intakeP = new LoggedTunableNumber("Intake/IntakeP");
+
   // States for the intake process
-  private enum IntakeState {
+  public enum IntakeState {
     IDLE, // Chilling, not doing anything
     WAITING, // Waiting for coral to show up
     INGESTING, // Pulling the coral in
@@ -25,9 +27,11 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   private IntakeState currentState = IntakeState.IDLE;
   private boolean usedToHaveCoral = false;
+  private boolean usedToHaveControl = false;
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
+    // intakeP.initDefault(0.0);
   }
 
   /**
@@ -45,24 +49,23 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {
-    return coralIntakeInputs.isSensorConnected && coralIntakeInputs.hasCoral;
+    return coralIntakeInputs.isInnerSensorConnected && coralIntakeInputs.hasCoral;
   }
 
   public Trigger getHasCoralTrigger() {
     return new Trigger(() -> hasCoral());
   }
 
-  public void intakeCoral(double speed) {
-    if (currentState == IntakeState.IDLE || currentState == IntakeState.STOPPED) {
+  public void intakeCoral() {
+    if (currentState == IntakeState.IDLE) {
       currentState = IntakeState.WAITING;
       usedToHaveCoral = hasCoral(); // Set the starting sensor state
+      usedToHaveControl = hasControl();
     }
-    // if (coralIntakeInputs.isSensorConnected && !hasCoral()) {
-    //   DoublePressTracker.doublePress(getHasCoralTrigger());
-    //   setIntakeSpeed(speed);
-    // } else {
-    //   setIntakeSpeed(0.0);
-    // }
+  }
+
+  public boolean hasControl() {
+    return coralIntakeInputs.hasControl;
   }
 
   // Tells you if the intake is done
@@ -76,65 +79,95 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     Logger.processInputs("CoralIntakeSubsystem/", coralIntakeInputs);
 
     boolean currentlyHasCoral = hasCoral();
+    boolean currentlyHasControl = hasControl();
 
     // Run the state machine
     switch (currentState) {
       case WAITING:
-        if (!usedToHaveCoral && currentlyHasCoral) {
+        coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.WAITING_INTAKE_SPEED);
+        if (currentlyHasControl && !usedToHaveControl) {
           // Coral just got detected: start pulling it in
-          coralIntakeInterface.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INTAKE_SPEED + 500);
           currentState = IntakeState.INGESTING;
         }
         break;
 
       case INGESTING:
-        if (usedToHaveCoral && !currentlyHasCoral) {
+        if (!currentlyHasControl && currentlyHasCoral) {
           // Coral’s gone from the sensor: reverse to position it
-          coralIntakeInterface.setIntakeSpeed(-CoralIntakeConstants.INTAKE_SPEED);
+          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
           currentState = IntakeState.REVERSING;
         }
         break;
 
       case REVERSING:
-        if (!usedToHaveCoral && currentlyHasCoral) {
+        if (currentlyHasCoral && currentlyHasControl) {
           // Coral’s back in place: stop the motor
-          coralIntakeInterface.setIntakeSpeed(0);
+          coralIntakeInterface.setIntakeVelocity(0);
           currentState = IntakeState.STOPPED;
         }
         break;
 
       case STOPPED:
-        // Chill until intakeCoral() is called again
+        // if (!usedToHaveCoral && !currentlyHasCoral) {
+        //   currentState = IntakeState.IDLE;
+        // }
         break;
 
       case IDLE:
+        coralIntakeInterface.setIntakeVelocity(0.0);
         // Waiting for the signal to start
         break;
     }
 
+    if (usedToHaveCoral != currentlyHasCoral) {
+      Logger.recordOutput("Intake/hasCoral", "coral change detect");
+    }
+
     // Remember the sensor state for next time
     usedToHaveCoral = currentlyHasCoral;
+    usedToHaveControl = currentlyHasControl;
+
+    // if (intakeP.hasChanged(hashCode())) {
+    //   coralIntakeInterface.setPID(intakeP.get());
+    // }
   }
 
-  public Command intakeCoral() {
-    if (!this.hasCoral()) {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
-          // sets speed when command ends
-          () -> this.setIntakeSpeed(0),
-          // requirements for command
-          this);
-    } else {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> this.setIntakeSpeed(0.0),
-          // sets speed when command ends
-          () -> this.setIntakeSpeed(0),
-          // requirements for command
-          this);
-    }
+  public void setIntakeState(IntakeState state) {
+    currentState = state;
   }
+
+  public double getIntakeVelocity() {
+    return coralIntakeInputs.intakeVelocity;
+  }
+
+  public void setIntakeVoltage(double volts) {
+    coralIntakeInterface.setIntakeVoltage(volts);
+  }
+
+  public void setIntakeVelocity(double velocity) {
+    coralIntakeInterface.setIntakeVelocity(velocity);
+  }
+
+  // public Command intakeCoral() {
+  //   if (!this.hasCoral()) {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   } else {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> this.setIntakeSpeed(0.0),
+  //         // sets speed when command ends
+  //         () -> this.setIntakeSpeed(0),
+  //         // requirements for command
+  //         this);
+  //   }
+  // }
 
   public Command ejectCoral() {
     return new StartEndCommand(

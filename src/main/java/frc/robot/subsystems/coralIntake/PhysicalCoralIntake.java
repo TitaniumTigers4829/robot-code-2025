@@ -3,12 +3,11 @@ package frc.robot.subsystems.coralIntake;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -19,11 +18,11 @@ import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFX coralIntakeMotor;
-  private final DigitalInput coralSensor;
-
-  private final Debouncer sensorDebouncer;
+  private final DigitalInput innerCoralSensor;
+  private final DigitalInput outerCoralSensor;
 
   private final VoltageOut voltageOut = new VoltageOut(0.0);
+  private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0.0);
 
   private final StatusSignal<AngularVelocity> intakeVelocity;
   private final StatusSignal<Current> intakeSupplyCurrent;
@@ -32,13 +31,13 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final StatusSignal<Temperature> intakeTemperatureCelsius;
   private final StatusSignal<Voltage> intakeAppliedVolts;
   private final StatusSignal<Double> intakeDutyCycle;
+  private final StatusSignal<Double> intakeReference;
   private final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
   public PhysicalCoralIntake() {
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
-    coralSensor = new DigitalInput(CoralIntakeConstants.CORAL_SENSOR_ID);
-
-    sensorDebouncer = new Debouncer(0.070, DebounceType.kRising);
+    innerCoralSensor = new DigitalInput(CoralIntakeConstants.CORAL_SENSOR_ID);
+    outerCoralSensor = new DigitalInput(0);
 
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -51,6 +50,14 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeConfig.CurrentLimits.SupplyCurrentLimitEnable =
         CoralIntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
+    intakeConfig.Slot0.kP = 0.3;
+    intakeConfig.Slot0.kS = 0.566927529597441;
+    intakeConfig.Slot0.kV = 0.098275156522801;
+    intakeConfig.Slot0.kA = 0.013968715343075;
+
+    intakeConfig.MotionMagic.MotionMagicCruiseVelocity = 50;
+    intakeConfig.MotionMagic.MotionMagicAcceleration = 150;
+
     coralIntakeMotor.getConfigurator().apply(intakeConfig);
 
     intakeVelocity = coralIntakeMotor.getVelocity();
@@ -60,6 +67,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeTemperatureCelsius = coralIntakeMotor.getDeviceTemp();
     intakeAppliedVolts = coralIntakeMotor.getMotorVoltage();
     intakeDutyCycle = coralIntakeMotor.getDutyCycle();
+    intakeReference = coralIntakeMotor.getClosedLoopReference();
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.RIO_SIGNAL_FREQUENCY,
         intakeVelocity,
@@ -70,13 +78,14 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
         intakeTemperatureCelsius,
         intakeTemperatureCelsius,
         intakeAppliedVolts,
-        intakeDutyCycle);
+        intakeDutyCycle,
+        intakeReference);
     coralIntakeMotor.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(CoralIntakeInputs intakeInputs) {
-    BaseStatusSignal.refreshAll(intakeVelocity);
+    BaseStatusSignal.refreshAll(intakeVelocity, intakeReference);
     intakeInputs.isMotorConnected =
         BaseStatusSignal.isAllGood(
             intakeVelocity,
@@ -85,23 +94,30 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
             intakeTemperatureCelsius,
             intakePosition,
             intakeAppliedVolts,
-            intakeDutyCycle);
-    intakeInputs.isSensorConnected =
-        coralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
+            intakeDutyCycle,
+            intakeReference);
+    intakeInputs.isInnerSensorConnected =
+        innerCoralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
     intakeInputs.intakeStatorCurrentAmps = intakeStatorCurrent.getValueAsDouble();
     intakeInputs.intakeTemp = intakeTemperatureCelsius.getValueAsDouble();
     intakeInputs.intakeAppliedVolts = intakeAppliedVolts.getValueAsDouble();
     intakeInputs.intakePosition = intakePosition.getValueAsDouble();
     intakeInputs.intakeSupplyCurrentAmps = intakeSupplyCurrent.getValueAsDouble();
-    intakeInputs.hasCoral =
-        sensorDebouncer.calculate(!coralSensor.get()); // true if coral is sensed
+    intakeInputs.hasCoral = !innerCoralSensor.get(); // true if coral is sensed
+    intakeInputs.hasControl = !outerCoralSensor.get();
     intakeInputs.intakeDutyCycle = intakeDutyCycle.getValueAsDouble();
+    intakeInputs.intakeReference = intakeReference.getValueAsDouble();
   }
 
   @Override
   public void setIntakeSpeed(double speed) {
     coralIntakeMotor.set(speed);
+  }
+
+  @Override
+  public void setIntakeVelocity(double velocity) {
+    coralIntakeMotor.setControl(velocityVoltage.withVelocity(velocity / 60.0));
   }
 
   @Override
@@ -113,5 +129,11 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   @Override
   public void setIntakeVoltage(double volts) {
     coralIntakeMotor.setControl(voltageOut.withOutput(volts));
+  }
+
+  @Override
+  public void setPID(double P) {
+    intakeConfig.Slot0.kP = P;
+    coralIntakeMotor.getConfigurator().apply(intakeConfig);
   }
 }

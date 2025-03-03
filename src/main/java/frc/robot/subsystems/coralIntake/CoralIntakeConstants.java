@@ -2,10 +2,12 @@ package frc.robot.subsystems.coralIntake;
 
 public final class CoralIntakeConstants {
   public static final int CORAL_INTAKE_MOTOR_ID = 30;
-  public static final int CORAL_SENSOR_ID = 0;
+  public static final int CORAL_SENSOR_ID = 3;
 
-  public static final double INTAKE_SPEED = 0.35;
-  public static final double EJECT_SPEED = 1.0;
+  public static final double WAITING_INTAKE_SPEED = 1500;
+  public static final double INTAKE_SPEED = 200;
+  public static final double EJECT_SPEED = 5000;
+  public static final double REVERSE_INTAKE_SPEED = -200;
 
   // the max amount of stator and supply current allowed in the motor, respectively
   public static final double INTAKE_STATOR_LIMIT = 80.0;
