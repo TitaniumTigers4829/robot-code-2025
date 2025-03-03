@@ -45,6 +45,26 @@ public class Autos {
   Trigger leftReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToLeftReef());
   Trigger rightReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToRightReef());
 
+  public AutoRoutine xOneMeterAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.X_ONE_METER_AUTO);
+    AutoTrajectory xOneMeterTrajectory = routine.trajectory(AutoConstants.X_ONE_METER_TRAJECTORY);
+    routine.active().onTrue(Commands.sequence(
+        autoFactory.resetOdometry(AutoConstants.X_ONE_METER_TRAJECTORY),
+        xOneMeterTrajectory.cmd()
+
+    ));
+    return routine;
+  }
+  public AutoRoutine yOneMeterAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.Y_ONE_METER_AUTO);
+    AutoTrajectory yOneMeterTrajectory = routine.trajectory(AutoConstants.Y_ONE_METER_TRAJECTORY);
+    routine.active().onTrue(Commands.sequence(
+        autoFactory.resetOdometry(AutoConstants.Y_ONE_METER_TRAJECTORY),
+        yOneMeterTrajectory.cmd()
+
+    ));
+    return routine;
+  }
   // Blue Auto Routines
   public AutoRoutine simpleRepulsorAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.SIMPLE_REPULSOR_AUTO);

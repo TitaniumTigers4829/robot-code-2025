@@ -493,7 +493,7 @@ public class Robot extends LoggedRobot {
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
-            false, // If alliance flipping should be enabled
+            true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
@@ -507,13 +507,18 @@ public class Robot extends LoggedRobot {
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
 
+        this.autoChooser.addRoutine(
+          AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
+          
     this.autoChooser.addRoutine(
-        AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
+      AutoConstants.X_ONE_METER_AUTO, () -> this.autos.simpleRepulsorAuto());
+      
+    this.autoChooser.addRoutine(
+      AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.simpleRepulsorAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
-
     this.autoChooser.addRoutine(
         AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
     // this.autoChooser.addRoutine(

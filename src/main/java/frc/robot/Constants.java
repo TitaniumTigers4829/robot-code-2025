@@ -329,10 +329,13 @@ public final class Constants {
   public static final class AutoConstants {
 
     // Different Pre-defined Auto Routines
+    public static final String Y_ONE_METER_AUTO = "Y-One-Meter-Test";
+    public static final String X_ONE_METER_AUTO = "X-One-Meter-Test";
     public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
     public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
     public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
     public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
+    public static final String TWO_CORAL_REPULSOR_AUTO = "Two-Coral-Repulsor-Auto";
     // This does not exist yet :(
 
     // All Trajectories are created on the blue alliance and are flipped in the code
@@ -368,6 +371,10 @@ public final class Constants {
     public static final String BLUE_LEFT_START_TO_I_TRAJECTORY = "BlueTrajectories/Left-Start-to-I";
     public static final String BLUE_LEFT_START_TO_H_TRAJECTORY = "BlueTrajectories/Left-Start-to-H";
     public static final String BLUE_LEFT_START_TO_J_TRAJECTORY = "BlueTrajectories/Left-Start-to-J";
+
+    // tuning 1 meter
+    public static final String X_ONE_METER_TRAJECTORY = "BlueTrajectories/X1METER";
+    public static final String Y_ONE_METER_TRAJECTORY = "BlueTrajectories/Y1METER";
 
     // Reef to Right Pickup
     public static final String BLUE_A_TO_RIGHT_PICKUP_TRAJECTORY =
@@ -434,7 +441,11 @@ public final class Constants {
     public static final String RED_TWO_CORAL_AUTO_ROUTINE = "Red-Two-Coral-Auto-Routine";
     public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
     public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
-
+    public static final Pose2d BLUE_LEFT_CORAL_STATION =
+        new Pose2d(
+            Units.inchesToMeters(33.51),
+            Units.inchesToMeters(25.8),
+            new Rotation2d(Units.degreesToRadians(54)));
     // Right Start
     public static final String RED_RIGHT_START_TO_E_TRAJECTORY = "RedTrajectories/Right-Start-to-E";
     public static final String RED_RIGHT_START_TO_F_TRAJECTORY = "RedTrajectories/Right-Start-to-F";
