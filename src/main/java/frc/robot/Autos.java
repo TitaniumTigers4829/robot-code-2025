@@ -4,7 +4,6 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -51,18 +50,17 @@ public class Autos {
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj =
-        routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
     AutoTrajectory eToPickupTraj =
-        routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToCTraj =
-        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_LEFT_PICKUP_TO_L_TRAJECTORY);
 
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
                 startToETraj.cmd()));
     startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
     eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
