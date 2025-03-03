@@ -22,7 +22,6 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
-import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
@@ -494,7 +493,7 @@ public class Robot extends LoggedRobot {
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
-            true, // If alliance flipping should be enabled
+            false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
@@ -507,17 +506,17 @@ public class Robot extends LoggedRobot {
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
 
     this.autoChooser.addRoutine(
         AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
+    // this.autoChooser.addRoutine(
+    // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
+    // this.autoChooser.addRoutine(
+    // AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
