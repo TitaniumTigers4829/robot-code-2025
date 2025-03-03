@@ -22,6 +22,7 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
@@ -493,7 +494,7 @@ public class Robot extends LoggedRobot {
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
-            false, // If alliance flipping should be enabled
+            true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
