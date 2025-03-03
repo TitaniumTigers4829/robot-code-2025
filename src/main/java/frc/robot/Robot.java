@@ -493,7 +493,7 @@ public class Robot extends LoggedRobot {
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
-            false, // If alliance flipping should be enabled
+            true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
