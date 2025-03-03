@@ -33,7 +33,7 @@ public class GetCoralFeedingStation extends Command {
     elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
     coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
     algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
-    if(coralIntakeSubsystem.hasCoral()){
+    if (coralIntakeSubsystem.hasCoral()) {
       coralIntakeSubsystem.setIntakeSpeed(0);
     }
   }

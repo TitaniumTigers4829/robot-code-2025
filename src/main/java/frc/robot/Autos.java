@@ -5,7 +5,6 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -82,7 +81,7 @@ public class Autos {
     startToETraj
         .done()
         .onTrue(
-            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+            new elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition())
                 .andThen(coralIntakeSubsystem.ejectCoral()));
 
     return routine;

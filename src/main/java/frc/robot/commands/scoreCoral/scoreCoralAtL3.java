@@ -8,10 +8,11 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class ScoreCoralAtL3 extends Command{
+public class ScoreCoralAtL3 extends Command {
   private final AlgaePivotSubsystem algaePivotSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
-  private final CoralIntakeSubsystem coralIntakeSubsystem;;
+  private final CoralIntakeSubsystem coralIntakeSubsystem;
+  ;
 
   public ScoreCoralAtL3(
       AlgaePivotSubsystem algaePivotSubsystem,
@@ -29,23 +30,23 @@ public class ScoreCoralAtL3 extends Command{
 
   @Override
   // Called every time the scheduler runs while the command is scheduled
-  public void execute(){
-    if(coralIntakeSubsystem.hasCoral()){
+  public void execute() {
+    if (coralIntakeSubsystem.hasCoral()) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L3_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L3_ANGLE);
-      if(elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L3_HEIGHT){
+      if (elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L3_HEIGHT) {
         coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
       }
     }
   }
 
-  public void end(boolean interrupted){
+  public void end(boolean interrupted) {
     elevatorSubsystem.setElevatorPosition(0);
     coralIntakeSubsystem.setIntakeSpeed(0);
     algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ANGLE_ZERO);
   }
 
-  public boolean isFinished(){
+  public boolean isFinished() {
     return false;
   }
 }
