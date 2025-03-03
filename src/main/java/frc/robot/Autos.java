@@ -46,6 +46,16 @@ public class Autos {
   Trigger rightReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToRightReef());
 
   // Blue Auto Routines
+  public AutoRoutine simpleRepulsorAuto() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.SIMPLE_REPULSOR_AUTO);
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                new RepulsorReef(swerveDrive, visionSubsystem, true),
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
+    return routine;
+  }
 
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);

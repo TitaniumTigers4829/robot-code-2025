@@ -332,6 +332,7 @@ public final class Constants {
     public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
     public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
     public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
+    public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
     // This does not exist yet :(
 
     // All Trajectories are created on the blue alliance and are flipped in the code
