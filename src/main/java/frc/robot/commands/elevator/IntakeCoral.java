@@ -23,6 +23,6 @@ public class IntakeCoral extends ParallelRaceGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-        new RunCommand(() -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED)));
+        new RunCommand(() -> coralIntakeSubsystem.intakeCoral()));
   }
 }
