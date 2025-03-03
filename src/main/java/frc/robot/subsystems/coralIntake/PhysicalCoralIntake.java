@@ -36,8 +36,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
 
   public PhysicalCoralIntake() {
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
-    innerCoralSensor = new DigitalInput(CoralIntakeConstants.CORAL_SENSOR_ID);
-    outerCoralSensor = new DigitalInput(0);
+    innerCoralSensor = new DigitalInput(CoralIntakeConstants.INNER_CORAL_SENSOR_ID);
+    outerCoralSensor = new DigitalInput(CoralIntakeConstants.OUTER_CORAL_SENSOR_ID);
 
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -50,13 +50,13 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeConfig.CurrentLimits.SupplyCurrentLimitEnable =
         CoralIntakeConstants.INTAKE_SUPPLY_LIMIT_ENABLE;
 
-    intakeConfig.Slot0.kP = 0.3;
-    intakeConfig.Slot0.kS = 0.566927529597441;
-    intakeConfig.Slot0.kV = 0.098275156522801;
-    intakeConfig.Slot0.kA = 0.013968715343075;
+    intakeConfig.Slot0.kP = CoralIntakeConstants.INTAKE_P;
+    intakeConfig.Slot0.kS = CoralIntakeConstants.INTAKE_S;
+    intakeConfig.Slot0.kV = CoralIntakeConstants.INTAKE_V;
+    intakeConfig.Slot0.kA = CoralIntakeConstants.INTAKE_A;
 
-    intakeConfig.MotionMagic.MotionMagicCruiseVelocity = 50;
-    intakeConfig.MotionMagic.MotionMagicAcceleration = 150;
+    intakeConfig.MotionMagic.MotionMagicCruiseVelocity = CoralIntakeConstants.INTAKE_CRUISE_VELOCITY;
+    intakeConfig.MotionMagic.MotionMagicAcceleration = CoralIntakeConstants.INTAKE_ACCELERATION;
 
     coralIntakeMotor.getConfigurator().apply(intakeConfig);
 
@@ -97,7 +97,9 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
             intakeDutyCycle,
             intakeReference);
     intakeInputs.isInnerSensorConnected =
-        innerCoralSensor.getChannel() == CoralIntakeConstants.CORAL_SENSOR_ID;
+        innerCoralSensor.getChannel() == CoralIntakeConstants.INNER_CORAL_SENSOR_ID;
+    intakeInputs.isOuterSensorConnected =
+        outerCoralSensor.getChannel() == CoralIntakeConstants.OUTER_CORAL_SENSOR_ID;
     intakeInputs.intakeVelocity = intakeVelocity.getValueAsDouble();
     intakeInputs.intakeStatorCurrentAmps = intakeStatorCurrent.getValueAsDouble();
     intakeInputs.intakeTemp = intakeTemperatureCelsius.getValueAsDouble();

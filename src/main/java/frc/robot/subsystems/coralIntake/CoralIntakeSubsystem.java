@@ -14,8 +14,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
 
-  // private static final LoggedTunableNumber intakeP = new LoggedTunableNumber("Intake/IntakeP");
-
   // States for the intake process
   public enum IntakeState {
     IDLE, // Chilling, not doing anything
@@ -31,7 +29,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
-    // intakeP.initDefault(0.0);
   }
 
   /**
@@ -86,8 +83,8 @@ public class CoralIntakeSubsystem extends SubsystemBase {
       case WAITING:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.WAITING_INTAKE_SPEED);
         if (currentlyHasControl && !usedToHaveControl) {
-          // Coral just got detected: start pulling it in
-          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INTAKE_SPEED + 500);
+          // Coral just got detected: start pushing it out
+          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INGEST_SPEED);
           currentState = IntakeState.INGESTING;
         }
         break;
@@ -103,34 +100,24 @@ public class CoralIntakeSubsystem extends SubsystemBase {
       case REVERSING:
         if (currentlyHasCoral && currentlyHasControl) {
           // Coral’s back in place: stop the motor
-          coralIntakeInterface.setIntakeVelocity(0);
+          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
           currentState = IntakeState.STOPPED;
         }
         break;
 
       case STOPPED:
-        // if (!usedToHaveCoral && !currentlyHasCoral) {
-        //   currentState = IntakeState.IDLE;
-        // }
+        coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
         break;
 
       case IDLE:
-        coralIntakeInterface.setIntakeVelocity(0.0);
+        coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
         // Waiting for the signal to start
         break;
-    }
-
-    if (usedToHaveCoral != currentlyHasCoral) {
-      Logger.recordOutput("Intake/hasCoral", "coral change detect");
     }
 
     // Remember the sensor state for next time
     usedToHaveCoral = currentlyHasCoral;
     usedToHaveControl = currentlyHasControl;
-
-    // if (intakeP.hasChanged(hashCode())) {
-    //   coralIntakeInterface.setPID(intakeP.get());
-    // }
   }
 
   public void setIntakeState(IntakeState state) {
