@@ -302,7 +302,7 @@ public class SwerveDrive extends SubsystemBase {
     double moveTheta =
         sample.omega
             + rotationChoreoController.calculate(
-                getOdometryAllianceRelativeRotation2d().getRadians(), sample.heading);
+                getOdometryRotation2d().getRadians(), sample.heading);
     drive(moveX, moveY, moveTheta, true);
   }
 
