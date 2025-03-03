@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -302,7 +303,7 @@ public class SwerveDrive extends SubsystemBase {
     double moveTheta =
         sample.omega
             + rotationChoreoController.calculate(
-                getOdometryRotation2d().getRadians(), sample.heading);
+                getEstimatedPose().getRotation().getRadians(), sample.heading);
     drive(moveX, moveY, moveTheta, true);
   }
 
@@ -602,17 +603,21 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Checks if the robot is within a certain distance of the reef.
    *
-   * @return a trigger that is true when the robot is within 0.5 meters of the reef.
+   * @return a trigger that is true when the robot is within 1 meter of the reef.
    */
-  public Trigger isReefInRange() {
-    return new Trigger(
-        () ->
-            getEstimatedPose()
-                    .getTranslation()
-                    .getDistance(
-                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                            .getTranslation())
-                < 0.5);
+  public boolean isReefInRange() {
+    return (getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                        .getTranslation())
+            <= 1
+        || getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                        .getTranslation())
+            <= 1);
   }
 
   public boolean isRobotAlignedToLeftReef() {

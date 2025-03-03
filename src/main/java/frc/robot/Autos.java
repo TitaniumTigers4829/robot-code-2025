@@ -3,13 +3,18 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
+import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -37,6 +42,7 @@ public class Autos {
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
   Trigger hasNoCoral = hasCoral.negate();
 
+  Trigger elevatorUpZone = new Trigger(() -> swerveDrive.isReefInRange());
   Trigger leftReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToLeftReef());
   Trigger rightReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToRightReef());
 
@@ -64,7 +70,10 @@ public class Autos {
     routine
         .anyDone(startToETraj, pickupToCTraj)
         .and(routine.observe(leftReefInRange).negate())
-        .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
+        .onTrue(
+            Commands.sequence(
+                new RepulsorReef(swerveDrive, visionSubsystem, true),
+                new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
@@ -74,8 +83,24 @@ public class Autos {
 
     routine
         .anyActive(eToPickupTraj)
-        .and(routine.observe(hasCoral))
+        .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(
+            Commands.sequence(
+                new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
+                new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", true))));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(
+            Commands.sequence(
+                new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
+                new RunCommand(
+                    () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
     return routine;
   }
 
@@ -118,6 +143,15 @@ public class Autos {
         .anyActive(eToPickupTraj, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -170,6 +204,14 @@ public class Autos {
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -206,6 +248,15 @@ public class Autos {
         .anyActive(eToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -248,6 +299,14 @@ public class Autos {
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -299,6 +358,14 @@ public class Autos {
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 }
