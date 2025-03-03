@@ -612,6 +612,24 @@ public class SwerveDrive extends SubsystemBase {
                 < 0.5);
   }
 
+  public boolean isRobotAlignedToLeftReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
+  public boolean isRobotAlignedToRightReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
   /**
    * Aligns the robot to the reef.
    *

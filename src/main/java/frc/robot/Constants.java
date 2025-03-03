@@ -508,7 +508,7 @@ public final class Constants {
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
-
+    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.45;
     // Choreo Drive Constants
     public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
     public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;

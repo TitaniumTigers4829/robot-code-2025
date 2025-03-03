@@ -381,7 +381,13 @@ public class Robot extends LoggedRobot {
             false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    this.autos = new Autos(autoFactory);
+    this.autos =
+        new Autos(
+            this.autoFactory,
+            this.elevatorSubsystem,
+            this.coralIntakeSubsystem,
+            this.swerveDrive,
+            this.visionSubsystem);
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
