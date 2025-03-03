@@ -6,7 +6,6 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
