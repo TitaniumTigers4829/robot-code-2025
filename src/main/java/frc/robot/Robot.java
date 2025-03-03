@@ -414,6 +414,7 @@ public class Robot extends LoggedRobot {
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
+        SmartDashboard.putBoolean("Coral", false);
       }
 
       default -> {

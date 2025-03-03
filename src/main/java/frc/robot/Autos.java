@@ -58,8 +58,8 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
@@ -71,6 +71,7 @@ public class Autos {
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+
     routine
         .anyActive(eToPickupTraj)
         .and(routine.observe(hasCoral))
@@ -98,16 +99,15 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     routine.anyDone(pickupToDTraj).onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-
     routine
         .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
         .and(routine.observe(hasCoral))
@@ -145,12 +145,12 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
-    pickupToDTraj.done().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
-    dToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
+    pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
+    dToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
@@ -190,8 +190,8 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
@@ -228,10 +228,10 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)
@@ -274,12 +274,12 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
-    pickupToDTraj.done().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
-    dToPickupTraj.done().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
+    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
+    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
+    pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
+    dToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
 
     routine
         .anyDone(startToETraj, pickupToCTraj)

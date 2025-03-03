@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.coralIntake;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,7 +39,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {
-    return coralIntakeInputs.hasCoral;
+    return SmartDashboard.getBoolean("Coral", true);
   }
 
   public void intakeCoral(double speed) {
