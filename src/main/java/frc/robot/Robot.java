@@ -35,6 +35,7 @@ import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
@@ -94,6 +95,8 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
+  private boolean isElevatorZeroed;
+
   public Robot() {
     checkGit();
     setupLogging();
@@ -130,6 +133,14 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     SmartDashboard.putBoolean("Trajectory Done", false);
+
+    // if (isElevatorZeroed == false) {
+    //   Commands.sequence(
+    //       Commands.run(() -> elevatorSubsystem.setVolts(-2.0)).withTimeout(0.5),
+    //       new InstantCommand(() -> elevatorSubsystem.resetPosition(0.0)),
+    //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
+    //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
+    // }
     swerveDrive.resetEstimatedPose(
         new Pose2d(
             swerveDrive.getEstimatedPose().getX(),
@@ -146,6 +157,14 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+
+    // if (isElevatorZeroed == false) {
+    //   Commands.sequence(
+    //       Commands.run(() -> elevatorSubsystem.setVolts(-2.0)).withTimeout(0.5),
+    //       new InstantCommand(() -> elevatorSubsystem.resetPosition(0.0)),
+    //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
+    //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
+    // }
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDriverController();
     configureOperatorController();
@@ -259,8 +278,10 @@ public class Robot extends LoggedRobot {
         .leftTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
-                () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
+                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                () ->
+                    coralIntakeSubsystem.setIntakeVelocity(
+                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                 coralIntakeSubsystem));
 
     operatorController
@@ -268,9 +289,10 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.sequence(
                 elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
                 Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
-                    () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
                     coralIntakeSubsystem)));
 
     operatorController
@@ -279,6 +301,14 @@ public class Robot extends LoggedRobot {
     operatorController
         .povDown()
         .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
+
+    operatorController
+        .povRight()
+        .whileTrue(
+            Commands.runEnd(
+                () -> coralIntakeSubsystem.setIntakeVelocity(2000),
+                () -> coralIntakeSubsystem.setIntakeVelocity(0.0),
+                coralIntakeSubsystem));
 
     // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
     // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
@@ -337,6 +367,11 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+  }
+
+  @Override
+  public void robotInit() {
+    isElevatorZeroed = false;
   }
 
   private void setupSubsystems() {

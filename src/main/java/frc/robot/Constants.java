@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
   private static RobotType robotType = RobotType.SIM_ROBOT;
+
   public static final boolean tuningMode = true;
 
   /**
@@ -86,7 +87,7 @@ public final class Constants {
   public static final class HardwareConstants {
     public static final double LOOP_TIME_SECONDS = 0.02;
 
-    public static final double RIO_SIGNAL_FREQUENCY = 100;
+    public static final double RIO_SIGNAL_FREQUENCY = 50;
     public static final double CANIVORE_SIGNAL_FREQUENCY = 250;
 
     public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
