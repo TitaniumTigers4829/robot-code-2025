@@ -328,7 +328,6 @@ public final class Constants {
   public static final class AutoConstants {
 
     // Different Pre-defined Auto Routines
-    public static final String BLUE_ONE_METER_AUTO_ROUTINE = "Blue-One-Meter-Auto-Routine";
     public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
     public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
     public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
@@ -348,7 +347,6 @@ public final class Constants {
     //  Right     \-----------------------|
 
     // Example 1 Meter Trajectory
-    public static final String BLUE_ONE_METER_TRAJECTORY = "BlueTrajectories/ONEMETERRRR";
 
     // Right Start
     public static final String BLUE_RIGHT_START_TO_E_TRAJECTORY =
@@ -431,13 +429,9 @@ public final class Constants {
         "BlueTrajectories/Left-Pickup-to-B";
 
     // Different Pre-defined Auto Routines
-    public static final String RED_ONE_METER_AUTO_ROUTINE = "Red-One-Meter-Auto-Routine";
     public static final String RED_TWO_CORAL_AUTO_ROUTINE = "Red-Two-Coral-Auto-Routine";
     public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
     public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
-
-    // Example 1 Meter Trajectory
-    public static final String RED_ONE_METER_TRAJECTORY = "RedTrajectories/ONEMETERRRR";
 
     // Right Start
     public static final String RED_RIGHT_START_TO_E_TRAJECTORY = "RedTrajectories/Right-Start-to-E";
@@ -510,37 +504,32 @@ public final class Constants {
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
-
     public static final double AUTO_ALIGN_TRANSLATION_P = 4;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
 
-    public static final double MAX_AUTO_SPEED = 3.805;
-    public static final double MAX_AUTO_ACCELERATION = 14.715;
+    // Choreo Drive Constants
+    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
+    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
 
-    public static final double CHOREO_AUTO_X_TRANSLATION_P = 10;
-    public static final double CHOREO_AUTO_X_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_X_TRANSLATION_D = 0.25;
-    public static final double CHOREO_AUTO_Y_TRANSLATION_P = 10;
-    public static final double CHOREO_AUTO_Y_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_Y_TRANSLATION_D = 0.25;
+    public static final double CHOREO_AUTO_TRANSLATION_P = 10;
+    public static final double CHOREO_AUTO_TRANSLATION_I = 0;
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.25;
+
     public static final double CHOREO_AUTO_THETA_P = 7.5;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS = 0.0005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS = 0.001;
+
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
-        new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
+        new TrapezoidProfile.Constraints(
+            MAX_AUTO_SPEED_METERS_PER_SECOND, MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
-
-    public static final double CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE = 0.0005;
-    public static final double CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE = 0.0005;
-
-    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.001;
-
-    // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);

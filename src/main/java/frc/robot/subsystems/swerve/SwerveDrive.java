@@ -45,15 +45,15 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final ProfiledPIDController xChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_X_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_X_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_X_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController yChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_Y_TRANSLATION_D,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
@@ -131,9 +131,12 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE);
-    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE);
-    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
+    xChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    yChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    rotationChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -307,11 +310,11 @@ public class SwerveDrive extends SubsystemBase {
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
     return swerveSample.x - xChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_X_TRANSLATION_TOLERANCE
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
         && swerveSample.y - yChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_Y_TRANSLATION_TOLERANCE
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
         && swerveSample.heading - rotationChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE;
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS;
   }
 
   /** Runs the SwerveModules periodic methods */

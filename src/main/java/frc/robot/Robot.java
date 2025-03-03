@@ -22,7 +22,6 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ScoreL4;
-import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
@@ -385,16 +384,12 @@ public class Robot extends LoggedRobot {
     this.autos = new Autos(autoFactory);
 
     this.autoChooser.addRoutine(
-        AutoConstants.BLUE_ONE_METER_AUTO_ROUTINE, () -> this.autos.blueOneMeterTestAutoRoutine());
-    this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
 
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_ONE_METER_AUTO_ROUTINE, () -> this.autos.redOneMeterTestAutoRoutine());
     this.autoChooser.addRoutine(
         AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
     this.autoChooser.addRoutine(

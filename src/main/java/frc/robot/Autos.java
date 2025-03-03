@@ -3,33 +3,29 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.commands.elevator.IntakeCoral;
+import frc.robot.commands.elevator.ScoreL4;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 public class Autos {
   private final AutoFactory autoFactory;
+  private ElevatorSubsystem elevatorSubsystem;
+  private CoralIntakeSubsystem coralIntakeSubsystem;
+  Trigger isCoralScored = new Trigger(() -> !coralIntakeSubsystem.hasCoral());
+  Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
 
   public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.coralIntakeSubsystem = coralIntakeSubsystem;
+  
   }
 
   // Blue Auto Routines
-  public AutoRoutine blueOneMeterTestAutoRoutine() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_ONE_METER_AUTO_ROUTINE);
-    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.BLUE_ONE_METER_TRAJECTORY);
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.BLUE_ONE_METER_TRAJECTORY),
-                oneMeterTrajectory.cmd()));
-    oneMeterTrajectory
-        .done()
-        .onTrue(new RunCommand(() -> SmartDashboard.putBoolean("Trajectory Done", true)));
-    return routine;
-  }
 
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
@@ -40,16 +36,23 @@ public class Autos {
         routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToCTraj =
         routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
-
+    
+        
     routine
         .active()
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-
+                startToETraj.done().onTrue(eToPickupTraj.cmd());
+                eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+          
+    routine
+        .anyDone(startToETraj, pickupToCTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
 
@@ -66,18 +69,24 @@ public class Autos {
         routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToDTraj =
         routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
-
+    
     routine
         .active()
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
-
+                startToETraj.done().onTrue(eToPickupTraj.cmd());
+                eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+                pickupToCTraj.done().and(hasCoral).onTrue(cToPickupTraj.cmd());
+                cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
+               
+    routine
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj, cToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
 
@@ -98,7 +107,7 @@ public class Autos {
         routine.trajectory(AutoConstants.BLUE_D_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToBTraj =
         routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_B_TRAJECTORY);
-
+    
     routine
         .active()
         .onTrue(
@@ -106,30 +115,23 @@ public class Autos {
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
     startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
-    pickupToDTraj.done().onTrue(dToPickupTraj.cmd());
-    dToPickupTraj.done().onTrue(pickupToBTraj.cmd());
+    eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+    pickupToCTraj.done().and(hasCoral).onTrue(cToPickupTraj.cmd());
+    cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
+    pickupToDTraj.done().and(hasCoral).onTrue(dToPickupTraj.cmd());
+    dToPickupTraj.done().and(isCoralScored).onTrue(pickupToBTraj.cmd());
+
+    routine
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
   }
 
   // Red Auto Routines
-  public AutoRoutine redOneMeterTestAutoRoutine() {
-    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_ONE_METER_AUTO_ROUTINE);
-    AutoTrajectory oneMeterTrajectory = routine.trajectory(AutoConstants.RED_ONE_METER_TRAJECTORY);
-    routine
-        .active()
-        .onTrue(
-            Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RED_ONE_METER_TRAJECTORY),
-                oneMeterTrajectory.cmd()));
-    oneMeterTrajectory
-        .done()
-        .onTrue(new RunCommand(() -> SmartDashboard.putBoolean("Trajectory Done", true)));
-    return routine;
-  }
 
   public AutoRoutine redTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE);
@@ -139,16 +141,22 @@ public class Autos {
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToCTraj =
         routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
-
+    
     routine
         .active()
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-
+                startToETraj.done().onTrue(eToPickupTraj.cmd());
+                eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+             
+    routine
+        .anyDone(startToETraj, pickupToCTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
 
@@ -164,17 +172,25 @@ public class Autos {
         routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToDTraj =
         routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_D_TRAJECTORY);
-
+    
+        
     routine
         .active()
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
+                startToETraj.done().onTrue(eToPickupTraj.cmd());
+                eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+                pickupToCTraj.done().and(hasCoral).onTrue(cToPickupTraj.cmd());
+                cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
+             
+    routine
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj, cToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
   }
@@ -202,12 +218,20 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToETraj.cmd()));
-    startToETraj.done().onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.done().onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.done().onTrue(cToPickupTraj.cmd());
-    cToPickupTraj.done().onTrue(pickupToDTraj.cmd());
-    pickupToDTraj.done().onTrue(dToPickupTraj.cmd());
-    dToPickupTraj.done().onTrue(pickupToBTraj.cmd());
+                startToETraj.done().onTrue(eToPickupTraj.cmd());
+                eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
+                pickupToCTraj.done().and(hasCoral).onTrue(cToPickupTraj.cmd());
+                cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
+                pickupToDTraj.done().and(hasCoral).onTrue(dToPickupTraj.cmd());
+                dToPickupTraj.done().and(isCoralScored).onTrue(pickupToBTraj.cmd());
+            
+
+    routine
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
   }
