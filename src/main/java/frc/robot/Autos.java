@@ -10,21 +10,25 @@ import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.swerve.SwerveDrive;
 
 public class Autos {
   private final AutoFactory autoFactory;
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
-  Trigger isCoralScored = new Trigger(() -> !coralIntakeSubsystem.hasCoral());
-  Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
+  private SwerveDrive swerveDrive;
 
   public Autos(AutoFactory autoFactory) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
+    this.swerveDrive = swerveDrive;
   
   }
 
+  Trigger isCoralScored = new Trigger(() -> !coralIntakeSubsystem.hasCoral());
+  Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
+  Trigger reefInRange =  swerveDrive.isReefInRange();
   // Blue Auto Routines
 
   public AutoRoutine blueTwoCoralAuto() {
@@ -48,10 +52,10 @@ public class Autos {
                 eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
           
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToETraj, pickupToCTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj)
+        .anyActive(eToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
@@ -82,10 +86,10 @@ public class Autos {
                 cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
                
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj)
+        .anyActive(eToPickupTraj, cToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
@@ -122,10 +126,10 @@ public class Autos {
     dToPickupTraj.done().and(isCoralScored).onTrue(pickupToBTraj.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
@@ -152,10 +156,10 @@ public class Autos {
                 eToPickupTraj.done().and(this.isCoralScored).onTrue(pickupToCTraj.cmd());
              
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToETraj, pickupToCTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj)
+        .anyActive(eToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
     return routine;
   }
@@ -186,10 +190,10 @@ public class Autos {
                 cToPickupTraj.done().and(isCoralScored).onTrue(pickupToDTraj.cmd());
              
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj)
+        .anyActive(eToPickupTraj, cToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
@@ -227,10 +231,10 @@ public class Autos {
             
 
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj).and(reefInRange)
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj).and(isCoralScored)
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
     return routine;
