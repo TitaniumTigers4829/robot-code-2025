@@ -41,6 +41,8 @@ public class PhysicalVision implements VisionInterface {
   /** The thread manager for the vision threads */
   private final ThreadManager threadManager = new ThreadManager(Limelight.values().length);
 
+  private final boolean[] isMegatag2 = new boolean[Limelight.values().length];
+
   public PhysicalVision() {
     limelightEstimates = new AtomicReferenceArray<>(Limelight.values().length);
     for (Limelight limelight : Limelight.values()) {
@@ -75,6 +77,8 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
       inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+
+      inputs.isMegaTag2[limelight.getId()] = isMegatag2[limelight.getId()];
     }
   }
 
@@ -155,11 +159,14 @@ public class PhysicalVision implements VisionInterface {
                 > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
+      isMegatag2[limelight.getId()] = true;
     } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
+      isMegatag2[limelight.getId()] = false;
     } else {
       limelightEstimates.set(limelight.getId(), new MegatagPoseEstimate());
+      isMegatag2[limelight.getId()] = false;
     }
   }
 
@@ -174,6 +181,7 @@ public class PhysicalVision implements VisionInterface {
 
     limelightEstimates.set(
         limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1PoseEstimate));
+    isMegatag2[limelight.getId()] = false;
   }
 
   /**
@@ -257,26 +265,23 @@ public class PhysicalVision implements VisionInterface {
     threadManager.shutdownAllThreads();
   }
 
+  private int iteration = 0;
+
   private void updateIMUMode(Limelight limelight) {
+    iteration++;
     if (limelight.hasInternalIMU()) {
       if (DriverStation.isEnabled()) {
         // Enable internal IMU for better pose accuracy when enabled
-        TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
+        if (iteration % 20 == 0) {
+          TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
+        } else {
+          TigerHelpers.setIMUMode(limelight.getName(), IMUMode.INTERNAL_EXTERNAL_ASSISTED);
+        }
         TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.ENABLED_THROTTLE);
-        limelightEstimates.set(
-            limelight.getId(),
-            MegatagPoseEstimate.fromLimelight(
-                TigerHelpers.getBotPoseEstimate(
-                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
       } else {
         // Disable internal IMU when robot is disabled
         TigerHelpers.setIMUMode(limelight.getName(), IMUMode.EXTERNAL_IMU_SEED_INTERNAL);
         TigerHelpers.setLimelightThrottle(limelight.getName(), VisionConstants.DISABLED_THROTTLE);
-        limelightEstimates.set(
-            limelight.getId(),
-            MegatagPoseEstimate.fromLimelight(
-                TigerHelpers.getBotPoseEstimate(
-                    limelight.getName(), TigerHelpers.Botpose.BLUE_MEGATAG2)));
       }
     }
   }
