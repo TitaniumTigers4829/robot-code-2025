@@ -50,10 +50,10 @@ public class Autos {
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.BLUE_LEFT_PICKUP_TO_L_TRAJECTORY);
 
     routine
@@ -61,12 +61,12 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .and(routine.observe(leftReefInRange).negate())
         .onTrue(
             Commands.sequence(
@@ -74,13 +74,13 @@ public class Autos {
                 new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     routine
-        .anyActive(eToPickupTraj)
+        .anyActive(jToPickupTrajectory)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
@@ -105,11 +105,11 @@ public class Autos {
   public AutoRoutine blueThreeCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj =
+    AutoTrajectory startToJTrajectory =
         routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
     AutoTrajectory cToPickupTraj =
         routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
@@ -121,24 +121,24 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     routine.anyDone(pickupToDTraj).onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj)
+        .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
@@ -156,11 +156,11 @@ public class Autos {
   public AutoRoutine blueFourCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj =
+    AutoTrajectory startToJTrajectory =
         routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY);
     AutoTrajectory cToPickupTraj =
         routine.trajectory(AutoConstants.BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY);
@@ -176,29 +176,29 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
     pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
     dToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     routine
         .anyDone(pickupToDTraj, pickupToBTraj)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
 
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
@@ -218,10 +218,10 @@ public class Autos {
   public AutoRoutine redTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
 
     routine
@@ -229,21 +229,21 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj)
+        .anyActive(jToPickupTrajectory)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
@@ -261,10 +261,10 @@ public class Autos {
   public AutoRoutine redThreeCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
     AutoTrajectory cToPickupTraj =
         routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
@@ -276,24 +276,24 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     routine.anyDone(pickupToDTraj).onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
 
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj)
+        .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
@@ -311,10 +311,10 @@ public class Autos {
   public AutoRoutine redFourCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToETraj = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
-    AutoTrajectory eToPickupTraj =
+    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
-    AutoTrajectory pickupToCTraj =
+    AutoTrajectory pickupToLTrajectory =
         routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
     AutoTrajectory cToPickupTraj =
         routine.trajectory(AutoConstants.RED_C_TO_RIGHT_PICKUP_TRAJECTORY);
@@ -330,29 +330,29 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
-                startToETraj.cmd()));
-    startToETraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(eToPickupTraj.cmd());
-    eToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToCTraj.cmd());
-    pickupToCTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
+                startToJTrajectory.cmd()));
+    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
     pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
     dToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToBTraj.cmd());
 
     routine
-        .anyDone(startToETraj, pickupToCTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
     routine
         .anyDone(pickupToDTraj, pickupToBTraj)
         .onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
 
     routine
-        .anyDone(startToETraj, pickupToCTraj, pickupToDTraj, pickupToBTraj)
+        .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
         .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
 
     routine
-        .anyActive(eToPickupTraj, cToPickupTraj, dToPickupTraj)
+        .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
         .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
 
