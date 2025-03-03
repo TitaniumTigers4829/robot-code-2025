@@ -55,7 +55,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeConfig.Slot0.kV = CoralIntakeConstants.INTAKE_V;
     intakeConfig.Slot0.kA = CoralIntakeConstants.INTAKE_A;
 
-    intakeConfig.MotionMagic.MotionMagicCruiseVelocity = CoralIntakeConstants.INTAKE_CRUISE_VELOCITY;
+    intakeConfig.MotionMagic.MotionMagicCruiseVelocity =
+        CoralIntakeConstants.INTAKE_CRUISE_VELOCITY;
     intakeConfig.MotionMagic.MotionMagicAcceleration = CoralIntakeConstants.INTAKE_ACCELERATION;
 
     coralIntakeMotor.getConfigurator().apply(intakeConfig);

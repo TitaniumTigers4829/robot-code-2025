@@ -280,7 +280,9 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             Commands.runEnd(
                 () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                () ->
+                    coralIntakeSubsystem.setIntakeVelocity(
+                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                 coralIntakeSubsystem));
 
     operatorController
