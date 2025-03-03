@@ -50,7 +50,8 @@ public class Autos {
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
@@ -62,8 +63,14 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
 
     routine
         .anyDone(startToJTrajectory, pickupToLTrajectory)
@@ -122,8 +129,14 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
     pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
@@ -177,8 +190,14 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
     pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
     pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
@@ -218,20 +237,27 @@ public class Autos {
   public AutoRoutine redTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.RED_LEFT_START_TO_J_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
-        routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
+        routine.trajectory(AutoConstants.RED_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
-        routine.trajectory(AutoConstants.RED_RIGHT_PICKUP_TO_C_TRAJECTORY);
+        routine.trajectory(AutoConstants.RED_LEFT_PICKUP_TO_L_TRAJECTORY);
 
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.RED_LEFT_START_TO_J_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
 
     routine
         .anyDone(startToJTrajectory, pickupToLTrajectory)
@@ -261,7 +287,8 @@ public class Autos {
   public AutoRoutine redThreeCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
@@ -277,8 +304,14 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
     pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
 
@@ -311,7 +344,8 @@ public class Autos {
   public AutoRoutine redFourCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory = routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
@@ -331,8 +365,14 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
     pickupToLTrajectory.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(cToPickupTraj.cmd());
     cToPickupTraj.recentlyDone().and(routine.observe(hasCoral)).onTrue(pickupToDTraj.cmd());
     pickupToDTraj.recentlyDone().and(routine.observe(hasNoCoral)).onTrue(dToPickupTraj.cmd());
