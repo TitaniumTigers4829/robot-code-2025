@@ -12,7 +12,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private LEDProcess process;
 
-  private boolean isRed;
+  public static boolean isRed;
 
   /** Creates a new LEDSubsystemImpl with the port in LEDConstants. */
   public LEDSubsystem() {

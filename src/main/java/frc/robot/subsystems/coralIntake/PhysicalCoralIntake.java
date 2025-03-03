@@ -15,11 +15,15 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
+import frc.robot.subsystems.leds.LEDSubsystem;
 
 public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFX coralIntakeMotor;
   private final DigitalInput coralSensor;
+  private final LEDSubsystem ledSubsystem;
 
   private final Debouncer sensorDebouncer;
 
@@ -35,6 +39,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
   public PhysicalCoralIntake() {
+    ledSubsystem = new LEDSubsystem();
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
     coralSensor = new DigitalInput(0);
 
@@ -95,6 +100,9 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeInputs.hasCoral =
         sensorDebouncer.calculate(!coralSensor.get()); // true if coral is sensed
     intakeInputs.intakeDutyCycle = intakeDutyCycle.getValueAsDouble();
+    if (intakeInputs.hasCoral) {
+        ledSubsystem.setProcess(LEDProcess.GREEN);
+    }
   }
 
   @Override
