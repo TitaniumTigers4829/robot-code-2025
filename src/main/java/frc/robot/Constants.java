@@ -8,9 +8,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
 
-  public static final boolean tuningMode = true;
+  public static final boolean tuningMode = false;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -528,11 +528,11 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 10;
+    public static final double CHOREO_AUTO_TRANSLATION_P = 20.0;
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0.25;
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
 
-    public static final double CHOREO_AUTO_THETA_P = 7.5;
+    public static final double CHOREO_AUTO_THETA_P = 7.0;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 
