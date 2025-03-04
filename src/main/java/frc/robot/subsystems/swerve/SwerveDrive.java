@@ -17,7 +17,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Robot;
 import frc.robot.extras.logging.Tracer;
@@ -72,8 +71,8 @@ public class SwerveDrive extends SubsystemBase {
   private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
   private final PIDController headingController = new PIDController(10, 0, 0);
 
-  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
+  // private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
+  // private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -136,6 +135,7 @@ public class SwerveDrive extends SubsystemBase {
     rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -528,18 +528,18 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
-  /**
-   * Checks if the robot is within a certain distance of a setpoint.
-   *
-   * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
-   */
-  public Trigger isAtSetpoint() {
-    return new Trigger(
-        () ->
-            Math.abs(headingController.getError()) < 0.5
-                && (Math.abs(xSetpointController.getError()) < 0.08
-                    || Math.abs(ySetpointController.getError()) < 0.08));
-  }
+  // /**
+  //  * Checks if the robot is within a certain distance of a setpoint.
+  //  *
+  //  * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
+  //  */
+  // public Trigger isAtSetpoint() {
+  //   return new Trigger(
+  //       () ->
+  //           Math.abs(headingController.getError()) < 0.5
+  //               && (Math.abs(xSetpointController.getError()) < 0.08
+  //                   || Math.abs(ySetpointController.getError()) < 0.08));
+  // }
 
   /**
    * Follows a repulsor field to a goal.
@@ -547,9 +547,9 @@ public class SwerveDrive extends SubsystemBase {
    * @param goal the goal to follow the repulsor field to.
    */
   public void followRepulsorField(Pose2d goal) {
-    xController.reset();
-    yController.reset();
-    headingController.reset();
+    // xController.reset();
+    // yController.reset();
+    // headingController.reset();
 
     Logger.recordOutput("Repulsor/Goal", goal);
 
@@ -561,8 +561,8 @@ public class SwerveDrive extends SubsystemBase {
     RepulsorSample sample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .8,
-            1.5);
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .9,
+            1.25);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0.0);
     ChassisSpeeds feedback =
@@ -596,16 +596,17 @@ public class SwerveDrive extends SubsystemBase {
    *
    * @return a trigger that is true when the robot is within 0.5 meters of the reef.
    */
-  public Trigger isReefInRange() {
-    return new Trigger(
-        () ->
-            getEstimatedPose()
-                    .getTranslation()
-                    .getDistance(
-                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                            .getTranslation())
-                < 0.5);
-  }
+  // public Trigger isReefInRange() {
+  //   return new Trigger(
+  //       () ->
+  //           getEstimatedPose()
+  //                   .getTranslation()
+  //                   .getDistance(
+  //                       ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(),
+  // true)
+  //                           .getTranslation())
+  //               < 0.5);
+  // }
 
   /**
    * Aligns the robot to the reef.
