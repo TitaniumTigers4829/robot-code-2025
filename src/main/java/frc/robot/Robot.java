@@ -196,7 +196,7 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.leftBumper().getAsBoolean());
+            () -> driverController.rightStick().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -244,6 +244,17 @@ public class Robot extends LoggedRobot {
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
+    operatorController
+        .povRight()
+        .whileTrue(
+            Commands.runEnd(
+                () ->
+                    coralIntakeSubsystem.setIntakeVelocity(
+                        CoralIntakeConstants.REVERSE_INTAKE_SPEED),
+                () ->
+                    coralIntakeSubsystem.setIntakeVelocity(
+                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                coralIntakeSubsystem));
     // operatorController
     //     .x()
     //     .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY() * 0.6));
