@@ -1,9 +1,9 @@
 package frc.robot.extras.vision;
 
+import com.titaniumtigers4829.data.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import java.nio.ByteBuffer;
 
 /**
@@ -87,18 +87,18 @@ public class MegatagPoseEstimate implements StructSerializable {
 
   public static MegatagPoseEstimate fromLimelight(PoseEstimate poseEstimate) {
     MegatagPoseEstimate rv = new MegatagPoseEstimate();
-    rv.fieldToCamera = poseEstimate.pose;
+    rv.fieldToCamera = poseEstimate.pose();
     if (rv.fieldToCamera == null) rv.fieldToCamera = Pose2d.kZero;
-    rv.timestampSeconds = poseEstimate.timestampSeconds;
-    rv.latency = poseEstimate.latency;
-    rv.avgTagArea = poseEstimate.avgTagArea;
-    rv.avgTagDist = poseEstimate.avgTagDist;
-    rv.tagCount = poseEstimate.tagCount;
-    rv.fiducialIds = new int[poseEstimate.rawFiducials.length];
+    rv.timestampSeconds = poseEstimate.timestampSeconds();
+    rv.latency = poseEstimate.latency();
+    rv.avgTagArea = poseEstimate.avgTagArea();
+    rv.avgTagDist = poseEstimate.avgTagDist();
+    rv.tagCount = poseEstimate.tagCount();
+    rv.fiducialIds = new int[poseEstimate.rawFiducials().length];
     rv.ambiguity = 0.0;
     for (int i = 0; i < rv.fiducialIds.length; ++i) {
-      rv.fiducialIds[i] = poseEstimate.rawFiducials[i].id;
-      rv.ambiguity = poseEstimate.rawFiducials[i].ambiguity;
+      rv.fiducialIds[i] = poseEstimate.rawFiducials()[i].id();
+      rv.ambiguity = poseEstimate.rawFiducials()[i].ambiguity();
     }
 
     return rv;

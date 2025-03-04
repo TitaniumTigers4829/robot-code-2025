@@ -1,5 +1,10 @@
 package frc.robot.subsystems.vision;
 
+import com.titaniumtigers4829.TigerHelpers;
+import com.titaniumtigers4829.data.IMUData.IMUMode;
+import com.titaniumtigers4829.data.PoseEstimate;
+import com.titaniumtigers4829.data.PoseEstimate.Botpose;
+import com.titaniumtigers4829.utils.NTUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -8,10 +13,6 @@ import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.extras.util.Pose2dMovingAverageFilter;
 import frc.robot.extras.util.ThreadManager;
 import frc.robot.extras.vision.MegatagPoseEstimate;
-import frc.robot.extras.vision.TigerHelpers;
-import frc.robot.extras.vision.TigerHelpers.Botpose;
-import frc.robot.extras.vision.TigerHelpers.IMUMode;
-import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -75,8 +76,8 @@ public class PhysicalVision implements VisionInterface {
 
       inputs.limelightCalculatedPoses[limelight.getId()] = getPoseFromAprilTags(limelight);
 
-      inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose;
-      inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose;
+      inputs.megatag1PoseEstimates[limelight.getId()] = getMegaTag1PoseEstimate(limelight).pose();
+      inputs.megatag2PoseEstimates[limelight.getId()] = getMegaTag2PoseEstimate(limelight).pose();
 
       inputs.isMegaTag2[limelight.getId()] = isMegatag2[limelight.getId()];
     }
@@ -153,14 +154,14 @@ public class PhysicalVision implements VisionInterface {
                 limelight,
                 VisionConstants.MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD,
                 VisionConstants.MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD,
-                megatag1Estimate.pose,
-                megatag2Estimate.pose)
+                megatag1Estimate.pose(),
+                megatag2Estimate.pose())
             || getLimelightAprilTagDistance(limelight)
                 > VisionConstants.MEGA_TAG_2_DISTANCE_THRESHOLD)) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag2Estimate));
       isMegatag2[limelight.getId()] = true;
-    } else if (isWithinFieldBounds(megatag1Estimate.pose)) {
+    } else if (isWithinFieldBounds(megatag1Estimate.pose())) {
       limelightEstimates.set(
           limelight.getId(), MegatagPoseEstimate.fromLimelight(megatag1Estimate));
       isMegatag2[limelight.getId()] = false;
@@ -248,7 +249,7 @@ public class PhysicalVision implements VisionInterface {
    * @return True if the limelight is connected
    */
   public boolean isLimelightConnected(Limelight limelight) {
-    return TigerHelpers.getLimelightNetworkTable(limelight.getName()).containsKey("tv");
+    return NTUtils.getLimelightNetworkTable(limelight.getName()).containsKey("tv");
   }
 
   /**
