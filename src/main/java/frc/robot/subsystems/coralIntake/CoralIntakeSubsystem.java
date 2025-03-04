@@ -7,14 +7,19 @@ package frc.robot.subsystems.coralIntake;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.leds.LEDSubsystem;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
+
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
+  private LEDSubsystem ledSubsystem;
 
-  public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
+  public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface, LEDSubsystem ledSubsystem) {
     this.coralIntakeInterface = coralIntakeInterface;
+    this.ledSubsystem = ledSubsystem;
   }
 
   /**
@@ -59,7 +64,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     if (!this.hasCoral()) {
       return new StartEndCommand(
           // sets speed while command is active
-          () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
+          () -> {
+            this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+            ledSubsystem.setProcess(LEDProcess.ORANGE);
+          },
           // sets speed when command ends
           () -> this.setIntakeSpeed(0),
           // requirements for command
@@ -78,7 +86,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   public Command ejectCoral() {
     return new StartEndCommand(
         // sets speed while command is active
-        () -> this.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
+        () -> {
+          this.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
+          ledSubsystem.setProcess(LEDProcess.PURPLE);
+        },
         // sets speed when command ends
         () -> this.setIntakeSpeed(0),
         // requirements for command

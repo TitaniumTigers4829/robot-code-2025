@@ -62,6 +62,8 @@ public final class LEDConstants {
     REVERSE_INTAKE(SparkConstants.RED, 0, 255, 0),
     FINISH_LINE_UP(SparkConstants.GREEN, 255, 255, 255),
     GREEN(SparkConstants.GREEN, 0, 255, 0),
+    PURPLE(SparkConstants.PURPLE, 160, 32, 240),
+    ORANGE(SparkConstants.ORANGE, 255, 165, 0),
     RED(SparkConstants.RED, 255, 0, 0),
     INTAKE(SparkConstants.RED, 255, 0, 0),
     NOTE_IN(SparkConstants.GREEN, 0, 255, 0),

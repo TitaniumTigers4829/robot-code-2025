@@ -15,7 +15,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
