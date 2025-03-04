@@ -22,7 +22,6 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
-import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
@@ -48,7 +47,6 @@ import frc.robot.subsystems.funnelPivot.FunnelPivotInterface;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.funnelPivot.PhysicalFunnelPivot;
 import frc.robot.subsystems.funnelPivot.SimulatedFunnelPivot;
-import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -103,7 +101,7 @@ public class Robot extends LoggedRobot {
     checkGit();
     setupLogging();
     setupSubsystems();
-    // setupAuto();
+    setupAuto();
   }
 
   /** This function is called periodically during all modes. */
@@ -134,6 +132,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    SmartDashboard.putBoolean("Trajectory Done", false);
 
     // if (isElevatorZeroed == false) {
     //   Commands.sequence(
@@ -461,6 +460,7 @@ public class Robot extends LoggedRobot {
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
+        SmartDashboard.putBoolean("Coral", false);
       }
 
       default -> {
@@ -483,37 +483,57 @@ public class Robot extends LoggedRobot {
         this.simWorld = null;
       }
     }
-    ledSubsystem.setProcess(LEDProcess.DEFAULT);
+    // ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
   private void setupAuto() {
+    SmartDashboard.putBoolean("Trajectory Done", false);
+
     this.autoChooser = new AutoChooser();
     // this sets up the auto factory
     this.autoFactory =
         new AutoFactory(
-            this.swerveDrive::getEstimatedPose, // A function that returns the current robot pose
-            this.swerveDrive
-                ::resetEstimatedPose, // A function that resets the current robot pose to the
+            () ->
+                this.swerveDrive
+                    .getEstimatedPose(), // A function that returns the current robot pose
+            (Pose2d pose) ->
+                this.swerveDrive.resetEstimatedPose(
+                    pose), // A function that resets the current robot pose to the
             (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followCommand =
+              FollowSwerveSampleCommand followSwerveSampleCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
-              followCommand.execute();
-              if (this.swerveDrive.isTrajectoryFinished(sample)) {
-                followCommand.cancel();
-              }
+              followSwerveSampleCommand.execute();
             }, // A function that follows a choreo trajectory
-            AllianceFlipper.isRed(), // If alliance flipping should be enabled
+            true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
         new Autos(
-            autoFactory, swerveDrive, visionSubsystem, elevatorSubsystem, coralIntakeSubsystem);
+            this.autoFactory,
+            this.elevatorSubsystem,
+            this.coralIntakeSubsystem,
+            this.swerveDrive,
+            this.visionSubsystem);
 
-    this.autoChooser.addRoutine("Example Auto", () -> this.autos.exampleAutoRoutine());
     this.autoChooser.addRoutine(
-        AutoConstants.ONE_METER_AUTO_ROUTINE, () -> this.autos.oneMeterTestAutoRoutine());
+        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
+
     this.autoChooser.addRoutine(
-        AutoConstants.ONE_CORAL_AUTO_ROUTINE, () -> this.autos.oneCoralAutoRoutine());
+        AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
+
+    this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
+
+    this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+    // this.autoChooser.addRoutine(
+    // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
+    // this.autoChooser.addRoutine(
+    // AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
     // This updates the auto chooser
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
