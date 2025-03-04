@@ -197,7 +197,7 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.button(10).getAsBoolean());
+            () -> driverController.rightStick().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
