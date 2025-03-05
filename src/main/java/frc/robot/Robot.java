@@ -515,8 +515,6 @@ public class Robot extends LoggedRobot {
             this.swerveDrive,
             this.visionSubsystem);
 
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
 
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
@@ -529,7 +527,16 @@ public class Robot extends LoggedRobot {
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
     this.autoChooser.addRoutine(
-        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+      AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
+
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
+        this.autoChooser.addRoutine(
+          AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
+    
+        this.autoChooser.addRoutine(
+            AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+    
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
     // this.autoChooser.addRoutine(
