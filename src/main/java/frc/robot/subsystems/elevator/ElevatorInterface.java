@@ -35,6 +35,8 @@ public interface ElevatorInterface {
     return 0.0;
   }
 
+  public default void enableLimits(boolean forward, boolean reverse) {}
+
   public default void openLoop(double output) {}
 
   public default void setPID(double kP, double kI, double kD) {}
