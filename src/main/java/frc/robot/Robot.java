@@ -139,16 +139,10 @@ public class Robot extends LoggedRobot {
     //   Commands.sequence(
     //       Commands.run(() -> elevatorSubsystem.setVolts(-2.0)).withTimeout(0.5),
     //       new InstantCommand(() -> elevatorSubsystem.resetPosition(0.0)),
-    //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
+    // new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
     //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
     // }
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    visionSubsystem.setOdometryInfo(
-        swerveDrive.getOdometryRotation2d().getDegrees(), 0, swerveDrive.getEstimatedPose());
+
   }
 
   /** This function is called periodically during autonomous. */
@@ -168,7 +162,7 @@ public class Robot extends LoggedRobot {
     // }
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDriverController();
-    configureOperatorController();
+    // configureOperatorController();
   }
 
   private void configureDriverController() {
@@ -251,7 +245,7 @@ public class Robot extends LoggedRobot {
             Commands.runEnd(
                 () ->
                     coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.REVERSE_INTAKE_SPEED),
+                        -CoralIntakeConstants.REVERSE_INTAKE_SPEED),
                 () ->
                     coralIntakeSubsystem.setIntakeVelocity(
                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
@@ -318,7 +312,7 @@ public class Robot extends LoggedRobot {
         .povRight()
         .whileTrue(
             Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(2000),
+                () -> coralIntakeSubsystem.setIntakeVelocity(-2000),
                 () -> coralIntakeSubsystem.setIntakeVelocity(0.0),
                 coralIntakeSubsystem));
 
