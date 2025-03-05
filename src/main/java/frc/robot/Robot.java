@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
@@ -141,13 +140,6 @@ public class Robot extends LoggedRobot {
     //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
     //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
     // }
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    visionSubsystem.setOdometryInfo(
-        swerveDrive.getOdometryRotation2d().getDegrees(), 0, swerveDrive.getEstimatedPose());
   }
 
   /** This function is called periodically during autonomous. */
@@ -211,19 +203,34 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
-    // Reset robot odometry based on the most recent vision pose measurement from april tags
-    // This should be pressed when looking at an april tag
     driverController
-        .povLeft()
-        .onTrue(
-            new InstantCommand(
-                () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+        .leftTrigger()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                    coralIntakeSubsystem)));
 
-    // FieldConstants has all reef poses
     driverController
         .rightTrigger()
-        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
+        .whileTrue(
+            Commands.runEnd(
+                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                () ->
+                    coralIntakeSubsystem.setIntakeVelocity(
+                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                coralIntakeSubsystem));
+
+    // Reset robot odometry based on the most recent vision pose measurement from april tags
+    // This should be pressed when looking at an april tag
+    // driverController
+    //     .povLeft()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
   }
 
   private void configureOperatorController() {
@@ -240,7 +247,10 @@ public class Robot extends LoggedRobot {
     // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
         .rightBumper()
-        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
+        .whileTrue(
+            elevatorSubsystem
+                .manualElevator(() -> operatorController.getLeftY())
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
@@ -255,15 +265,6 @@ public class Robot extends LoggedRobot {
                     coralIntakeSubsystem.setIntakeVelocity(
                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                 coralIntakeSubsystem));
-    // operatorController
-    //     .x()
-    //     .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY() * 0.6));
-    // operatorController
-    //     .y()
-    //     .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
-    // operatorController
-    //     .a()
-    //     .whileTrue(new RunCommand(() -> funnelSubsystem.setFunnelAngle(8.0), funnelSubsystem));
     /* Uncomment below to score the coral with controller, this scores with auto align
      * and I'm pretty sure it doesn't work well yet. (idk)
      *
@@ -271,19 +272,27 @@ public class Robot extends LoggedRobot {
      */
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
 
     operatorController
         .x()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
 
     operatorController
         .b()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
+                .onlyIf((() -> coralIntakeSubsystem.isIntakeComplete())));
 
     operatorController
         .y()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
 
     operatorController
         .leftTrigger()
@@ -296,37 +305,11 @@ public class Robot extends LoggedRobot {
                 coralIntakeSubsystem));
 
     operatorController
-        .leftBumper()
-        .whileTrue(
-            Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
-
-    operatorController
         .povUp()
         .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
     operatorController
         .povDown()
         .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
-
-    operatorController
-        .povRight()
-        .whileTrue(
-            Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(2000),
-                () -> coralIntakeSubsystem.setIntakeVelocity(0.0),
-                coralIntakeSubsystem));
-
-    // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
-    // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
-    // scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {

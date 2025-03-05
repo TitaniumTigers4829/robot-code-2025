@@ -16,8 +16,8 @@ import org.littletonrobotics.junction.Logger;
 public final class ReefLocations {
   private ReefLocations() {}
 
-  private static final Pose2d[] BLUE_POSES;
-  private static final Pose2d[] RED_POSES;
+  public static final Pose2d[] BLUE_POSES;
+  public static final Pose2d[] RED_POSES;
 
   public static final Translation2d BLUE_REEF;
   public static final Translation2d RED_REEF;

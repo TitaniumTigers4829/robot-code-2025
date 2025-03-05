@@ -66,6 +66,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return currentState == IntakeState.STOPPED;
   }
 
+  public boolean isIntakeIdle() {
+    return currentState == IntakeState.IDLE;
+  }
+
   @Override
   public void periodic() {
     coralIntakeInterface.updateInputs(coralIntakeInputs);
