@@ -6,8 +6,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.extras.math.mathutils.GearRatio;
 import frc.robot.extras.util.DCMotorExt;
-import frc.robot.extras.util.GearRatio;
 import frc.robot.sim.configs.SimGyroConfig;
 import frc.robot.sim.configs.SimMechanismConfig;
 import frc.robot.sim.configs.SimSwerveConfig;
@@ -78,7 +78,7 @@ public class SimWorld {
 
   /** Constructs a new simulation world. */
   public SimWorld() {
-    arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.TIMEOUT_S), 5);
+    arena = new ReefscapeSimArena(Seconds.of(HardwareConstants.LOOP_TIME_SECONDS), 5);
     simRobot = new SimRobot<>(arena, "User", swerveConfig, 1);
 
     aprilTagSim = new VisionSystemSim("AprilTags");

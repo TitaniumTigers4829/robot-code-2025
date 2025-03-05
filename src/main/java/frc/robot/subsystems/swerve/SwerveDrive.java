@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,14 +16,18 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.extras.setpointGen.SwerveSetpoint;
-import frc.robot.extras.setpointGen.SwerveSetpointGenerator;
+import frc.robot.Robot;
+import frc.robot.extras.logging.Tracer;
+import frc.robot.extras.swerve.RepulsorFieldPlanner;
+import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
+import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.TimeUtil;
-import frc.robot.extras.util.Tracer;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
@@ -62,11 +67,20 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModulePosition[] lastModulePositions;
   private final SwerveDrivePoseEstimator poseEstimator;
 
+  private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
+
+  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(10, 0, 0);
+
+  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
+  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
+
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
           DriveConstants.MODULE_TRANSLATIONS,
-          DCMotor.getKrakenX60(1).withReduction(ModuleConstants.DRIVE_GEAR_RATIO),
-          DCMotor.getFalcon500(1).withReduction(1),
+          DCMotor.getFalcon500(1).withReduction(ModuleConstants.DRIVE_GEAR_RATIO),
+          DCMotor.getFalcon500(1).withReduction(ModuleConstants.TURN_GEAR_RATIO),
           60,
           58,
           7,
@@ -79,14 +93,6 @@ public class SwerveDrive extends SubsystemBase {
 
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
-
-  private final Timer inactiveTimer = new Timer();
-
-  private boolean isMoving; // Tracks if the robot is moving
-
-  private double lastMovementTime = inactiveTimer.get(); // Time of the last movement
-
-  private static final long INACTIVITY_THRESHOLD = 3000; // 3 seconds in milliseconds
 
   public SwerveDrive(
       GyroInterface gyroIO,
@@ -126,9 +132,12 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
+    xChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    yChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    rotationChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -161,16 +170,37 @@ public class SwerveDrive extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
     setpoint =
-        setpointGenerator.generateSetpoint(setpoint, desiredSpeeds, HardwareConstants.TIMEOUT_S);
+        setpointGenerator.generateSimpleSetpoint(
+            setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
   }
 
-  /*
-   * Updates the pose estimator with the pose calculated from the april tags. How much it
-   * contributes to the pose estimation is set by setPoseEstimatorVisionConfidence.
+  public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
+    drive(
+        speeds.vxMetersPerSecond,
+        speeds.vyMetersPerSecond,
+        speeds.omegaRadiansPerSecond,
+        fieldRelative);
+  }
+
+  public ChassisSpeeds getChassisSpeeds() {
+    return setpoint.chassisSpeeds();
+  }
+
+  public void drive(ChassisSpeeds speeds) {
+    drive(
+        -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond, false);
+  }
+
+  /**
+   * Allows PID on the chassis rotation.
    *
+   * @param speeds The ChassisSpeeds of the drive to set.
+   * @param rotationControl The control on the drive rotatio /* Updates the pose estimator with the
+   *     pose calculated from the april tags. How much it contributes to the pose estimation is set
+   *     by setPoseEstimatorVisionConfidence.
    * @param visionMeasurement The pose calculated from the april tags
    * @param currentTimeStampSeconds The time stamp in seconds of when the pose from the april tags
    *     was calculated.
@@ -197,12 +227,45 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Runs characterization on voltage
    *
-   * @param volts voltage to set
+   * @param volts current to set
    */
-  public void runCharacterization(double volts) {
+  public void runCharacterizationVoltage(double volts) {
     for (SwerveModule module : swerveModules) {
       module.setVoltage(Volts.of(-volts));
     }
+  }
+
+  /**
+   * Runs characterization on current
+   *
+   * @param amps current to set
+   */
+  public void runCharacterizationCurrent(double amps) {
+    for (SwerveModule module : swerveModules) {
+      module.setCurrent(Amps.of(-amps));
+    }
+  }
+
+  /**
+   * @param omegaspeed Controls the rotation speed of the drivetrain for characterization.
+   */
+  public void runWheelRadiusCharacterization(double omegaspeed) {
+    drive(0, 0, omegaspeed, false);
+  }
+
+  /**
+   * Gets the wheel radiues characterization position
+   *
+   * @return returns the averaged wheel positions.
+   */
+  public double[] getWheelRadiusCharacterizationPosition() {
+    double[] wheelPositions = new double[swerveModules.length];
+
+    // Iterate over all the swerve modules, get their positions and add them to the array
+    for (SwerveModule module : swerveModules) {
+      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
+    }
+    return wheelPositions;
   }
 
   /**
@@ -234,23 +297,25 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
-    if (sample != null) {
-      Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
-      double moveTheta =
-          -sample.omega
-              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
-      drive(moveX, moveY, moveTheta, true);
-    }
+    double moveX = sample.vx + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
+    double moveY = sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
+    double moveTheta =
+        sample.omega
+            + rotationChoreoController.calculate(
+                getOdometryRotation2d().getRadians(), sample.heading);
+    drive(-moveX, -moveY, -moveTheta, true);
   }
 
   /**
    * @return if the robot is at the desired swerveSample
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xChoreoController.getGoal().position
-        && swerveSample.y < yChoreoController.getGoal().position;
+    return swerveSample.x - xChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
+        && swerveSample.y - yChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
+        && swerveSample.heading - rotationChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS;
   }
 
   /** Runs the SwerveModules periodic methods */
@@ -383,14 +448,7 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
-  // Check if the robot has been inactive for 3 seconds
-  public boolean isThreeSecsInactive() {
-    if (!isMoving && System.currentTimeMillis() - lastMovementTime >= INACTIVITY_THRESHOLD) {
-      return true; // 3 seconds of inactivity
-    }
-    return false; // Still moving or not enough time passed
-  }
-
+  /** Sets the modules to form an X stance. */
   public void setXStance() {
     Rotation2d[] swerveHeadings = new Rotation2d[swerveModules.length];
     for (int i = 0; i < 4; i++) {
@@ -413,7 +471,7 @@ public class SwerveDrive extends SubsystemBase {
         moduleDeltas = getModulesDelta(modulePositions);
 
     // If the gyro is connected, use the gyro rotation. If not, use the calculated rotation from the
-    // // modules.
+    // modules.
     if (gyroInputs.isConnected) {
       rawGyroRotation = getGyroRotation2d();
     } else {
@@ -476,5 +534,117 @@ public class SwerveDrive extends SubsystemBase {
    */
   public void resetEstimatedPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  /**
+   * Checks if the robot is within a certain distance of a setpoint.
+   *
+   * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
+   */
+  public Trigger isAtSetpoint() {
+    return new Trigger(
+        () ->
+            Math.abs(headingController.getError()) < 0.5
+                && (Math.abs(xSetpointController.getError()) < 0.08
+                    || Math.abs(ySetpointController.getError()) < 0.08));
+  }
+
+  /**
+   * Follows a repulsor field to a goal.
+   *
+   * @param goal the goal to follow the repulsor field to.
+   */
+  public void followRepulsorField(Pose2d goal) {
+    xController.reset();
+    yController.reset();
+    headingController.reset();
+
+    Logger.recordOutput("Repulsor/Goal", goal);
+
+    // Sets the goal of the repulsor
+    repulsorFieldPlanner.setGoal(goal.getTranslation());
+
+    // Samples the repulsor field using the current position, max speed, and distance at which to
+    // slow down. This is used with the goal pose to calculate motion towards a setpoint.
+    RepulsorSample sample =
+        repulsorFieldPlanner.sampleField(
+            poseEstimator.getEstimatedPosition().getTranslation(),
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .8,
+            1.5);
+
+    ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0.0);
+    ChassisSpeeds feedback =
+        new ChassisSpeeds(
+            xController.calculate(
+                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+            yController.calculate(
+                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+            headingController.calculate(
+                poseEstimator.getEstimatedPosition().getRotation().getRadians(),
+                goal.getRotation().getRadians()));
+
+    Logger.recordOutput("Repulsor/Error", goal.minus(poseEstimator.getEstimatedPosition()));
+    Logger.recordOutput("Repulsor/Feedforward", feedforward);
+    Logger.recordOutput("Repulsor/Feedback", feedback);
+
+    Logger.recordOutput("Repulsor/Vector field", repulsorFieldPlanner.getArrows());
+
+    ChassisSpeeds outputFieldRelative = feedforward.plus(feedback);
+    ChassisSpeeds outputRobotRelative =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
+
+    outputRobotRelative =
+        Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
+    drive(outputRobotRelative, false);
+  }
+
+  /**
+   * Checks if the robot is within a certain distance of the reef.
+   *
+   * @return a trigger that is true when the robot is within 1 meter of the reef.
+   */
+  public boolean isReefInRange() {
+    return (getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                        .getTranslation())
+            <= 1
+        || getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                        .getTranslation())
+            <= 1);
+  }
+
+  public boolean isRobotAlignedToLeftReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
+  public boolean isRobotAlignedToRightReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
+  /**
+   * Aligns the robot to the reef.
+   *
+   * @param left whether to align to the left or right reef.
+   */
+  public void reefAlign(Boolean left) {
+    followRepulsorField(
+        ReefLocations.getSelectedLocation(
+            poseEstimator.getEstimatedPosition().getTranslation(), left));
   }
 }
