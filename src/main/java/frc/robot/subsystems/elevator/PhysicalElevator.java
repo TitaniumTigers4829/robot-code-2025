@@ -172,7 +172,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
   @Override
   public double getVolts() {
-    return leaderAppliedVoltage.getValueAsDouble();
+    return followerAppliedVoltage.getValueAsDouble();
   }
 
   @Override

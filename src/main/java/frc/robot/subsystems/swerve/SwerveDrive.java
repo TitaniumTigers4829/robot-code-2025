@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -72,9 +73,9 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(2.5, 0, 0);
+  private final PIDController xController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(8, 0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -252,7 +253,7 @@ public class SwerveDrive extends SubsystemBase {
 
     // Iterate over all the swerve modules, get their positions and add them to the array
     for (SwerveModule module : swerveModules) {
-      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
+      wheelPositions[swerveModules.length - 1] = module.getDrivePositionRadians();
     }
     return wheelPositions;
   }
@@ -610,10 +611,16 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            xController.calculate(
-                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-            yController.calculate(
-                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+            MathUtil.clamp(
+                xController.calculate(
+                    poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+                0,
+                3),
+            MathUtil.clamp(
+                yController.calculate(
+                    poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+                0,
+                3),
             headingController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));

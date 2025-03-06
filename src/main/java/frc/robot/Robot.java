@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.characterization.WheelRadiusCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
@@ -174,6 +176,20 @@ public class Robot extends LoggedRobot {
                   driverController::getLeftX, driverController::getLeftY, 3)[0]
         };
 
+    // driverController
+    //     .a()
+    //     .whileTrue(
+    //         new FeedForwardCharacterization(
+    //             swerveDrive,
+    //             swerveDrive::runCharacterizationCurrent,
+    //             swerveDrive::getCharacterizationVelocity));
+    driverController
+        .a()
+        .whileTrue(
+            new WheelRadiusCharacterization(
+                swerveDrive,
+                frc.robot.commands.characterization.WheelRadiusCharacterization.Direction
+                    .CLOCKWISE));
     // DRIVER BUTTONS
     Command driveCommand =
         new DriveCommand(
