@@ -97,6 +97,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.resetElevatorPosition(position);
   }
 
+  public void enableLimits(boolean forward, boolean reverse) {
+    elevatorInterface.enableLimits(forward, reverse);
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);
