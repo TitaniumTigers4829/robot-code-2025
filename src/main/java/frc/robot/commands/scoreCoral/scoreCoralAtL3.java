@@ -3,7 +3,6 @@ package frc.robot.commands.scoreCoral;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.algaePivot.AlgaePivotConstants;
 import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
-import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -39,7 +38,7 @@ public class ScoreCoralAtL3 extends Command {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L3_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L3_ANGLE);
       if (elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L3_HEIGHT) {
-        coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED);
+        coralIntakeSubsystem.ejectCoral();
       }
     }
   }

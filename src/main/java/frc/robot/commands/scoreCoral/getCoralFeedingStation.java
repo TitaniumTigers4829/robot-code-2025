@@ -36,10 +36,10 @@ public class GetCoralFeedingStation extends Command {
   public void execute() {
     if(swerveModule.getDrivePositionMeters() == SwerveConstants.FEEDING_STATION_POSITION){
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
-      coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+      coralIntakeSubsystem.intakeCoral();
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
       if (coralIntakeSubsystem.hasCoral()) {
-        coralIntakeSubsystem.setIntakeSpeed(0);
+        coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.WAITING_INTAKE_SPEED);
       }
     }
     

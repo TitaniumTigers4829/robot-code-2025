@@ -29,6 +29,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
+
+    if (currentState == IntakeState.IDLE) {
+      currentState = IntakeState.WAITING;
+      usedToHaveCoral = hasCoral(); // Set the starting sensor state
+      usedToHaveControl = hasControl();
+    }
   }
 
   /**
@@ -47,14 +53,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    */
   public boolean hasCoral() {
     return SmartDashboard.getBoolean("Coral", true);
-  }
-
-  public void intakeCoral() {
-    if (currentState == IntakeState.IDLE) {
-      currentState = IntakeState.WAITING;
-      usedToHaveCoral = hasCoral(); // Set the starting sensor state
-      usedToHaveControl = hasControl();
-    }
   }
 
   public boolean hasControl() {
@@ -132,25 +130,25 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.setIntakeVelocity(velocity);
   }
 
-  // public Command intakeCoral() {
-  //   if (!this.hasCoral()) {
-  //     return new StartEndCommand(
-  //         // sets speed while command is active
-  //         () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
-  //         // sets speed when command ends
-  //         () -> this.setIntakeSpeed(0),
-  //         // requirements for command
-  //         this);
-  //   } else {
-  //     return new StartEndCommand(
-  //         // sets speed while command is active
-  //         () -> this.setIntakeSpeed(0.0),
-  //         // sets speed when command ends
-  //         () -> this.setIntakeSpeed(0),
-  //         // requirements for command
-  //         this);
-  //   }
-  // }
+  public Command intakeCoral() {
+    if (!this.hasCoral()) {
+      return new StartEndCommand(
+          // sets speed while command is active
+          () -> this.setIntakeSpeed(CoralIntakeConstants.INGEST_SPEED),
+          // sets speed when command ends
+          () -> this.setIntakeSpeed(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+          // requirements for command
+          this);
+    } else {
+      return new StartEndCommand(
+          // sets speed while command is active
+          () -> this.setIntakeSpeed(CoralIntakeConstants.WAITING_INTAKE_SPEED),
+          // sets speed when command ends
+          () -> this.setIntakeSpeed(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+          // requirements for command
+          this);
+    }
+  }
 
   public Command ejectCoral() {
     return new StartEndCommand(

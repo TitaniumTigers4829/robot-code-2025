@@ -36,11 +36,13 @@ import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
 import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
+import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -310,13 +312,6 @@ public class Robot extends LoggedRobot {
                 () -> coralIntakeSubsystem.setIntakeVelocity(2000),
                 () -> coralIntakeSubsystem.setIntakeVelocity(0.0),
                 coralIntakeSubsystem));
-
-    // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
-    // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
-    // scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
@@ -503,7 +498,7 @@ public class Robot extends LoggedRobot {
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,
-            this.visionSubsystem);
+            this.visionSubsystem, algaePivotSubsystem);
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());

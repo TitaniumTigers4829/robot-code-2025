@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -20,18 +22,20 @@ public class Autos {
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private SwerveDrive swerveDrive;
   private VisionSubsystem visionSubsystem;
+  private AlgaePivotSubsystem algaePivotSubsystem;
 
   public Autos(
       AutoFactory autoFactory,
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem, AlgaePivotSubsystem algaePivotSubsystem) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
+    this.algaePivotSubsystem = algaePivotSubsystem;
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -76,7 +80,7 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 new RepulsorReef(swerveDrive, visionSubsystem, true),
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
+                new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
 
@@ -187,21 +191,21 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -253,21 +257,21 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -306,20 +310,20 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
     routine
         .anyActive(jToPickupTrajectory)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -363,20 +367,20 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -428,21 +432,21 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 }
