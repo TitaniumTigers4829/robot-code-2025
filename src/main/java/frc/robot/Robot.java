@@ -93,7 +93,8 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean shouldAlignReef, shouldAlignSource = false;
+  private boolean shouldAlignSource = true;
+  private boolean shouldAlignReef = false;
 
   public Robot() {
     checkGit();
@@ -236,11 +237,11 @@ public class Robot extends LoggedRobot {
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
-    // driverController
-    //     .povLeft()
-    //     .onTrue(
-    //         new InstantCommand(
-    //             () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+    driverController
+        .povLeft()
+        .onTrue(
+            new InstantCommand(
+                () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
   }
 
   private void configureOperatorController() {
@@ -249,9 +250,9 @@ public class Robot extends LoggedRobot {
     operatorController
         .rightBumper()
         .whileTrue(
-            elevatorSubsystem
-                .manualElevator(() -> operatorController.getLeftY())
-                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
+            elevatorSubsystem.manualElevator(() -> operatorController.getLeftY())
+            // .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
+            );
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));

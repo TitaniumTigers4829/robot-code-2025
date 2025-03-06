@@ -92,11 +92,11 @@ public class PhysicalElevator implements ElevatorInterface {
     leaderDutyCycle = leaderMotor.getDutyCycle();
     leaderStatorCurrent = leaderMotor.getStatorCurrent();
     followerStatorCurrent = followerMotor.getStatorCurrent();
-    elevatorReference = leaderMotor.getClosedLoopReference();
+    elevatorReference = followerMotor.getClosedLoopReference();
     leaderVelocity = leaderMotor.getVelocity();
     elevatorError =
-        leaderMotor.getClosedLoopReference().getValueAsDouble()
-            - leaderMotor.getPosition().getValueAsDouble();
+        followerMotor.getClosedLoopReference().getValueAsDouble()
+            - followerMotor.getPosition().getValueAsDouble();
     leaderTemp = leaderMotor.getDeviceTemp();
     followerTemp = followerMotor.getDeviceTemp();
 
@@ -155,7 +155,7 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getElevatorPosition() {
     leaderPosition.refresh();
     followerPosition.refresh();
-    return leaderPosition.getValueAsDouble();
+    return followerPosition.getValueAsDouble();
   }
 
   @Override

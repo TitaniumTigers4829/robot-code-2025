@@ -89,7 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public boolean isAtSetpoint(double position) {
-    return Math.abs(position - inputs.leaderMotorPosition)
+    return Math.abs(position - inputs.followerMotorPosition)
         < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
   }
 

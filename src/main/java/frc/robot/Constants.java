@@ -8,7 +8,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
+  private static RobotType robotType = RobotType.DEV_ROBOT;
 
   public static final boolean tuningMode = false;
 
@@ -523,16 +523,16 @@ public final class Constants {
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
     public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.1;
     // Choreo Drive Constants
-    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
-    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
+    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 4.5;
+    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.25;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 20.0;
+    public static final double CHOREO_AUTO_TRANSLATION_P = 1.25;
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
 
-    public static final double CHOREO_AUTO_THETA_P = 7.0;
+    public static final double CHOREO_AUTO_THETA_P = 3.0;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 

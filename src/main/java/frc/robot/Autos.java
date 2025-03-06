@@ -3,7 +3,9 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
@@ -99,55 +101,57 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    startToJTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    Logger.recordOutput("one thingy", startToJTrajectory.getRawTrajectory().getPoses());
-    // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
-    // // startToJTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(pickupToLTrajectory.cmd());
+    // startToJTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
 
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(leftReefInRange).negate())
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new RepulsorReef(swerveDrive, visionSubsystem, true),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
+    Logger.recordOutput("Trajectories/Traj1", startToJTrajectory.getRawTrajectory().getPoses());
+    Logger.recordOutput("Trajectories/Traj2", jToPickupTrajectory.getRawTrajectory().getPoses());
+    Logger.recordOutput("Trajectories/Traj3", pickupToLTrajectory.getRawTrajectory().getPoses());
 
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(hasCoral))
-    //     .and(routine.observe(leftReefInRange))
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
+    startToJTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasNoCoral))
+        .onTrue(jToPickupTrajectory.cmd());
+    jToPickupTrajectory
+        .recentlyDone()
+        .and(routine.observe(hasCoral))
+        .onTrue(pickupToLTrajectory.cmd());
 
-    // routine
-    //     .anyActive(jToPickupTrajectory)
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
+        .and(routine.observe(leftReefInRange).negate())
+        .onTrue(
+            Commands.sequence(
+                new RepulsorReef(swerveDrive, visionSubsystem, true),
+                new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
 
-    // routine
-    //     .observe(elevatorUpZone)
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger",
-    // true))));
-    // routine
-    //     .observe(elevatorUpZone.negate())
-    //     .or(routine.observe(hasNoCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem,
-    // ElevatorSetpoints.FEEDER.getPosition()),
-    //             new RunCommand(
-    //                 () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
+    routine
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
+        .and(routine.observe(hasCoral))
+        .and(routine.observe(rightReefInRange))
+        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+
+    routine
+        .anyActive(jToPickupTrajectory)
+        .and(routine.observe(hasNoCoral))
+        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(
+            Commands.sequence(
+                new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
+                new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", true))));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(
+            Commands.sequence(
+                new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
+                new RunCommand(
+                    () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
     return routine;
   }
 

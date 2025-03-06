@@ -74,7 +74,7 @@ public class SwerveDrive extends SubsystemBase {
 
   private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
   private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(10, 0, 0);
+  private final PIDController headingController = new PIDController(2.5, 0, 0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -641,7 +641,7 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative, false);
+    drive(outputRobotRelative.unaryMinus(), false);
   }
 
   /**
