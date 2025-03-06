@@ -511,17 +511,17 @@ public final class Constants {
 
     // Auto Align Constants
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
-    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
-    public static final double AUTO_ALIGN_ROTATION_P = 10.0;
+    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = .5;
+    public static final double AUTO_ALIGN_ROTATION_P = 13.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 6;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
-    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.1;
+    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.01;
     // Choreo Drive Constants
     public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
     public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;

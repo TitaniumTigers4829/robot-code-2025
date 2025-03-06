@@ -140,6 +140,7 @@ public class SwerveDrive extends SubsystemBase {
         AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
