@@ -3,6 +3,7 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,7 +18,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Robot;
@@ -69,12 +69,9 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(10, 0, 0);
-
-  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
+  private final PIDController xController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(8, 0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -264,7 +261,7 @@ public class SwerveDrive extends SubsystemBase {
 
     // Iterate over all the swerve modules, get their positions and add them to the array
     for (SwerveModule module : swerveModules) {
-      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
+      wheelPositions[swerveModules.length - 1] = module.getDrivePositionRadians();
     }
     return wheelPositions;
   }
@@ -538,19 +535,6 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * Checks if the robot is within a certain distance of a setpoint.
-   *
-   * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
-   */
-  public Trigger isAtSetpoint() {
-    return new Trigger(
-        () ->
-            Math.abs(headingController.getError()) < 0.5
-                && (Math.abs(xSetpointController.getError()) < 0.08
-                    || Math.abs(ySetpointController.getError()) < 0.08));
-  }
-
-  /**
    * Follows a repulsor field to a goal.
    *
    * @param goal the goal to follow the repulsor field to.
@@ -576,10 +560,16 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0.0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            xController.calculate(
-                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-            yController.calculate(
-                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+            MathUtil.clamp(
+                xController.calculate(
+                    poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+                0,
+                3),
+            MathUtil.clamp(
+                yController.calculate(
+                    poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+                0,
+                3),
             headingController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));

@@ -178,13 +178,13 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_ROTATIONS_PER_SECOND = 30;
     public static final double MAX_ANGULAR_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED = 24;
 
-    public static final double DRIVE_P = .345; // .85
+    public static final double DRIVE_P = 6.0;
     public static final double DRIVE_I = 0.0;
     public static final double DRIVE_D = 0.0;
 
     // These values were characterized using our characterization commands.
     public static final double DRIVE_S = .151315113225759;
-    public static final double DRIVE_V = 0.0272854272591;
+    public static final double DRIVE_V = 0.272854272591;
     public static final double DRIVE_A = 0.0;
   }
 

@@ -512,12 +512,12 @@ public final class Constants {
     // Auto Align Constants
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
     public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = .5;
-    public static final double AUTO_ALIGN_ROTATION_P = 13.0;
+    public static final double AUTO_ALIGN_ROTATION_P = 15.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
-    public static final double AUTO_ALIGN_TRANSLATION_P = 6;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 12;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
