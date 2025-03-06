@@ -511,7 +511,7 @@ public class SwerveDrive extends SubsystemBase {
    * @return The module positions for all the modules in the order: frontLeft, frontRight, backLeft,
    *     backRight.
    */
-  private SwerveModulePosition[] getModulePositions() {
+  public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = new SwerveModulePosition[swerveModules.length];
     for (int i = 0; i < positions.length; i++) positions[i] = swerveModules[i].getPosition();
     return positions;

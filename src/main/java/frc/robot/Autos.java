@@ -81,7 +81,8 @@ public class Autos {
     startToETraj
         .done()
         .onTrue(
-            new elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition())
+            elevatorSubsystem
+                .setElevationPosition(ElevatorSetpoints.L4.getPosition())
                 .andThen(coralIntakeSubsystem.ejectCoral()));
 
     return routine;

@@ -7,20 +7,23 @@ import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveModule;
 
 public class ScoreCoralAtL2 extends Command {
   private final AlgaePivotSubsystem algaePivotSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final CoralIntakeSubsystem coralIntakeSubsystem;
-  ;
+  private final SwerveModule swerveModule;
 
   public ScoreCoralAtL2(
       AlgaePivotSubsystem algaePivotSubsystem,
       ElevatorSubsystem elevatorSubsystem,
-      CoralIntakeSubsystem coralIntakeSubsystem) {
+      CoralIntakeSubsystem coralIntakeSubsystem, SwerveModule swerveModule) {
     this.algaePivotSubsystem = algaePivotSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
+    this.swerveModule = swerveModule;
     addRequirements(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem);
   }
 
@@ -31,7 +34,7 @@ public class ScoreCoralAtL2 extends Command {
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute() {
-    if (coralIntakeSubsystem.hasCoral()) {
+    if (coralIntakeSubsystem.hasCoral() && swerveModule.getDrivePositionMeters() == SwerveConstants.L2_POSITION) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L2_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L2_ANGLE);
       if (elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L2_HEIGHT) {

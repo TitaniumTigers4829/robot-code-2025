@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
@@ -13,6 +14,12 @@ import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.DevConstants;
 /** Swerve Constants */
 public class SwerveConstants {
 
+    public static final double FEEDING_STATION_POSITION = 0.0;
+    public static final double TROPH_POSITION = 0.0;
+    public static final double L2_POSITION = 0.0;
+    public static final double L3_POSITION = 0.0;
+    public static final double L4_POSITION = 0.0;
+    
   public static final class DriveConstants {
     public static final double X_POS_TRUST = 0.03; // Meters
     public static final double Y_POS_TRUST = 0.03; // Meters

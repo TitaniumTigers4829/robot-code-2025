@@ -7,19 +7,24 @@ import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveModule;
 
 public class GetCoralFeedingStation extends Command {
   private final CoralIntakeSubsystem coralIntakeSubsystem;
   private final ElevatorSubsystem elevatorSubsystem;
   private final AlgaePivotSubsystem algaePivotSubsystem;
+  private final SwerveModule swerveModule;
 
   public GetCoralFeedingStation(
       CoralIntakeSubsystem coralIntakeSubsystem,
       ElevatorSubsystem elevatorSubsystem,
-      AlgaePivotSubsystem algaePivotSubsystem) {
+      AlgaePivotSubsystem algaePivotSubsystem, SwerveModule swerveModule) {
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.algaePivotSubsystem = algaePivotSubsystem;
+    this.swerveModule = swerveModule;
     addRequirements(coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem);
   }
 
@@ -30,12 +35,15 @@ public class GetCoralFeedingStation extends Command {
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute() {
-    elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
-    coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
-    algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
-    if (coralIntakeSubsystem.hasCoral()) {
-      coralIntakeSubsystem.setIntakeSpeed(0);
+    if(swerveModule.getDrivePositionMeters() == SwerveConstants.FEEDING_STATION_POSITION){
+      elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
+      coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+      algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
+      if (coralIntakeSubsystem.hasCoral()) {
+        coralIntakeSubsystem.setIntakeSpeed(0);
+      }
     }
+    
   }
 
   @Override

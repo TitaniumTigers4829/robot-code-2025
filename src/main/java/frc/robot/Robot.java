@@ -14,14 +14,17 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.scoreCoral.GetCoralFeedingStation;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL2;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL3;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
+import frc.robot.commands.scoreCoral.ScoreCoralAtTroph;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -33,12 +36,10 @@ import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
 import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
-import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -68,6 +69,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -89,6 +91,7 @@ public class Robot extends LoggedRobot {
   private AlgaePivotSubsystem algaePivotSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
+  private SwerveModule swerveModule;
 
   private SimWorld simWorld;
 
@@ -209,17 +212,10 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    JoystickButton intakeButton = new JoystickButton(buttonBoard, 0);
-    JoystickButton outakeButton = new JoystickButton(buttonBoard, 1);
-    JoystickButton scoreL1 = new JoystickButton(buttonBoard, 2);
-    JoystickButton scoreL2 = new JoystickButton(buttonBoard, 3);
-    JoystickButton scoreL3 = new JoystickButton(buttonBoard, 4);
-    JoystickButton scoreL4 = new JoystickButton(buttonBoard, 5);
+
     // JoystickButton alignLeft = new JoystickButton(buttonBoard, 6);
     // JoystickButton alignRight = new JoystickButton(buttonBoard, 7);
 
-    // operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
-    // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
         .rightBumper()
         .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
@@ -242,37 +238,33 @@ public class Robot extends LoggedRobot {
      */
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition()));
+        .whileTrue(
+            new ScoreCoralAtTroph(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
 
     operatorController
         .x()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition()));
+        .whileTrue(
+            new ScoreCoralAtL2(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
 
     operatorController
         .b()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition()));
+        .whileTrue(
+            new ScoreCoralAtL3(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .y()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .whileTrue(
+            new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
-        .leftTrigger()
+        .rightBumper()
         .whileTrue(
-            Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
-                () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
-                coralIntakeSubsystem));
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
+    
+    operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
 
-    operatorController
-        .leftBumper()
-        .whileTrue(
-            Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(CoralIntakeConstants.INTAKE_SPEED),
-                    () -> coralIntakeSubsystem.setIntakeSpeed(0.0),
-                    coralIntakeSubsystem)));
+    operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
 
     operatorController
         .povUp()
@@ -280,13 +272,6 @@ public class Robot extends LoggedRobot {
     operatorController
         .povDown()
         .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
-
-    // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
-    // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
-    // scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
