@@ -331,9 +331,15 @@ public final class Constants {
     // Different Pre-defined Auto Routines
     public static final String Y_ONE_METER_AUTO = "Y-One-Meter-Test";
     public static final String X_ONE_METER_AUTO = "X-One-Meter-Test";
-    public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
-    public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
-    public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
+    public static final String BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE = "Blue-Left-Two-Coral-Auto-Routine";
+    public static final String BLUE_MID_TWO_CORAL_AUTO_ROUTINE = "Blue-Mid-Two-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE = "Blue-Right-Two-Coral-Auto-Routine";
+    public static final String BLUE_LEFT_THREE_CORAL_AUTO_ROUTINE = "Blue-Left-Three-Coral-Auto-Routine";
+    public static final String BLUE_MID_THREE_CORAL_AUTO_ROUTINE = "Blue-Mid-Three-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_THREE_CORAL_AUTO_ROUTINE = "Blue-Right-Three-Coral-Auto-Routine";
+    public static final String BLUE_LEFT_FOUR_CORAL_AUTO_ROUTINE = "Blue-Left-Four-Coral-Auto-Routine";
+    public static final String BLUE_MID_FOUR_CORAL_AUTO_ROUTINE = "Blue-Mid-Four-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_FOUR_CORAL_AUTO_ROUTINE = "Blue-Right-Four-Coral-Auto-Routine";
     public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
     public static final String TWO_CORAL_REPULSOR_AUTO = "Two-Coral-Repulsor-Auto";
     // This does not exist yet :(
@@ -438,9 +444,15 @@ public final class Constants {
         "BlueTrajectories/Left-Pickup-to-B";
 
     // Different Pre-defined Auto Routines
-    public static final String RED_TWO_CORAL_AUTO_ROUTINE = "Red-Two-Coral-Auto-Routine";
-    public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
-    public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
+    public static final String RED_RIGHT_TWO_CORAL_AUTO_ROUTINE = "Red-Right-Two-Coral-Auto-Routine";
+    public static final String RED_MID_TWO_CORAL_AUTO_ROUTINE = "Red-Mid-Two-Coral-Auto-Routine";
+    public static final String RED_LEFT_TWO_CORAL_AUTO_ROUTINE = "Red-Left-Two-Coral-Auto-Routine";
+    public static final String RED_RIGHT_THREE_CORAL_AUTO_ROUTINE = "Red-Right-Three-Coral-Auto-Routine";
+    public static final String RED_MID_THREE_CORAL_AUTO_ROUTINE = "Red-Mid-Three-Coral-Auto-Routine";
+    public static final String RED_LEFT_THREE_CORAL_AUTO_ROUTINE = "Red-Left-Three-Coral-Auto-Routine";
+    public static final String RED_RIGHT_FOUR_CORAL_AUTO_ROUTINE = "Red-Right-Four-Coral-Auto-Routine";
+    public static final String RED_MID_FOUR_CORAL_AUTO_ROUTINE = "Red-Mid-Four-Coral-Auto-Routine";
+    public static final String RED_LEFT_FOUR_CORAL_AUTO_ROUTINE = "Red-Left-Four-Coral-Auto-Routine";
     public static final Pose2d BLUE_LEFT_CORAL_STATION =
         new Pose2d(
             Units.inchesToMeters(33.51),

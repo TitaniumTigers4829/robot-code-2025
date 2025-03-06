@@ -515,9 +515,16 @@ public class Robot extends LoggedRobot {
             this.swerveDrive,
             this.visionSubsystem);
 
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
-
+    this.autoChooser.addRoutine(AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_MID_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidTwoCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_LEFT_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftThreeCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_MID_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidThreeCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_RIGHT_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightThreeCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_LEFT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftFourCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_MID_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidFourCoralAuto());
+    this.autoChooser.addRoutine(AutoConstants.BLUE_RIGHT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightFourCoralAuto());
+    
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
 
@@ -528,8 +535,17 @@ public class Robot extends LoggedRobot {
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+   
+      this.autoChooser.addRoutine(AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_MID_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redMidTwoCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_LEFT_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftThreeCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_MID_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redMidThreeCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_RIGHT_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redRightThreeCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_LEFT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftFourCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_MID_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redMidFourCoralAuto());
+      this.autoChooser.addRoutine(AutoConstants.RED_RIGHT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redRightFourCoralAuto());
+  
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
     // this.autoChooser.addRoutine(
