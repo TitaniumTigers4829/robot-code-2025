@@ -15,6 +15,7 @@ public class DriveCommand extends DriveCommandBase {
   private final DoubleSupplier leftJoystickX, leftJoystickY, rightJoystickX;
   private final BooleanSupplier isFieldRelative, isHighRotation;
   private double angularSpeed;
+  private boolean shouldAlignSource, shouldAlignReef;
 
   /**
    * The command for driving the robot using joystick inputs.
@@ -34,7 +35,9 @@ public class DriveCommand extends DriveCommandBase {
       DoubleSupplier leftJoystickY,
       DoubleSupplier rightJoystickX,
       BooleanSupplier isFieldRelative,
-      BooleanSupplier isHighRotation) {
+      BooleanSupplier isHighRotation,
+      boolean shouldAlignSource,
+      boolean shouldAlignReef) {
     super(driveSubsystem, visionSubsystem);
     this.driveSubsystem = driveSubsystem;
     addRequirements(driveSubsystem, visionSubsystem);
@@ -44,6 +47,8 @@ public class DriveCommand extends DriveCommandBase {
     this.rightJoystickX = rightJoystickX;
     this.isFieldRelative = isFieldRelative;
     this.isHighRotation = isHighRotation;
+    this.shouldAlignReef = shouldAlignReef;
+    this.shouldAlignSource = shouldAlignSource;
   }
 
   @Override
@@ -72,11 +77,11 @@ public class DriveCommand extends DriveCommandBase {
         rightJoystickX.getAsDouble() * angularSpeed,
         isFieldRelative.getAsBoolean());
 
-    if (driveSubsystem.nearSource()) {
+    if (driveSubsystem.nearSource() && shouldAlignSource) {
       driveSubsystem.sourceAlign(driveTranslationalControlSupplier);
     }
 
-    if (driveSubsystem.isReefInRange()) {
+    if (driveSubsystem.isReefInRange() && shouldAlignReef) {
       driveSubsystem.reefAlign(driveTranslationalControlSupplier);
     }
     // Runs all the code from DriveCommand that estimates pose

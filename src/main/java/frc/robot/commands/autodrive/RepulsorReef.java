@@ -4,9 +4,6 @@
 
 package frc.robot.commands.autodrive;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.commands.drive.DriveCommandBase;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;

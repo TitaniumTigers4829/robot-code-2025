@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
@@ -94,7 +93,7 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean isElevatorZeroed;
+  private boolean shouldAlignReef, shouldAlignSource = false;
 
   public Robot() {
     checkGit();
@@ -188,7 +187,9 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.rightStick().getAsBoolean());
+            () -> driverController.rightStick().getAsBoolean(),
+            shouldAlignSource,
+            shouldAlignReef);
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -207,22 +208,31 @@ public class Robot extends LoggedRobot {
         .leftTrigger()
         .whileTrue(
             Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
+                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                    Commands.runEnd(
+                        () -> coralIntakeSubsystem.intakeCoral(),
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                        coralIntakeSubsystem))
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = true)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = false))))
+        .onFalse(
+            Commands.runOnce(() -> shouldAlignSource = false)
+                .alongWith(Commands.runOnce(() -> shouldAlignReef = true)));
 
     driverController
         .rightTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = true)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = false))));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
@@ -234,15 +244,6 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
-    JoystickButton intakeButton = new JoystickButton(buttonBoard, 0);
-    JoystickButton outakeButton = new JoystickButton(buttonBoard, 1);
-    JoystickButton scoreL1 = new JoystickButton(buttonBoard, 2);
-    JoystickButton scoreL2 = new JoystickButton(buttonBoard, 3);
-    JoystickButton scoreL3 = new JoystickButton(buttonBoard, 4);
-    JoystickButton scoreL4 = new JoystickButton(buttonBoard, 5);
-    // JoystickButton alignLeft = new JoystickButton(buttonBoard, 6);
-    // JoystickButton alignRight = new JoystickButton(buttonBoard, 7);
-
     // operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
     // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
@@ -274,25 +275,37 @@ public class Robot extends LoggedRobot {
         .a()
         .whileTrue(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
-                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = false)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = true))));
 
     operatorController
         .x()
         .whileTrue(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
-                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = false)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = true))));
 
     operatorController
         .b()
         .whileTrue(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
-                .onlyIf((() -> coralIntakeSubsystem.isIntakeComplete())));
+                .onlyIf((() -> coralIntakeSubsystem.isIntakeComplete()))
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = false)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = true))));
 
     operatorController
         .y()
         .whileTrue(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
-                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete()));
+                .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
+                .alongWith(
+                    Commands.runOnce(() -> shouldAlignSource = false)
+                        .alongWith(Commands.runOnce(() -> shouldAlignReef = true))));
 
     operatorController
         .leftTrigger()
@@ -364,9 +377,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void robotInit() {
-    isElevatorZeroed = false;
-  }
+  public void robotInit() {}
 
   private void setupSubsystems() {
     switch (Constants.getRobot()) {

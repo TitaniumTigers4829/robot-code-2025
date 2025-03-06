@@ -76,9 +76,6 @@ public class SwerveDrive extends SubsystemBase {
   private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
   private final PIDController headingController = new PIDController(10, 0, 0);
 
-  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
-
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
           DriveConstants.MODULE_TRANSLATIONS,
@@ -143,6 +140,8 @@ public class SwerveDrive extends SubsystemBase {
         AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
+
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -738,7 +737,6 @@ public class SwerveDrive extends SubsystemBase {
     followRepulsorField(getBranchPose(bestBranchWall, bestLeft), nudgeSupplier);
   }
 
-  
   /**
    * Aligns the robot to the reef.
    *
@@ -751,28 +749,26 @@ public class SwerveDrive extends SubsystemBase {
 
     // There are 6 reef walls, and each wall has 2 branches (left/right)
     for (int i = 0; i < 6; i++) {
-        Pose2d branchPose = getBranchPose(i, left);
-        Translation2d branchLocation = branchPose.getTranslation();
+      Pose2d branchPose = getBranchPose(i, left);
+      Translation2d branchLocation = branchPose.getTranslation();
 
-        // Calculate how far the robot is from the branch
-        Translation2d robotToBranchVector =
-            branchLocation.minus(poseEstimator.getEstimatedPosition().getTranslation());
-        double branchDistanceScore = robotToBranchVector.getNorm();
+      // Calculate how far the robot is from the branch
+      Translation2d robotToBranchVector =
+          branchLocation.minus(poseEstimator.getEstimatedPosition().getTranslation());
+      double branchDistanceScore = robotToBranchVector.getNorm();
 
-        double branchScore = branchDistanceScore;
+      double branchScore = branchDistanceScore;
 
-        Logger.recordOutput(
-            "Swerve/Reef Align/Wall " + i + " " + (left ? "Left" : "Right") + "/Score",
-            branchScore);
+      Logger.recordOutput(
+          "Swerve/Reef Align/Wall " + i + " " + (left ? "Left" : "Right") + "/Score", branchScore);
 
-        if (branchScore < bestScore) {
-          bestScore = branchScore;
-          bestBranchWall = i;
-        }
+      if (branchScore < bestScore) {
+        bestScore = branchScore;
+        bestBranchWall = i;
       }
+    }
     followRepulsorField(getBranchPose(bestBranchWall, left));
   }
-
 
   private Pose2d getBranchPose(int reefWall, boolean left) {
     var branches = AllianceFlipper.isRed() ? ReefLocations.RED_POSES : ReefLocations.BLUE_POSES;
