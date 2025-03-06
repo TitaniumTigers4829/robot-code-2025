@@ -19,7 +19,8 @@ public class GetCoralFeedingStation extends Command {
   public GetCoralFeedingStation(
       CoralIntakeSubsystem coralIntakeSubsystem,
       ElevatorSubsystem elevatorSubsystem,
-      AlgaePivotSubsystem algaePivotSubsystem, SwerveModule swerveModule) {
+      AlgaePivotSubsystem algaePivotSubsystem,
+      SwerveModule swerveModule) {
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.algaePivotSubsystem = algaePivotSubsystem;
@@ -34,7 +35,7 @@ public class GetCoralFeedingStation extends Command {
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute() {
-    if(swerveModule.getDrivePositionMeters() == SwerveConstants.FEEDING_STATION_POSITION){
+    if (swerveModule.getDrivePositionMeters() == SwerveConstants.FEEDING_STATION_POSITION) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
       coralIntakeSubsystem.intakeCoral();
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
@@ -42,7 +43,6 @@ public class GetCoralFeedingStation extends Command {
         coralIntakeSubsystem.setIntakeSpeed(CoralIntakeConstants.WAITING_INTAKE_SPEED);
       }
     }
-    
   }
 
   @Override

@@ -25,7 +25,6 @@ import frc.robot.commands.scoreCoral.ScoreCoralAtL2;
 import frc.robot.commands.scoreCoral.ScoreCoralAtL3;
 import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
 import frc.robot.commands.scoreCoral.ScoreCoralAtTroph;
-import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
@@ -39,10 +38,8 @@ import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
-import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -54,6 +51,7 @@ import frc.robot.subsystems.funnelPivot.SimulatedFunnelPivot;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
@@ -71,7 +69,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -271,29 +268,33 @@ public class Robot extends LoggedRobot {
     operatorController
         .a()
         .whileTrue(
-            new ScoreCoralAtTroph(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+            new ScoreCoralAtTroph(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .x()
         .whileTrue(
-            new ScoreCoralAtL2(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem));
+            new ScoreCoralAtL2(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .b()
         .whileTrue(
-            new ScoreCoralAtL3(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
+            new ScoreCoralAtL3(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .y()
         .whileTrue(
-            new ScoreCoralAtL4(algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .rightBumper()
         .whileTrue(
             new GetCoralFeedingStation(
                 coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
-    
+
     operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
 
     operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
@@ -498,7 +499,9 @@ public class Robot extends LoggedRobot {
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,
-            this.visionSubsystem, algaePivotSubsystem);
+            this.visionSubsystem,
+            this.algaePivotSubsystem,
+            this.swerveModule);
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());

@@ -18,7 +18,8 @@ public class ScoreCoralAtL2 extends Command {
   public ScoreCoralAtL2(
       AlgaePivotSubsystem algaePivotSubsystem,
       ElevatorSubsystem elevatorSubsystem,
-      CoralIntakeSubsystem coralIntakeSubsystem, SwerveModule swerveModule) {
+      CoralIntakeSubsystem coralIntakeSubsystem,
+      SwerveModule swerveModule) {
     this.algaePivotSubsystem = algaePivotSubsystem;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
@@ -33,7 +34,8 @@ public class ScoreCoralAtL2 extends Command {
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute() {
-    if (coralIntakeSubsystem.hasCoral() && swerveModule.getDrivePositionMeters() == SwerveConstants.L2_POSITION) {
+    if (coralIntakeSubsystem.hasCoral()
+        && swerveModule.getDrivePositionMeters() == SwerveConstants.L2_POSITION) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L2_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L2_ANGLE);
       if (elevatorSubsystem.getElevatorPosition() == ElevatorConstants.ELEVATOR_L2_HEIGHT) {
