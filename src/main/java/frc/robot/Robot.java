@@ -498,6 +498,7 @@ public class Robot extends LoggedRobot {
               FollowSwerveSampleCommand followSwerveSampleCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
+              Logger.recordOutput("Trajectory/sample", sample.getPose());
             }, // A function that follows a choreo trajectory
             true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem

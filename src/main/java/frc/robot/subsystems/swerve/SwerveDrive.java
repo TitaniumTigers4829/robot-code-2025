@@ -55,7 +55,7 @@ public class SwerveDrive extends SubsystemBase {
           AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
   private final ProfiledPIDController yChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P * 0.0,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
           AutoConstants.CHOREO_AUTO_TRANSLATION_D,
           AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
@@ -132,15 +132,7 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(
-        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
-    yChoreoController.setTolerance(
-        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
-    rotationChoreoController.setTolerance(
-        AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
-
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
-
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
@@ -189,11 +181,6 @@ public class SwerveDrive extends SubsystemBase {
 
   public ChassisSpeeds getChassisSpeeds() {
     return setpoint.chassisSpeeds();
-  }
-
-  public void drive(ChassisSpeeds speeds) {
-    drive(
-        -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond, false);
   }
 
   /**
@@ -299,13 +286,42 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
-    double moveX = sample.vx + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
-    double moveY = sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
-    double moveTheta =
-        sample.omega
-            + rotationChoreoController.calculate(
-                getOdometryRotation2d().getRadians(), sample.heading);
-    drive(-moveX, -moveY, -moveTheta, true);
+    double[] moduleForcesX = sample.moduleForcesX();
+    double[] moduleForcesY = sample.moduleForcesY();
+
+    double totalForcesX = 0.0;
+    double totalForcesY = 0.0;
+
+    for (int i = 0; i < moduleForcesX.length; i++) {
+      totalForcesX += moduleForcesX[i];
+      totalForcesY += moduleForcesY[i];
+    }
+
+    // Use the summed forces in the drive method
+    ChassisSpeeds chassisSpeeds;
+    // if (fieldRelative) {
+    //   chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+    //       totalForceX + moveX, totalForceY + moveY, moveTheta, getOdometryRotation2d());
+    // } else {
+    chassisSpeeds =
+        new ChassisSpeeds(
+            sample.vx
+                // + totalForcesX
+                + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
+            sample.vy,
+            sample.omega);
+    Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
+    Logger.recordOutput("Trajectories/DesiredX", sample.x);
+    Logger.recordOutput("Trajectories/vx", sample.vx);
+    // }
+    // double moveX = sample.vx;
+    // // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
+    // double moveY = sample.vy;
+    // // + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
+    // double moveTheta = sample.omega;
+    //     + rotationChoreoController.calculate(
+    //         getOdometryRotation2d().getRadians(), sample.heading);
+    drive(chassisSpeeds.unaryMinus(), true);
   }
 
   /**
