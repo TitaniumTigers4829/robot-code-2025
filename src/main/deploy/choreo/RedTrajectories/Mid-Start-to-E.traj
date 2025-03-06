@@ -1,5 +1,5 @@
 {
- "name":"Mid-Start-to-H",
+ "name":"Mid-Start-to-E",
  "version":1,
  "snapshot":{
   "waypoints":[
@@ -13,8 +13,8 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"MidStart.x()", "val":10.085494041442873}, "y":{"exp":"MidStart.y()", "val":4.0}, "heading":{"exp":"MidStart.heading()", "val":0.0}, "intervals":14, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"11.926153182983398 m", "val":11.926153182983398}, "y":{"exp":"3.8687400817871094 m", "val":3.86874008178711}, "heading":{"exp":"H.heading()", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"MidStart.x()", "val":10.085494041442873}, "y":{"exp":"MidStart.y()", "val":4.0}, "heading":{"exp":"0 rad", "val":0.0}, "intervals":14, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"12.622642517089844 m", "val":12.622642517089844}, "y":{"exp":"5.094562530517578 m", "val":5.094562530517578}, "heading":{"exp":"-0.9817477042468103 rad", "val":-0.9817477042468103}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
