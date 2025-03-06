@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.HardwareConstants;
+import frc.robot.Robot;
 import frc.robot.extras.logging.Tracer;
 import frc.robot.extras.swerve.RepulsorFieldPlanner;
 import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
@@ -130,9 +132,12 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
+    xChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    yChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS);
+    rotationChoreoController.setTolerance(
+        AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -164,7 +169,9 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
+    setpoint =
+        setpointGenerator.generateSimpleSetpoint(
+            setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -290,23 +297,25 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
-    if (sample != null) {
-      Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
-      double moveTheta =
-          -sample.omega
-              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
-      drive(moveX, moveY, moveTheta, true);
-    }
+    double moveX = sample.vx + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
+    double moveY = sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
+    double moveTheta =
+        sample.omega
+            + rotationChoreoController.calculate(
+                getOdometryRotation2d().getRadians(), sample.heading);
+    drive(-moveX, -moveY, -moveTheta, true);
   }
 
   /**
    * @return if the robot is at the desired swerveSample
    */
   public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xChoreoController.getGoal().position
-        && swerveSample.y < yChoreoController.getGoal().position;
+    return swerveSample.x - xChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
+        && swerveSample.y - yChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
+        && swerveSample.heading - rotationChoreoController.getGoal().position
+            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS;
   }
 
   /** Runs the SwerveModules periodic methods */
@@ -585,23 +594,47 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    outputRobotRelative =
+        Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
+    drive(outputRobotRelative, false);
   }
 
   /**
    * Checks if the robot is within a certain distance of the reef.
    *
-   * @return a trigger that is true when the robot is within 0.5 meters of the reef.
+   * @return a trigger that is true when the robot is within 1 meter of the reef.
    */
-  public Trigger isReefInRange() {
-    return new Trigger(
-        () ->
-            getEstimatedPose()
-                    .getTranslation()
-                    .getDistance(
-                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                            .getTranslation())
-                < 0.5);
+  public boolean isReefInRange() {
+    return (getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                        .getTranslation())
+            <= 1
+        || getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                        .getTranslation())
+            <= 1);
+  }
+
+  public boolean isRobotAlignedToLeftReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
+  public boolean isRobotAlignedToRightReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
   }
 
   /**

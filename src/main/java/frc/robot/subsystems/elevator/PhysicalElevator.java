@@ -79,7 +79,6 @@ public class PhysicalElevator implements ElevatorInterface {
 
     leaderMotor.getConfigurator().apply(elevatorConfig);
     followerMotor.setControl(follower);
-    // elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
 
     leaderPosition = leaderMotor.getPosition();
@@ -172,6 +171,14 @@ public class PhysicalElevator implements ElevatorInterface {
   public void resetElevatorPosition(double position) {
     leaderMotor.setPosition(position);
     followerMotor.setPosition(position);
+  }
+
+  @Override
+  public void enableLimits(boolean forward, boolean reverse) {
+    elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = forward;
+    elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
+    leaderMotor.getConfigurator().apply(elevatorConfig);
+    followerMotor.getConfigurator().apply(elevatorConfig);
   }
 
   @Override
