@@ -10,6 +10,7 @@ package frc.robot.extras.util;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -33,13 +34,13 @@ public final class ReefLocations {
 
     var A =
         new Pose2d(
-            BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 + .144,
+            BLUE_REEF.getX() - 1.39,
+            FieldConstants.FIELD_WIDTH_METERS / 2 + .144 - Units.inchesToMeters(2.5),
             Rotation2d.kZero);
     var B =
         new Pose2d(
-            BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 - .144,
+            BLUE_REEF.getX() - 1.39,
+            FieldConstants.FIELD_WIDTH_METERS / 2 - .144 - Units.inchesToMeters(2.5),
             Rotation2d.kZero);
 
     BLUE_POSES = new Pose2d[12];

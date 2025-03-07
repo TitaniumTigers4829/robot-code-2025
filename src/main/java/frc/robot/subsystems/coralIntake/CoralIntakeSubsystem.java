@@ -159,9 +159,9 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   public Command ejectCoral() {
     return new StartEndCommand(
         // sets speed while command is active
-        () -> this.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
+        () -> this.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
         // sets speed when command ends
-        () -> this.setIntakeSpeed(0),
+        () -> this.setIntakeVelocity(0),
         // requirements for command
         this);
   }

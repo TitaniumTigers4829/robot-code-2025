@@ -48,18 +48,16 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
-  private final ProfiledPIDController xChoreoController =
-      new ProfiledPIDController(
+  private final PIDController xChoreoController =
+      new PIDController(
           AutoConstants.CHOREO_AUTO_TRANSLATION_P,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController yChoreoController =
-      new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P * 0.0,
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+  private final PIDController yChoreoController =
+      new PIDController(
+          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
-          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
           AutoConstants.CHOREO_AUTO_THETA_P,
@@ -287,17 +285,6 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
-    double[] moduleForcesX = sample.moduleForcesX();
-    double[] moduleForcesY = sample.moduleForcesY();
-
-    double totalForcesX = 0.0;
-    double totalForcesY = 0.0;
-
-    for (int i = 0; i < moduleForcesX.length; i++) {
-      totalForcesX += moduleForcesX[i];
-      totalForcesY += moduleForcesY[i];
-    }
-
     // Use the summed forces in the drive method
     ChassisSpeeds chassisSpeeds;
     // if (fieldRelative) {
@@ -306,10 +293,11 @@ public class SwerveDrive extends SubsystemBase {
     // } else {
     chassisSpeeds =
         new ChassisSpeeds(
-            sample.vx
-                // + totalForcesX
-                + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
-            sample.vy,
+            sample.vx,
+            // + totalForcesX
+            // + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
+            sample.vy, // + yChoreoController.calculate(getChassisSpeeds().vyMetersPerSecond,
+            // sample.vy)
             sample.omega);
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
@@ -323,18 +311,6 @@ public class SwerveDrive extends SubsystemBase {
     //     + rotationChoreoController.calculate(
     //         getOdometryRotation2d().getRadians(), sample.heading);
     drive(chassisSpeeds.unaryMinus(), true);
-  }
-
-  /**
-   * @return if the robot is at the desired swerveSample
-   */
-  public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x - xChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
-        && swerveSample.y - yChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS
-        && swerveSample.heading - rotationChoreoController.getGoal().position
-            <= AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS;
   }
 
   /** Runs the SwerveModules periodic methods */

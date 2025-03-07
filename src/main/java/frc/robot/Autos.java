@@ -10,6 +10,7 @@ import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -83,26 +84,63 @@ public class Autos {
     return routine;
   }
 
+  public AutoRoutine djfkajfl() {
+    AutoRoutine routine = autoFactory.newRoutine("djsakfjl");
+
+    routine
+        .active()
+        .onTrue(
+            Commands.runEnd(
+                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .withTimeout(1.0));
+    return routine;
+  }
+
   public AutoRoutine blueTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE);
 
     AutoTrajectory startToJTrajectory =
-        routine.trajectory(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
-        routine.trajectory(AutoConstants.BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
-        routine.trajectory(AutoConstants.BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_LEFT_PICKUP_TO_A_TRAJECTORY);
 
     routine
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
                 startToJTrajectory.cmd()));
-    // startToJTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+    startToJTrajectory
+        .done()
+        .onTrue(
+            new RepulsorReef(swerveDrive, visionSubsystem, false)
+                .alongWith(
+                    new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                .withTimeout(4.0)
+                .andThen(
+                    Commands.runEnd(
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.EJECT_SPEED),
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                            coralIntakeSubsystem)
+                        .withTimeout(1.0)));
 
-    startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
-    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
+    Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
+    Logger.recordOutput(
+        "Trajectories/jtopickup", jToPickupTrajectory.getRawTrajectory().getPoses());
+    // Logger.recordOutput(
+    // "Trajectories/pickuptoL", pickupToLTrajectory.getRawTrajectory().getPoses());
+    // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
+    // jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
     // startToJTrajectory
     //     .recentlyDone()
     //     .and(routine.observe(hasNoCoral))
