@@ -103,7 +103,7 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
-                funnelSubsystem.dropFunnel(),
+                // funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()
@@ -194,7 +194,7 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_RIGHT_START_TO_E_TRAJECTORY),
-                funnelSubsystem.dropFunnel(),
+                // funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()
@@ -471,7 +471,7 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_LEFT_START_TO_J_TRAJECTORY),
-                funnelSubsystem.dropFunnel(),
+                // funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()
@@ -562,7 +562,7 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY),
-                funnelSubsystem.dropFunnel(),
+                // funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()
