@@ -3,27 +3,32 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.HardwareConstants;
 import frc.robot.extras.logging.Tracer;
 import frc.robot.extras.swerve.RepulsorFieldPlanner;
 import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
+import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.TimeUtil;
 import frc.robot.sim.configs.SimSwerveModuleConfig.WheelCof;
@@ -34,6 +39,7 @@ import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -42,18 +48,16 @@ public class SwerveDrive extends SubsystemBase {
   private final GyroInterface gyroIO;
   private final GyroInputsAutoLogged gyroInputs;
   private final SwerveModule[] swerveModules;
-  private final ProfiledPIDController xChoreoController =
-      new ProfiledPIDController(
+  private final PIDController xChoreoController =
+      new PIDController(
           AutoConstants.CHOREO_AUTO_TRANSLATION_P,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_CONSTRAINTS);
-  private final ProfiledPIDController yChoreoController =
-      new ProfiledPIDController(
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+  private final PIDController yChoreoController =
+      new PIDController(
           AutoConstants.CHOREO_AUTO_TRANSLATION_P,
           AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D,
-          AutoConstants.AUTO_ALIGN_TRANSLATION_CONSTRAINTS);
+          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
           AutoConstants.CHOREO_AUTO_THETA_P,
@@ -67,12 +71,9 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(10, 0, 0);
-
-  private final PIDController xSetpointController = new PIDController(15.0, 0.0, 0.0);
-  private final PIDController ySetpointController = new PIDController(15.0, 0.0, 0.0);
+  private final PIDController xController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController yController = new PIDController(5.0, 0.0, 0.0);
+  private final PIDController headingController = new PIDController(8, 0, 0.0);
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -130,11 +131,8 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_Y_POS_TRUST,
                 VisionConstants.VISION_ANGLE_TRUST));
 
-    xChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    yChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE);
-    rotationChoreoController.setTolerance(AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE);
-
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -164,7 +162,9 @@ public class SwerveDrive extends SubsystemBase {
                 xSpeed, ySpeed, rotationSpeed, getOdometryAllianceRelativeRotation2d())
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
-    setpoint = setpointGenerator.generateSimpleSetpoint(setpoint, desiredSpeeds, 0.02);
+    setpoint =
+        setpointGenerator.generateSimpleSetpoint(
+            setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
     Logger.recordOutput("SwerveStates/DesiredStates", setpoint.moduleStates());
@@ -180,11 +180,6 @@ public class SwerveDrive extends SubsystemBase {
 
   public ChassisSpeeds getChassisSpeeds() {
     return setpoint.chassisSpeeds();
-  }
-
-  public void drive(ChassisSpeeds speeds) {
-    drive(
-        -speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond, false);
   }
 
   /**
@@ -256,7 +251,7 @@ public class SwerveDrive extends SubsystemBase {
 
     // Iterate over all the swerve modules, get their positions and add them to the array
     for (SwerveModule module : swerveModules) {
-      wheelPositions[swerveModules.length] = module.getDrivePositionRadians();
+      wheelPositions[swerveModules.length - 1] = module.getDrivePositionRadians();
     }
     return wheelPositions;
   }
@@ -290,23 +285,32 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
-    if (sample != null) {
-      Pose2d pose = getEstimatedPose();
-      double moveX = -sample.vx + xChoreoController.calculate(pose.getX(), sample.x);
-      double moveY = -sample.vy + yChoreoController.calculate(pose.getY(), sample.y);
-      double moveTheta =
-          -sample.omega
-              + rotationChoreoController.calculate(pose.getRotation().getRadians(), sample.heading);
-      drive(moveX, moveY, moveTheta, true);
-    }
-  }
-
-  /**
-   * @return if the robot is at the desired swerveSample
-   */
-  public boolean isTrajectoryFinished(SwerveSample swerveSample) {
-    return swerveSample.x < xChoreoController.getGoal().position
-        && swerveSample.y < yChoreoController.getGoal().position;
+    // Use the summed forces in the drive method
+    ChassisSpeeds chassisSpeeds;
+    // if (fieldRelative) {
+    //   chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+    //       totalForceX + moveX, totalForceY + moveY, moveTheta, getOdometryRotation2d());
+    // } else {
+    chassisSpeeds =
+        new ChassisSpeeds(
+            sample.vx,
+            // + totalForcesX
+            // + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
+            sample.vy, // + yChoreoController.calculate(getChassisSpeeds().vyMetersPerSecond,
+            // sample.vy)
+            sample.omega);
+    Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
+    Logger.recordOutput("Trajectories/DesiredX", sample.x);
+    Logger.recordOutput("Trajectories/vx", sample.vx);
+    // }
+    // double moveX = sample.vx;
+    // // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
+    // double moveY = sample.vy;
+    // // + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
+    // double moveTheta = sample.omega;
+    //     + rotationChoreoController.calculate(
+    //         getOdometryRotation2d().getRadians(), sample.heading);
+    drive(chassisSpeeds.unaryMinus(), true);
   }
 
   /** Runs the SwerveModules periodic methods */
@@ -343,6 +347,24 @@ public class SwerveDrive extends SubsystemBase {
    */
   public double getGyroRate() {
     return gyroInputs.yawVelocityDegreesPerSecond;
+  }
+
+  /**
+   * Gets the current roll of the gyro
+   *
+   * @return idk
+   */
+  public double getGyroRoll() {
+    return gyroInputs.rollDegrees;
+  }
+
+  /**
+   * Gets the current pitch of the gyro
+   *
+   * @return smthn
+   */
+  public double getGyroPitch() {
+    return gyroInputs.pitchDegrees;
   }
 
   /**
@@ -527,60 +549,111 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
-  /**
-   * Checks if the robot is within a certain distance of a setpoint.
-   *
-   * @return a trigger that is true when the robot is within 0.5 meters of the setpoint.
-   */
-  public Trigger isAtSetpoint() {
-    return new Trigger(
-        () ->
-            Math.abs(headingController.getError()) < 0.5
-                && (Math.abs(xSetpointController.getError()) < 0.08
-                    || Math.abs(ySetpointController.getError()) < 0.08));
+  @AutoLogOutput
+  public boolean nearSource() {
+    double maxX = 3.5;
+    if (AllianceFlipper.isRed()) {
+      return poseEstimator.getEstimatedPosition().getX()
+          > (FieldConstants.FIELD_WIDTH_METERS - maxX);
+    } else {
+      return poseEstimator.getEstimatedPosition().getX() < maxX;
+    }
   }
 
-  /**
-   * Follows a repulsor field to a goal.
-   *
-   * @param goal the goal to follow the repulsor field to.
-   */
+  public void sourceAlign(Supplier<Translation2d> translationalControlSupplier) {
+    headingController.reset();
+    double targetAngle = Units.degreesToRadians(54);
+    if (AllianceFlipper.isRed()) {
+      targetAngle = Math.PI - targetAngle;
+    }
+    if (poseEstimator.getEstimatedPosition().getY() > FieldConstants.FIELD_WIDTH_METERS / 2) {
+      targetAngle *= -1;
+    }
+
+    var translationalControl = translationalControlSupplier.get();
+
+    ChassisSpeeds commandedRobotSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            new ChassisSpeeds(
+                translationalControl.getX() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+                translationalControl.getY() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
+                headingController.calculate(
+                    poseEstimator.getEstimatedPosition().getRotation().getRadians(), targetAngle)),
+            getOdometryRotation2d());
+
+    drive(commandedRobotSpeeds, false);
+  }
+
   public void followRepulsorField(Pose2d goal) {
+    followRepulsorField(goal, null);
+  }
+
+  public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
+
+    repulsorFieldPlanner.setGoal(goal.getTranslation());
     xController.reset();
     yController.reset();
     headingController.reset();
-
     Logger.recordOutput("Repulsor/Goal", goal);
 
-    // Sets the goal of the repulsor
-    repulsorFieldPlanner.setGoal(goal.getTranslation());
-
-    // Samples the repulsor field using the current position, max speed, and distance at which to
-    // slow down. This is used with the goal pose to calculate motion towards a setpoint.
     RepulsorSample sample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .8,
-            1.5);
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .9,
+            1.25);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            xController.calculate(
-                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-            yController.calculate(
-                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+            MathUtil.clamp(
+                xController.calculate(
+                    poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+                0,
+                3),
+            MathUtil.clamp(
+                yController.calculate(
+                    poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+                0,
+                3),
             headingController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
-    Logger.recordOutput("Repulsor/Error", goal.minus(poseEstimator.getEstimatedPosition()));
+    var error = goal.minus(poseEstimator.getEstimatedPosition());
+    Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
 
-    Logger.recordOutput("Repulsor/Vector field", repulsorFieldPlanner.getArrows());
+    //                  Logger.recordOutput("Repulsor/Vector field",
+    // repulsorFieldPlanner.getArrows());
 
     ChassisSpeeds outputFieldRelative = feedforward.plus(feedback);
+
+    if (nudgeSupplier != null) {
+      Translation2d nudge = nudgeSupplier.get();
+      if (nudge.getNorm() > .1) {
+        double nudgeScalar =
+            Math.min(error.getTranslation().getNorm() / 3, 1)
+                * Math.min(error.getTranslation().getNorm() / 3, 1)
+                * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+
+        if (AllianceFlipper.isRed()) {
+          nudge = new Translation2d(-nudge.getX(), -nudge.getY());
+        }
+        nudgeScalar *=
+            Math.abs(
+                nudge
+                    .getAngle()
+                    .minus(
+                        new Rotation2d(
+                            outputFieldRelative.vxMetersPerSecond,
+                            outputFieldRelative.vyMetersPerSecond))
+                    .getSin());
+        outputFieldRelative.vxMetersPerSecond += nudge.getX() * nudgeScalar;
+        outputFieldRelative.vyMetersPerSecond += nudge.getY() * nudgeScalar;
+      }
+    }
+
     ChassisSpeeds outputRobotRelative =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
@@ -591,17 +664,39 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Checks if the robot is within a certain distance of the reef.
    *
-   * @return a trigger that is true when the robot is within 0.5 meters of the reef.
+   * @return a trigger that is true when the robot is within 1 meter of the reef.
    */
-  public Trigger isReefInRange() {
-    return new Trigger(
-        () ->
-            getEstimatedPose()
-                    .getTranslation()
-                    .getDistance(
-                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                            .getTranslation())
-                < 0.5);
+  public boolean isReefInRange() {
+    return (getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                        .getTranslation())
+            <= 1
+        || getEstimatedPose()
+                .getTranslation()
+                .getDistance(
+                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                        .getTranslation())
+            <= 1);
+  }
+
+  public boolean isRobotAlignedToLeftReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+  }
+
+  public boolean isRobotAlignedToRightReef() {
+    return getEstimatedPose()
+            .getTranslation()
+            .getDistance(
+                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
+                    .getTranslation())
+        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
   }
 
   /**
@@ -609,9 +704,91 @@ public class SwerveDrive extends SubsystemBase {
    *
    * @param left whether to align to the left or right reef.
    */
-  public void reefAlign(Boolean left) {
-    followRepulsorField(
-        ReefLocations.getSelectedLocation(
-            poseEstimator.getEstimatedPosition().getTranslation(), left));
+  public void reefAlign(Supplier<Translation2d> nudgeSupplier) {
+    int bestBranchWall = 0;
+    boolean bestLeft = true;
+    double bestScore = Double.POSITIVE_INFINITY;
+
+    // There are 6 reef walls, and each wall has 2 branches (left/right)
+    for (int i = 0; i < 6; i++) {
+      for (boolean left : new boolean[] {true, false}) {
+        Pose2d branchPose = getBranchPose(i, left);
+        Translation2d branchLocation = branchPose.getTranslation();
+
+        // Calculate how far the robot is from the branch
+        Translation2d robotToBranchVector =
+            branchLocation.minus(poseEstimator.getEstimatedPosition().getTranslation());
+        double branchDistanceScore = robotToBranchVector.getNorm();
+
+        // Incorporate any driver input if provided
+        Translation2d driverControlVector = nudgeSupplier.get();
+        if (AllianceFlipper.isRed()) {
+          driverControlVector =
+              new Translation2d(-driverControlVector.getX(), -driverControlVector.getY());
+        }
+
+        double driverInputScore;
+        if (driverControlVector.getNorm() < 0.1) {
+          driverInputScore = 0;
+        } else {
+          double robotToBranchAngle = robotToBranchVector.getAngle().getDegrees();
+          double driverControlAngle = driverControlVector.getAngle().getDegrees();
+          driverInputScore = driverControlAngle - robotToBranchAngle;
+          // Multiply by a factor (here 2) to weight the driver input relative to distance
+          driverInputScore = Math.cos(driverInputScore) * 2;
+        }
+
+        double branchScore = branchDistanceScore - driverInputScore;
+
+        Logger.recordOutput(
+            "Swerve/Reef Align/Wall " + i + " " + (left ? "Left" : "Right") + "/Score",
+            branchScore);
+
+        if (branchScore < bestScore) {
+          bestScore = branchScore;
+          bestBranchWall = i;
+          bestLeft = left;
+        }
+      }
+    }
+    followRepulsorField(getBranchPose(bestBranchWall, bestLeft), nudgeSupplier);
+  }
+
+  /**
+   * Aligns the robot to the reef.
+   *
+   * @param left whether to align to the left or right reef.
+   */
+  public void reefAlign(boolean left) {
+    int bestBranchWall = 0;
+    boolean bestLeft = true;
+    double bestScore = Double.POSITIVE_INFINITY;
+
+    // There are 6 reef walls, and each wall has 2 branches (left/right)
+    for (int i = 0; i < 6; i++) {
+      Pose2d branchPose = getBranchPose(i, left);
+      Translation2d branchLocation = branchPose.getTranslation();
+
+      // Calculate how far the robot is from the branch
+      Translation2d robotToBranchVector =
+          branchLocation.minus(poseEstimator.getEstimatedPosition().getTranslation());
+      double branchDistanceScore = robotToBranchVector.getNorm();
+
+      double branchScore = branchDistanceScore;
+
+      Logger.recordOutput(
+          "Swerve/Reef Align/Wall " + i + " " + (left ? "Left" : "Right") + "/Score", branchScore);
+
+      if (branchScore < bestScore) {
+        bestScore = branchScore;
+        bestBranchWall = i;
+      }
+    }
+    followRepulsorField(getBranchPose(bestBranchWall, left));
+  }
+
+  private Pose2d getBranchPose(int reefWall, boolean left) {
+    var branches = AllianceFlipper.isRed() ? ReefLocations.RED_POSES : ReefLocations.BLUE_POSES;
+    return branches[reefWall * 2 + (left ? 0 : 1)];
   }
 }

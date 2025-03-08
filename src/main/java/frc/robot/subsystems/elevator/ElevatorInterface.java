@@ -17,6 +17,9 @@ public interface ElevatorInterface {
     public double followerStatorCurrent = 0.0;
     public double leaderVelocity = 0.0;
     public double elevatorError = 0.0;
+
+    public double leaderTemp = 0.0;
+    public double followerTemp = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}
@@ -34,6 +37,8 @@ public interface ElevatorInterface {
   public default double getVolts() {
     return 0.0;
   }
+
+  public default void enableLimits(boolean forward, boolean reverse) {}
 
   public default void openLoop(double output) {}
 

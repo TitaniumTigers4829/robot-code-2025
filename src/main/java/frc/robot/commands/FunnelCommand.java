@@ -4,28 +4,19 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import frc.robot.commands.drive.DriveCommandBase;
-import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.funnelPivot.FunnelConstants;
+import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RepulsorCommand extends DriveCommandBase {
-  private SwerveDrive swerveDrive;
-  private final Pose2d setpoint;
-  private final Pose2d estimatedPose;
+public class FunnelCommand extends Command {
+  FunnelSubsystem funnelSubsystem;
 
-  /** Creates a new RepulsorCommand. */
-  public RepulsorCommand(
-      SwerveDrive swerveDrive,
-      VisionSubsystem visionSubsystem,
-      Pose2d setpoint,
-      Pose2d estimatedPose) {
-    super(swerveDrive, visionSubsystem);
-    this.swerveDrive = swerveDrive;
-    this.setpoint = setpoint;
-    this.estimatedPose = estimatedPose;
-    addRequirements(swerveDrive);
+  /** Creates a new FunnelCommand. */
+  public FunnelCommand(FunnelSubsystem funnelSubsystem) {
+    this.funnelSubsystem = funnelSubsystem;
+    addRequirements(funnelSubsystem);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -35,8 +26,7 @@ public class RepulsorCommand extends DriveCommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    super.execute();
-    swerveDrive.followRepulsorField(setpoint);
+    funnelSubsystem.setFunnelAngle(FunnelConstants.ANGLE_INTAKE);
   }
 
   // Called once the command ends or is interrupted.

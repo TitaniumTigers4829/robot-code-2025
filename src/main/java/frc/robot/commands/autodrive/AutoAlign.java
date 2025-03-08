@@ -4,7 +4,6 @@
 
 package frc.robot.commands.autodrive;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -70,14 +69,8 @@ public class AutoAlign extends DriveCommandBase {
     double thetaPoseError = targetPose.getRotation().minus(drivePose.getRotation()).getRadians();
 
     // Uses the PID controllers to calculate the drive output
-    double xOutput =
-        MathUtil.applyDeadband(
-            xTranslationController.calculate(xPoseError, 0),
-            AutoConstants.AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT);
-    double yOutput =
-        MathUtil.applyDeadband(
-            yTranslationController.calculate(yPoseError, 0),
-            AutoConstants.AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT);
+    double xOutput = xTranslationController.calculate(xPoseError, 0);
+    double yOutput = yTranslationController.calculate(yPoseError, 0);
     double turnOutput;
     turnOutput =
         // MathUtil.applyDeadband(
@@ -107,8 +100,9 @@ public class AutoAlign extends DriveCommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return yTranslationController.atGoal()
-        // && rotationController.atGoal()
-        && xTranslationController.atGoal();
+    // return yTranslationController.atGoal()
+    //     // && rotationController.atGoal()
+    //     && xTranslationController.atGoal();
+    return false;
   }
 }
