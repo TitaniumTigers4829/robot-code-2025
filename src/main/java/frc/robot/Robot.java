@@ -225,7 +225,7 @@ public class Robot extends LoggedRobot {
             Commands.runEnd(
                     () ->
                         coralIntakeSubsystem.setIntakeVelocity(
-                            CoralIntakeConstants.REVERSE_INTAKE_SPEED),
+                            CoralIntakeConstants.REVERSE_INTAKE_SPEED + 1800),
                     () ->
                         coralIntakeSubsystem.setIntakeVelocity(
                             CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),

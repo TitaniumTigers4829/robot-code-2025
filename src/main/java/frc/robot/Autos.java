@@ -4,6 +4,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
@@ -108,7 +109,8 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new RepulsorReef(swerveDrive, visionSubsystem, false)
+            new WaitCommand(2.0).andThen(
+            new RepulsorReef(swerveDrive, visionSubsystem, true)
                 .alongWith(
                     new SetElevatorPosition(
                         swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
@@ -122,7 +124,7 @@ public class Autos {
                                 coralIntakeSubsystem.setIntakeVelocity(
                                     CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                             coralIntakeSubsystem)
-                        .withTimeout(1.0)));
+                        .withTimeout(1.0))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
@@ -199,6 +201,7 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
+            new WaitCommand(2.0).andThen(
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .alongWith(
                     new SetElevatorPosition(
@@ -213,7 +216,7 @@ public class Autos {
                                 coralIntakeSubsystem.setIntakeVelocity(
                                     CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                             coralIntakeSubsystem)
-                        .withTimeout(1.0)));
+                        .withTimeout(1.0))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
@@ -476,6 +479,7 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
+            new WaitCommand(2.0).andThen(
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .alongWith(
                     new SetElevatorPosition(
@@ -490,7 +494,7 @@ public class Autos {
                                 coralIntakeSubsystem.setIntakeVelocity(
                                     CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                             coralIntakeSubsystem)
-                        .withTimeout(1.0)));
+                        .withTimeout(1.0))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
@@ -567,7 +571,9 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new RepulsorReef(swerveDrive, visionSubsystem, false)
+            new WaitCommand(2.0).andThen(
+
+            new RepulsorReef(swerveDrive, visionSubsystem, true)
                 .alongWith(
                     new SetElevatorPosition(
                         swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
@@ -581,7 +587,7 @@ public class Autos {
                                 coralIntakeSubsystem.setIntakeVelocity(
                                     CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                             coralIntakeSubsystem)
-                        .withTimeout(1.0)));
+                        .withTimeout(1.0))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
