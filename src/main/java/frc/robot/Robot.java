@@ -475,21 +475,26 @@ public class Robot extends LoggedRobot {
             this.funnelSubsystem);
 
     this.autoChooser.addRoutine(
-        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
+        AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
+
+    this.autoChooser.addRoutine(
+        AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
 
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
 
-    this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
+    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
 
-    this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
-    this.autoChooser.addRoutine("uh oh", () -> this.autos.djfkajfl());
+    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
     this.autoChooser.addRoutine(
-        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+        AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
     // this.autoChooser.addRoutine(
