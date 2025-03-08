@@ -15,13 +15,13 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 
 public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFX coralIntakeMotor;
   private final DigitalInput innerCoralSensor;
   private final DigitalInput outerCoralSensor;
+  private final LEDSubsystem ledSubsystem;
 
   private final VoltageOut voltageOut = new VoltageOut(0.0);
   private final MotionMagicVelocityVoltage velocityVoltage = new MotionMagicVelocityVoltage(0.0);
