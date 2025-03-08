@@ -203,6 +203,10 @@ public class Robot extends LoggedRobot {
                     () -> coralIntakeSubsystem.intakeCoral(),
                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
                     coralIntakeSubsystem)));
+    operatorController
+        .povLeft()
+        .whileTrue(
+            Commands.runOnce(() -> coralIntakeSubsystem.setStuckMode(true), coralIntakeSubsystem));
 
     operatorController
         .rightBumper()
@@ -214,7 +218,6 @@ public class Robot extends LoggedRobot {
                         (coralIntakeSubsystem.isIntakeComplete()
                                 || coralIntakeSubsystem.isIntakeIdle())
                             && !overrideElevator));
-    operatorController.povLeft().onTrue(Commands.runOnce((() -> overrideElevator = true)));
 
     operatorController
         .rightTrigger()
