@@ -48,9 +48,9 @@ public class FunnelSubsystem extends SubsystemBase {
         () -> funnelPivotInterface.setFunnelSpeed(position.getAsDouble() / 2.0), this);
   }
 
-  public Command dropFunnel(){
-    return new RunCommand(
-      () -> funnelPivotInterface.setFunnelSpeed(0.3), this).withTimeout(0.5).andThen(
-        () -> funnelPivotInterface.setFunnelSpeed(0));
+  public Command dropFunnel() {
+    return new RunCommand(() -> funnelPivotInterface.setFunnelSpeed(0.3), this)
+        .withTimeout(0.5)
+        .andThen(() -> funnelPivotInterface.setFunnelSpeed(0));
   }
 }

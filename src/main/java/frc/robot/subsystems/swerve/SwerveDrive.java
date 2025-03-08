@@ -351,7 +351,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the current roll of the gyro
-   * 
+   *
    * @return idk
    */
   public double getGyroRoll() {
@@ -360,7 +360,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Gets the current pitch of the gyro
-   * 
+   *
    * @return smthn
    */
   public double getGyroPitch() {
