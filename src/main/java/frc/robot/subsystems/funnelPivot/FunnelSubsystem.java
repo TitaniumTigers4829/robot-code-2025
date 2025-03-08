@@ -53,4 +53,6 @@ public class FunnelSubsystem extends SubsystemBase {
         .withTimeout(0.5)
         .andThen(() -> funnelPivotInterface.setFunnelSpeed(0));
   }
+
+  
 }
