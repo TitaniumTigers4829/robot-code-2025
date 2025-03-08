@@ -8,7 +8,7 @@ public final class CoralIntakeConstants {
   public static final double WAITING_INTAKE_SPEED = 1500;
   public static final double INGEST_SPEED = 700;
   public static final double EJECT_SPEED = 5000;
-  public static final double REVERSE_INTAKE_SPEED = -200;
+  public static final double REVERSE_INTAKE_SPEED = -2000;
   public static final double NEUTRAL_INTAKE_SPEED = 0.0;
 
   // PID and feedforward constants

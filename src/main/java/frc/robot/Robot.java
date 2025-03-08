@@ -223,13 +223,17 @@ public class Robot extends LoggedRobot {
         .povRight()
         .whileTrue(
             Commands.runEnd(
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.REVERSE_INTAKE_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.REVERSE_INTAKE_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .andThen(
+                    Commands.runOnce(
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
+                        coralIntakeSubsystem)));
 
     operatorController
         .a()
@@ -279,11 +283,15 @@ public class Robot extends LoggedRobot {
         .leftTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .andThen(
+                    Commands.runOnce(
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
+                        coralIntakeSubsystem)));
 
     operatorController
         .povUp()
