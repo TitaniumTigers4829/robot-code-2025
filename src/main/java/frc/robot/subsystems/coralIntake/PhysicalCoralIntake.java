@@ -99,8 +99,8 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
     intakeInputs.hasCoral =
         sensorDebouncer.calculate(!coralSensor.get()); // true if coral is sensed
     intakeInputs.intakeDutyCycle = intakeDutyCycle.getValueAsDouble();
-    if (intakeInputs.hasCoral) {
-        ledSubsystem.setProcess(LEDProcess.GREEN);
+    if (intakeInputs.hasControl()) {
+      ledSubsystem.setProcess(LEDProcess.GREEN);
     }
   }
 

@@ -106,15 +106,8 @@ public class Robot extends LoggedRobot {
     setupLogging();
     setupSubsystems();
     // setupAuto();
-  
 
-      if (LEDSubsystem.isRed) {
-        // Set LED process to RED
-        ledSubsystem.setProcess(LEDProcess.RED_ALLIANCE);
-      } else {
-        // Set LED process to BLUE
-        ledSubsystem.setProcess(LEDProcess.BLUE_ALLIANCE);
-      }
+    
   }
 
   /** This function is called periodically during all modes. */
@@ -356,7 +349,8 @@ public class Robot extends LoggedRobot {
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
-        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake(), ledSubsystem);
+        this.coralIntakeSubsystem =
+            new CoralIntakeSubsystem(new PhysicalCoralIntake(), ledSubsystem);
         this.simWorld = null;
       }
       case DEV_ROBOT -> {
@@ -371,7 +365,8 @@ public class Robot extends LoggedRobot {
         this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
-        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake(), ledSubsystem);
+        this.coralIntakeSubsystem =
+            new CoralIntakeSubsystem(new PhysicalCoralIntake(), ledSubsystem);
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
@@ -389,7 +384,8 @@ public class Robot extends LoggedRobot {
         this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
-        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {}, ledSubsystem);
+        this.coralIntakeSubsystem =
+            new CoralIntakeSubsystem(new CoralIntakeInterface() {}, ledSubsystem);
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.simWorld = null;
@@ -411,7 +407,8 @@ public class Robot extends LoggedRobot {
         this.swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
-        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake(), ledSubsystem);
+        this.coralIntakeSubsystem =
+            new CoralIntakeSubsystem(new SimulatedCoralntake(), ledSubsystem);
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
       }
@@ -430,7 +427,8 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {});
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new FunnelPivotInterface() {});
-        this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {}, ledSubsystem);
+        this.coralIntakeSubsystem =
+            new CoralIntakeSubsystem(new CoralIntakeInterface() {}, ledSubsystem);
         this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new ClimbPivotInterface() {});
         this.simWorld = null;
