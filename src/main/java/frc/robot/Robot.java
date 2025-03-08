@@ -204,6 +204,7 @@ public class Robot extends LoggedRobot {
                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
                     coralIntakeSubsystem)));
 
+
     operatorController
         .rightBumper()
         .whileTrue(

@@ -129,6 +129,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         this);
   }
 
+
+  
+  public Command manualElevator(double output) {
+    return new RunCommand(
+        // does this while command is active
+        () -> this.openLoop(output),
+        // requirements for command
+        this);
+  }
+
   public Command setElevationPosition(double position) {
     return new FunctionalCommand(
         // initialization function
