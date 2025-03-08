@@ -8,6 +8,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
@@ -28,7 +29,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
   private final MotionMagicVoltage mmPositionRequest = new MotionMagicVoltage(0.0);
   private final DutyCycleOut dutyCyleOut = new DutyCycleOut(0.0);
-  // private final Follower follower;
+  private final Follower follower;
 
   private final MotionMagicTorqueCurrentFOC mmTorqueRequest = new MotionMagicTorqueCurrentFOC(0.0);
   private final TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
@@ -51,7 +52,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
   /** Creates a new PhysicalElevator. */
   public PhysicalElevator() {
-    // follower = new Follower(leaderMotor.getDeviceID(), true);
+    follower = new Follower(leaderMotor.getDeviceID(), true);
     elevatorConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
 
     // Limits
@@ -80,8 +81,8 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.Feedback.SensorToMechanismRatio = ElevatorConstants.ELEVATOR_GEAR_RATIO;
 
     leaderMotor.getConfigurator().apply(elevatorConfig);
-    // followerMotor.setControl(follower);
-    elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    followerMotor.setControl(follower);
+    // elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
 
     leaderPosition = leaderMotor.getPosition();
@@ -155,36 +156,36 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getElevatorPosition() {
     leaderPosition.refresh();
     followerPosition.refresh();
-    return followerPosition.getValueAsDouble();
+    return leaderPosition.getValueAsDouble();
   }
 
   @Override
   public void setElevatorPosition(double position) {
     leaderMotor.setControl(mmPositionRequest.withPosition(position));
-    followerMotor.setControl(mmPositionRequest.withPosition(position));
+    // followerMotor.setControl(mmPositionRequest.withPosition(position));
   }
 
   @Override
   public void setVolts(double volts) {
     leaderMotor.setVoltage(-volts);
-    followerMotor.setVoltage(-volts);
+    // followerMotor.setVoltage(-volts);
   }
 
   @Override
   public double getVolts() {
-    return followerAppliedVoltage.getValueAsDouble();
+    return leaderAppliedVoltage.getValueAsDouble();
   }
 
   @Override
   public void openLoop(double output) {
     leaderMotor.setControl(dutyCyleOut.withOutput(output));
-    followerMotor.setControl(dutyCyleOut.withOutput(output));
+    // followerMotor.setControl(dutyCyleOut.withOutput(output));
   }
 
   @Override
   public void resetElevatorPosition(double position) {
     leaderMotor.setPosition(position);
-    followerMotor.setPosition(position);
+    // followerMotor.setPosition(position);
   }
 
   @Override

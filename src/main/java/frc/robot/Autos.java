@@ -13,6 +13,7 @@ import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
+import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -24,18 +25,20 @@ public class Autos {
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private SwerveDrive swerveDrive;
   private VisionSubsystem visionSubsystem;
+  private FunnelSubsystem funnelSubsystem;
 
   public Autos(
       AutoFactory autoFactory,
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem, FunnelSubsystem funnelSubsystem) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
+    this.funnelSubsystem = funnelSubsystem;
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -114,7 +117,8 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
+                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY), 
+                funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -89,7 +90,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public boolean isAtSetpoint(double position) {
-    return Math.abs(position - inputs.followerMotorPosition)
+    return Math.abs(position - inputs.leaderMotorPosition)
         < ElevatorConstants.ELEVATOR_ERROR_TOLERANCE;
   }
 
@@ -123,7 +124,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command manualElevator(DoubleSupplier joystickY) {
     return new RunCommand(
         // does this while command is active
-        () -> this.openLoop(joystickY.getAsDouble()),
+        () -> this.openLoop(MathUtil.applyDeadband(joystickY.getAsDouble(), .1)),
         // requirements for command
         this);
   }

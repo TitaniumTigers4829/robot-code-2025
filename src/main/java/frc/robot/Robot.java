@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.FunnelCommand;
 import frc.robot.commands.characterization.WheelRadiusCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
@@ -35,6 +35,7 @@ import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeInterface;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
@@ -220,24 +221,22 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
-    // driverController
-    //     .leftTrigger()
-    //     .whileTrue(
-    //         Commands.sequence(
-    //
-    // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-    //                 new InstantCommand(() ->
-    // coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-    //                 Commands.runEnd(
-    //                     () -> coralIntakeSubsystem.intakeCoral(),
-    //                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-    //                     coralIntakeSubsystem))
-    //             .alongWith(
-    //                 Commands.runOnce(() -> shouldAlignSource = true)
-    //                     .alongWith(Commands.runOnce(() -> shouldAlignReef = false))))
-    //     .onFalse(
-    //         Commands.runOnce(() -> shouldAlignSource = false)
-    //             .alongWith(Commands.runOnce(() -> shouldAlignReef = true)));
+    driverController
+        .leftTrigger()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                    coralIntakeSubsystem)));
+    //         .alongWith(
+    //             Commands.runOnce(() -> shouldAlignSource = true)
+    //                 .alongWith(Commands.runOnce(() -> shouldAlignReef = false))))
+    // .onFalse(
+    //     Commands.runOnce(() -> shouldAlignSource = false)
+    //         .alongWith(Commands.runOnce(() -> shouldAlignReef = true)));
 
     // driverController
     //     .rightTrigger()
@@ -253,10 +252,11 @@ public class Robot extends LoggedRobot {
     //                 Commands.runOnce(() -> shouldAlignSource = true)
     //                     .alongWith(Commands.runOnce(() -> shouldAlignReef = false))));
 
-    driverController
-        .rightTrigger()
-        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
+    // driverController
+    //     .rightTrigger()
+    //     .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+    // driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem,
+    // true));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
@@ -268,6 +268,7 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
+    operatorController.leftTrigger().whileTrue(new FunnelCommand(funnelSubsystem));
     // operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
     // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
@@ -343,15 +344,15 @@ public class Robot extends LoggedRobot {
                     Commands.runOnce(() -> shouldAlignSource = false)
                         .alongWith(Commands.runOnce(() -> shouldAlignReef = false))));
 
-    operatorController
-        .leftTrigger()
-        .whileTrue(
-            Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+    // operatorController
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         Commands.runEnd(
+    //             () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+    //             () ->
+    //                 coralIntakeSubsystem.setIntakeVelocity(
+    //                     CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+    //             coralIntakeSubsystem));
 
     operatorController
         .povUp()
@@ -544,7 +545,7 @@ public class Robot extends LoggedRobot {
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,
-            this.visionSubsystem);
+            this.visionSubsystem, this.funnelSubsystem);
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
