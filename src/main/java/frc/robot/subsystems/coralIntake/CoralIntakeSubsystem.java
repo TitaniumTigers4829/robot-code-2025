@@ -53,13 +53,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return SmartDashboard.getBoolean("Coral", true);
   }
 
-  public void intakeCoral() {
-    if (currentState == IntakeState.IDLE) {
-      currentState = IntakeState.WAITING;
-      usedToHaveCoral = hasCoral(); // Set the starting sensor state
-      usedToHaveControl = hasControl();
-    }
-  }
+  // public void intakeCoral() {
+  //   if (currentState == IntakeState.IDLE) {
+  //     currentState = IntakeState.WAITING;
+  //     usedToHaveCoral = hasCoral(); // Set the starting sensor state
+  //     usedToHaveControl = hasControl();
+  //   }
+  // }
 
   public boolean hasControl() {
     return coralIntakeInputs.hasControl;
