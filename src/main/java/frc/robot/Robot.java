@@ -6,7 +6,6 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,10 +22,6 @@ import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
-import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
-import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
-import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
-import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
@@ -77,14 +72,12 @@ public class Robot extends LoggedRobot {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
-  private final Joystick buttonBoard = new Joystick(2);
 
   private VisionSubsystem visionSubsystem;
   private SwerveDrive swerveDrive;
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private FunnelSubsystem funnelSubsystem;
-  private AlgaePivotSubsystem algaePivotSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
 
@@ -94,8 +87,7 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean shouldAlignSource = false;
-  private boolean shouldAlignReef = false;
+  private boolean overrideElevator = false;
 
   public Robot() {
     checkGit();
@@ -171,9 +163,7 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.rightStick().getAsBoolean(),
-            shouldAlignSource,
-            shouldAlignReef);
+            () -> driverController.rightStick().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -217,9 +207,15 @@ public class Robot extends LoggedRobot {
     operatorController
         .rightBumper()
         .whileTrue(
-            elevatorSubsystem.manualElevator(() -> operatorController.getLeftY())
-            // .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
-            );
+            elevatorSubsystem
+                .manualElevator(() -> operatorController.getLeftY())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
+    operatorController.povLeft().onTrue(Commands.runOnce((() -> overrideElevator = true)));
+
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
@@ -242,8 +238,9 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .x()
@@ -252,8 +249,9 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .b()
@@ -261,9 +259,10 @@ public class Robot extends LoggedRobot {
             new SetElevatorPosition(
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
                 .onlyIf(
-                    (() ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .y()
@@ -272,8 +271,9 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .leftTrigger()
@@ -361,7 +361,6 @@ public class Robot extends LoggedRobot {
         this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.simWorld = null;
@@ -379,7 +378,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
@@ -397,7 +395,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.simWorld = null;
       }
@@ -419,7 +416,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         SmartDashboard.putBoolean("Coral", false);
@@ -440,7 +436,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new FunnelPivotInterface() {});
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new ClimbPivotInterface() {});
         this.simWorld = null;
       }

@@ -39,7 +39,7 @@ public class ElevatorConstants {
 
   // limit
   public static final double LIMIT = -0.01;
-  public static final boolean LIMIT_ENABLE = false;
+  public static final boolean LIMIT_ENABLE = true;
   public static final double REVERSE_LIMIT = -9.6;
   public static final boolean REVRESE_LIMIT_ENABLE = true;
 
