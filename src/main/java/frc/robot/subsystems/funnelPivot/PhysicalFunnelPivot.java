@@ -41,6 +41,9 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
         FunnelConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
 
+    funnelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    funnelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
+
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = FunnelConstants.MAX_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
