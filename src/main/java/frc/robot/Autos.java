@@ -13,8 +13,8 @@ import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
-import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -32,7 +32,8 @@ public class Autos {
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
-      VisionSubsystem visionSubsystem, FunnelSubsystem funnelSubsystem) {
+      VisionSubsystem visionSubsystem,
+      FunnelSubsystem funnelSubsystem) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
@@ -117,7 +118,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY), 
+                autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
                 funnelSubsystem.dropFunnel(),
                 startToJTrajectory.cmd()));
     startToJTrajectory
@@ -125,7 +126,8 @@ public class Autos {
         .onTrue(
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .alongWith(
-                    new SetElevatorPosition(swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                    new SetElevatorPosition(
+                        swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                 .withTimeout(4.0)
                 .andThen(
                     Commands.runEnd(
@@ -242,11 +244,15 @@ public class Autos {
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -308,11 +314,15 @@ public class Autos {
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -360,11 +370,15 @@ public class Autos {
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -417,11 +431,15 @@ public class Autos {
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -483,11 +501,15 @@ public class Autos {
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 }

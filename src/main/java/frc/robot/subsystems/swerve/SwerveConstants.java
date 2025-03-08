@@ -153,7 +153,7 @@ public class SwerveConstants {
 
     public static final double GYRO_MAX_PITCH = 30.0; // degrees
     public static final double GYRO_MAX_ROLL = 30.0; // degrees
-    
+
     public static final double DRIVE_GEAR_RATIO =
         Constants.getRobot() == RobotType.DEV_ROBOT ? 7.13 : 4.59; // 4.59
     public static final double TURN_GEAR_RATIO = 11.3142;
