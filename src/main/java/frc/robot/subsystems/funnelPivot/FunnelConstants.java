@@ -7,14 +7,15 @@ public class FunnelConstants {
 
   public static final SensorDirectionValue FUNNEL_ENCODER_REVERSED =
       SensorDirectionValue.Clockwise_Positive;
-  public static final double MAX_VELOCITY_ROTATIONS_PER_SECOND = 20.0;
-  public static final double MAX_ACCELERATION_ROTATIONS_PER_SECOND = 20.0;
+  public static final double MAX_VELOCITY_ROTATIONS_PER_SECOND = 5.0;
+  public static final double MAX_ACCELERATION_ROTATIONS_PER_SECOND = 5.0;
 
-  public static final double MAX_ANGLE = 0.0;
-  public static final double MIN_ANGLE = 0.0;
+  public static final double MAX_ANGLE = FunnelConstants.ANGLE_ZERO;
+  public static final double MIN_ANGLE = FunnelConstants.ANGLE_INTAKE;
 
   public static final double ANGLE_ZERO = 0.0;
-  public static final double PIVOT_P = 100.0;
+  public static final double ANGLE_INTAKE = 38.6376953125;
+  public static final double PIVOT_P = 10.0;
   public static final double PIVOT_I = 0.0;
   public static final double PIVOT_D = 0.0;
   public static final double PIVOT_G = 0.0;
@@ -27,7 +28,4 @@ public class FunnelConstants {
   public static final double FUNNEL_PIVOT_SPEED = 0.0;
   public static final double FUNNEL_VOLTAGE = 0.0;
   public static final double FUNNEL_NEUTRAL_SPEED = 0.0;
-
-  // set starting pos of motor cuz no encoder
-  public static final double startingPos = 0.0;
 }

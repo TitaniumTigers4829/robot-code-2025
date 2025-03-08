@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
@@ -95,7 +94,8 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean isElevatorZeroed;
+  private boolean shouldAlignSource = false;
+  private boolean shouldAlignReef = false;
 
   public Robot() {
     checkGit();
@@ -131,24 +131,7 @@ public class Robot extends LoggedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
-    SmartDashboard.putBoolean("Trajectory Done", false);
-
-    // if (isElevatorZeroed == false) {
-    //   Commands.sequence(
-    //       Commands.run(() -> elevatorSubsystem.setVolts(-2.0)).withTimeout(0.5),
-    //       new InstantCommand(() -> elevatorSubsystem.resetPosition(0.0)),
-    //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
-    //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
-    // }
-    swerveDrive.resetEstimatedPose(
-        new Pose2d(
-            swerveDrive.getEstimatedPose().getX(),
-            swerveDrive.getEstimatedPose().getY(),
-            Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())));
-    visionSubsystem.setOdometryInfo(
-        swerveDrive.getOdometryRotation2d().getDegrees(), 0, swerveDrive.getEstimatedPose());
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
@@ -157,14 +140,6 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-
-    // if (isElevatorZeroed == false) {
-    //   Commands.sequence(
-    //       Commands.run(() -> elevatorSubsystem.setVolts(-2.0)).withTimeout(0.5),
-    //       new InstantCommand(() -> elevatorSubsystem.resetPosition(0.0)),
-    //       new InstantCommand(() -> elevatorSubsystem.setVolts(0.0)),
-    //       new InstantCommand(() -> elevatorSubsystem.enableLimits(true, true)));
-    // }
     DriverStation.silenceJoystickConnectionWarning(true);
     configureDriverController();
     configureOperatorController();
@@ -196,7 +171,9 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.rightStick().getAsBoolean());
+            () -> driverController.rightStick().getAsBoolean(),
+            shouldAlignSource,
+            shouldAlignReef);
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -211,6 +188,11 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
+    driverController
+        .rightTrigger()
+        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
+
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
     driverController
@@ -218,29 +200,26 @@ public class Robot extends LoggedRobot {
         .onTrue(
             new InstantCommand(
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
-
-    // FieldConstants has all reef poses
-    driverController
-        .rightTrigger()
-        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
   }
 
   private void configureOperatorController() {
-    JoystickButton intakeButton = new JoystickButton(buttonBoard, 0);
-    JoystickButton outakeButton = new JoystickButton(buttonBoard, 1);
-    JoystickButton scoreL1 = new JoystickButton(buttonBoard, 2);
-    JoystickButton scoreL2 = new JoystickButton(buttonBoard, 3);
-    JoystickButton scoreL3 = new JoystickButton(buttonBoard, 4);
-    JoystickButton scoreL4 = new JoystickButton(buttonBoard, 5);
-    // JoystickButton alignLeft = new JoystickButton(buttonBoard, 6);
-    // JoystickButton alignRight = new JoystickButton(buttonBoard, 7);
+    operatorController
+        .leftBumper()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                    coralIntakeSubsystem)));
 
-    // operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
-    // operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
     operatorController
         .rightBumper()
-        .whileTrue(elevatorSubsystem.manualElevator(() -> operatorController.getLeftY()));
+        .whileTrue(
+            elevatorSubsystem.manualElevator(() -> operatorController.getLeftY())
+            // .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
+            );
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
@@ -255,35 +234,46 @@ public class Robot extends LoggedRobot {
                     coralIntakeSubsystem.setIntakeVelocity(
                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                 coralIntakeSubsystem));
-    // operatorController
-    //     .x()
-    //     .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY() * 0.6));
-    // operatorController
-    //     .y()
-    //     .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
-    // operatorController
-    //     .a()
-    //     .whileTrue(new RunCommand(() -> funnelSubsystem.setFunnelAngle(8.0), funnelSubsystem));
-    /* Uncomment below to score the coral with controller, this scores with auto align
-     * and I'm pretty sure it doesn't work well yet. (idk)
-     *
-     * We should probably make the ScoreL commands parallel but for now we're testing.
-     */
+
     operatorController
         .a()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(
+                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+                .onlyIf(
+                    () ->
+                        coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle()));
 
     operatorController
         .x()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(
+                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+                .onlyIf(
+                    () ->
+                        coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle()));
 
     operatorController
         .b()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(
+                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
+                .onlyIf(
+                    (() ->
+                        coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .y()
-        .whileTrue(new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .whileTrue(
+            new SetElevatorPosition(
+                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+                .onlyIf(
+                    () ->
+                        coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle()));
 
     operatorController
         .leftTrigger()
@@ -296,37 +286,11 @@ public class Robot extends LoggedRobot {
                 coralIntakeSubsystem));
 
     operatorController
-        .leftBumper()
-        .whileTrue(
-            Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
-
-    operatorController
         .povUp()
         .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
     operatorController
         .povDown()
         .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
-
-    operatorController
-        .povRight()
-        .whileTrue(
-            Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(2000),
-                () -> coralIntakeSubsystem.setIntakeVelocity(0.0),
-                coralIntakeSubsystem));
-
-    // intakeButton.whileTrue(coralIntakeSubsystem.intakeCoral());
-    // outakeButton.whileTrue(coralIntakeSubsystem.ejectCoral());
-    // scoreL1.whileTrue(new ScoreL1(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL2.whileTrue(new ScoreL2(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL3.whileTrue(new ScoreL3(elevatorSubsystem, coralIntakeSubsystem));
-    // scoreL4.whileTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
   }
 
   private void checkGit() {
@@ -381,9 +345,7 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-  public void robotInit() {
-    isElevatorZeroed = false;
-  }
+  public void robotInit() {}
 
   private void setupSubsystems() {
     switch (Constants.getRobot()) {
@@ -503,6 +465,7 @@ public class Robot extends LoggedRobot {
               FollowSwerveSampleCommand followSwerveSampleCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
               followSwerveSampleCommand.execute();
+              Logger.recordOutput("Trajectory/sample", sample.getPose());
             }, // A function that follows a choreo trajectory
             true, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
@@ -513,7 +476,8 @@ public class Robot extends LoggedRobot {
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,
-            this.visionSubsystem);
+            this.visionSubsystem,
+            this.funnelSubsystem);
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
@@ -524,6 +488,7 @@ public class Robot extends LoggedRobot {
     this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
 
     this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
+    this.autoChooser.addRoutine("uh oh", () -> this.autos.djfkajfl());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
