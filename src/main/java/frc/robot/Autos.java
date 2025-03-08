@@ -85,7 +85,8 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                new InstantCommand(()->swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new InstantCommand(
+                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
                 new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(6),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
