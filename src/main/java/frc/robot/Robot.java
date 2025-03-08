@@ -299,7 +299,7 @@ public class Robot extends LoggedRobot {
     operatorController
         .a()
         .whileTrue(
-            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+            new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
                 .onlyIf(
                     () ->
                         coralIntakeSubsystem.isIntakeComplete()
@@ -311,7 +311,7 @@ public class Robot extends LoggedRobot {
     operatorController
         .x()
         .whileTrue(
-            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+            new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
                 .onlyIf(
                     () ->
                         coralIntakeSubsystem.isIntakeComplete()
@@ -323,19 +323,16 @@ public class Robot extends LoggedRobot {
     operatorController
         .b()
         .whileTrue(
-            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
+            new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
                 .onlyIf(
                     (() ->
                         coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()))
-                .alongWith(
-                    Commands.runOnce(() -> shouldAlignSource = false)
-                        .alongWith(Commands.runOnce(() -> shouldAlignReef = false))));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .y()
         .whileTrue(
-            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+            new SetElevatorPosition(swerveDrive,elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
                 .onlyIf(
                     () ->
                         coralIntakeSubsystem.isIntakeComplete()

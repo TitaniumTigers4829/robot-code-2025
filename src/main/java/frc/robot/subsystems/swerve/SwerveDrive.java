@@ -350,6 +350,24 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
+   * Gets the current roll of the gyro
+   * 
+   * @return idk
+   */
+  public double getGyroRoll() {
+    return gyroInputs.rollDegrees;
+  }
+
+  /**
+   * Gets the current pitch of the gyro
+   * 
+   * @return smthn
+   */
+  public double getGyroPitch() {
+    return gyroInputs.pitchDegrees;
+  }
+
+  /**
    * Gets the rotation of the robot represented as a Rotation2d.
    *
    * @return a Rotation2d for the heading of the robot.
