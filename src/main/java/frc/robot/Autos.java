@@ -84,7 +84,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                new RepulsorReef(swerveDrive, visionSubsystem, true),
+                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(6),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
