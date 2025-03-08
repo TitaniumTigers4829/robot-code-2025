@@ -4,6 +4,7 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
@@ -84,6 +85,7 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
+                new InstantCommand(()->swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
                 new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(6),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;

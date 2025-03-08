@@ -44,8 +44,7 @@ public class FunnelSubsystem extends SubsystemBase {
   }
 
   public Command manualFunnel(DoubleSupplier position) {
-    return new RunCommand(
-        () -> funnelPivotInterface.setFunnelSpeed(position.getAsDouble()), this);
+    return new RunCommand(() -> funnelPivotInterface.setFunnelSpeed(position.getAsDouble()), this);
   }
 
   public Command dropFunnel() {
