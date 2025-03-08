@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   private static RobotType robotType = RobotType.DEV_ROBOT;
 
-  public static final boolean tuningMode = true;
+  public static final boolean tuningMode = false;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT

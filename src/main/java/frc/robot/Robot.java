@@ -462,7 +462,7 @@ public class Robot extends LoggedRobot {
               followSwerveSampleCommand.execute();
               Logger.recordOutput("Trajectory/sample", sample.getPose());
             }, // A function that follows a choreo trajectory
-            true, // If alliance flipping should be enabled
+            false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
@@ -483,9 +483,11 @@ public class Robot extends LoggedRobot {
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
 
-    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
+    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () ->
+    // this.autos.xOneMeterAuto());
 
-    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
+    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () ->
+    // this.autos.yOneMeterAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
