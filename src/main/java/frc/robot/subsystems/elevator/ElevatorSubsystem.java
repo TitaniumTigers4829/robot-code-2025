@@ -103,7 +103,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public void toggleLimits() {
-    elevatorInterface.enableLimits(!elevatorInterface.getForwardLimit(), !elevatorInterface.getReverseLimit());
+    elevatorInterface.enableLimits(
+        !elevatorInterface.getForwardLimit(), !elevatorInterface.getReverseLimit());
   }
 
   @Override

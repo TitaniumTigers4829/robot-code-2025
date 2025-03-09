@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
@@ -198,14 +197,13 @@ public class Robot extends LoggedRobot {
         .leftBumper()
         .whileTrue(
             Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
                 new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
                 Commands.runEnd(
                     () -> coralIntakeSubsystem.intakeCoral(),
                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
                     coralIntakeSubsystem)));
-    operatorController
-        .povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
+    operatorController.povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
 
     operatorController
         .rightBumper()

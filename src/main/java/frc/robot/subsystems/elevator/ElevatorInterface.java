@@ -48,7 +48,11 @@ public interface ElevatorInterface {
 
   public default void resetElevatorPosition(double position) {}
 
-  public default boolean getReverseLimit() { return false; }
+  public default boolean getReverseLimit() {
+    return false;
+  }
 
-  public default boolean getForwardLimit() { return false; }
+  public default boolean getForwardLimit() {
+    return false;
+  }
 }
