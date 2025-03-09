@@ -664,7 +664,7 @@ public class SwerveDrive extends SubsystemBase {
     outputRobotRelative =
         Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    drive(outputRobotRelative, false);
   }
 
   /**
