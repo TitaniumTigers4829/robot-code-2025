@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
@@ -85,9 +86,9 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                new InstantCommand(
-                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
-                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(6),
+                new InstantCommand(()->swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new DriveCommand(swerveDrive, visionSubsystem, ()-> 0, ()->0.15, ()->0, ()->false, ()->false).withTimeout(3.5),
+                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }

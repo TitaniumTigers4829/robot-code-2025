@@ -11,10 +11,10 @@ public class ScoreL4 extends SequentialCommandGroup {
   /** Creates a new ScoreL4. */
   public ScoreL4(ElevatorSubsystem elevatorSubsystem, CoralIntakeSubsystem coralIntakeSubsystem) {
     addCommands(
-        elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()).withTimeout(7.0),
+        elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()).withTimeout(6.0),
         Commands.run(
                 () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
                 coralIntakeSubsystem)
-            .withTimeout(1.0));
+            .withTimeout(10.0));
   }
 }
