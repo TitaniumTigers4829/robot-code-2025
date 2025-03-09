@@ -297,10 +297,14 @@ public class Robot extends LoggedRobot {
 
     operatorController
         .povUp()
-        .whileTrue(climbPivotSubsystem.manualPivotClimb(()->JoystickUtil.modifyAxis(()->operatorController.getLeftY(), 2)));
+        .whileTrue(
+            climbPivotSubsystem.manualPivotClimb(
+                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
     operatorController
         .povDown()
-        .whileTrue(funnelSubsystem.manualFunnel(()->JoystickUtil.modifyAxis(()->operatorController.getLeftY(),2)));
+        .whileTrue(
+            funnelSubsystem.manualFunnel(
+                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
   }
 
   private void checkGit() {
