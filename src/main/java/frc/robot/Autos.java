@@ -108,6 +108,8 @@ public class Autos {
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY),
                 // funnelSubsystem.dropFunnel(),
+                // elevatorSubsystem.manualElevator(-0.2).withTimeout(0.2),
+                // Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem),
                 startToJTrajectory.cmd()));
     startToJTrajectory
         .done()
