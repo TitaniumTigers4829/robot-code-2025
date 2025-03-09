@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems.coralIntake;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -126,13 +125,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         }
         break;
 
-      // case JAM_CLEARING:
-      //   // Maintain reverse until the jam clearing duration has elapsed
-      //   if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
-      //     // After jam clearing, return to waiting state to try ingestion again
-      //     currentState = IntakeState.WAITING;
-      //   }
-      //   break;
+        // case JAM_CLEARING:
+        //   // Maintain reverse until the jam clearing duration has elapsed
+        //   if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
+        //     // After jam clearing, return to waiting state to try ingestion again
+        //     currentState = IntakeState.WAITING;
+        //   }
+        //   break;
 
       case STOPPED:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
