@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
@@ -293,12 +294,12 @@ public class SwerveDrive extends SubsystemBase {
     // } else {
     chassisSpeeds =
         new ChassisSpeeds(
-            sample.vx/2.0,
+            sample.vx,
             // + totalForcesX
             // + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
-            sample.vy/2.0, // + yChoreoController.calculate(getChassisSpeeds().vyMetersPerSecond,
+            sample.vy, // + yChoreoController.calculate(getChassisSpeeds().vyMetersPerSecond,
             // sample.vy)
-            sample.omega/2.0);
+            sample.omega);
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
     Logger.recordOutput("Trajectories/vx", sample.vx);
@@ -310,7 +311,8 @@ public class SwerveDrive extends SubsystemBase {
     // double moveTheta = sample.omega;
     //     + rotationChoreoController.calculate(
     //         getOdometryRotation2d().getRadians(), sample.heading);
-    drive(chassisSpeeds.unaryMinus(), true);
+    chassisSpeeds = Robot.isSimulation() ? chassisSpeeds : chassisSpeeds.unaryMinus();
+    drive(chassisSpeeds, true);
   }
 
   /** Runs the SwerveModules periodic methods */
