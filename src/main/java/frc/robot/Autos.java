@@ -95,8 +95,7 @@ public class Autos {
   public AutoRoutine blueLeftTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory =
-        routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
+    AutoTrajectory startToJTrajectory = routine.trajectory("RedTrajectories/new-path");
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =

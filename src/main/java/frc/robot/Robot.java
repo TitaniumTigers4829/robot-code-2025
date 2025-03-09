@@ -207,7 +207,6 @@ public class Robot extends LoggedRobot {
         .povLeft()
         .whileTrue(Commands.runOnce(() -> coralIntakeSubsystem.setStuckMode(true)));
 
-
     operatorController
         .rightBumper()
         .whileTrue(

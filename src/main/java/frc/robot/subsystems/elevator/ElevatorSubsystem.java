@@ -129,8 +129,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         this);
   }
 
-
-  
   public Command manualElevator(double output) {
     return new RunCommand(
         // does this while command is active

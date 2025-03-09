@@ -96,8 +96,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     switch (currentState) {
       case WAITING:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.WAITING_INTAKE_SPEED);
-        if ((currentlyHasControl && !usedToHaveControl)
-            || (currentlyHasControl && !stuck && usedToHaveControl)) {
+        if ((currentlyHasControl && !usedToHaveControl)) {
           // Coral just got detected: start pushing it out
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INGEST_SPEED);
           currentState = IntakeState.INGESTING;
