@@ -15,11 +15,9 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
 
-
   // New Constants for Jam Handling
   private static final double JAM_CURRENT_THRESHOLD = 20.0; // amps (adjust as needed)
-  private static final double JAM_CLEARING_DURATION = 0.5;   // seconds (adjust as needed)
-
+  private static final double JAM_CLEARING_DURATION = 0.5; // seconds (adjust as needed)
 
   // States for the intake process
   public enum IntakeState {
@@ -38,7 +36,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private int stuckCounter = 0;
 
   private double jamStartTime = 0;
-
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
@@ -107,13 +104,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case INGESTING:
-      // If motor current is too high, a jam is likely – enter jam clearing state
-      if (coralIntakeInputs.intakeStatorCurrentAmps > JAM_CURRENT_THRESHOLD) {
-        currentState = IntakeState.JAM_CLEARING;
-        jamStartTime = Timer.getFPGATimestamp();
-        coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
-        break;
-      }
+        // If motor current is too high, a jam is likely – enter jam clearing state
+        if (coralIntakeInputs.intakeStatorCurrentAmps > JAM_CURRENT_THRESHOLD) {
+          currentState = IntakeState.JAM_CLEARING;
+          jamStartTime = Timer.getFPGATimestamp();
+          coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
+          break;
+        }
         if (!currentlyHasControl && currentlyHasCoral) {
           // Coral’s gone from the sensor: reverse to position it
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
@@ -129,14 +126,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         }
         break;
 
-
       case JAM_CLEARING:
-      // Maintain reverse until the jam clearing duration has elapsed
-      if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
-        // After jam clearing, return to waiting state to try ingestion again
-        currentState = IntakeState.WAITING;
-      }
-      break;
+        // Maintain reverse until the jam clearing duration has elapsed
+        if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
+          // After jam clearing, return to waiting state to try ingestion again
+          currentState = IntakeState.WAITING;
+        }
+        break;
 
       case STOPPED:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
