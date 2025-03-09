@@ -102,6 +102,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.enableLimits(forward, reverse);
   }
 
+  public void toggleLimits() {
+    elevatorInterface.enableLimits(!elevatorInterface.getForwardLimit(), !elevatorInterface.getReverseLimit());
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);

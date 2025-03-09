@@ -197,6 +197,16 @@ public class PhysicalElevator implements ElevatorInterface {
   }
 
   @Override
+  public boolean getForwardLimit() {
+    return elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable;
+  }
+
+  @Override
+  public boolean getReverseLimit() {
+    return elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable;
+  }
+
+  @Override
   public void setPID(double kP, double kI, double kD) {
     elevatorConfig.Slot0.kP = kP;
     elevatorConfig.Slot0.kI = kI;
