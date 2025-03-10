@@ -32,14 +32,14 @@ public class ElevatorConstants {
   public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
   public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = false;
 
-  public static final double MOTION_MAGIC_MAX_ACCELERATION = 160;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100;
+  public static final double MOTION_MAGIC_MAX_ACCELERATION = 160 / 2.0;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100 / 2.0;
 
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
 
   // limit
   public static final double LIMIT = -0.01;
-  public static final boolean LIMIT_ENABLE = false;
+  public static final boolean LIMIT_ENABLE = true;
   public static final double REVERSE_LIMIT = -9.6;
   public static final boolean REVRESE_LIMIT_ENABLE = true;
 
@@ -49,7 +49,7 @@ public class ElevatorConstants {
     L2(-3.65),
     L3(-5.845),
     L4(-9.5),
-    FEEDER(-1.2646484375);
+    FEEDER(-1.31103515625);
 
     private final double position;
 

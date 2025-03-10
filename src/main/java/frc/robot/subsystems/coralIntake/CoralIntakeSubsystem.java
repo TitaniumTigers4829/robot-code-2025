@@ -29,6 +29,8 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private IntakeState currentState = IntakeState.IDLE;
   private boolean usedToHaveCoral = false;
   private boolean usedToHaveControl = false;
+  private boolean stuck = false;
+  private int stuckCounter = 0;
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
@@ -74,6 +76,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return currentState == IntakeState.IDLE;
   }
 
+  public void setStuckMode(boolean b) {
+    this.stuck = b;
+  }
+
   @Override
   public void periodic() {
     coralIntakeInterface.updateInputs(coralIntakeInputs);
@@ -82,11 +88,19 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     boolean currentlyHasCoral = hasCoral();
     boolean currentlyHasControl = hasControl();
 
+    if (stuck) {
+      stuckCounter++;
+    }
+    if (stuck && stuckCounter >= 5) {
+      stuck = false;
+      stuckCounter = 0;
+    }
+
     // Run the state machine
     switch (currentState) {
       case WAITING:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.WAITING_INTAKE_SPEED);
-        if (currentlyHasControl && !usedToHaveControl) {
+        if ((currentlyHasControl && !usedToHaveControl)) {
           // Coral just got detected: start pushing it out
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INGEST_SPEED);
           currentState = IntakeState.INGESTING;
