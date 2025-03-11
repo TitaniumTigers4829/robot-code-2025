@@ -41,6 +41,7 @@ import frc.robot.subsystems.funnelPivot.FunnelPivotInterface;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.funnelPivot.PhysicalFunnelPivot;
 import frc.robot.subsystems.funnelPivot.SimulatedFunnelPivot;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -452,7 +453,7 @@ public class Robot extends LoggedRobot {
         this.simWorld = null;
       }
     }
-    // ledSubsystem.setProcess(LEDProcess.DEFAULT);
+    ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
   private void setupAuto() {
