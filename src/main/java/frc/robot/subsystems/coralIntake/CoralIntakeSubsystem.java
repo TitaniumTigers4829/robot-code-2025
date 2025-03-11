@@ -173,7 +173,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
       return new StartEndCommand(
           // sets speed while command is active
           () -> {
-            this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED);
+            this.setIntakeSpeed(CoralIntakeConstants.INGEST_SPEED);
             ledSubsystem.setProcess(LEDProcess.ORANGE);
           },
           // sets speed when command ends
@@ -186,14 +186,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     } else {
       return new StartEndCommand(
           // sets speed while command is active
-          () -> { 
+          () -> {
             this.setIntakeSpeed(0.0);
-              ledSubsystem.setProcess(LEDProcess.GREEN);
+            ledSubsystem.setProcess(LEDProcess.GREEN);
           },
           // sets speed when command ends
           () -> {
             this.setIntakeSpeed(0);
-              ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
+            ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
           },
           // requirements for command
           this);

@@ -15,8 +15,6 @@ import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
-import frc.robot.subsystems.leds.LEDSubsystem;
 
 public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFX coralIntakeMotor;
@@ -37,7 +35,6 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   private final TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
   public PhysicalCoralIntake() {
-    ledSubsystem = new LEDSubsystem();
     coralIntakeMotor = new TalonFX(CoralIntakeConstants.CORAL_INTAKE_MOTOR_ID);
     innerCoralSensor = new DigitalInput(CoralIntakeConstants.INNER_CORAL_SENSOR_ID);
     outerCoralSensor = new DigitalInput(CoralIntakeConstants.OUTER_CORAL_SENSOR_ID);
