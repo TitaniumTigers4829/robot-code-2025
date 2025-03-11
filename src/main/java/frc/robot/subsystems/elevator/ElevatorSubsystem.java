@@ -102,6 +102,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.enableLimits(forward, reverse);
   }
 
+  public void toggleLimits() {
+    elevatorInterface.enableLimits(
+        !elevatorInterface.getForwardLimit(), !elevatorInterface.getReverseLimit());
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);
@@ -125,6 +130,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     return new RunCommand(
         // does this while command is active
         () -> this.openLoop(MathUtil.applyDeadband(joystickY.getAsDouble(), .1)),
+        // requirements for command
+        this);
+  }
+
+  public Command manualElevator(double output) {
+    return new RunCommand(
+        // does this while command is active
+        () -> this.openLoop(output),
         // requirements for command
         this);
   }

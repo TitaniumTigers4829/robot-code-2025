@@ -6,7 +6,6 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,10 +23,6 @@ import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
-import frc.robot.subsystems.algaePivot.AlgaePivotInterface;
-import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
-import frc.robot.subsystems.algaePivot.PhysicalAlgaePivot;
-import frc.robot.subsystems.algaePivot.SimulatedAlgaePivot;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
@@ -47,6 +42,7 @@ import frc.robot.subsystems.funnelPivot.FunnelPivotInterface;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.funnelPivot.PhysicalFunnelPivot;
 import frc.robot.subsystems.funnelPivot.SimulatedFunnelPivot;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -78,14 +74,12 @@ public class Robot extends LoggedRobot {
 
   private final CommandXboxController driverController = new CommandXboxController(0);
   private final CommandXboxController operatorController = new CommandXboxController(1);
-  private final Joystick buttonBoard = new Joystick(2);
 
   private VisionSubsystem visionSubsystem;
   private SwerveDrive swerveDrive;
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private FunnelSubsystem funnelSubsystem;
-  private AlgaePivotSubsystem algaePivotSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
 
@@ -95,8 +89,7 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean shouldAlignSource = false;
-  private boolean shouldAlignReef = false;
+  private boolean overrideElevator = false;
 
   public Robot() {
     checkGit();
@@ -172,9 +165,7 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.rightStick().getAsBoolean(),
-            shouldAlignSource,
-            shouldAlignReef);
+            () -> driverController.rightStick().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -208,19 +199,25 @@ public class Robot extends LoggedRobot {
         .leftBumper()
         .whileTrue(
             Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
                 new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
                 Commands.runEnd(
                     () -> coralIntakeSubsystem.intakeCoral(),
                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
                     coralIntakeSubsystem)));
+    operatorController.povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
 
     operatorController
         .rightBumper()
         .whileTrue(
-            elevatorSubsystem.manualElevator(() -> operatorController.getLeftY())
-            // .onlyIf(() -> coralIntakeSubsystem.isIntakeComplete())
-            );
+            elevatorSubsystem
+                .manualElevator(() -> operatorController.getLeftY())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
+
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
@@ -228,13 +225,17 @@ public class Robot extends LoggedRobot {
         .povRight()
         .whileTrue(
             Commands.runEnd(
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.REVERSE_INTAKE_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.REVERSE_INTAKE_SPEED + -1800),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .andThen(
+                    Commands.runOnce(
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
+                        coralIntakeSubsystem)));
 
     operatorController
         .a()
@@ -243,8 +244,9 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .x()
@@ -253,8 +255,9 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .b()
@@ -262,9 +265,10 @@ public class Robot extends LoggedRobot {
             new SetElevatorPosition(
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
                 .onlyIf(
-                    (() ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .y()
@@ -273,25 +277,34 @@ public class Robot extends LoggedRobot {
                     swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
                 .onlyIf(
                     () ->
-                        coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle()));
+                        (coralIntakeSubsystem.isIntakeComplete()
+                                || coralIntakeSubsystem.isIntakeIdle())
+                            && !overrideElevator));
 
     operatorController
         .leftTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                () ->
-                    coralIntakeSubsystem.setIntakeVelocity(
-                        CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                coralIntakeSubsystem));
+                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .andThen(
+                    Commands.runOnce(
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
+                        coralIntakeSubsystem)));
 
     operatorController
         .povUp()
-        .whileTrue(climbPivotSubsystem.manualPivotClimb(() -> operatorController.getLeftY()));
+        .whileTrue(
+            climbPivotSubsystem.manualPivotClimb(
+                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
     operatorController
         .povDown()
-        .whileTrue(funnelSubsystem.manualFunnel(() -> operatorController.getLeftY()));
+        .whileTrue(
+            funnelSubsystem.manualFunnel(
+                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
   }
 
   private void checkGit() {
@@ -362,7 +375,6 @@ public class Robot extends LoggedRobot {
         this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new PhysicalAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.simWorld = null;
@@ -380,7 +392,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
@@ -398,7 +409,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.simWorld = null;
       }
@@ -420,7 +430,6 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new SimulatedAlgaePivot());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         SmartDashboard.putBoolean("Coral", false);
@@ -441,12 +450,11 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new FunnelPivotInterface() {});
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.algaePivotSubsystem = new AlgaePivotSubsystem(new AlgaePivotInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new ClimbPivotInterface() {});
         this.simWorld = null;
       }
     }
-    // ledSubsystem.setProcess(LEDProcess.DEFAULT);
+    ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
   private void setupAuto() {
@@ -468,7 +476,7 @@ public class Robot extends LoggedRobot {
               followSwerveSampleCommand.execute();
               Logger.recordOutput("Trajectory/sample", sample.getPose());
             }, // A function that follows a choreo trajectory
-            true, // If alliance flipping should be enabled
+            false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
     this.autos =
@@ -481,21 +489,28 @@ public class Robot extends LoggedRobot {
             this.funnelSubsystem);
 
     this.autoChooser.addRoutine(
-        AutoConstants.BLUE_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueTwoCoralAuto());
+        AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
+
+    this.autoChooser.addRoutine(
+        AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
 
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
 
-    this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
+    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () ->
+    // this.autos.xOneMeterAuto());
 
-    this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
-    this.autoChooser.addRoutine("uh oh", () -> this.autos.djfkajfl());
+    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () ->
+    // this.autos.yOneMeterAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
     this.autoChooser.addRoutine(
-        AutoConstants.RED_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redTwoCoralAuto());
+        AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+
+    this.autoChooser.addRoutine(
+        AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
     // this.autoChooser.addRoutine(

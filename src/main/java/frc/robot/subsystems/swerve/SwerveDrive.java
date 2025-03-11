@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.Robot;
 import frc.robot.extras.logging.Tracer;
 import frc.robot.extras.swerve.RepulsorFieldPlanner;
 import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
@@ -292,13 +293,14 @@ public class SwerveDrive extends SubsystemBase {
     //       totalForceX + moveX, totalForceY + moveY, moveTheta, getOdometryRotation2d());
     // } else {
     chassisSpeeds =
-        new ChassisSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
             sample.vx,
             // + totalForcesX
-            // + xChoreoController.calculate(getChassisSpeeds().vxMetersPerSecond, sample.vx),
-            sample.vy, // + yChoreoController.calculate(getChassisSpeeds().vyMetersPerSecond,
-            // sample.vy)
-            sample.omega);
+            // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x),
+            sample.vy,
+            // + yChoreoController.calculate(getEstimatedPose().getY(), sample.vy),
+            sample.omega,
+            getOdometryRotation2d());
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
     Logger.recordOutput("Trajectories/vx", sample.vx);
@@ -310,7 +312,8 @@ public class SwerveDrive extends SubsystemBase {
     // double moveTheta = sample.omega;
     //     + rotationChoreoController.calculate(
     //         getOdometryRotation2d().getRadians(), sample.heading);
-    drive(chassisSpeeds.unaryMinus(), true);
+    chassisSpeeds = Robot.isSimulation() ? chassisSpeeds : chassisSpeeds.unaryMinus();
+    drive(chassisSpeeds, false);
   }
 
   /** Runs the SwerveModules periodic methods */
@@ -658,7 +661,10 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    drive(outputRobotRelative.unaryMinus(), false);
+    outputRobotRelative =
+        Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
+
+    drive(outputRobotRelative, false);
   }
 
   /**

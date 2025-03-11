@@ -1,6 +1,7 @@
 package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.elevator.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -32,7 +33,7 @@ public class SetElevatorPosition extends Command {
         || Math.abs(swerveDrive.getGyroRoll()) < ModuleConstants.GYRO_MAX_ROLL) {
       elevatorSubsystem.setElevatorPosition(position);
     } else {
-      elevatorSubsystem.setElevatorPosition(0.0);
+      elevatorSubsystem.setElevatorPosition(ElevatorConstants.LIMIT);
     }
   }
 

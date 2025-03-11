@@ -150,7 +150,6 @@ public class SwerveConstants {
   }
 
   public class ModuleConstants {
-
     public static final double GYRO_MAX_PITCH = 30.0; // degrees
     public static final double GYRO_MAX_ROLL = 30.0; // degrees
 

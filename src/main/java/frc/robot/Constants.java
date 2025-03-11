@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   private static RobotType robotType = RobotType.DEV_ROBOT;
 
-  public static final boolean tuningMode = true;
+  public static final boolean tuningMode = false;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -331,7 +331,10 @@ public final class Constants {
     // Different Pre-defined Auto Routines
     public static final String Y_ONE_METER_AUTO = "Y-One-Meter-Test";
     public static final String X_ONE_METER_AUTO = "X-One-Meter-Test";
-    public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
+    public static final String BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Left-Two-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Right-Two-Coral-Auto-Routine";
     public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
     public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
     public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
@@ -438,7 +441,9 @@ public final class Constants {
         "BlueTrajectories/Left-Pickup-to-B";
 
     // Different Pre-defined Auto Routines
-    public static final String RED_TWO_CORAL_AUTO_ROUTINE = "Red-Two-Coral-Auto-Routine";
+    public static final String RED_LEFT_TWO_CORAL_AUTO_ROUTINE = "Red-Left-Two-Coral-Auto-Routine";
+    public static final String RED_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Red-Right-Two-Coral-Auto-Routine";
     public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
     public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
     public static final Pose2d BLUE_LEFT_CORAL_STATION =
