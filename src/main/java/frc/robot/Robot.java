@@ -592,14 +592,13 @@ public class Robot extends LoggedRobot {
             () ->
                 (RobotModeTriggers.autonomous().getAsBoolean() && coralIntakeSubsystem.hasCoral()));
 
-
     RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
     autoElevatorUpZone.whileTrue(
         Commands.sequence(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
             new RunCommand(() -> SmartDashboard.putBoolean("UpZone", true))));
-   
-      autoHasCoral.whileFalse(
+
+    autoHasCoral.whileFalse(
         Commands.sequence(
             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
             new RunCommand(() -> SmartDashboard.putBoolean("UpZone", false))));
