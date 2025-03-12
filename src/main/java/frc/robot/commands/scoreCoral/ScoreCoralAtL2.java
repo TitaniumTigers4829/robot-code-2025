@@ -38,7 +38,8 @@ public class ScoreCoralAtL2 extends Command {
         && swerveModule.getDrivePositionMeters() == SwerveConstants.L2_POSITION) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_L2_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_L2_ANGLE);
-      if (Math.abs(elevatorSubsystem.getElevatorPosition() - ElevatorConstants.ELEVATOR_L2_HEIGHT) < ElevatorConstants.ELEVATOR_POSITION_THRESHOLD) {
+      if (Math.abs(elevatorSubsystem.getElevatorPosition() - ElevatorConstants.ELEVATOR_L2_HEIGHT)
+          < ElevatorConstants.ELEVATOR_POSITION_THRESHOLD) {
         coralIntakeSubsystem.ejectCoral();
       }
     }

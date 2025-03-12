@@ -38,8 +38,10 @@ public class ScoreCoralAtTroph extends Command {
         && swerveModule.getDrivePositionMeters() == SwerveConstants.TROPH_POSITION) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_TROPH_LEVEL_HEIGHT);
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_TROPH_LEVEL_ANGLE);
-      if (elevatorSubsystem.getElevatorPosition()
-          == ElevatorConstants.ELEVATOR_TROPH_LEVEL_HEIGHT) {
+      if (Math.abs(
+              elevatorSubsystem.getElevatorPosition()
+                  - ElevatorConstants.ELEVATOR_TROPH_LEVEL_HEIGHT)
+          < ElevatorConstants.ELEVATOR_POSITION_THRESHOLD) {
         coralIntakeSubsystem.ejectCoral();
       }
     }
