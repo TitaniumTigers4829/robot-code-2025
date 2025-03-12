@@ -29,7 +29,7 @@ public final class Constants {
 
   /**
    * Gets the mode of the robot based on the RobotType and the state of {@link RobotBase}, if the
-   * robot isn't real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
+   * robot isnt real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
    *
    * @return the currently used Mode
    */
@@ -40,7 +40,7 @@ public final class Constants {
     };
   }
 
-  /** An enum to select the robot's mode. */
+  /** An enum to select the robots mode. */
   public enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -81,7 +81,7 @@ public final class Constants {
   }
 
   /**
-   * This is where we place constants related to hardware on a robot that aren't specific to any
+   * This is where we place constants related to hardware on a robot that arent specific to any
    * singular subsystem.
    */
   public static final class HardwareConstants {

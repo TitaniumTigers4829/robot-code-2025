@@ -28,7 +28,7 @@ public final class Constants {
 
   /**
    * Gets the mode of the robot based on the RobotType and the state of {@link RobotBase}, if the
-   * robot isn't real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
+   * robot isnt real but is also not the SIM_ROBOT, it will set the currently used mode to REPLAY
    *
    * @return the currently used Mode
    */
@@ -39,7 +39,7 @@ public final class Constants {
     };
   }
 
-  /** An enum to select the robot's mode. */
+  /** An enum to select the robots mode. */
   public enum Mode {
     /** Running on a real robot. */
     REAL,
@@ -80,7 +80,7 @@ public final class Constants {
   }
 
   /**
-   * This is where we place constants related to hardware on a robot that aren't specific to any
+   * This is where we place constants related to hardware on a robot that arent specific to any
    * singular subsystem.
    */
   public static final class HardwareConstants {
@@ -104,7 +104,7 @@ public final class Constants {
   }
 
   /**
-   * This is where constants used to describe the game's field go. This will have the dimensions of
+   * This is where constants used to describe the games field go. This will have the dimensions of
    * the field, but also the coordinates of obstacles, game pieces, or other places of interest.
    */
   public static final class FieldConstants {
@@ -122,7 +122,7 @@ public final class Constants {
 
     /* The meaning behind the numbering of the reefs is that it starts from the reef closest to the driver station (Blue side)
     or the reef closer to the robots (Red side) and goes clockwise. Now thinking about it, I should probably find a better way
-    to number these reefs so they have some sense on how they're numbered, but that's for other members to decide.
+    to number these reefs so they have some sense on how theyre numbered, but thats for other members to decide.
     */
     public static final Pose2d BLUE_REEF_ONE =
         new Pose2d(
@@ -338,7 +338,7 @@ public final class Constants {
 
     // All Trajectories are created on the blue alliance and are flipped in the code
     // Right and Left are always from the perspective of the driver station
-    // letters represent nodes on the coral according to FIRST's official system:
+    // letters represent nodes on the coral according to FIRSTs official system:
 
     //  Left      /-----------------------|
     //          /        K--J             |

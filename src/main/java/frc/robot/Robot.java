@@ -26,6 +26,7 @@ import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
 import frc.robot.commands.scoreCoral.ScoreCoralAtTroph;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
@@ -86,6 +87,7 @@ public class Robot extends LoggedRobot {
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
   private SwerveModule swerveModule;
+  private AlgaePivotSubsystem algaePivotSubsystem;
 
   private SimWorld simWorld;
 
@@ -95,11 +97,12 @@ public class Robot extends LoggedRobot {
 
   private boolean overrideElevator = false;
 
-  public Robot() {
+  public Robot(AlgaePivotSubsystem algaePivotSubsystem) {
     checkGit();
     setupLogging();
     setupSubsystems();
     setupAuto();
+    this.algaePivotSubsystem = algaePivotSubsystem;
   }
 
   /** This function is called periodically during all modes. */
@@ -261,12 +264,6 @@ public class Robot extends LoggedRobot {
                 algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.ejectCoral());
-
-    operatorController
-        .rightBumper()
-        .whileTrue(
-            new GetCoralFeedingStation(
-                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
 
     operatorController
         .povUp()
@@ -452,15 +449,7 @@ public class Robot extends LoggedRobot {
             false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    this.autos =
-        new Autos(
-            this.autoFactory,
-            this.elevatorSubsystem,
-            this.coralIntakeSubsystem,
-            this.swerveDrive,
-            this.visionSubsystem,
-            this.funnelSubsystem,
-            this.swerveModule);
+    this.autos = autos;
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
