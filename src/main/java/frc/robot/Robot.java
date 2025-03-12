@@ -19,7 +19,6 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.scoreCoral.GetCoralFeedingStation;
 import frc.robot.commands.scoreCoral.ScoreCoralAtL2;
 import frc.robot.commands.scoreCoral.ScoreCoralAtL3;
@@ -37,7 +36,6 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -204,13 +202,8 @@ public class Robot extends LoggedRobot {
     operatorController
         .leftBumper()
         .whileTrue(
-            Commands.sequence(
-                // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
     operatorController.povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
 
     operatorController
@@ -267,21 +260,13 @@ public class Robot extends LoggedRobot {
             new ScoreCoralAtL4(
                 algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
-    operatorController
-        .leftTrigger()
-        .whileTrue(
-            new ScoreCoralAtL4(
-                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
+    operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.ejectCoral());
 
     operatorController
         .rightBumper()
         .whileTrue(
             new GetCoralFeedingStation(
                 coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
-
-    operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.intakeCoral());
-
-    operatorController.leftBumper().whileTrue(coralIntakeSubsystem.ejectCoral());
 
     operatorController
         .povUp()
@@ -474,7 +459,7 @@ public class Robot extends LoggedRobot {
             this.coralIntakeSubsystem,
             this.swerveDrive,
             this.visionSubsystem,
-            this.funnelSubsystem, 
+            this.funnelSubsystem,
             this.swerveModule);
 
     this.autoChooser.addRoutine(

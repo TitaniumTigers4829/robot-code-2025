@@ -35,7 +35,8 @@ public class GetCoralFeedingStation extends Command {
   @Override
   // Called every time the scheduler runs while the command is scheduled
   public void execute() {
-    if (swerveModule.getDrivePositionMeters() == SwerveConstants.FEEDING_STATION_POSITION) {
+    if (Math.abs(swerveModule.getDrivePositionMeters())
+        == Math.abs(SwerveConstants.FEEDING_STATION_POSITION)) {
       elevatorSubsystem.setElevatorPosition(ElevatorConstants.ELEVATOR_FEEDING_STATION_HEIGHT);
       coralIntakeSubsystem.intakeCoral();
       algaePivotSubsystem.setAlgaeAngle(AlgaePivotConstants.ALGAE_FEEDING_STATION_ANGLE);
