@@ -2,23 +2,21 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.drive;
+package frc.robot.commands;
 
-import choreo.trajectory.SwerveSample;
-import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.funnelPivot.FunnelConstants;
+import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class FollowSwerveSampleCommand extends DriveCommandBase {
-  private final SwerveDrive swerveDrive;
-  private final SwerveSample swerveSample;
+public class FunnelCommand extends Command {
+  FunnelSubsystem funnelSubsystem;
 
-  public FollowSwerveSampleCommand(
-      SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, SwerveSample swerveSample) {
-    super(swerveDrive, visionSubsystem);
-    this.swerveDrive = swerveDrive;
-    this.swerveSample = swerveSample;
-    addRequirements(swerveDrive, visionSubsystem);
+  /** Creates a new FunnelCommand. */
+  public FunnelCommand(FunnelSubsystem funnelSubsystem) {
+    this.funnelSubsystem = funnelSubsystem;
+    addRequirements(funnelSubsystem);
+    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
@@ -28,8 +26,7 @@ public class FollowSwerveSampleCommand extends DriveCommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerveDrive.followSwerveSample(swerveSample);
-    super.execute();
+    funnelSubsystem.setFunnelAngle(FunnelConstants.ANGLE_INTAKE);
   }
 
   // Called once the command ends or is interrupted.

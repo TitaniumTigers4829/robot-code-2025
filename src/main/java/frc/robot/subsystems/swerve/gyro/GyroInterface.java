@@ -10,6 +10,8 @@ public interface GyroInterface {
 
     public double yawDegrees = 0.0;
     public double yawVelocityDegreesPerSecond = 0.0;
+    public double rollDegrees = 0.0;
+    public double pitchDegrees = 0.0;
     public double accelX = 0.0;
     public double accelY = 0.0;
   }

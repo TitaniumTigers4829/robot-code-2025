@@ -331,7 +331,10 @@ public final class Constants {
     // Different Pre-defined Auto Routines
     public static final String Y_ONE_METER_AUTO = "Y-One-Meter-Test";
     public static final String X_ONE_METER_AUTO = "X-One-Meter-Test";
-    public static final String BLUE_TWO_CORAL_AUTO_ROUTINE = "Blue-Two-Coral-Auto-Routine";
+    public static final String BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Left-Two-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Right-Two-Coral-Auto-Routine";
     public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
     public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
     public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
@@ -438,7 +441,9 @@ public final class Constants {
         "BlueTrajectories/Left-Pickup-to-B";
 
     // Different Pre-defined Auto Routines
-    public static final String RED_TWO_CORAL_AUTO_ROUTINE = "Red-Two-Coral-Auto-Routine";
+    public static final String RED_LEFT_TWO_CORAL_AUTO_ROUTINE = "Red-Left-Two-Coral-Auto-Routine";
+    public static final String RED_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Red-Right-Two-Coral-Auto-Routine";
     public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
     public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
     public static final Pose2d BLUE_LEFT_CORAL_STATION =
@@ -511,28 +516,28 @@ public final class Constants {
 
     // Auto Align Constants
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
-    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
-    public static final double AUTO_ALIGN_ROTATION_P = 10.0;
+    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = .5;
+    public static final double AUTO_ALIGN_ROTATION_P = 15.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 12;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
-    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.1;
+    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.01;
     // Choreo Drive Constants
-    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
-    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 9.630;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 43.328;
+    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 4.5;
+    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.25;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 20.0;
+    public static final double CHOREO_AUTO_TRANSLATION_P = .25;
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
 
-    public static final double CHOREO_AUTO_THETA_P = 7.0;
+    public static final double CHOREO_AUTO_THETA_P = 0.0;
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 

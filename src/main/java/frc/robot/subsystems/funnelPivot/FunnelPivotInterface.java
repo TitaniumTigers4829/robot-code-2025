@@ -33,4 +33,6 @@ public interface FunnelPivotInterface {
   default double getFunnelPivotTarget() {
     return 0.0;
   }
+
+  default void setPID(double kP, double kI, double kD) {}
 }

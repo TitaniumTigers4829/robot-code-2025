@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.climbPivot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -79,7 +80,9 @@ public class ClimbPivot extends SubsystemBase {
    * @return
    */
   public Command manualPivotClimb(DoubleSupplier position) {
-    return new RunCommand(() -> climbPivotInterface.manualPivot(position.getAsDouble()), this);
+    return new RunCommand(
+        () -> climbPivotInterface.manualPivot(MathUtil.applyDeadband(position.getAsDouble(), .1)),
+        this);
   }
 
   /**

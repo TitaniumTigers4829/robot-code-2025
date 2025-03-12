@@ -1,10 +1,12 @@
 package frc.robot.commands.drive;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class DriveCommand extends DriveCommandBase {
 
@@ -49,6 +51,11 @@ public class DriveCommand extends DriveCommandBase {
 
   @Override
   public void execute() {
+
+    Supplier<Translation2d> driveTranslationalControlSupplier =
+        () -> {
+          return new Translation2d(leftJoystickX.getAsDouble(), leftJoystickY.getAsDouble());
+        };
     // Most of the time the driver prefers that the robot rotates slowly, as it gives them more
     // control
     // but sometimes (e.g. when fighting defense bots) being able to rotate quickly is necessary
@@ -64,7 +71,6 @@ public class DriveCommand extends DriveCommandBase {
         leftJoystickY.getAsDouble() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
         rightJoystickX.getAsDouble() * angularSpeed,
         isFieldRelative.getAsBoolean());
-
     // Runs all the code from DriveCommand that estimates pose
     super.execute();
   }
