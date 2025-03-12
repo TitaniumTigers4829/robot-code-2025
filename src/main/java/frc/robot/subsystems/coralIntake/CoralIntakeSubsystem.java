@@ -42,6 +42,12 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
     this.ledSubsystem = ledSubsystem;
+
+    if (currentState == IntakeState.IDLE) {
+      currentState = IntakeState.WAITING;
+      usedToHaveCoral = hasCoral(); // Set the starting sensor state
+      usedToHaveControl = hasControl();
+    }
   }
 
   /**
@@ -107,7 +113,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case INGESTING:
-        // If motor current is too high, a jam is likely – enter jam clearing state
+        // If motor current is too high, a jam is likely - enter jam clearing state
         // if (coralIntakeInputs.intakeStatorCurrentAmps > JAM_CURRENT_THRESHOLD) {
         //   currentState = IntakeState.JAM_CLEARING;
         //   jamStartTime = Timer.getFPGATimestamp();
@@ -115,7 +121,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         //   break;
         // }
         if (!currentlyHasControl && currentlyHasCoral) {
-          // Coral’s gone from the sensor: reverse to position it
+          // Corals gone from the sensor: reverse to position it
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
           currentState = IntakeState.REVERSING;
         }
@@ -123,7 +129,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
       case REVERSING:
         if (currentlyHasCoral && currentlyHasControl) {
-          // Coral’s back in place: stop the motor
+          // Corals back in place: stop the motor
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
           currentState = IntakeState.STOPPED;
         }

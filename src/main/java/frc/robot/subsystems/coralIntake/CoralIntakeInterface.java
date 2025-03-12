@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CoralIntakeInterface {
 
   @AutoLog
-  public static class CoralIntakeInputs {
+  public class CoralIntakeInputs {
     public boolean isMotorConnected = false;
     public boolean isInnerSensorConnected = false;
     public boolean isOuterSensorConnected = false;

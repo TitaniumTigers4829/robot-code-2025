@@ -41,7 +41,7 @@ public class ElevatorConstants {
   public static final double LIMIT = -0.01;
   public static final boolean LIMIT_ENABLE = true;
   public static final double REVERSE_LIMIT = -9.6;
-  public static final boolean REVRESE_LIMIT_ENABLE = true;
+  public static final boolean REVERSE_LIMIT_ENABLE = true;
 
   // Elevator setpoints
   public enum ElevatorSetpoints {
@@ -61,4 +61,11 @@ public class ElevatorConstants {
       return position;
     }
   }
+
+  public static final double ELEVATOR_FEEDING_STATION_HEIGHT = 0.0;
+  public static final double ELEVATOR_TROPH_LEVEL_HEIGHT = 0.0;
+  public static final double ELEVATOR_L2_HEIGHT = 0.0;
+  public static final double ELEVATOR_L3_HEIGHT = 0.0;
+  public static final double ELEVATOR_L4_HEIGHT = 0.0;
+  public static final double ELEVATOR_POSITION_THRESHOLD = 0.0;
 }

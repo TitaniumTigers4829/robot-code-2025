@@ -10,15 +10,16 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.elevator.IntakeCoral;
-import frc.robot.commands.elevator.ScoreL4;
-import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.scoreCoral.GetCoralFeedingStation;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,6 +29,8 @@ public class Autos {
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private SwerveDrive swerveDrive;
   private VisionSubsystem visionSubsystem;
+  private AlgaePivotSubsystem algaePivotSubsystem;
+  private SwerveModule swerveModule;
   private FunnelSubsystem funnelSubsystem;
 
   public Autos(
@@ -36,12 +39,16 @@ public class Autos {
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
       VisionSubsystem visionSubsystem,
+      AlgaePivotSubsystem algaePivotSubsystem,
+      SwerveModule swerveModule,
       FunnelSubsystem funnelSubsystem) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
+    this.algaePivotSubsystem = algaePivotSubsystem;
+    this.swerveModule = swerveModule;
     this.funnelSubsystem = funnelSubsystem;
   }
 
@@ -98,7 +105,8 @@ public class Autos {
                         () -> false)
                     .withTimeout(3.5),
                 new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
+                new ScoreCoralAtL4(
+                    algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule)));
     return routine;
   }
 
@@ -127,8 +135,11 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, true)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new ScoreCoralAtL4(
+                                algaePivotSubsystem,
+                                elevatorSubsystem,
+                                coralIntakeSubsystem,
+                                swerveModule))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(
@@ -220,8 +231,11 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new ScoreCoralAtL4(
+                                algaePivotSubsystem,
+                                elevatorSubsystem,
+                                coralIntakeSubsystem,
+                                swerveModule))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(
@@ -328,25 +342,27 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
         .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
         .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
     return routine;
   }
 
@@ -398,25 +414,27 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
         .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
         .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
     return routine;
   }
 
@@ -499,19 +517,11 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(4.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+                            new ScoreCoralAtL4(
+                                algaePivotSubsystem,
+                                elevatorSubsystem,
+                                coralIntakeSubsystem,
+                                swerveModule))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
@@ -592,19 +602,11 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, true)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(4.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+                            new ScoreCoralAtL4(
+                                algaePivotSubsystem,
+                                elevatorSubsystem,
+                                coralIntakeSubsystem,
+                                swerveModule))));
 
     Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
     Logger.recordOutput(
@@ -630,34 +632,30 @@ public class Autos {
     //             new RepulsorReef(swerveDrive, visionSubsystem, true),
     //             new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
 
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(hasCoral))
-    //     .and(routine.observe(rightReefInRange))
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+    routine
+        .anyDone(startToJTrajectory, pickupToLTrajectory)
+        .and(routine.observe(hasCoral))
+        .and(routine.observe(leftReefInRange))
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
+    routine
+        .anyActive(jToPickupTrajectory)
+        .and(routine.observe(hasNoCoral))
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
-    // routine
-    //     .anyActive(jToPickupTrajectory)
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-
-    // routine
-    //     .observe(elevatorUpZone)
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger",
-    // true))));
-    // routine
-    //     .observe(elevatorUpZone.negate())
-    //     .or(routine.observe(hasNoCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem,
-    // ElevatorSetpoints.FEEDER.getPosition()),
-    //             new RunCommand(
-    //                 () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
+    routine
+        .observe(elevatorUpZone)
+        .and(routine.observe(hasCoral))
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
+    routine
+        .observe(elevatorUpZone.negate())
+        .or(routine.observe(hasNoCoral))
+        .onTrue(
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
     return routine;
   }
 
@@ -701,24 +699,22 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 
@@ -770,25 +766,23 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
         .and(routine.observe(hasNoCoral))
-        .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(coralIntakeSubsystem.intakeCoral());
 
     routine
         .observe(elevatorUpZone)
         .and(routine.observe(hasCoral))
-        .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()));
     routine
         .observe(elevatorUpZone.negate())
         .or(routine.observe(hasNoCoral))
-        .onTrue(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+        .onTrue(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
 }

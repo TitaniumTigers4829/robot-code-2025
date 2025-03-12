@@ -19,9 +19,14 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
-import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.scoreCoral.GetCoralFeedingStation;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL2;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL3;
+import frc.robot.commands.scoreCoral.ScoreCoralAtL4;
+import frc.robot.commands.scoreCoral.ScoreCoralAtTroph;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
+import frc.robot.subsystems.algaePivot.AlgaePivotSubsystem;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
@@ -32,7 +37,6 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.coralIntake.PhysicalCoralIntake;
 import frc.robot.subsystems.coralIntake.SimulatedCoralntake;
-import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
@@ -45,6 +49,7 @@ import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
@@ -81,6 +86,8 @@ public class Robot extends LoggedRobot {
   private FunnelSubsystem funnelSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
+  private SwerveModule swerveModule;
+  private AlgaePivotSubsystem algaePivotSubsystem;
 
   private SimWorld simWorld;
 
@@ -90,11 +97,12 @@ public class Robot extends LoggedRobot {
 
   private boolean overrideElevator = false;
 
-  public Robot() {
+  public Robot(AlgaePivotSubsystem algaePivotSubsystem) {
     checkGit();
     setupLogging();
     setupSubsystems();
     setupAuto();
+    this.algaePivotSubsystem = algaePivotSubsystem;
   }
 
   /** This function is called periodically during all modes. */
@@ -197,13 +205,8 @@ public class Robot extends LoggedRobot {
     operatorController
         .leftBumper()
         .whileTrue(
-            Commands.sequence(
-                // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
+            new GetCoralFeedingStation(
+                coralIntakeSubsystem, elevatorSubsystem, algaePivotSubsystem, swerveModule));
     operatorController.povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
 
     operatorController
@@ -239,60 +242,28 @@ public class Robot extends LoggedRobot {
     operatorController
         .a()
         .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+            new ScoreCoralAtTroph(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .x()
         .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+            new ScoreCoralAtL2(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .b()
         .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+            new ScoreCoralAtL3(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
     operatorController
         .y()
         .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+            new ScoreCoralAtL4(
+                algaePivotSubsystem, elevatorSubsystem, coralIntakeSubsystem, swerveModule));
 
-    operatorController
-        .leftTrigger()
-        .whileTrue(
-            Commands.runEnd(
-                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
-                    () ->
-                        coralIntakeSubsystem.setIntakeVelocity(
-                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                    coralIntakeSubsystem)
-                .andThen(
-                    Commands.runOnce(
-                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
-                        coralIntakeSubsystem)));
+    operatorController.leftTrigger().whileTrue(coralIntakeSubsystem.ejectCoral());
 
     operatorController
         .povUp()
@@ -478,14 +449,7 @@ public class Robot extends LoggedRobot {
             false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    this.autos =
-        new Autos(
-            this.autoFactory,
-            this.elevatorSubsystem,
-            this.coralIntakeSubsystem,
-            this.swerveDrive,
-            this.visionSubsystem,
-            this.funnelSubsystem);
+    this.autos = autos;
 
     this.autoChooser.addRoutine(
         AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
