@@ -496,11 +496,9 @@ public class Robot extends LoggedRobot {
     this.autoChooser.addRoutine(
         AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
 
-    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () ->
-    // this.autos.xOneMeterAuto());
+    this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
 
-    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () ->
-    // this.autos.yOneMeterAuto());
+    this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
     // this.autoChooser.addRoutine(
     //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
     // this.autoChooser.addRoutine(
