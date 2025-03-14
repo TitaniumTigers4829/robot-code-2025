@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.commands.autodrive.PathPlannerAutoDrive;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
@@ -198,7 +200,10 @@ public class Robot extends LoggedRobot {
             // Rotation speed
             () -> driverController.rightStick().getAsBoolean());
     swerveDrive.setDefaultCommand(driveCommand);
-
+    driverController
+        .leftBumper()
+        .whileTrue(
+            new PathPlannerAutoDrive(swerveDrive, visionSubsystem, FieldConstants.BLUE_REEF_EIGHT));
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
     driverController
         .povRight()

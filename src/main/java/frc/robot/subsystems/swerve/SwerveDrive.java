@@ -3,6 +3,10 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -94,6 +98,13 @@ public class SwerveDrive extends SubsystemBase {
   private final Alert gyroDisconnectedAlert =
       new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
 
+  /**
+   * @param gyroIO
+   * @param frontLeftModuleIO
+   * @param frontRightModuleIO
+   * @param backLeftModuleIO
+   * @param backRightModuleIO
+   */
   public SwerveDrive(
       GyroInterface gyroIO,
       ModuleInterface frontLeftModuleIO,
@@ -139,9 +150,28 @@ public class SwerveDrive extends SubsystemBase {
     rotationChoreoController.setTolerance(
         AutoConstants.CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS);
 
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
+
+    AutoBuilder.configure(
+        this::getEstimatedPose,
+        this::resetEstimatedPose,
+        this::getChassisSpeeds,
+        (ChassisSpeeds speeds, DriveFeedforwards f) -> this.drive(speeds),
+        new PPHolonomicDriveController(
+            new PIDConstants(
+                AutoConstants.AUTO_ALIGN_TRANSLATION_P,
+                AutoConstants.AUTO_ALIGN_TRANSLATION_I,
+                AutoConstants.AUTO_ALIGN_TRANSLATION_D),
+            new PIDConstants(
+                AutoConstants.AUTO_ALIGN_ROTATION_P,
+                AutoConstants.AUTO_ALIGN_ROTATION_I,
+                AutoConstants.AUTO_ALIGN_ROTATION_D)),
+        AutoConstants.ROBOT_CONFIG,
+        () -> false,
+        this);
   }
 
   @Override
@@ -183,6 +213,10 @@ public class SwerveDrive extends SubsystemBase {
         speeds.vyMetersPerSecond,
         speeds.omegaRadiansPerSecond,
         fieldRelative);
+  }
+
+  public void driveFieldRelative(ChassisSpeeds speeds, DriveFeedforwards f) {
+    drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true);
   }
 
   public ChassisSpeeds getChassisSpeeds() {

@@ -1,14 +1,20 @@
 package frc.robot;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.subsystems.swerve.SwerveConstants;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.DEV_ROBOT;
+  private static RobotType robotType = RobotType.SIM_ROBOT;
 
   public static final boolean tuningMode = false;
 
@@ -510,6 +516,10 @@ public final class Constants {
     public static final String RED_LEFT_PICKUP_TO_B_TRAJECTORY = "RedTrajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
+
+    public static final RobotConfig ROBOT_CONFIG =
+        new RobotConfig(49.8952, 6, new ModuleConfig(null, , 0, null, null, 0), 1);
+
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
     public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
     public static final double AUTO_ALIGN_ROTATION_P = 10.0;
@@ -522,6 +532,7 @@ public final class Constants {
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
     public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.1;
+
     // Choreo Drive Constants
     public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 3.805;
     public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 14.715;
@@ -546,6 +557,25 @@ public final class Constants {
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+    // PP Auto Align Constants
+
+    public static final PIDConstants PP_AUTO_PID_TRANSLATION_CONSTANTS =
+        new PIDConstants(
+            AUTO_ALIGN_TRANSLATION_P, AUTO_ALIGN_TRANSLATION_I, AUTO_ALIGN_TRANSLATION_D);
+
+    public static final PIDConstants PP_AUTO_PID_ROTATION_CONSTANTS =
+        new PIDConstants(AUTO_ALIGN_ROTATION_P, AUTO_ALIGN_ROTATION_I, AUTO_ALIGN_ROTATION_D);
+
+    public static final PPHolonomicDriveController PP_AUTO_ALIGN_DRIVE_CONTROLLER =
+        new PPHolonomicDriveController(
+            PP_AUTO_PID_TRANSLATION_CONSTANTS, PP_AUTO_PID_ROTATION_CONSTANTS);
+
+    public static final PathConstraints PP_AUTO_ALIGN_CONSTRAINTS =
+        new PathConstraints(
+            MAX_AUTO_SPEED_METERS_PER_SECOND,
+            MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND,
+            MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
   }
 
   public static final class JoystickConstants {
