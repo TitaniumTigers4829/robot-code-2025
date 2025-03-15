@@ -294,12 +294,13 @@ public class SwerveDrive extends SubsystemBase {
     // } else {
     chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            sample.vx,
-            // + totalForcesX
-            // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x),
-            sample.vy,
-            // + yChoreoController.calculate(getEstimatedPose().getY(), sample.vy),
-            sample.omega,
+            sample.vx
+                // + totalForcesX
+                + xChoreoController.calculate(getEstimatedPose().getX(), sample.x),
+            sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y),
+            sample.omega
+                + rotationChoreoController.calculate(
+                    getEstimatedPose().getRotation().getRadians(), sample.heading),
             getOdometryRotation2d());
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
