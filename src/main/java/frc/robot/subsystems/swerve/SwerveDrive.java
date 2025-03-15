@@ -3,7 +3,6 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,6 +15,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -72,9 +72,12 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(5.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(5.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(8, 0, 0.0);
+  private final ProfiledPIDController xController =
+      new ProfiledPIDController(.050, 0.0, 0.0, new Constraints(1.5, 2));
+  private final ProfiledPIDController yController =
+      new ProfiledPIDController(.050, 0.0, 0.0, new Constraints(1.5, 2));
+  private final ProfiledPIDController headingController =
+      new ProfiledPIDController(2.5, 0, 0.0, new Constraints(1.5, 2));
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -164,7 +167,7 @@ public class SwerveDrive extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
     setpoint =
-        setpointGenerator.generateSimpleSetpoint(
+        setpointGenerator.generateSetpoint(
             setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
@@ -179,6 +182,7 @@ public class SwerveDrive extends SubsystemBase {
         fieldRelative);
   }
 
+  @AutoLogOutput(key = "SwerveState/Speeds")
   public ChassisSpeeds getChassisSpeeds() {
     return setpoint.chassisSpeeds();
   }
@@ -286,6 +290,9 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
+    xChoreoController.reset();
+    yChoreoController.reset();
+    rotationChoreoController.reset(sample.heading);
     // Use the summed forces in the drive method
     ChassisSpeeds chassisSpeeds;
     // if (fieldRelative) {
@@ -565,7 +572,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void sourceAlign(Supplier<Translation2d> translationalControlSupplier) {
-    headingController.reset();
+    // headingController.reset();
     double targetAngle = Units.degreesToRadians(54);
     if (AllianceFlipper.isRed()) {
       targetAngle = Math.PI - targetAngle;
@@ -595,9 +602,9 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
-    xController.reset();
-    yController.reset();
-    headingController.reset();
+    xController.reset(goal.getX());
+    yController.reset(goal.getY());
+    headingController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
     RepulsorSample sample =
@@ -609,16 +616,10 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            MathUtil.clamp(
-                xController.calculate(
-                    poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-                0,
-                3),
-            MathUtil.clamp(
-                yController.calculate(
-                    poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
-                0,
-                3),
+            xController.calculate(
+                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+            yController.calculate(
+                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
             headingController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
@@ -627,6 +628,8 @@ public class SwerveDrive extends SubsystemBase {
     Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
+    Logger.recordOutput("Repulsor/Velocity/vx", sample.vx());
+    Logger.recordOutput("Repulsor/Velocity/vy", sample.vy());
 
     //                  Logger.recordOutput("Repulsor/Vector field",
     // repulsorFieldPlanner.getArrows());
@@ -664,6 +667,9 @@ public class SwerveDrive extends SubsystemBase {
 
     outputRobotRelative =
         Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
+
+    Logger.recordOutput("Repulsor/Speeds", outputRobotRelative);
+    // Logger.recordOutput(getName(), null);
 
     drive(outputRobotRelative, false);
   }

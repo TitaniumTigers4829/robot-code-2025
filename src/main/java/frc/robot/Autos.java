@@ -79,6 +79,19 @@ public class Autos {
     return routine;
   }
 
+  public AutoRoutine yOneMeterAndRotationAuto() {
+    AutoRoutine routine = autoFactory.newRoutine("Rotation auto");
+    AutoTrajectory yOneMeterAndRotationAuto = routine.trajectory("RedTrajectories/rotatepath");
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                autoFactory.resetOdometry("RedTrajectories/rotatepath"),
+                yOneMeterAndRotationAuto.cmd()));
+
+    return routine;
+  }
+
   // Blue Auto Routines
   public AutoRoutine simpleRepulsorAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.SIMPLE_REPULSOR_AUTO);
@@ -105,11 +118,12 @@ public class Autos {
   public AutoRoutine blueLeftTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory startToJTrajectory = routine.trajectory("RedTrajectories/new-path");
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.BLUE_LEFT_START_TO_J_TRAJECTORY);
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.BLUE_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
-        routine.trajectory(AutoConstants.BLUE_LEFT_PICKUP_TO_A_TRAJECTORY);
+        routine.trajectory(AutoConstants.BLUE_LEFT_PICKUP_TO_L_TRAJECTORY);
 
     routine
         .active()
@@ -123,27 +137,33 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new WaitCommand(2.0)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, true)
-                        .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(4.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+            //         new WaitCommand(2.0)
+            //             .andThen(
+            new RepulsorReef(swerveDrive, visionSubsystem, false)
+                .withTimeout(2.0)
+                .andThen(jToPickupTrajectory.cmd()));
+    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
+    pickupToLTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+    //                     .alongWith(
+    //                         new SetElevatorPosition(
+    //                             swerveDrive, elevatorSubsystem,
+    // ElevatorSetpoints.L4.getPosition()))
+    //                     .withTimeout(4.0)
+    //                     .andThen(
+    //                         Commands.runEnd(
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.EJECT_SPEED),
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+    //                                 coralIntakeSubsystem)
+    //                             .withTimeout(1.0))));
 
-    Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
-    Logger.recordOutput(
-        "Trajectories/jtopickup", jToPickupTrajectory.getRawTrajectory().getPoses());
+    // Logger.recordOutput("Trajectories/starttoj",
+    // startToJTrajectory.getRawTrajectory().getPoses());
+    // Logger.recordOutput(
+    //     "Trajectories/jtopickup", jToPickupTrajectory.getRawTrajectory().getPoses());
     // Logger.recordOutput(
     // "Trajectories/pickuptoL", pickupToLTrajectory.getRawTrajectory().getPoses());
     // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());

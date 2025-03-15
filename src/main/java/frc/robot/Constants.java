@@ -533,11 +533,11 @@ public final class Constants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
-    public static final double CHOREO_AUTO_TRANSLATION_P = 0.75;
+    public static final double CHOREO_AUTO_TRANSLATION_P = 0.75; // 1
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
     public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
 
-    public static final double CHOREO_AUTO_THETA_P = 10.0;
+    public static final double CHOREO_AUTO_THETA_P = 2.0; // 5
     public static final double CHOREO_AUTO_THETA_I = 0;
     public static final double CHOREO_AUTO_THETA_D = 0;
 
