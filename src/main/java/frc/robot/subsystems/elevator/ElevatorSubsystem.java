@@ -35,6 +35,10 @@ public class ElevatorSubsystem extends SubsystemBase {
   public double elevatorStatorCurrent() {
     return elevatorInterface.elevatorStatorCurrent();
   }
+  
+  public void homing() {
+    elevatorInterface.homing();
+  }
 
   @Override
   public void periodic() {

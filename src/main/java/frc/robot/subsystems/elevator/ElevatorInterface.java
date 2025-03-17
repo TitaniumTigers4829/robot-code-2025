@@ -35,4 +35,5 @@ public interface ElevatorInterface {
   public default double getVolts() {
     return 0.0;
   }
+  public default void homing(){}
 }

@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -101,25 +103,27 @@ public class PhysicalElevator implements ElevatorInterface {
 
     desiredPosition = 0.0;
   }
-
+  /**
+   * Homing to prevent stalling. If there is too much stator current, that shows stalling, so we just set that to the max/or min positions and stop the motor
+   * 
+   */
   public void homing() {
-   if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD) {
-      setElevatorPosition(-ElevatorConstants.MIN_HEIGHT);
-      setElevatorPosition(ElevatorConstants.MIN_HEIGHT);
+   if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble() >= 0.0) { //below stator threshold AND going in positive direction (going down)
+      leaderMotor.setPosition(0);//set encoder back to 0
+      followerMotor.setPosition(0); // set encoder back to 0
+      //leaderMotor.setPosition(Rotations.of(0.0));
+      followerMotor.set(0);
+      leaderMotor.set(0);} 
+   
+   else if (leaderMotor.getStatorCurrent().getValueAsDouble() <= ElevatorConstants.MIN_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble() <= 0.0) { //above stator threshold AND going in negative direction (going up)
+      leaderMotor.setPosition(ElevatorConstants.MAX_HEIGHT);//set encoder to max height
+      followerMotor.setPosition(ElevatorConstants.MAX_HEIGHT); // set encoder to max height
+      //leaderMotor.setPosition(Rotations.of(0.0));
       followerMotor.set(0);
       leaderMotor.set(0);
-      //zero encoder positions
-      leaderMotor.setPosition(0);
-      followerMotor.setPosition(0); } 
-   }
-  public void setElevatorHeights() {
-    if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()>= 0.1) {
-      leaderMotor.setPosition(-ElevatorConstants.MAX_HEIGHT);
-      followerMotor.setPosition(ElevatorConstants.MAX_HEIGHT); //IDK PROB DOESNT WORK JESUS FIX IT
-    } else if (leaderMotor.getStatorCurrent().getValueAsDouble() <= ElevatorConstants.MIN_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()<= -0.1) {
-      leaderMotor.setPosition(-ElevatorConstants.MIN_HEIGHT);
-      followerMotor.setPosition(ElevatorConstants.MIN_HEIGHT); 
-  }
+    }
+
+  
 
   }
 
@@ -167,4 +171,5 @@ public class PhysicalElevator implements ElevatorInterface {
   public double getVolts() {
     return leaderAppliedVoltage.getValueAsDouble();
   }
+ 
 }

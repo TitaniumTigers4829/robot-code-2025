@@ -170,7 +170,9 @@ public class Robot extends LoggedRobot {
                 new ModuleInterface() {},
                 new ModuleInterface() {},
                 new ModuleInterface() {});
-        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
+        elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {
+
+          });
         simWorld = null;
       }
     }
@@ -331,7 +333,7 @@ public class Robot extends LoggedRobot {
     //extra elevator safety
 
     //homing
-    
+    elevatorSubsystem.homing();
 
     }
   
