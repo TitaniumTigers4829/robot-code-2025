@@ -43,9 +43,4 @@ public class ElevatorConstants {
   public static final double REVERSE_LIMIT = 0.15;
   public static final boolean REVRESE_LIMIT_ENABLE = false;
 
-  // The limits for the gyro
-  public static final double MAX_ROLL_ANGLE = 30; // degrees
-  public static final double MAX_PITCH_ANGLE = 20; // degrees
-  // public static final double MAX_ACCEL_X = 69;
-  // public static final double MAX_ACCEL_Y = 432423;
 }

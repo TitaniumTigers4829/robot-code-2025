@@ -115,8 +115,8 @@ public class PhysicalElevator implements ElevatorInterface {
   public void setElevatorHeights() {
     if (leaderMotor.getStatorCurrent().getValueAsDouble() >= ElevatorConstants.MAX_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()>= 0.1) {
       leaderMotor.setPosition(-ElevatorConstants.MAX_HEIGHT);
-      followerMotor.setPosition(ElevatorConstants.MAX_HEIGHT); //IDK PROB DOESNT WORK JESUS FIX IT}
-    else if (leaderMotor.getStatorCurrent().getValueAsDouble() <= ElevatorConstants.MIN_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()<= -0.1) {
+      followerMotor.setPosition(ElevatorConstants.MAX_HEIGHT); //IDK PROB DOESNT WORK JESUS FIX IT
+    } else if (leaderMotor.getStatorCurrent().getValueAsDouble() <= ElevatorConstants.MIN_STATOR_THRESHOLD && leaderMotor.getVelocity().getValueAsDouble()<= -0.1) {
       leaderMotor.setPosition(-ElevatorConstants.MIN_HEIGHT);
       followerMotor.setPosition(ElevatorConstants.MIN_HEIGHT); 
   }

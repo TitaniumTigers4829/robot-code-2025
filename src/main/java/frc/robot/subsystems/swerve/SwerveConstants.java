@@ -181,4 +181,11 @@ public class SwerveConstants {
       SensorDirectionValue encoderReversed,
       InvertedValue turnReversed,
       InvertedValue driveReversed) {}
+
+  
+  // The limits for the gyro
+  public static final double MAX_ROLL_ANGLE = 30; // degrees
+  public static final double MAX_PITCH_ANGLE = 20; // degrees
+  // public static final double MAX_ACCEL_X = 69;
+  // public static final double MAX_ACCEL_Y = 432423;
 }

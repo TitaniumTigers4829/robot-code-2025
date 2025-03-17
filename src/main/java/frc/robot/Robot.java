@@ -321,13 +321,12 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     // Elevator Safety
-    if (Math.abs(swerveDrive.getRoll()) >= ElevatorConstants.MAX_ROLL_ANGLE // gyro safety
+    if (Math.abs(swerveDrive.getRoll()) >= SwerveConstants.MAX_ROLL_ANGLE // gyro safety
         || Math.abs(swerveDrive.getPitch())
-            >= ElevatorConstants
+            >= SwerveConstants
                 .MAX_PITCH_ANGLE) 
     {
-      // elevatorSubsystem.setDefaultCommand(new ZeroElevator(elevatorSubsystem)); // maybe works
-      elevatorSubsystem.setElevatorPosition(0);
+        elevatorSubsystem.setElevatorPosition(0);
     }
     //extra elevator safety
 
