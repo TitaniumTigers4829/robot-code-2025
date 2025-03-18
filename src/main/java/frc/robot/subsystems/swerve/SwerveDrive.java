@@ -20,7 +20,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Robot;
@@ -39,7 +38,6 @@ import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
-
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -58,14 +56,14 @@ public class SwerveDrive extends SubsystemBase {
           DriveConstants.AUTO_TRANSLATION_D);
   private final PIDController yChoreoController =
       new PIDController(
-        DriveConstants.AUTO_TRANSLATION_P,
-        DriveConstants.AUTO_TRANSLATION_I,
-        DriveConstants.AUTO_TRANSLATION_D);
+          DriveConstants.AUTO_TRANSLATION_P,
+          DriveConstants.AUTO_TRANSLATION_I,
+          DriveConstants.AUTO_TRANSLATION_D);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
-        DriveConstants.AUTO_THETA_P,
-        DriveConstants.AUTO_THETA_I,
-        DriveConstants.AUTO_THETA_D,
+          DriveConstants.AUTO_THETA_P,
+          DriveConstants.AUTO_THETA_I,
+          DriveConstants.AUTO_THETA_D,
           DriveConstants.AUTO_THETA_CONTROLLER_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
@@ -702,13 +700,13 @@ public class SwerveDrive extends SubsystemBase {
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                         .getTranslation())
-            <= 1
+            <= .01
         || getEstimatedPose()
                 .getTranslation()
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                         .getTranslation())
-            <= 1);
+            <= .01);
   }
 
   public boolean isRobotAlignedToLeftReef() {
@@ -717,7 +715,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                     .getTranslation())
-        <= 1.0;
+        <= .01;
   }
 
   public boolean isRobotAlignedToRightReef() {
@@ -726,7 +724,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                     .getTranslation())
-        <= 1.0;
+        <= .01;
   }
 
   /**

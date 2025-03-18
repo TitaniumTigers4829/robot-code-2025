@@ -586,29 +586,35 @@ public class Autos {
                 //     .onlyIf(() -> swerveDrive.isReefInRange())
                 //     .deadlineFor(reefPathfinding.goTo(initialBranch))
                 .withName("ScoreAt" + initialBranch.name())
-                .andThen(reefToSource[0].spawnCmd())
+                .andThen(reefToSource[1].spawnCmd())
+                // .andThen(sourcePathfinding.goTo(source))
                 .withName("StartTo" + initialBranch.name()));
 
     for (int i = 0; i < cyclingBranches.length; i++) {
       reefToSource[i]
           .done()
           .onTrue(
-              waitUntil(() -> coralIntakeSubsystem.hasControl())
-                  // .withTimeout(.5) // ONLY RUN IN SIM
-                  .deadlineFor(sourcePathfinding.goTo(source))
+              //   waitUntil(() -> coralIntakeSubsystem.hasControl())
+              // .withTimeout(.5) // ONLY RUN IN SIM
+              //   .deadlineFor(
+              sourcePathfinding
+                  .goTo(source)
+                  // )
                   .andThen(sourceToReef[i].spawnCmd())
                   .withName("Source" + source.name()));
 
       sourceToReef[i]
           .atTimeBeforeEnd(.5)
           .onTrue(
-              Commands.run(
-                      () ->
-                          elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
-                  .onlyIf(() -> swerveDrive.isReefInRange())
-                  .deadlineFor(
-                      waitUntil(sourceToReef[i].done())
-                          .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy()))
+              //   Commands.run(
+              //           () ->
+              //
+              // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
+              //       .onlyIf(() -> swerveDrive.isReefInRange())
+              //   .deadlineFor(
+              waitUntil(sourceToReef[i].done())
+                  .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
+                  //   )
                   .andThen(nextCycleSpwnCmd[i])
                   .withName("ScoreAt" + cyclingBranches[i].name()));
     }

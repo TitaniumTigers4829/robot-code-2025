@@ -155,12 +155,11 @@ public class SwerveConstants {
     public static final double REPULSOR_MAX_VELOCITY = 1.5;
     public static final double REPULSOR_MAX_ACCELERATION = 2.0;
 
-    
     // Choreo Drive Constants
     public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 4.5;
     public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.25;
-    public static final double MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 4*Math.PI;
-    public static final double MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 6*Math.PI;
+    public static final double MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
+    public static final double MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 6 * Math.PI;
 
     public static final double AUTO_TRANSLATION_P = 0.75; // 1
     public static final double AUTO_TRANSLATION_I = 0;
@@ -179,7 +178,8 @@ public class SwerveConstants {
 
     public static final TrapezoidProfile.Constraints AUTO_THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
-            MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
+            MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND,
+            MAX_AUTO_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);
   }
 
   public class ModuleConstants {
