@@ -39,6 +39,8 @@ import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
+
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -51,20 +53,20 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final PIDController xChoreoController =
       new PIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+          DriveConstants.AUTO_TRANSLATION_P,
+          DriveConstants.AUTO_TRANSLATION_I,
+          DriveConstants.AUTO_TRANSLATION_D);
   private final PIDController yChoreoController =
       new PIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+        DriveConstants.AUTO_TRANSLATION_P,
+        DriveConstants.AUTO_TRANSLATION_I,
+        DriveConstants.AUTO_TRANSLATION_D);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_THETA_P,
-          AutoConstants.CHOREO_AUTO_THETA_I,
-          AutoConstants.CHOREO_AUTO_THETA_D,
-          AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
+        DriveConstants.AUTO_THETA_P,
+        DriveConstants.AUTO_THETA_I,
+        DriveConstants.AUTO_THETA_D,
+          DriveConstants.AUTO_THETA_CONTROLLER_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -72,12 +74,27 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final ProfiledPIDController xController =
-      new ProfiledPIDController(.050, 0.0, 0.0, new Constraints(1.5, 2));
-  private final ProfiledPIDController yController =
-      new ProfiledPIDController(.050, 0.0, 0.0, new Constraints(1.5, 2));
-  private final ProfiledPIDController headingController =
-      new ProfiledPIDController(2.5, 0, 0.0, new Constraints(1.5, 2));
+  private final ProfiledPIDController xRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.REPULSOR_TRANSLATION_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+  private final ProfiledPIDController yRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.REPULSOR_TRANSLATION_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+  private final ProfiledPIDController headingRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.HEADING_REPULSOR_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -136,7 +153,7 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_ANGLE_TRUST));
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
-    headingController.enableContinuousInput(-Math.PI, Math.PI);
+    headingRepulsorController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -588,7 +605,7 @@ public class SwerveDrive extends SubsystemBase {
             new ChassisSpeeds(
                 translationalControl.getX() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
                 translationalControl.getY() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                headingController.calculate(
+                headingRepulsorController.calculate(
                     poseEstimator.getEstimatedPosition().getRotation().getRadians(), targetAngle)),
             getOdometryRotation2d());
 
@@ -602,9 +619,9 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
-    xController.reset(goal.getX());
-    yController.reset(goal.getY());
-    headingController.reset(goal.getRotation().getRadians());
+    xRepulsorController.reset(goal.getX());
+    yRepulsorController.reset(goal.getY());
+    headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
     RepulsorSample sample =
@@ -616,11 +633,11 @@ public class SwerveDrive extends SubsystemBase {
     ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            xController.calculate(
+            xRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-            yController.calculate(
+            yRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
-            headingController.calculate(
+            headingRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
@@ -700,7 +717,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                     .getTranslation())
-        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+        <= 1.0;
   }
 
   public boolean isRobotAlignedToRightReef() {
@@ -709,7 +726,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                     .getTranslation())
-        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+        <= 1.0;
   }
 
   /**
