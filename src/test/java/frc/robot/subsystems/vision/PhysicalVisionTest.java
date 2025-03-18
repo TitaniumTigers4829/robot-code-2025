@@ -28,7 +28,7 @@ public class PhysicalVisionTest {
     // Mocks the NetworkTable instance for testing
     networkTableInstance = NetworkTableInstance.create();
     TigerHelpers.setNetworkTableInstance(networkTableInstance);
-    backLimelightTable = networkTableInstance.getTable(Limelight.BACK.getName());
+    backLimelightTable = networkTableInstance.getTable(Limelight.FRONT_LEFT.getName());
     physicalVision = new PhysicalVision();
   }
 
@@ -43,28 +43,28 @@ public class PhysicalVisionTest {
     // logic is the same
 
     // Because tv isn't populated it means the limelight isn't connected
-    assertFalse(physicalVision.canSeeAprilTags(Limelight.BACK));
+    assertFalse(physicalVision.canSeeAprilTags(Limelight.FRONT_LEFT));
 
     // Because tx is greater than the accurate FOV, it should return false
     backLimelightTable.getEntry("tv").setDouble(1.0);
-    backLimelightTable.getEntry("tx").setDouble(Limelight.BACK.getAccurateFOV() + 1);
-    assertFalse(physicalVision.canSeeAprilTags(Limelight.BACK));
+    backLimelightTable.getEntry("tx").setDouble(Limelight.FRONT_LEFT.getAccurateFOV() + 1);
+    assertFalse(physicalVision.canSeeAprilTags(Limelight.FRONT_LEFT));
 
     // If tv is 1 and tx is less than the accurate FOV, it should return true,
     // regardless of tx being negative, positive, or zero
-    backLimelightTable.getEntry("tx").setDouble(-(Limelight.BACK.getAccurateFOV() - 1));
-    assertTrue(physicalVision.canSeeAprilTags(Limelight.BACK));
-    backLimelightTable.getEntry("tx").setDouble((Limelight.BACK.getAccurateFOV() - 1));
-    assertTrue(physicalVision.canSeeAprilTags(Limelight.BACK));
+    backLimelightTable.getEntry("tx").setDouble(-(Limelight.FRONT_LEFT.getAccurateFOV() - 1));
+    assertTrue(physicalVision.canSeeAprilTags(Limelight.FRONT_LEFT));
+    backLimelightTable.getEntry("tx").setDouble((Limelight.FRONT_LEFT.getAccurateFOV() - 1));
+    assertTrue(physicalVision.canSeeAprilTags(Limelight.FRONT_LEFT));
     backLimelightTable.getEntry("tx").setDouble(0.0);
-    assertTrue(physicalVision.canSeeAprilTags(Limelight.BACK));
+    assertTrue(physicalVision.canSeeAprilTags(Limelight.FRONT_LEFT));
   }
 
   @Test
   void testGetMegaTag1PoseEstimate() {
     // When the limelight doesn't see any targets, it should return an empty
     // PoseEstimate
-    assertEquals(new PoseEstimate(), physicalVision.getMegaTag1PoseEstimate(Limelight.BACK));
+    assertEquals(new PoseEstimate(), physicalVision.getMegaTag1PoseEstimate(Limelight.FRONT_LEFT));
 
     PoseEstimate expectedPoseEstimate =
         new PoseEstimate(
@@ -80,14 +80,14 @@ public class PhysicalVisionTest {
 
     // Because PoseEstimates are sent over the network tables as just an array of
     // doubles, we have to manually set the values for the test
-    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
-    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag1PoseEstimate(Limelight.BACK));
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
+    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag1PoseEstimate(Limelight.FRONT_LEFT));
   }
 
   @Test
   void testGetMegaTag2PoseEstimate() {
     // This is just a duplicate of the previous test, but for MT2
-    assertEquals(new PoseEstimate(), physicalVision.getMegaTag2PoseEstimate(Limelight.BACK));
+    assertEquals(new PoseEstimate(), physicalVision.getMegaTag2PoseEstimate(Limelight.FRONT_LEFT));
 
     PoseEstimate expectedPoseEstimate =
         new PoseEstimate(
@@ -102,8 +102,8 @@ public class PhysicalVisionTest {
             true);
 
     TigerHelpers.setBotPoseEstimate(
-        expectedPoseEstimate, Limelight.BACK.getName(), Botpose.BLUE_MEGATAG2);
-    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag2PoseEstimate(Limelight.BACK));
+        expectedPoseEstimate, Limelight.FRONT_LEFT.getName(), Botpose.BLUE_MEGATAG2);
+    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag2PoseEstimate(Limelight.FRONT_LEFT));
   }
 
   @Test
@@ -115,18 +115,18 @@ public class PhysicalVisionTest {
   void testLimelightEstimatesGetters() {
     // First we test that the getters return their default values before we set
     // limelightEstimates
-    assertEquals(new Pose2d(), physicalVision.getPoseFromAprilTags(Limelight.BACK));
-    assertEquals(0, physicalVision.getNumberOfAprilTags(Limelight.BACK));
+    assertEquals(new Pose2d(), physicalVision.getPoseFromAprilTags(Limelight.FRONT_LEFT));
+    assertEquals(0, physicalVision.getNumberOfAprilTags(Limelight.FRONT_LEFT));
     // Because of how doubles work, we can't compare them directly, so we have to
     // also have a delta/range to check if it's "close enough"
-    assertEquals(0.0, physicalVision.getTimestampSeconds(Limelight.BACK));
-    assertEquals(0.0, physicalVision.getLatencySeconds(Limelight.BACK));
-    assertEquals(Double.MAX_VALUE, physicalVision.getLimelightAprilTagDistance(Limelight.BACK));
-    assertEquals(0.0, physicalVision.getAmbiguity(Limelight.BACK));
+    assertEquals(0.0, physicalVision.getTimestampSeconds(Limelight.FRONT_LEFT));
+    assertEquals(0.0, physicalVision.getLatencySeconds(Limelight.FRONT_LEFT));
+    assertEquals(Double.MAX_VALUE, physicalVision.getLimelightAprilTagDistance(Limelight.FRONT_LEFT));
+    assertEquals(0.0, physicalVision.getAmbiguity(Limelight.FRONT_LEFT));
 
     // We have to set these values so that canSeeAprilTags returns true
     backLimelightTable.getEntry("tv").setDouble(1.0);
-    backLimelightTable.getEntry("tx").setDouble(Limelight.BACK.getAccurateFOV() - 1);
+    backLimelightTable.getEntry("tx").setDouble(Limelight.FRONT_LEFT.getAccurateFOV() - 1);
 
     RawFiducial[] expectedRawFiducials = {new RawFiducial(1, 0, 0, 1, 1, 1, 0.2)};
 
@@ -142,34 +142,34 @@ public class PhysicalVisionTest {
             expectedRawFiducials,
             false);
 
-    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
     // For simplictity, we're just going to use the disabledPoseUpdate method to set
     // the limelightEstimates as it doesn't have any logic in it like
     // enabledPoseUpdate
-    physicalVision.disabledPoseUpdate(Limelight.BACK);
-    assertEquals(expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.BACK));
+    physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
+    assertEquals(expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.FRONT_LEFT));
     assertEquals(
-        expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.BACK));
+        expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.FRONT_LEFT));
     // We have to divide by 1000 because the timestamp is in milliseconds
     assertEquals(
         expectedPoseEstimate.latency / 1000.0,
-        physicalVision.getLatencySeconds(Limelight.BACK),
+        physicalVision.getLatencySeconds(Limelight.FRONT_LEFT),
         0.0);
     assertEquals(
         expectedPoseEstimate.avgTagDist,
-        physicalVision.getLimelightAprilTagDistance(Limelight.BACK),
+        physicalVision.getLimelightAprilTagDistance(Limelight.FRONT_LEFT),
         0.0);
     assertEquals(
         expectedPoseEstimate.rawFiducials[0].ambiguity,
-        physicalVision.getAmbiguity(Limelight.BACK),
+        physicalVision.getAmbiguity(Limelight.FRONT_LEFT),
         0.0);
   }
 
   @Test
   void testIsValidMeasurement() {
     // If the pose hasn't been updated, it should return false
-    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    assertFalse(physicalVision.isValidMeasurement(Limelight.FRONT_LEFT));
 
     // If the pose is not empty, within the field, is confident, and not
     // teleporting, then it should be true
@@ -190,20 +190,20 @@ public class PhysicalVisionTest {
             },
             false);
 
-    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
     backLimelightTable.getEntry("tv").setDouble(1.0);
-    backLimelightTable.getEntry("tx").setDouble(Limelight.BACK.getAccurateFOV() - 1);
+    backLimelightTable.getEntry("tx").setDouble(Limelight.FRONT_LEFT.getAccurateFOV() - 1);
 
     // Update the limeightEstimates
-    physicalVision.disabledPoseUpdate(Limelight.BACK);
+    physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
 
     // We call isValidMeasurement a bunch here to fill up the isTeleporting moving average
     for (int i = 0; i < VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE; i++) {
-      physicalVision.isValidMeasurement(Limelight.BACK);
+      physicalVision.isValidMeasurement(Limelight.FRONT_LEFT);
     }
 
-    assertTrue(physicalVision.isValidMeasurement(Limelight.BACK));
+    assertTrue(physicalVision.isValidMeasurement(Limelight.FRONT_LEFT));
 
     // If we make the make the ambiguity high, it should return false
     expectedPoseEstimate =
@@ -223,10 +223,10 @@ public class PhysicalVisionTest {
             },
             false);
 
-    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
-    physicalVision.disabledPoseUpdate(Limelight.BACK);
-    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
+    assertFalse(physicalVision.isValidMeasurement(Limelight.FRONT_LEFT));
 
     // If we make it start teleporting, it should return false
     expectedPoseEstimate =
@@ -246,21 +246,21 @@ public class PhysicalVisionTest {
             },
             false);
 
-    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.BACK.getName());
+    TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
-    physicalVision.disabledPoseUpdate(Limelight.BACK);
-    assertFalse(physicalVision.isValidMeasurement(Limelight.BACK));
+    physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
+    assertFalse(physicalVision.isValidMeasurement(Limelight.FRONT_LEFT));
   }
 
   @ParameterizedTest
   @ValueSource(doubles = {30.0, 270.0, -50.0, 451.5})
   void testSetOdometryInfo(double headingDegrees) {
     physicalVision.setOdometryInfo(headingDegrees, 0, new Pose2d());
-    physicalVision.checkAndUpdatePose(Limelight.BACK);
+    physicalVision.checkAndUpdatePose(Limelight.FRONT_LEFT);
 
     assertEquals(
         headingDegrees,
         TigerHelpers.getLimelightNetworkTableDoubleArray(
-            Limelight.BACK.getName(), "robot_orientation_set")[0]);
+            Limelight.FRONT_LEFT.getName(), "robot_orientation_set")[0]);
   }
 }
