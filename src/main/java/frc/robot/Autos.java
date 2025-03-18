@@ -586,7 +586,7 @@ public class Autos {
                 //     .onlyIf(() -> swerveDrive.isReefInRange())
                 //     .deadlineFor(reefPathfinding.goTo(initialBranch))
                 .withName("ScoreAt" + initialBranch.name())
-                .andThen(reefToSource[1].spawnCmd())
+                .andThen(reefToSource[0].spawnCmd())
                 // .andThen(sourcePathfinding.goTo(source))
                 .withName("StartTo" + initialBranch.name()));
 
