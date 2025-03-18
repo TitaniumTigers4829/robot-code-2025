@@ -44,13 +44,13 @@ public interface FlywheelInterface {
   }
 
   /**
-   * Sets the desired speed for the flywheel motor. This method should be implemented to control the
-   * flywheel motor to the target speed.
+   * Sets the desired velocity for the flywheel motor. This method should be implemented to control the
+   * flywheel motor to the target velocity.
    *
-   * @param speed The desired speed for the flywheel motor (e.g., in RPM, percentage, or another
+   * @param velocity The desired velocity for the flywheel motor (e.g., in RPM, rad/s, or another
    *     relevant unit).
    */
-  public default void setFlywheelSpeed(double speed) {}
+  public default void setFlywheelVelocity(double velocity) {}
 
   /**
    * Sets the applied voltage for the flywheel motor. This method is used to directly control the

@@ -11,11 +11,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 /** Add your docs here. */
 public class PhysicalFlywheel implements FlywheelInterface {
-  private VoltageOut voltageOut = new VoltageOut(0.0);
+  private TalonFX flywheelMotor = new TalonFX(FlywheelConstants.FLYWHEEL_MOTOR_ID);
   public TalonFXConfiguration config;
 
+  private VoltageOut voltageOut = new VoltageOut(0.0);
   private VelocityVoltage velocityRequest = new VelocityVoltage(0.0);
-  private TalonFX flywheelMotor = new TalonFX(FlywheelConstants.FLYWHEEL_MOTOR_ID);
 
   public PhysicalFlywheel() {
     config.Slot0.kP = FlywheelConstants.FLYWHEEL_P;
@@ -33,11 +33,11 @@ public class PhysicalFlywheel implements FlywheelInterface {
     inputs.flywheelMotorSpeed = getFlywheelVelocity();
   }
 
-  public void setFlywheelSpeed(double velocity) {
+  public void setFlywheelVelocity(double velocity) {
     flywheelMotor.setControl(velocityRequest.withVelocity(velocity));
   }
 
-  public double getFlywheelSpeed(double velocity) {
+  public double getFlywheelVelocity() {
     return flywheelMotor.getVelocity().getValueAsDouble();
   }
 

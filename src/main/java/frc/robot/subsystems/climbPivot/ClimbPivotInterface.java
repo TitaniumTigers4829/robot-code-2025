@@ -46,7 +46,7 @@ public interface ClimbPivotInterface {
    * Manually pivots the climb pivot system to the desired position. This method should be
    * implemented to control the climb pivot motor to reach the target position.
    *
-   * @param position
+   * @param position The desired position to manually pivot to.
    */
   public default void manualPivot(double position) {}
 

@@ -39,15 +39,25 @@ public class SimulatedFunnelPivot implements FunnelPivotInterface {
   }
 
   @Override
+  public void setFunnelAngle(double angle) {
+    double currentFunnelPivotAngleRots = Units.radiansToRotations(funnelPivotSim.getAngleRads());
+    double armFF = armFeedForward.calculate(angle, funnelPivotController.getSetpoint().velocity);
+    setFunnelVoltage(funnelPivotController.calculate(currentFunnelPivotAngleRots, angle) + armFF);
+  }
+
+  @Override
   public void setFunnelVoltage(double voltage) {
     appliedVolts = voltage;
     funnelPivotSim.setInputVoltage(voltage);
   }
 
   @Override
-  public void setFunnelAngle(double angle) {
-    double currentFunnelPivotAngleRots = Units.radiansToRotations(funnelPivotSim.getAngleRads());
-    double armFF = armFeedForward.calculate(angle, funnelPivotController.getSetpoint().velocity);
-    setFunnelVoltage(funnelPivotController.calculate(currentFunnelPivotAngleRots, angle) + armFF);
+  public double getFunnelAngle() {
+    return Units.radiansToRotations(funnelPivotSim.getAngleRads());
+  }
+
+  @Override
+  public double getFunnelPivotTarget() {
+    return funnelPivotController.getSetpoint().position;
   }
 }

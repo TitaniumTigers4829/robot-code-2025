@@ -27,7 +27,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public void setFlywheelSpeed(double speed) {
-    flywheelInterface.setFlywheelSpeed(speed);
+    flywheelInterface.setFlywheelVelocity(speed);
   }
 
   public void setVolts(double volts) {
@@ -41,7 +41,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     Logger.processInputs("Flywheel/", inputs);
   }
 
-  public Command setFlyhweelSpeed(double speed) {
-    return this.runOnce(() -> setFlyhweelSpeed(speed));
+  public Command setFlywheelSpeedCmd(double speed) {
+    return this.runOnce(() -> setFlywheelSpeed(speed));
   }
 }

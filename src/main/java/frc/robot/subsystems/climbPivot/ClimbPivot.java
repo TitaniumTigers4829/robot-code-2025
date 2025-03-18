@@ -76,9 +76,9 @@ public class ClimbPivot extends SubsystemBase {
   }
 
   /**
-   * @param position i dont actually know what this is
-   * @return
-   */
+ * @param position the speed input for manual control of the pivot
+ * @return the command that will run the pivot motor manually
+ */
   public Command manualPivotClimb(DoubleSupplier position) {
     return new RunCommand(
         () -> climbPivotInterface.manualPivot(MathUtil.applyDeadband(position.getAsDouble(), .1)),
