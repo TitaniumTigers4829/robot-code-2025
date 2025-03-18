@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -111,6 +112,9 @@ public final class Constants {
   public static final class FieldConstants {
     public static final double FIELD_LENGTH_METERS = Units.inchesToMeters(690);
     public static final double FIELD_WIDTH_METERS = Units.inchesToMeters(317);
+
+  public static final Translation2d FIELD_CENTER =
+      new Translation2d(FIELD_LENGTH_METERS / 2, FIELD_WIDTH_METERS / 2);
 
     public static final double REEF_LEVEL_ONE_Z = Units.inchesToMeters(18);
     public static final double REEF_LEVEL_TWO_Z = Units.inchesToMeters(31.875);

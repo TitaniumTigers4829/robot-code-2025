@@ -2,7 +2,6 @@ package frc.robot;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,7 +17,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -462,7 +460,7 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("Trajectory Done", false);
 
     this.autoChooser = new AutoChooser();
-   
+
     this.autos =
         new Autos(
             this.elevatorSubsystem,

@@ -5,6 +5,7 @@ import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.autodrive.RepulsorCommand;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
@@ -21,6 +24,7 @@ import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.ReefLocations.ReefBranch;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
@@ -29,15 +33,13 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
-
 import java.util.HashMap;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
-    private final LoggedDashboardChooser<String> chooser;
+  private final LoggedDashboardChooser<String> chooser;
   private final AutoFactory autoFactory;
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
@@ -46,26 +48,31 @@ public class Autos {
   private FunnelSubsystem funnelSubsystem;
   private final String NONE_NAME = "Do Nothing";
 
-    private final HashMap<String, Supplier<Command>> routines = new HashMap<>();
+  private final HashMap<String, Supplier<Command>> routines = new HashMap<>();
 
-  
-    @FunctionalInterface
-    private interface ReefRepulsorCommand {
-      Command goTo(ReefBranch branch);
-    }
-  
-    @FunctionalInterface
-    private interface SourceRepulsorCommand {
-      Command goTo(Source source);
-    }
-  
-    private final ReefRepulsorCommand reefPathfinding;
-    private final SourceRepulsorCommand sourcePathfinding;
+  private final Pose2d sourceRight = new Pose2d(1.61, .67, Rotation2d.fromDegrees(54));
+  private final Pose2d sourceLeft =
+      new Pose2d(
+          sourceRight.getX(),
+          FieldConstants.FIELD_WIDTH_METERS - sourceRight.getY(),
+          sourceRight.getRotation().unaryMinus());
+
+  @FunctionalInterface
+  private interface ReefRepulsorCommand {
+    Command goTo(ReefBranch branch);
+  }
+
+  @FunctionalInterface
+  private interface SourceRepulsorCommand {
+    Command goTo(Source source);
+  }
+
+  private final ReefRepulsorCommand reefPathfinding;
+  private final SourceRepulsorCommand sourcePathfinding;
 
   private String selectedCommandName = NONE_NAME;
   private Command selectedCommand = Commands.none();
   private boolean selectedOnRed = false;
-
 
   public Autos(
       ElevatorSubsystem elevatorSubsystem,
@@ -79,15 +86,11 @@ public class Autos {
     this.visionSubsystem = visionSubsystem;
     this.funnelSubsystem = funnelSubsystem;
     chooser = new LoggedDashboardChooser<>("Auto Chooser");
-     // this sets up the auto factory
+    // this sets up the auto factory
     this.autoFactory =
         new AutoFactory(
-            () ->
-                this.swerveDrive
-                    .getEstimatedPose(), // A function that returns the current robot pose
-            (Pose2d pose) ->
-                this.swerveDrive.resetEstimatedPose(
-                    pose), // A function that resets the current robot pose to the
+            swerveDrive::getEstimatedPose, // A function that returns the current robot pose
+            swerveDrive::resetEstimatedPose, // A function that resets the current robot pose to the
             (SwerveSample sample) -> {
               FollowSwerveSampleCommand followSwerveSampleCommand =
                   new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
@@ -99,18 +102,22 @@ public class Autos {
 
     reefPathfinding =
         branch ->
-                swerve
-                    .followRepulsorField(ReefLocations.getScoringLocation(branch))
-                    .withName("Reef Align " + branch.name());
-        sourcePathfinding =
-            source -> {
-              var pose = source == Source.L ? sourceLeft : sourceRight;
-              if (AllianceFlipper.isRed()) {
-                pose = pose.rotateAround(Constants.FIELD_CENTER, Rotation2d.kPi);
-              }
-              return swerve.followRepulsorField(pose).withName("Source Align " + source.name());
-            };
-
+            new RepulsorCommand(
+                    swerveDrive,
+                    visionSubsystem,
+                    ReefLocations.getScoringLocation(branch),
+                    swerveDrive.getEstimatedPose())
+                .withName("Reef Align " + branch.name());
+    sourcePathfinding =
+        source -> {
+          Pose2d pose = source == Source.L ? sourceLeft : sourceRight;
+          if (AllianceFlipper.isRed()) {
+            pose = pose.rotateAround(new Pose2d(FieldConstants.FIELD_CENTER, Rotation2d.kPi));
+          }
+          return new RepulsorCommand(
+                  swerveDrive, visionSubsystem, pose, swerveDrive.getEstimatedPose())
+              .withName("Source Align " + source.name());
+        };
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -508,7 +515,7 @@ public class Autos {
     return routine;
   }
 
-    private AutoRoutine createRoutine(
+  private AutoRoutine createRoutine(
       AutoFactory factory,
       SwerveDrive swerve,
       VisionSubsystem visionSubsystem,
@@ -552,7 +559,7 @@ public class Autos {
       reefToSource[i]
           .done()
           .onTrue(
-              waitUntil(()->coralIntakeSubsystem::hasControl)
+              waitUntil(() -> coralIntakeSubsystem::hasControl)
                   // .withTimeout(.5) // ONLY RUN IN SIM
                   .deadlineFor(sourcePathfinding.goTo(source))
                   .andThen(sourceToReef[i].spawnCmd())
@@ -572,8 +579,6 @@ public class Autos {
 
     return routine;
   }
-
-
 
   // Red Auto Routines
 
@@ -946,13 +951,12 @@ public class Autos {
                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
-  
+
   private final Alert selectedNonexistentAuto =
       new Alert("Selected an auto that isn't an option!", Alert.AlertType.kError);
   private final Alert loadedAutoAlert = new Alert("", Alert.AlertType.kInfo);
 
-
-    public void update() {
+  public void update() {
     if (DriverStation.isDSAttached() && DriverStation.getAlliance().isPresent()) {
       var selected = chooser.get();
       if (selected.equals(selectedCommandName) && selectedOnRed == AllianceFlipper.isRed()) {
@@ -999,5 +1003,4 @@ public class Autos {
   private AutoTrajectory getTrajectory(AutoRoutine routine, Source source, ReefBranch reefBranch) {
     return routine.trajectory(reefBranch.name() + "~S" + source.name(), 1);
   }
-
 }
