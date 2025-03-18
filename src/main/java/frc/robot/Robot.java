@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
@@ -122,13 +120,24 @@ public class Robot extends LoggedRobot {
     autos.update();
   }
 
+  private Command autoCommand;
+
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    autoCommand = autos.getSelectedCommand();
+    autoCommand.schedule();
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
+
+  @Override
+  public void autonomousExit() {
+    autoCommand.cancel();
+    autos.clear();
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -425,7 +434,7 @@ public class Robot extends LoggedRobot {
 
         this.visionSubsystem =
             new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
-        this.swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
+        this.swerveDrive.resetEstimatedPose(new Pose2d(7, 4, new Rotation2d()));
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
@@ -469,38 +478,41 @@ public class Robot extends LoggedRobot {
             this.visionSubsystem,
             this.funnelSubsystem);
 
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
-
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
-
-    this.autoChooser.addRoutine(
-        AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
-
-    this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () -> this.autos.xOneMeterAuto());
-
-    this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () -> this.autos.yOneMeterAuto());
-
-    this.autoChooser.addRoutine("Rotation auto", () -> this.autos.yOneMeterAndRotationAuto());
     // this.autoChooser.addRoutine(
-    //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
-    // this.autoChooser.addRoutine(
-    //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+    //     AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
 
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () ->
+    // this.autos.blueRightTwoCoralAuto());
+
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
+
+    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () ->
+    // this.autos.xOneMeterAuto());
+
+    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () ->
+    // this.autos.yOneMeterAuto());
+
+    // this.autoChooser.addRoutine("Rotation auto", () -> this.autos.yOneMeterAndRotationAuto());
+    // // this.autoChooser.addRoutine(
+    // //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
+    // // this.autoChooser.addRoutine(
+    // //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
+
+    // this.autoChooser.addRoutine(
+    //     AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
     // this.autoChooser.addRoutine(
     // AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
     // This updates the auto chooser
-    SmartDashboard.putData("Auto Chooser", this.autoChooser);
+    // SmartDashboard.putData("Auto Chooser", this.autoChooser);
 
     // This
-    RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
+    // RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
   }
 
   /** This function is called periodically during operator control. */
