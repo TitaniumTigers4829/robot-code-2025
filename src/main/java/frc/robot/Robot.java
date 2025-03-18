@@ -120,7 +120,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    autos.update();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -460,27 +462,9 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putBoolean("Trajectory Done", false);
 
     this.autoChooser = new AutoChooser();
-    // this sets up the auto factory
-    this.autoFactory =
-        new AutoFactory(
-            () ->
-                this.swerveDrive
-                    .getEstimatedPose(), // A function that returns the current robot pose
-            (Pose2d pose) ->
-                this.swerveDrive.resetEstimatedPose(
-                    pose), // A function that resets the current robot pose to the
-            (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followSwerveSampleCommand =
-                  new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
-              followSwerveSampleCommand.execute();
-              Logger.recordOutput("Trajectory/sample", sample.getPose());
-            }, // A function that follows a choreo trajectory
-            false, // If alliance flipping should be enabled
-            this.swerveDrive); // The drive subsystem
-
+   
     this.autos =
         new Autos(
-            this.autoFactory,
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,

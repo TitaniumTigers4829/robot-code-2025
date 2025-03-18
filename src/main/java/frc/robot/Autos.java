@@ -3,16 +3,25 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
+import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.ReefLocations.ReefBranch;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
@@ -20,29 +29,88 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
+import java.util.HashMap;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class Autos {
+    private final LoggedDashboardChooser<String> chooser;
   private final AutoFactory autoFactory;
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private SwerveDrive swerveDrive;
   private VisionSubsystem visionSubsystem;
   private FunnelSubsystem funnelSubsystem;
+  private final String NONE_NAME = "Do Nothing";
+
+    private final HashMap<String, Supplier<Command>> routines = new HashMap<>();
+
+  
+    @FunctionalInterface
+    private interface ReefRepulsorCommand {
+      Command goTo(ReefBranch branch);
+    }
+  
+    @FunctionalInterface
+    private interface SourceRepulsorCommand {
+      Command goTo(Source source);
+    }
+  
+    private final ReefRepulsorCommand reefPathfinding;
+    private final SourceRepulsorCommand sourcePathfinding;
+
+  private String selectedCommandName = NONE_NAME;
+  private Command selectedCommand = Commands.none();
+  private boolean selectedOnRed = false;
+
 
   public Autos(
-      AutoFactory autoFactory,
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
       VisionSubsystem visionSubsystem,
       FunnelSubsystem funnelSubsystem) {
-    this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
     this.funnelSubsystem = funnelSubsystem;
+    chooser = new LoggedDashboardChooser<>("Auto Chooser");
+     // this sets up the auto factory
+    this.autoFactory =
+        new AutoFactory(
+            () ->
+                this.swerveDrive
+                    .getEstimatedPose(), // A function that returns the current robot pose
+            (Pose2d pose) ->
+                this.swerveDrive.resetEstimatedPose(
+                    pose), // A function that resets the current robot pose to the
+            (SwerveSample sample) -> {
+              FollowSwerveSampleCommand followSwerveSampleCommand =
+                  new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
+              followSwerveSampleCommand.execute();
+              Logger.recordOutput("Trajectory/sample", sample.getPose());
+            }, // A function that follows a choreo trajectory
+            false, // If alliance flipping should be enabled
+            this.swerveDrive); // The drive subsystem
+
+    reefPathfinding =
+        branch ->
+                swerve
+                    .followRepulsorField(ReefLocations.getScoringLocation(branch))
+                    .withName("Reef Align " + branch.name());
+        sourcePathfinding =
+            source -> {
+              var pose = source == Source.L ? sourceLeft : sourceRight;
+              if (AllianceFlipper.isRed()) {
+                pose = pose.rotateAround(Constants.FIELD_CENTER, Rotation2d.kPi);
+              }
+              return swerve.followRepulsorField(pose).withName("Source Align " + source.name());
+            };
+
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -440,6 +508,73 @@ public class Autos {
     return routine;
   }
 
+    private AutoRoutine createRoutine(
+      AutoFactory factory,
+      SwerveDrive swerve,
+      VisionSubsystem visionSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      CoralIntakeSubsystem coralIntakeSubsystem,
+      Source source,
+      ReefBranch initialBranch,
+      ReefBranch... cyclingBranches) {
+    var routine = factory.newRoutine("Autogenerated Routine");
+
+    var reefToSource = new AutoTrajectory[cyclingBranches.length];
+    var sourceToReef = new AutoTrajectory[cyclingBranches.length];
+    reefToSource[0] = getTrajectory(routine, initialBranch, source);
+    sourceToReef[0] = getTrajectory(routine, source, cyclingBranches[0]);
+    for (int i = 1; i < cyclingBranches.length; i++) {
+      reefToSource[i] = getTrajectory(routine, cyclingBranches[i - 1], source);
+      sourceToReef[i] = getTrajectory(routine, source, cyclingBranches[i]);
+    }
+    var nextCycleSpwnCmd = new Command[sourceToReef.length];
+    for (int i = 0; i < sourceToReef.length - 1; i++) {
+      nextCycleSpwnCmd[i] = reefToSource[i + 1].spawnCmd();
+    }
+    nextCycleSpwnCmd[sourceToReef.length - 1] =
+        new ScheduleCommand(
+            getTrajectory(routine, cyclingBranches[cyclingBranches.length - 1], source)
+                .cmd()
+                .andThen(sourcePathfinding.goTo(source)));
+
+    routine
+        .active()
+        .onTrue(
+            sequence(
+                    waitUntil(swerve::nearingTargetPose),
+                    elevatorSubsystem.setElevatorPosition(swerve::atTargetPoseAuto))
+                .deadlineFor(reefPathfinding.goTo(initialBranch))
+                .withName("ScoreAt" + initialBranch.name())
+                .andThen(reefToSource[0].spawnCmd())
+                .withName("StartTo" + initialBranch.name()));
+
+    for (int i = 0; i < cyclingBranches.length; i++) {
+      reefToSource[i]
+          .done()
+          .onTrue(
+              waitUntil(()->coralIntakeSubsystem::hasControl)
+                  // .withTimeout(.5) // ONLY RUN IN SIM
+                  .deadlineFor(sourcePathfinding.goTo(source))
+                  .andThen(sourceToReef[i].spawnCmd())
+                  .withName("Source" + source.name()));
+
+      sourceToReef[i]
+          .atTimeBeforeEnd(.5)
+          .onTrue(
+              elevatorSubsystem
+                  .setElevatorPosition(swerve::atTargetPoseAuto)
+                  .deadlineFor(
+                      waitUntil(sourceToReef[i].done())
+                          .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy()))
+                  .andThen(nextCycleSpwnCmd[i])
+                  .withName("ScoreAt" + cyclingBranches[i].name()));
+    }
+
+    return routine;
+  }
+
+
+
   // Red Auto Routines
 
   //   public AutoRoutine redTwoCoralAuto() {
@@ -811,4 +946,58 @@ public class Autos {
                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     return routine;
   }
+  
+  private final Alert selectedNonexistentAuto =
+      new Alert("Selected an auto that isn't an option!", Alert.AlertType.kError);
+  private final Alert loadedAutoAlert = new Alert("", Alert.AlertType.kInfo);
+
+
+    public void update() {
+    if (DriverStation.isDSAttached() && DriverStation.getAlliance().isPresent()) {
+      var selected = chooser.get();
+      if (selected.equals(selectedCommandName) && selectedOnRed == AllianceFlipper.isRed()) {
+        return;
+      }
+      if (!routines.containsKey(selected)) {
+        selected = NONE_NAME;
+        selectedNonexistentAuto.set(true);
+      } else {
+        selectedNonexistentAuto.set(false);
+      }
+      selectedCommandName = selected;
+      selectedCommand = routines.get(selected).get().withName(selectedCommandName);
+      selectedOnRed = AllianceFlipper.isRed();
+      loadedAutoAlert.setText("Loaded Auto: " + selectedCommandName);
+      loadedAutoAlert.set(true);
+    }
+  }
+
+  public void clear() {
+    selectedCommandName = NONE_NAME;
+    selectedCommand = Commands.none();
+    selectedOnRed = false;
+  }
+
+  public Command getSelectedCommand() {
+    return selectedCommand;
+  }
+
+  private void addRoutine(String name, Supplier<AutoRoutine> generator) {
+    chooser.addOption(name, name);
+    routines.put(name, () -> generator.get().cmd());
+  }
+
+  private enum Source {
+    L,
+    R
+  }
+
+  private AutoTrajectory getTrajectory(AutoRoutine routine, ReefBranch reefBranch, Source source) {
+    return routine.trajectory(reefBranch.name() + "~S" + source.name(), 0);
+  }
+
+  private AutoTrajectory getTrajectory(AutoRoutine routine, Source source, ReefBranch reefBranch) {
+    return routine.trajectory(reefBranch.name() + "~S" + source.name(), 1);
+  }
+
 }
