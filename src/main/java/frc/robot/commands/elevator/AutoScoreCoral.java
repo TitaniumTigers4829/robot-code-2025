@@ -7,11 +7,11 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class ScoreL4 extends SequentialCommandGroup {
+public class AutoScoreCoral extends SequentialCommandGroup {
   /** Creates a new ScoreL4. */
-  public ScoreL4(ElevatorSubsystem elevatorSubsystem, CoralIntakeSubsystem coralIntakeSubsystem) {
+  public AutoScoreCoral(ElevatorSubsystem elevatorSubsystem, CoralIntakeSubsystem coralIntakeSubsystem, double elevatorPosition) {
     addCommands(
-        elevatorSubsystem.setElevationPosition(ElevatorSetpoints.L4.getPosition()).withTimeout(6.0),
+        elevatorSubsystem.setElevationPosition(elevatorPosition).withTimeout(6.0),
         Commands.run(
                 () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
                 coralIntakeSubsystem)

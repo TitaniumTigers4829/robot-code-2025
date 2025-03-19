@@ -11,7 +11,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.IntakeCoral;
-import frc.robot.commands.elevator.ScoreL4;
+import frc.robot.commands.elevator.AutoScoreCoral;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
@@ -98,7 +98,7 @@ public class Autos {
                         () -> false)
                     .withTimeout(3.5),
                 new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
-                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
+                new AutoScoreCoral(elevatorSubsystem, coralIntakeSubsystem, ElevatorSetpoints.L4.getPosition())));
     return routine;
   }
 
@@ -328,7 +328,7 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new AutoScoreCoral(elevatorSubsystem, coralIntakeSubsystem, ElevatorSetpoints.L4.getPosition()));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
@@ -398,7 +398,7 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new AutoScoreCoral(elevatorSubsystem, coralIntakeSubsystem, ElevatorSetpoints.L4.getPosition()));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
@@ -701,7 +701,7 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new AutoScoreCoral(elevatorSubsystem, coralIntakeSubsystem, ElevatorSetpoints.L4.getPosition()));
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj)
         .and(routine.observe(hasNoCoral))
@@ -770,7 +770,7 @@ public class Autos {
         .anyDone(startToJTrajectory, pickupToLTrajectory, pickupToDTraj, pickupToBTraj)
         .and(routine.observe(hasCoral))
         .and(routine.observe(leftReefInRange))
-        .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
+        .onTrue(new AutoScoreCoral(elevatorSubsystem, coralIntakeSubsystem, ElevatorSetpoints.L4.getPosition()));
 
     routine
         .anyActive(jToPickupTrajectory, cToPickupTraj, dToPickupTraj)
