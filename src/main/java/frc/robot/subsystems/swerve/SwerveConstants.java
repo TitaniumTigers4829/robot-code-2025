@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.AquilaConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.CompConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.DevConstants;
 
 /** Swerve Constants */
@@ -143,6 +144,55 @@ public class SwerveConstants {
           InvertedValue.CounterClockwise_Positive;
     }
 
+    public static final class CompConstants {
+      public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 1;
+      public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 2;
+      public static final int REAR_LEFT_DRIVE_MOTOR_ID = 3;
+      public static final int REAR_RIGHT_DRIVE_MOTOR_ID = 4;
+
+      public static final int FRONT_LEFT_TURN_MOTOR_ID = 5;
+      public static final int FRONT_RIGHT_TURN_MOTOR_ID = 6;
+      public static final int REAR_LEFT_TURN_MOTOR_ID = 7;
+      public static final int REAR_RIGHT_TURN_MOTOR_ID = 8;
+
+      public static final int FRONT_LEFT_CANCODER_ID = 9;
+      public static final int FRONT_RIGHT_CANCODER_ID = 10;
+      public static final int REAR_LEFT_CANCODER_ID = 11;
+      public static final int REAR_RIGHT_CANCODER_ID = 12;
+
+      public static final double FRONT_LEFT_ZERO_ANGLE = -0.09521484375;
+      public static final double FRONT_RIGHT_ZERO_ANGLE = -0.478271484375;
+      public static final double REAR_LEFT_ZERO_ANGLE = -0.318115234375;
+      public static final double REAR_RIGHT_ZERO_ANGLE = -0.473388671875;
+
+      public static final SensorDirectionValue FRONT_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue FRONT_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_LEFT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+      public static final SensorDirectionValue REAR_RIGHT_CANCODER_REVERSED =
+          SensorDirectionValue.CounterClockwise_Positive;
+
+      public static final InvertedValue FRONT_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue REAR_LEFT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_TURN_MOTOR_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+
+      public static final InvertedValue FRONT_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue FRONT_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+      public static final InvertedValue REAR_LEFT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.CounterClockwise_Positive;
+      public static final InvertedValue REAR_RIGHT_DRIVE_ENCODER_REVERSED =
+          InvertedValue.Clockwise_Positive;
+    }
+
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
 
@@ -186,9 +236,9 @@ public class SwerveConstants {
     public static final double GYRO_MAX_PITCH = 30.0; // degrees
     public static final double GYRO_MAX_ROLL = 30.0; // degrees
 
-    public static final double DRIVE_GEAR_RATIO =
-        Constants.getRobot() == RobotType.DEV_ROBOT ? 7.13 : 4.59; // 4.59
-    public static final double TURN_GEAR_RATIO = 11.3142;
+    public static final double DRIVE_GEAR_RATIO = 6.48;
+    // Constants.getRobot() == RobotType.DEV_ROBOT ? 7.13 : 4.59; // 4.59
+    public static final double TURN_GEAR_RATIO = 12.1;
     public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3.9);
 
     public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
@@ -292,7 +342,41 @@ public class SwerveConstants {
             DevConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
       };
 
-  public static final ModuleConfig[] compModuleConfigs = null;
+  public static final ModuleConfig[] compModuleConfigs =
+      new ModuleConfig[] {
+        new ModuleConfig(
+            CompConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
+            CompConstants.FRONT_LEFT_TURN_MOTOR_ID,
+            CompConstants.FRONT_LEFT_CANCODER_ID,
+            CompConstants.FRONT_LEFT_ZERO_ANGLE,
+            CompConstants.FRONT_LEFT_CANCODER_REVERSED,
+            CompConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
+            CompConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            CompConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
+            CompConstants.FRONT_RIGHT_TURN_MOTOR_ID,
+            CompConstants.FRONT_RIGHT_CANCODER_ID,
+            CompConstants.FRONT_RIGHT_ZERO_ANGLE,
+            CompConstants.FRONT_RIGHT_CANCODER_REVERSED,
+            CompConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
+            CompConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            CompConstants.REAR_LEFT_DRIVE_MOTOR_ID,
+            CompConstants.REAR_LEFT_TURN_MOTOR_ID,
+            CompConstants.REAR_LEFT_CANCODER_ID,
+            CompConstants.REAR_LEFT_ZERO_ANGLE,
+            CompConstants.REAR_LEFT_CANCODER_REVERSED,
+            CompConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
+            CompConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
+        new ModuleConfig(
+            CompConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
+            CompConstants.REAR_RIGHT_TURN_MOTOR_ID,
+            CompConstants.REAR_RIGHT_CANCODER_ID,
+            CompConstants.REAR_RIGHT_ZERO_ANGLE,
+            CompConstants.REAR_RIGHT_CANCODER_REVERSED,
+            CompConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
+            CompConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
+      };
 
   public record ModuleConfig(
       int driveMotorChannel,

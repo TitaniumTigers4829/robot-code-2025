@@ -10,12 +10,10 @@ import org.photonvision.PhotonCamera;
 
 public final class VisionConstants {
   public enum Limelight {
-    BACK(BACK_LIMELIGHT_NUMBER, BACK_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false),
     FRONT_LEFT(
-        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR, false),
+        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false),
     FRONT_RIGHT(
-        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL3_FOV_MARGIN_OF_ERROR, false),
-    ELEVATOR(ELEVATOR_LIMELIGHT_NUMBER, ELEVATOR_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true);
+        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true);
 
     private final int id;
     private final String name;
@@ -47,9 +45,8 @@ public final class VisionConstants {
 
     public static Limelight fromId(int id) {
       return switch (id) {
-        case 0 -> BACK;
-        case 1 -> FRONT_LEFT;
-        case 2 -> FRONT_RIGHT;
+        case 0 -> FRONT_LEFT;
+        case 1 -> FRONT_RIGHT;
         default -> throw new IllegalArgumentException("Invalid Limelight ID: " + id);
       };
     }
@@ -66,12 +63,9 @@ public final class VisionConstants {
           new Translation3d(0.2816630892, 0.2724405524, 0.232156), new Rotation3d(0.0, 25, -35));
   public static final Transform3d ELEVATOR_TRANSFORM = new Transform3d();
 
-  public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.BACK.getName());
-  public static final PhotonCamera FRONT_LEFT_CAMERA =
-      new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  public static final PhotonCamera FRONT_RIGHT_CAMERA =
+  public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.FRONT_LEFT.getName());
+  public static final PhotonCamera ELEVATOR_CAMERA =
       new PhotonCamera(Limelight.FRONT_RIGHT.getName());
-  public static final PhotonCamera ELEVATOR_CAMERA = new PhotonCamera(Limelight.ELEVATOR.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
@@ -98,14 +92,10 @@ public final class VisionConstants {
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = .5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;
 
-  public static final String BACK_LIMELIGHT_NAME = "limelight-shooter";
-  public static final int BACK_LIMELIGHT_NUMBER = 0;
-  public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-left";
-  public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 1;
-  public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
-  public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 2;
-  public static final String ELEVATOR_LIMELIGHT_NAME = "limelight-elevate";
-  public static final int ELEVATOR_LIMELIGHT_NUMBER = 3;
+  public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-shooter";
+  public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 0;
+  public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-elevate";
+  public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 1;
 
   // TODO: these need to be changed, maybe to 10 and 0?
   public static final int DISABLED_THROTTLE = 175;
