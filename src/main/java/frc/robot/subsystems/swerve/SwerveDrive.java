@@ -88,7 +88,7 @@ public class SwerveDrive extends SubsystemBase {
               DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
   private final ProfiledPIDController headingRepulsorController =
       new ProfiledPIDController(
-          DriveConstants.HEADING_REPULSOR_P,
+          DriveConstants.REPULSOR_HEADING_P,
           BigDecimal.ZERO.doubleValue(),
           BigDecimal.ZERO.doubleValue(),
           new Constraints(

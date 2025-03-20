@@ -77,6 +77,8 @@ public class Robot extends LoggedRobot {
   private FunnelSubsystem funnelSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
+  
+  private Command autoCommand;
 
   private SimWorld simWorld;
 
@@ -119,8 +121,6 @@ public class Robot extends LoggedRobot {
   public void disabledPeriodic() {
     autos.update();
   }
-
-  private Command autoCommand;
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
