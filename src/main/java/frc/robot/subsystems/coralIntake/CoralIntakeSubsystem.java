@@ -4,21 +4,29 @@
 
 package frc.robot.subsystems.coralIntake;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
+  private LEDSubsystem ledSubsystem;
+
+  // New Constants for Jam Handling
+  private static final double JAM_CURRENT_THRESHOLD = 20.0; // amps (adjust as needed)
+  private static final double JAM_CLEARING_DURATION = 0.5; // seconds (adjust as needed)
 
   // States for the intake process
   public enum IntakeState {
     IDLE, // Chilling, not doing anything
     WAITING, // Waiting for coral to show up
     INGESTING, // Pulling the coral in
+    JAM_CLEARING,
     REVERSING, // Backing up to position it
     STOPPED // All done, motor off
   }
@@ -26,9 +34,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private IntakeState currentState = IntakeState.IDLE;
   private boolean usedToHaveCoral = false;
   private boolean usedToHaveControl = false;
+  private boolean stuck = false;
+  private int stuckCounter = 0;
+
+  private double jamStartTime = 0;
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
+    this.ledSubsystem = ledSubsystem;
   }
 
   /**
@@ -46,20 +59,16 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {
-    return coralIntakeInputs.isInnerSensorConnected && coralIntakeInputs.hasCoral;
+    return SmartDashboard.getBoolean("Coral", true);
   }
 
-  public Trigger getHasCoralTrigger() {
-    return new Trigger(() -> hasCoral());
-  }
-
-  public void intakeCoral() {
-    if (currentState == IntakeState.IDLE) {
-      currentState = IntakeState.WAITING;
-      usedToHaveCoral = hasCoral(); // Set the starting sensor state
-      usedToHaveControl = hasControl();
-    }
-  }
+  // public void intakeCoral() {
+  //   if (currentState == IntakeState.IDLE) {
+  //     currentState = IntakeState.WAITING;
+  //     usedToHaveCoral = hasCoral(); // Set the starting sensor state
+  //     usedToHaveControl = hasControl();
+  //   }
+  // }
 
   public boolean hasControl() {
     return coralIntakeInputs.hasControl;
@@ -68,6 +77,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   // Tells you if the intake is done
   public boolean isIntakeComplete() {
     return currentState == IntakeState.STOPPED;
+  }
+
+  public boolean isIntakeIdle() {
+    return currentState == IntakeState.IDLE;
+  }
+
+  public void setStuckMode(boolean b) {
+    this.stuck = b;
   }
 
   @Override
@@ -82,7 +99,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     switch (currentState) {
       case WAITING:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.WAITING_INTAKE_SPEED);
-        if (currentlyHasControl && !usedToHaveControl) {
+        if ((currentlyHasControl && !usedToHaveControl)) {
           // Coral just got detected: start pushing it out
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.INGEST_SPEED);
           currentState = IntakeState.INGESTING;
@@ -90,6 +107,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case INGESTING:
+        // If motor current is too high, a jam is likely – enter jam clearing state
+        // if (coralIntakeInputs.intakeStatorCurrentAmps > JAM_CURRENT_THRESHOLD) {
+        //   currentState = IntakeState.JAM_CLEARING;
+        //   jamStartTime = Timer.getFPGATimestamp();
+        //   coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
+        //   break;
+        // }
         if (!currentlyHasControl && currentlyHasCoral) {
           // Coral’s gone from the sensor: reverse to position it
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
@@ -104,6 +128,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
           currentState = IntakeState.STOPPED;
         }
         break;
+
+        // case JAM_CLEARING:
+        //   // Maintain reverse until the jam clearing duration has elapsed
+        //   if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
+        //     // After jam clearing, return to waiting state to try ingestion again
+        //     currentState = IntakeState.WAITING;
+        //   }
+        //   break;
 
       case STOPPED:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);
@@ -136,32 +168,44 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.setIntakeVelocity(velocity);
   }
 
-  // public Command intakeCoral() {
-  //   if (!this.hasCoral()) {
-  //     return new StartEndCommand(
-  //         // sets speed while command is active
-  //         () -> this.setIntakeSpeed(CoralIntakeConstants.INTAKE_SPEED),
-  //         // sets speed when command ends
-  //         () -> this.setIntakeSpeed(0),
-  //         // requirements for command
-  //         this);
-  //   } else {
-  //     return new StartEndCommand(
-  //         // sets speed while command is active
-  //         () -> this.setIntakeSpeed(0.0),
-  //         // sets speed when command ends
-  //         () -> this.setIntakeSpeed(0),
-  //         // requirements for command
-  //         this);
-  //   }
-  // }
+  public Command intakeCoral() {
+    if (!this.hasCoral()) {
+      return new StartEndCommand(
+          // sets speed while command is active
+          () -> {
+            this.setIntakeSpeed(CoralIntakeConstants.INGEST_SPEED);
+            ledSubsystem.setProcess(LEDProcess.ORANGE);
+          },
+          // sets speed when command ends
+          () -> {
+            this.setIntakeSpeed(0);
+            ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
+          },
+          // requirements for command
+          this);
+    } else {
+      return new StartEndCommand(
+          // sets speed while command is active
+          () -> {
+            this.setIntakeSpeed(0.0);
+            ledSubsystem.setProcess(LEDProcess.GREEN);
+          },
+          // sets speed when command ends
+          () -> {
+            this.setIntakeSpeed(0);
+            ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
+          },
+          // requirements for command
+          this);
+    }
+  }
 
   public Command ejectCoral() {
     return new StartEndCommand(
         // sets speed while command is active
-        () -> this.setIntakeSpeed(CoralIntakeConstants.EJECT_SPEED),
+        () -> this.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
         // sets speed when command ends
-        () -> this.setIntakeSpeed(0),
+        () -> this.setIntakeVelocity(0),
         // requirements for command
         this);
   }

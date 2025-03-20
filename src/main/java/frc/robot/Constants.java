@@ -8,8 +8,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.DEV_ROBOT;
-  public static final boolean tuningMode = true;
+  private static RobotType robotType = RobotType.COMP_ROBOT;
+
+  public static final boolean tuningMode = false;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -328,10 +329,16 @@ public final class Constants {
   public static final class AutoConstants {
 
     // Different Pre-defined Auto Routines
-    public static final String ONE_CORAL_AUTO_ROUTINE = "One-Coral-Auto-Routine";
-    public static final String EXAMPLE_AUTO_ROUTINE = "Example-Auto-Routine";
-    public static final String FLEXIBLE_AUTO_ROUTINE = "Flexible-Auto-Routine";
-    public static final String ONE_METER_AUTO_ROUTINE = "One-Meter-Auto-Routine";
+    public static final String Y_ONE_METER_AUTO = "Y-One-Meter-Test";
+    public static final String X_ONE_METER_AUTO = "X-One-Meter-Test";
+    public static final String BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Left-Two-Coral-Auto-Routine";
+    public static final String BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Blue-Right-Two-Coral-Auto-Routine";
+    public static final String BLUE_THREE_CORAL_AUTO_ROUTINE = "Blue-Three-Coral-Auto-Routine";
+    public static final String BLUE_FOUR_CORAL_AUTO_ROUTINE = "Blue-Four-Coral-Auto-Routine";
+    public static final String SIMPLE_REPULSOR_AUTO = "Simple-Repulsor-Auto";
+    public static final String TWO_CORAL_REPULSOR_AUTO = "Two-Coral-Repulsor-Auto";
     // This does not exist yet :(
 
     // All Trajectories are created on the blue alliance and are flipped in the code
@@ -348,93 +355,199 @@ public final class Constants {
     //  Right     \-----------------------|
 
     // Example 1 Meter Trajectory
-    public static final String ONE_METER_TRAJECTORY = "Trajectories/ONEMETERRRR";
 
     // Right Start
-    public static final String RIGHT_START_TO_E_TRAJECTORY = "Trajectories/Right-Start-to-E";
-    public static final String RIGHT_START_TO_F_TRAJECTORY = "Trajectories/Right-Start-to-F";
-    public static final String RIGHT_START_TO_G_TRAJECTORY = "Trajectories/Right-Start-to-G";
+    public static final String BLUE_RIGHT_START_TO_E_TRAJECTORY =
+        "BlueTrajectories/Right-Start-to-E";
+    public static final String BLUE_RIGHT_START_TO_F_TRAJECTORY =
+        "BlueTrajectories/Right-Start-to-F";
+    public static final String BLUE_RIGHT_START_TO_G_TRAJECTORY =
+        "BlueTrajectories/Right-Start-to-G";
     // Mid Start
-    public static final String MID_START_TO_E_TRAJECTORY = "Trajectories/Mid-Start-to-E";
-    public static final String MID_START_TO_F_TRAJECTORY = "Trajectories/Mid-Start-to-F";
-    public static final String MID_START_TO_G_TRAJECTORY = "Trajectories/Mid-Start-to-G";
-    public static final String MID_START_TO_H_TRAJECTORY = "Trajectories/Mid-Start-to-H";
-    public static final String MID_START_TO_I_TRAJECTORY = "Trajectories/Mid-Start-to-I";
-    public static final String MID_START_TO_J_TRAJECTORY = "Trajectories/Mid-Start-to-J";
+    public static final String BLUE_MID_START_TO_E_TRAJECTORY = "BlueTrajectories/Mid-Start-to-E";
+    public static final String BLUE_MID_START_TO_F_TRAJECTORY = "BlueTrajectories/Mid-Start-to-F";
+    public static final String BLUE_MID_START_TO_G_TRAJECTORY = "BlueTrajectories/Mid-Start-to-G";
+    public static final String BLUE_MID_START_TO_H_TRAJECTORY = "BlueTrajectories/Mid-Start-to-H";
+    public static final String BLUE_MID_START_TO_I_TRAJECTORY = "BlueTrajectories/Mid-Start-to-I";
+    public static final String BLUE_MID_START_TO_J_TRAJECTORY = "BlueTrajectories/Mid-Start-to-J";
     // Left Start
-    public static final String LEFT_START_TO_I_TRAJECTORY = "Trajectories/Left-Start-to-I";
-    public static final String LEFT_START_TO_H_TRAJECTORY = "Trajectories/Left-Start-to-H";
-    public static final String LEFT_START_TO_J_TRAJECTORY = "Trajectories/Left-Start-to-J";
+    public static final String BLUE_LEFT_START_TO_I_TRAJECTORY = "BlueTrajectories/Left-Start-to-I";
+    public static final String BLUE_LEFT_START_TO_H_TRAJECTORY = "BlueTrajectories/Left-Start-to-H";
+    public static final String BLUE_LEFT_START_TO_J_TRAJECTORY = "BlueTrajectories/Left-Start-to-J";
+
+    // tuning 1 meter
+    public static final String X_ONE_METER_TRAJECTORY = "BlueTrajectories/X1METER";
+    public static final String Y_ONE_METER_TRAJECTORY = "BlueTrajectories/Y1METER";
 
     // Reef to Right Pickup
-    public static final String A_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/A-to-Right-Pickup";
-    public static final String B_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/B-to-Right-Pickup";
-    public static final String C_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/C-to-Right-Pickup";
-    public static final String D_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/D-to-Right-Pickup";
-    public static final String E_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/E-to-Right-Pickup";
-    public static final String F_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/F-to-Right-Pickup";
-    public static final String G_TO_RIGHT_PICKUP_TRAJECTORY = "Trajectories/G-to-Right-Pickup";
+    public static final String BLUE_A_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/A-to-Right-Pickup";
+    public static final String BLUE_B_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/B-to-Right-Pickup";
+    public static final String BLUE_C_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/C-to-Right-Pickup";
+    public static final String BLUE_D_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/D-to-Right-Pickup";
+    public static final String BLUE_E_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/E-to-Right-Pickup";
+    public static final String BLUE_F_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/F-to-Right-Pickup";
+    public static final String BLUE_G_TO_RIGHT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/G-to-Right-Pickup";
     // Reef to Left Pickup
-    public static final String H_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/H-to-Left-Pickup";
-    public static final String I_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/I-to-Left-Pickup";
-    public static final String J_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/J-to-Left-Pickup";
-    public static final String K_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/K-to-Left-Pickup";
-    public static final String L_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/L-to-Left-Pickup";
-    public static final String A_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/A-to-Left-Pickup";
-    public static final String B_TO_LEFT_PICKUP_TRAJECTORY = "Trajectories/B-to-Left-Pickup";
+    public static final String BLUE_H_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/H-to-Left-Pickup";
+    public static final String BLUE_I_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/I-to-Left-Pickup";
+    public static final String BLUE_J_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/J-to-Left-Pickup";
+    public static final String BLUE_K_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/K-to-Left-Pickup";
+    public static final String BLUE_L_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/L-to-Left-Pickup";
+    public static final String BLUE_A_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/A-to-Left-Pickup";
+    public static final String BLUE_B_TO_LEFT_PICKUP_TRAJECTORY =
+        "BlueTrajectories/B-to-Left-Pickup";
     // Right Pickup to Reef
-    public static final String RIGHT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Right-Pickup-to-A";
-    public static final String RIGHT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Right-Pickup-to-B";
-    public static final String RIGHT_PICKUP_TO_C_TRAJECTORY = "Trajectories/Right-Pickup-to-C";
-    public static final String RIGHT_PICKUP_TO_D_TRAJECTORY = "Trajectories/Right-Pickup-to-D";
-    public static final String RIGHT_PICKUP_TO_E_TRAJECTORY = "Trajectories/Right-Pickup-to-E";
-    public static final String RIGHT_PICKUP_TO_F_TRAJECTORY = "Trajectories/Right-Pickup-to-F";
-    public static final String RIGHT_PICKUP_TO_G_TRAJECTORY = "Trajectories/Right-Pickup-to-G";
+    public static final String BLUE_RIGHT_PICKUP_TO_A_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-A";
+    public static final String BLUE_RIGHT_PICKUP_TO_B_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-B";
+    public static final String BLUE_RIGHT_PICKUP_TO_C_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-C";
+    public static final String BLUE_RIGHT_PICKUP_TO_D_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-D";
+    public static final String BLUE_RIGHT_PICKUP_TO_E_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-E";
+    public static final String BLUE_RIGHT_PICKUP_TO_F_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-F";
+    public static final String BLUE_RIGHT_PICKUP_TO_G_TRAJECTORY =
+        "BlueTrajectories/Right-Pickup-to-G";
     // Left Pickup to Reef
-    public static final String LEFT_PICKUP_TO_H_TRAJECTORY = "Trajectories/Left-Pickup-to-H";
-    public static final String LEFT_PICKUP_TO_I_TRAJECTORY = "Trajectories/Left-Pickup-to-I";
-    public static final String LEFT_PICKUP_TO_J_TRAJECTORY = "Trajectories/Left-Pickup-to-J";
-    public static final String LEFT_PICKUP_TO_K_TRAJECTORY = "Trajectories/Left-Pickup-to-K";
-    public static final String LEFT_PICKUP_TO_L_TRAJECTORY = "Trajectories/Left-Pickup-to-L";
-    public static final String LEFT_PICKUP_TO_A_TRAJECTORY = "Trajectories/Left-Pickup-to-A";
-    public static final String LEFT_PICKUP_TO_B_TRAJECTORY = "Trajectories/Left-Pickup-to-B";
+    public static final String BLUE_LEFT_PICKUP_TO_H_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-H";
+    public static final String BLUE_LEFT_PICKUP_TO_I_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-I";
+    public static final String BLUE_LEFT_PICKUP_TO_J_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-J";
+    public static final String BLUE_LEFT_PICKUP_TO_K_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-K";
+    public static final String BLUE_LEFT_PICKUP_TO_L_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-L";
+    public static final String BLUE_LEFT_PICKUP_TO_A_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-A";
+    public static final String BLUE_LEFT_PICKUP_TO_B_TRAJECTORY =
+        "BlueTrajectories/Left-Pickup-to-B";
+
+    // Different Pre-defined Auto Routines
+    public static final String RED_LEFT_TWO_CORAL_AUTO_ROUTINE = "Red-Left-Two-Coral-Auto-Routine";
+    public static final String RED_RIGHT_TWO_CORAL_AUTO_ROUTINE =
+        "Red-Right-Two-Coral-Auto-Routine";
+    public static final String RED_THREE_CORAL_AUTO_ROUTINE = "Red-Three-Coral-Auto-Routine";
+    public static final String RED_FOUR_CORAL_AUTO_ROUTINE = "Red-Four-Coral-Auto-Routine";
+    public static final Pose2d BLUE_LEFT_CORAL_STATION =
+        new Pose2d(
+            Units.inchesToMeters(33.51),
+            Units.inchesToMeters(25.8),
+            new Rotation2d(Units.degreesToRadians(54)));
+    // Right Start
+    public static final String RED_RIGHT_START_TO_E_TRAJECTORY = "RedTrajectories/Right-Start-to-E";
+    public static final String RED_RIGHT_START_TO_F_TRAJECTORY = "RedTrajectories/Right-Start-to-F";
+    public static final String RED_RIGHT_START_TO_G_TRAJECTORY = "RedTrajectories/Right-Start-to-G";
+    // Mid Start
+    public static final String RED_MID_START_TO_E_TRAJECTORY = "RedTrajectories/Mid-Start-to-E";
+    public static final String RED_MID_START_TO_F_TRAJECTORY = "RedTrajectories/Mid-Start-to-F";
+    public static final String RED_MID_START_TO_G_TRAJECTORY = "RedTrajectories/Mid-Start-to-G";
+    public static final String RED_MID_START_TO_H_TRAJECTORY = "RedTrajectories/Mid-Start-to-H";
+    public static final String RED_MID_START_TO_I_TRAJECTORY = "RedTrajectories/Mid-Start-to-I";
+    public static final String RED_MID_START_TO_J_TRAJECTORY = "RedTrajectories/Mid-Start-to-J";
+    // Left Start
+    public static final String RED_LEFT_START_TO_I_TRAJECTORY = "RedTrajectories/Left-Start-to-I";
+    public static final String RED_LEFT_START_TO_H_TRAJECTORY = "RedTrajectories/Left-Start-to-H";
+    public static final String RED_LEFT_START_TO_J_TRAJECTORY = "RedTrajectories/Left-Start-to-J";
+
+    // Reef to Right Pickup
+    public static final String RED_A_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/A-to-Right-Pickup";
+    public static final String RED_B_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/B-to-Right-Pickup";
+    public static final String RED_C_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/C-to-Right-Pickup";
+    public static final String RED_D_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/D-to-Right-Pickup";
+    public static final String RED_E_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/E-to-Right-Pickup";
+    public static final String RED_F_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/F-to-Right-Pickup";
+    public static final String RED_G_TO_RIGHT_PICKUP_TRAJECTORY =
+        "RedTrajectories/G-to-Right-Pickup";
+    // Reef to Left Pickup
+    public static final String RED_H_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/H-to-Left-Pickup";
+    public static final String RED_I_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/I-to-Left-Pickup";
+    public static final String RED_J_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/J-to-Left-Pickup";
+    public static final String RED_K_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/K-to-Left-Pickup";
+    public static final String RED_L_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/L-to-Left-Pickup";
+    public static final String RED_A_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/A-to-Left-Pickup";
+    public static final String RED_B_TO_LEFT_PICKUP_TRAJECTORY = "RedTrajectories/B-to-Left-Pickup";
+    // Right Pickup to Reef
+    public static final String RED_RIGHT_PICKUP_TO_A_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-A";
+    public static final String RED_RIGHT_PICKUP_TO_B_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-B";
+    public static final String RED_RIGHT_PICKUP_TO_C_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-C";
+    public static final String RED_RIGHT_PICKUP_TO_D_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-D";
+    public static final String RED_RIGHT_PICKUP_TO_E_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-E";
+    public static final String RED_RIGHT_PICKUP_TO_F_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-F";
+    public static final String RED_RIGHT_PICKUP_TO_G_TRAJECTORY =
+        "RedTrajectories/Right-Pickup-to-G";
+    // Left Pickup to Reef
+    public static final String RED_LEFT_PICKUP_TO_H_TRAJECTORY = "RedTrajectories/Left-Pickup-to-H";
+    public static final String RED_LEFT_PICKUP_TO_I_TRAJECTORY = "RedTrajectories/Left-Pickup-to-I";
+    public static final String RED_LEFT_PICKUP_TO_J_TRAJECTORY = "RedTrajectories/Left-Pickup-to-J";
+    public static final String RED_LEFT_PICKUP_TO_K_TRAJECTORY = "RedTrajectories/Left-Pickup-to-K";
+    public static final String RED_LEFT_PICKUP_TO_L_TRAJECTORY = "RedTrajectories/Left-Pickup-to-L";
+    public static final String RED_LEFT_PICKUP_TO_A_TRAJECTORY = "RedTrajectories/Left-Pickup-to-A";
+    public static final String RED_LEFT_PICKUP_TO_B_TRAJECTORY = "RedTrajectories/Left-Pickup-to-B";
 
     // Auto Align Constants
     public static final double AUTO_ALIGN_TRANSLATION_DEADBAND_AMOUNT = 0.01;
-    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = 1;
-    public static final double AUTO_ALIGN_ROTATION_P = 10.0;
+    public static final double AUTO_ALIGN_ROTATION_DEADBAND_AMOUNT = .5;
+    public static final double AUTO_ALIGN_ROTATION_P = 15.0;
     public static final double AUTO_ALIGN_ROTATION_I = 0;
     public static final double AUTO_ALIGN_ROTATION_D = 0;
     public static final Constraints AUTO_ALIGN_ROTATION_CONSTRAINTS =
         new Constraints(4 * Math.PI, 6 * Math.PI);
-
-    public static final double AUTO_ALIGN_TRANSLATION_P = 4;
+    public static final double AUTO_ALIGN_TRANSLATION_P = 12;
     public static final double AUTO_ALIGN_TRANSLATION_I = 0;
     public static final double AUTO_ALIGN_TRANSLATION_D = 0;
     public static final Constraints AUTO_ALIGN_TRANSLATION_CONSTRAINTS = new Constraints(4, 5);
+    public static final double AUTO_ALIGN_ACCEPTABLE_ERROR = 0.01;
+    // Choreo Drive Constants
+    public static final double MAX_AUTO_SPEED_METERS_PER_SECOND = 4.5;
+    public static final double MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.25;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = Math.PI;
+    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = Math.PI;
 
-    // These used to be in Trajectory Constants
-
-    public static final double MAX_AUTO_SPEED = 5.0;
-    public static final double MAX_AUTO_ACCELERATION = 3;
-
-    public static final double CHOREO_AUTO_TRANSLATION_P = 1.5; // 1.7
+    public static final double CHOREO_AUTO_TRANSLATION_P = .25;
     public static final double CHOREO_AUTO_TRANSLATION_I = 0;
-    public static final double CHOREO_AUTO_TRANSLATION_D = 0.2;
-    public static final double CHOREO_AUTO_THETA_P = 4.5; // 5
-    public static final double CHOREO_AUTO_THETA_I = 0; // 5
-    public static final double CHOREO_AUTO_THETA_D = 0.4;
+    public static final double CHOREO_AUTO_TRANSLATION_D = 0.0;
+
+    public static final double CHOREO_AUTO_THETA_P = 0.0;
+    public static final double CHOREO_AUTO_THETA_I = 0;
+    public static final double CHOREO_AUTO_THETA_D = 0;
+
+    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE_METERS = 0.0005;
+    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE_RADIANS = 0.001;
+
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_TRANSLATION_CONSTRAINTS =
-        new TrapezoidProfile.Constraints(MAX_AUTO_SPEED, MAX_AUTO_ACCELERATION);
+        new TrapezoidProfile.Constraints(
+            MAX_AUTO_SPEED_METERS_PER_SECOND, MAX_AUTO_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 2;
-    public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 2;
-
-    public static final double CHOREO_AUTO_ACCEPTABLE_TRANSLATION_TOLERANCE = 0.01;
-
-    public static final double CHOREO_AUTO_ACCEPTABLE_ROTATION_TOLERANCE = 0.01;
-
-    // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints CHOREO_AUTO_THETA_CONTROLLER_CONSTRAINTS =
         new TrapezoidProfile.Constraints(
             MAX_ANGULAR_SPEED_RADIANS_PER_SECOND, MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED);

@@ -28,8 +28,8 @@ public class FollowSwerveSampleCommand extends DriveCommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    super.execute();
     swerveDrive.followSwerveSample(swerveSample);
+    super.execute();
   }
 
   // Called once the command ends or is interrupted.

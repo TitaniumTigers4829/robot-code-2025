@@ -19,6 +19,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.HardwareConstants;
 
@@ -43,6 +44,8 @@ public class PhysicalElevator implements ElevatorInterface {
   private final StatusSignal<Current> followerStatorCurrent;
   private final StatusSignal<Double> elevatorReference;
   private final StatusSignal<AngularVelocity> leaderVelocity;
+  private final StatusSignal<Temperature> leaderTemp;
+  private final StatusSignal<Temperature> followerTemp;
   private final double elevatorError;
 
   private final TalonFXConfiguration elevatorConfig = new TalonFXConfiguration();
@@ -79,6 +82,7 @@ public class PhysicalElevator implements ElevatorInterface {
 
     leaderMotor.getConfigurator().apply(elevatorConfig);
     followerMotor.setControl(follower);
+    // elevatorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     followerMotor.getConfigurator().apply(elevatorConfig);
 
     leaderPosition = leaderMotor.getPosition();
@@ -89,11 +93,13 @@ public class PhysicalElevator implements ElevatorInterface {
     leaderDutyCycle = leaderMotor.getDutyCycle();
     leaderStatorCurrent = leaderMotor.getStatorCurrent();
     followerStatorCurrent = followerMotor.getStatorCurrent();
-    elevatorReference = leaderMotor.getClosedLoopReference();
+    elevatorReference = followerMotor.getClosedLoopReference();
     leaderVelocity = leaderMotor.getVelocity();
     elevatorError =
-        leaderMotor.getClosedLoopReference().getValueAsDouble()
-            - leaderMotor.getPosition().getValueAsDouble();
+        followerMotor.getClosedLoopReference().getValueAsDouble()
+            - followerMotor.getPosition().getValueAsDouble();
+    leaderTemp = leaderMotor.getDeviceTemp();
+    followerTemp = followerMotor.getDeviceTemp();
 
     leaderMotor.setPosition(0.0);
     followerMotor.setPosition(0.0);
@@ -109,7 +115,9 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderStatorCurrent,
         followerStatorCurrent,
         elevatorReference,
-        leaderVelocity);
+        leaderVelocity,
+        followerTemp,
+        leaderTemp);
     leaderMotor.optimizeBusUtilization();
     followerMotor.optimizeBusUtilization();
   }
@@ -126,7 +134,9 @@ public class PhysicalElevator implements ElevatorInterface {
         leaderStatorCurrent,
         followerStatorCurrent,
         elevatorReference,
-        leaderVelocity);
+        leaderVelocity,
+        leaderTemp,
+        followerTemp);
     inputs.leaderMotorPosition = leaderPosition.getValueAsDouble();
     inputs.leaderMotorVoltage = leaderAppliedVoltage.getValueAsDouble();
     inputs.leaderDutyCycle = leaderDutyCycle.getValueAsDouble();
@@ -138,6 +148,8 @@ public class PhysicalElevator implements ElevatorInterface {
     inputs.followerStatorCurrent = followerStatorCurrent.getValueAsDouble();
     inputs.leaderVelocity = leaderVelocity.getValueAsDouble();
     inputs.elevatorError = elevatorError;
+    inputs.leaderTemp = leaderTemp.getValueAsDouble();
+    inputs.followerTemp = followerTemp.getValueAsDouble();
   }
 
   @Override
@@ -150,11 +162,13 @@ public class PhysicalElevator implements ElevatorInterface {
   @Override
   public void setElevatorPosition(double position) {
     leaderMotor.setControl(mmPositionRequest.withPosition(position));
+    // followerMotor.setControl(mmPositionRequest.withPosition(position));
   }
 
   @Override
   public void setVolts(double volts) {
     leaderMotor.setVoltage(-volts);
+    // followerMotor.setVoltage(-volts);
   }
 
   @Override
@@ -165,12 +179,13 @@ public class PhysicalElevator implements ElevatorInterface {
   @Override
   public void openLoop(double output) {
     leaderMotor.setControl(dutyCyleOut.withOutput(output));
+    // followerMotor.setControl(dutyCyleOut.withOutput(output));
   }
 
   @Override
   public void resetElevatorPosition(double position) {
     leaderMotor.setPosition(position);
-    followerMotor.setPosition(position);
+    // followerMotor.setPosition(position);
   }
 
   @Override
@@ -179,6 +194,16 @@ public class PhysicalElevator implements ElevatorInterface {
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = reverse;
     leaderMotor.getConfigurator().apply(elevatorConfig);
     followerMotor.getConfigurator().apply(elevatorConfig);
+  }
+
+  @Override
+  public boolean getForwardLimit() {
+    return elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable;
+  }
+
+  @Override
+  public boolean getReverseLimit() {
+    return elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable;
   }
 
   @Override

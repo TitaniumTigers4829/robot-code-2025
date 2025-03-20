@@ -11,13 +11,13 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RepulsorReef extends DriveCommandBase {
   SwerveDrive swerveDrive;
-  boolean isLeft;
+  boolean left;
 
   /** Creates a new RepulsorReef. */
-  public RepulsorReef(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, boolean isLeft) {
+  public RepulsorReef(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, boolean left) {
     super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
-    this.isLeft = isLeft;
+    this.left = left;
     addRequirements(swerveDrive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -30,7 +30,7 @@ public class RepulsorReef extends DriveCommandBase {
   @Override
   public void execute() {
     super.execute();
-    swerveDrive.reefAlign(isLeft);
+    swerveDrive.reefAlign(left);
   }
 
   // Called once the command ends or is interrupted.
