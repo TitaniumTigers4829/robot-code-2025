@@ -86,8 +86,6 @@ public class Robot extends LoggedRobot {
   private AutoChooser autoChooser;
   private Autos autos;
 
-  private boolean overrideElevator = false;
-
   public Robot() {
     checkGit();
     setupLogging();
@@ -223,8 +221,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .rightTrigger()
@@ -253,8 +250,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .x()
@@ -264,8 +260,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .b()
@@ -275,8 +270,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .y()
@@ -286,8 +280,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .leftTrigger()
