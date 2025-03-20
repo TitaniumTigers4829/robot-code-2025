@@ -31,8 +31,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
  */
 public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim shooterCameraSim;
-  PhotonCameraSim frontLeftCameraSim;
-  PhotonCameraSim frontRightCameraSim;
   // private final VisionSystemSim visionSim;
   // private final Supplier<Pose2d> robotSimulationPose;
 
@@ -69,22 +67,14 @@ public class SimulatedVision extends PhysicalVision {
     visionSim
         .get()
         .addCamera(shooterCameraSim, VisionConstants.BACK_TRANSFORM); // check inverse things
-    visionSim.get().addCamera(frontLeftCameraSim, VisionConstants.FRONT_LEFT_TRANSFORM);
-    visionSim.get().addCamera(frontRightCameraSim, VisionConstants.FRONT_RIGHT_TRANSFORM);
 
     // Enable the raw and processed streams. (http://localhost:1181 / 1182)
     shooterCameraSim.enableRawStream(true);
     shooterCameraSim.enableProcessedStream(true);
-    frontLeftCameraSim.enableRawStream(true);
-    frontLeftCameraSim.enableProcessedStream(true);
-    frontRightCameraSim.enableRawStream(true);
-    frontRightCameraSim.enableProcessedStream(true);
 
     // // Enable drawing a wireframe visualization of the field to the camera streams.
     // // This is extremely resource-intensive and is disabled by default.
     shooterCameraSim.enableDrawWireframe(true);
-    frontLeftCameraSim.enableDrawWireframe(true);
-    frontRightCameraSim.enableDrawWireframe(true);
   }
 
   @Override
