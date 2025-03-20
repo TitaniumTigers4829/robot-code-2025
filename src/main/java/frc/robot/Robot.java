@@ -376,6 +376,7 @@ public class Robot extends LoggedRobot {
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
       }
       case DEV_ROBOT -> {

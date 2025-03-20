@@ -8,6 +8,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.RobotType;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.AquilaConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.CompConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants.DevConstants;
 
 /** Swerve Constants */
@@ -308,7 +309,40 @@ public class SwerveConstants {
             DevConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
       };
 
-  public static final ModuleConfig[] compModuleConfigs = null;
+  public static final ModuleConfig[] compModuleConfigs =  new ModuleConfig[] {
+    new ModuleConfig(
+        CompConstants.FRONT_LEFT_DRIVE_MOTOR_ID,
+        CompConstants.FRONT_LEFT_TURN_MOTOR_ID,
+        CompConstants.FRONT_LEFT_CANCODER_ID,
+        CompConstants.FRONT_LEFT_ZERO_ANGLE,
+        CompConstants.FRONT_LEFT_CANCODER_REVERSED,
+        CompConstants.FRONT_LEFT_TURN_MOTOR_REVERSED,
+        CompConstants.FRONT_LEFT_DRIVE_ENCODER_REVERSED),
+    new ModuleConfig(
+        CompConstants.FRONT_RIGHT_DRIVE_MOTOR_ID,
+        CompConstants.FRONT_RIGHT_TURN_MOTOR_ID,
+        CompConstants.FRONT_RIGHT_CANCODER_ID,
+        CompConstants.FRONT_RIGHT_ZERO_ANGLE,
+        CompConstants.FRONT_RIGHT_CANCODER_REVERSED,
+        CompConstants.FRONT_RIGHT_TURN_MOTOR_REVERSED,
+        CompConstants.FRONT_RIGHT_DRIVE_ENCODER_REVERSED),
+    new ModuleConfig(
+        CompConstants.REAR_LEFT_DRIVE_MOTOR_ID,
+        CompConstants.REAR_LEFT_TURN_MOTOR_ID,
+        CompConstants.REAR_LEFT_CANCODER_ID,
+        CompConstants.REAR_LEFT_ZERO_ANGLE,
+        CompConstants.REAR_LEFT_CANCODER_REVERSED,
+        CompConstants.REAR_LEFT_TURN_MOTOR_REVERSED,
+        CompConstants.REAR_LEFT_DRIVE_ENCODER_REVERSED),
+    new ModuleConfig(
+        CompConstants.REAR_RIGHT_DRIVE_MOTOR_ID,
+        CompConstants.REAR_RIGHT_TURN_MOTOR_ID,
+        CompConstants.REAR_RIGHT_CANCODER_ID,
+        CompConstants.REAR_RIGHT_ZERO_ANGLE,
+        CompConstants.REAR_RIGHT_CANCODER_REVERSED,
+        CompConstants.REAR_RIGHT_TURN_MOTOR_REVERSED,
+        CompConstants.REAR_RIGHT_DRIVE_ENCODER_REVERSED)
+  };
 
   public record ModuleConfig(
       int driveMotorChannel,
