@@ -622,32 +622,30 @@ public class SwerveDrive extends SubsystemBase {
     headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
-    RepulsorSample sample =
+    RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
             DriveConstants.MAX_SPEED_METERS_PER_SECOND * .9,
             1.25);
 
-    ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
+    ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
             xRepulsorController.calculate(
-                poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
+                poseEstimator.getEstimatedPosition().getX(),
+                repulsorSample.intermediateGoal().getX()),
             yRepulsorController.calculate(
-                poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
+                poseEstimator.getEstimatedPosition().getY(),
+                repulsorSample.intermediateGoal().getY()),
             headingRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
     var error = goal.minus(poseEstimator.getEstimatedPosition());
+    
     Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
-    Logger.recordOutput("Repulsor/Velocity/vx", sample.vx());
-    Logger.recordOutput("Repulsor/Velocity/vy", sample.vy());
-
-    //                  Logger.recordOutput("Repulsor/Vector field",
-    // repulsorFieldPlanner.getArrows());
 
     ChassisSpeeds outputFieldRelative = feedforward.plus(feedback);
 
