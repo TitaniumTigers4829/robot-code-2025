@@ -3,7 +3,6 @@ package frc.robot.subsystems.swerve;
 import static edu.wpi.first.units.Units.*;
 
 import choreo.trajectory.SwerveSample;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,11 +15,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.Robot;
@@ -39,6 +38,7 @@ import frc.robot.subsystems.swerve.gyro.GyroInputsAutoLogged;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.vision.VisionConstants;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -51,20 +51,20 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] swerveModules;
   private final PIDController xChoreoController =
       new PIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+          DriveConstants.AUTO_TRANSLATION_P,
+          DriveConstants.AUTO_TRANSLATION_I,
+          DriveConstants.AUTO_TRANSLATION_D);
   private final PIDController yChoreoController =
       new PIDController(
-          AutoConstants.CHOREO_AUTO_TRANSLATION_P,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_I,
-          AutoConstants.CHOREO_AUTO_TRANSLATION_D);
+          DriveConstants.AUTO_TRANSLATION_P,
+          DriveConstants.AUTO_TRANSLATION_I,
+          DriveConstants.AUTO_TRANSLATION_D);
   private final ProfiledPIDController rotationChoreoController =
       new ProfiledPIDController(
-          AutoConstants.CHOREO_AUTO_THETA_P,
-          AutoConstants.CHOREO_AUTO_THETA_I,
-          AutoConstants.CHOREO_AUTO_THETA_D,
-          AutoConstants.AUTO_ALIGN_ROTATION_CONSTRAINTS);
+          DriveConstants.AUTO_THETA_P,
+          DriveConstants.AUTO_THETA_I,
+          DriveConstants.AUTO_THETA_D,
+          DriveConstants.AUTO_THETA_CONTROLLER_CONSTRAINTS);
 
   private Rotation2d rawGyroRotation;
   private final SwerveModulePosition[] lastModulePositions;
@@ -72,9 +72,27 @@ public class SwerveDrive extends SubsystemBase {
 
   private final RepulsorFieldPlanner repulsorFieldPlanner = new RepulsorFieldPlanner();
 
-  private final PIDController xController = new PIDController(5.0, 0.0, 0.0);
-  private final PIDController yController = new PIDController(5.0, 0.0, 0.0);
-  private final PIDController headingController = new PIDController(8, 0, 0.0);
+  private final ProfiledPIDController xRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.REPULSOR_TRANSLATION_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+  private final ProfiledPIDController yRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.REPULSOR_TRANSLATION_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+  private final ProfiledPIDController headingRepulsorController =
+      new ProfiledPIDController(
+          DriveConstants.REPULSOR_HEADING_P,
+          BigDecimal.ZERO.doubleValue(),
+          BigDecimal.ZERO.doubleValue(),
+          new Constraints(
+              DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
 
   private final SwerveSetpointGenerator setpointGenerator =
       new SwerveSetpointGenerator(
@@ -133,7 +151,7 @@ public class SwerveDrive extends SubsystemBase {
                 VisionConstants.VISION_ANGLE_TRUST));
 
     rotationChoreoController.enableContinuousInput(-Math.PI, Math.PI);
-    headingController.enableContinuousInput(-Math.PI, Math.PI);
+    headingRepulsorController.enableContinuousInput(-Math.PI, Math.PI);
 
     gyroDisconnectedAlert.set(false);
   }
@@ -164,7 +182,7 @@ public class SwerveDrive extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
     setpoint =
-        setpointGenerator.generateSimpleSetpoint(
+        setpointGenerator.generateSetpoint(
             setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
@@ -179,6 +197,7 @@ public class SwerveDrive extends SubsystemBase {
         fieldRelative);
   }
 
+  @AutoLogOutput(key = "SwerveState/Speeds")
   public ChassisSpeeds getChassisSpeeds() {
     return setpoint.chassisSpeeds();
   }
@@ -286,6 +305,9 @@ public class SwerveDrive extends SubsystemBase {
    * @param sample trajectory
    */
   public void followSwerveSample(SwerveSample sample) {
+    xChoreoController.reset();
+    yChoreoController.reset();
+    rotationChoreoController.reset(sample.heading);
     // Use the summed forces in the drive method
     ChassisSpeeds chassisSpeeds;
     // if (fieldRelative) {
@@ -294,12 +316,13 @@ public class SwerveDrive extends SubsystemBase {
     // } else {
     chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            sample.vx,
-            // + totalForcesX
-            // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x),
-            sample.vy,
-            // + yChoreoController.calculate(getEstimatedPose().getY(), sample.vy),
-            sample.omega,
+            sample.vx
+                // + totalForcesX
+                + xChoreoController.calculate(getEstimatedPose().getX(), sample.x),
+            sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y),
+            sample.omega
+                + rotationChoreoController.calculate(
+                    getEstimatedPose().getRotation().getRadians(), sample.heading),
             getOdometryRotation2d());
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
@@ -564,7 +587,7 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   public void sourceAlign(Supplier<Translation2d> translationalControlSupplier) {
-    headingController.reset();
+    // headingController.reset();
     double targetAngle = Units.degreesToRadians(54);
     if (AllianceFlipper.isRed()) {
       targetAngle = Math.PI - targetAngle;
@@ -580,7 +603,7 @@ public class SwerveDrive extends SubsystemBase {
             new ChassisSpeeds(
                 translationalControl.getX() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
                 translationalControl.getY() * DriveConstants.MAX_SPEED_METERS_PER_SECOND,
-                headingController.calculate(
+                headingRepulsorController.calculate(
                     poseEstimator.getEstimatedPosition().getRotation().getRadians(), targetAngle)),
             getOdometryRotation2d());
 
@@ -594,41 +617,35 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
-    xController.reset();
-    yController.reset();
-    headingController.reset();
+    xRepulsorController.reset(goal.getX());
+    yRepulsorController.reset(goal.getY());
+    headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
-    RepulsorSample sample =
+    RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
             DriveConstants.MAX_SPEED_METERS_PER_SECOND * .9,
             1.25);
 
-    ChassisSpeeds feedforward = new ChassisSpeeds(sample.vx(), sample.vy(), 0);
+    ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            MathUtil.clamp(
-                xController.calculate(
-                    poseEstimator.getEstimatedPosition().getX(), sample.intermediateGoal().getX()),
-                0,
-                3),
-            MathUtil.clamp(
-                yController.calculate(
-                    poseEstimator.getEstimatedPosition().getY(), sample.intermediateGoal().getY()),
-                0,
-                3),
-            headingController.calculate(
+            xRepulsorController.calculate(
+                poseEstimator.getEstimatedPosition().getX(),
+                repulsorSample.intermediateGoal().getX()),
+            yRepulsorController.calculate(
+                poseEstimator.getEstimatedPosition().getY(),
+                repulsorSample.intermediateGoal().getY()),
+            headingRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
     var error = goal.minus(poseEstimator.getEstimatedPosition());
+
     Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
-
-    //                  Logger.recordOutput("Repulsor/Vector field",
-    // repulsorFieldPlanner.getArrows());
 
     ChassisSpeeds outputFieldRelative = feedforward.plus(feedback);
 
@@ -664,6 +681,9 @@ public class SwerveDrive extends SubsystemBase {
     outputRobotRelative =
         Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
 
+    Logger.recordOutput("Repulsor/Speeds", outputRobotRelative);
+    // Logger.recordOutput(getName(), null);
+
     drive(outputRobotRelative, false);
   }
 
@@ -678,13 +698,13 @@ public class SwerveDrive extends SubsystemBase {
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                         .getTranslation())
-            <= 1
+            <= .01
         || getEstimatedPose()
                 .getTranslation()
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                         .getTranslation())
-            <= 1);
+            <= .01);
   }
 
   public boolean isRobotAlignedToLeftReef() {
@@ -693,7 +713,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                     .getTranslation())
-        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+        <= .01;
   }
 
   public boolean isRobotAlignedToRightReef() {
@@ -702,7 +722,7 @@ public class SwerveDrive extends SubsystemBase {
             .getDistance(
                 ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                     .getTranslation())
-        <= AutoConstants.AUTO_ALIGN_ACCEPTABLE_ERROR;
+        <= .01;
   }
 
   /**
