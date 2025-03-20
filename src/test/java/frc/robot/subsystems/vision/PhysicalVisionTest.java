@@ -2,15 +2,16 @@ package frc.robot.subsystems.vision;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.titaniumtigers4829.TigerHelpers;
+import com.titaniumtigers4829.data.PoseEstimate;
+import com.titaniumtigers4829.data.PoseEstimate.Botpose;
+import com.titaniumtigers4829.data.RawFiducial;
+import com.titaniumtigers4829.utils.NTUtils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.extras.vision.TigerHelpers;
-import frc.robot.extras.vision.TigerHelpers.Botpose;
-import frc.robot.extras.vision.TigerHelpers.PoseEstimate;
-import frc.robot.extras.vision.TigerHelpers.RawFiducial;
 import frc.robot.subsystems.vision.VisionConstants.Limelight;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,8 @@ public class PhysicalVisionTest {
   void setUp() {
     // Mocks the NetworkTable instance for testing
     networkTableInstance = NetworkTableInstance.create();
-    TigerHelpers.setNetworkTableInstance(networkTableInstance);
-    backLimelightTable = networkTableInstance.getTable(Limelight.FRONT_LEFT.getName());
+    NTUtils.setNetworkTableInstance(networkTableInstance);
+    backLimelightTable = networkTableInstance.getTable(Limelight.BACK.getName());
     physicalVision = new PhysicalVision();
   }
 
@@ -76,7 +77,8 @@ public class PhysicalVisionTest {
             5.0,
             0.5,
             new RawFiducial[] {},
-            false);
+            false,
+            Botpose.BLUE_MEGATAG1);
 
     // Because PoseEstimates are sent over the network tables as just an array of
     // doubles, we have to manually set the values for the test
@@ -100,7 +102,8 @@ public class PhysicalVisionTest {
             5.0,
             0.5,
             new RawFiducial[] {},
-            true);
+            true,
+            Botpose.BLUE_MEGATAG2);
 
     TigerHelpers.setBotPoseEstimate(
         expectedPoseEstimate, Limelight.FRONT_LEFT.getName(), Botpose.BLUE_MEGATAG2);
@@ -143,30 +146,30 @@ public class PhysicalVisionTest {
             5.0,
             0.5,
             expectedRawFiducials,
-            false);
+            false,
+            Botpose.BLUE_MEGATAG1);
 
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
     // For simplictity, we're just going to use the disabledPoseUpdate method to set
     // the limelightEstimates as it doesn't have any logic in it like
     // enabledPoseUpdate
-    physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
+    physicalVision.disabledPoseUpdate(Limelight.BACK);
+    assertEquals(expectedPoseEstimate.pose(), physicalVision.getPoseFromAprilTags(Limelight.BACK));
     assertEquals(
-        expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.FRONT_LEFT));
-    assertEquals(
-        expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.FRONT_LEFT));
+        expectedPoseEstimate.tagCount(), physicalVision.getNumberOfAprilTags(Limelight.BACK));
     // We have to divide by 1000 because the timestamp is in milliseconds
     assertEquals(
-        expectedPoseEstimate.latency / 1000.0,
-        physicalVision.getLatencySeconds(Limelight.FRONT_LEFT),
+        expectedPoseEstimate.latency() / 1000.0,
+        physicalVision.getLatencySeconds(Limelight.BACK),
         0.0);
     assertEquals(
-        expectedPoseEstimate.avgTagDist,
-        physicalVision.getLimelightAprilTagDistance(Limelight.FRONT_LEFT),
+        expectedPoseEstimate.avgTagDist(),
+        physicalVision.getLimelightAprilTagDistance(Limelight.BACK),
         0.0);
     assertEquals(
-        expectedPoseEstimate.rawFiducials[0].ambiguity,
-        physicalVision.getAmbiguity(Limelight.FRONT_LEFT),
+        expectedPoseEstimate.rawFiducials()[0].ambiguity(),
+        physicalVision.getAmbiguity(Limelight.BACK),
         0.0);
   }
 
@@ -192,7 +195,8 @@ public class PhysicalVisionTest {
             new RawFiducial[] {
               new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
             },
-            false);
+            false,
+            Botpose.BLUE_MEGATAG1);
 
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
@@ -225,7 +229,8 @@ public class PhysicalVisionTest {
             new RawFiducial[] {
               new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 1.1)
             },
-            false);
+            false,
+            Botpose.BLUE_MEGATAG1);
 
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
@@ -248,7 +253,8 @@ public class PhysicalVisionTest {
             new RawFiducial[] {
               new RawFiducial(1, 0, 0, 1, 1, 1, VisionConstants.MAX_AMBIGUITY_THRESHOLD * 0.9)
             },
-            false);
+            false,
+            Botpose.BLUE_MEGATAG1);
 
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
 
@@ -264,7 +270,7 @@ public class PhysicalVisionTest {
 
     assertEquals(
         headingDegrees,
-        TigerHelpers.getLimelightNetworkTableDoubleArray(
-            Limelight.FRONT_LEFT.getName(), "robot_orientation_set")[0]);
+        NTUtils.getLimelightNetworkTableDoubleArray(
+            Limelight.BACK.getName(), "robot_orientation_set")[0]);
   }
 }
