@@ -81,7 +81,8 @@ public class PhysicalVisionTest {
     // Because PoseEstimates are sent over the network tables as just an array of
     // doubles, we have to manually set the values for the test
     TigerHelpers.setBotPoseEstimate(expectedPoseEstimate, Limelight.FRONT_LEFT.getName());
-    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag1PoseEstimate(Limelight.FRONT_LEFT));
+    assertEquals(
+        expectedPoseEstimate, physicalVision.getMegaTag1PoseEstimate(Limelight.FRONT_LEFT));
   }
 
   @Test
@@ -103,7 +104,8 @@ public class PhysicalVisionTest {
 
     TigerHelpers.setBotPoseEstimate(
         expectedPoseEstimate, Limelight.FRONT_LEFT.getName(), Botpose.BLUE_MEGATAG2);
-    assertEquals(expectedPoseEstimate, physicalVision.getMegaTag2PoseEstimate(Limelight.FRONT_LEFT));
+    assertEquals(
+        expectedPoseEstimate, physicalVision.getMegaTag2PoseEstimate(Limelight.FRONT_LEFT));
   }
 
   @Test
@@ -121,7 +123,8 @@ public class PhysicalVisionTest {
     // also have a delta/range to check if it's "close enough"
     assertEquals(0.0, physicalVision.getTimestampSeconds(Limelight.FRONT_LEFT));
     assertEquals(0.0, physicalVision.getLatencySeconds(Limelight.FRONT_LEFT));
-    assertEquals(Double.MAX_VALUE, physicalVision.getLimelightAprilTagDistance(Limelight.FRONT_LEFT));
+    assertEquals(
+        Double.MAX_VALUE, physicalVision.getLimelightAprilTagDistance(Limelight.FRONT_LEFT));
     assertEquals(0.0, physicalVision.getAmbiguity(Limelight.FRONT_LEFT));
 
     // We have to set these values so that canSeeAprilTags returns true
@@ -148,7 +151,8 @@ public class PhysicalVisionTest {
     // the limelightEstimates as it doesn't have any logic in it like
     // enabledPoseUpdate
     physicalVision.disabledPoseUpdate(Limelight.FRONT_LEFT);
-    assertEquals(expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.FRONT_LEFT));
+    assertEquals(
+        expectedPoseEstimate.pose, physicalVision.getPoseFromAprilTags(Limelight.FRONT_LEFT));
     assertEquals(
         expectedPoseEstimate.tagCount, physicalVision.getNumberOfAprilTags(Limelight.FRONT_LEFT));
     // We have to divide by 1000 because the timestamp is in milliseconds

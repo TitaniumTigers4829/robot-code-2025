@@ -64,7 +64,8 @@ public class SimulatedVision extends PhysicalVision {
     // with visible
     // targets.
     // Instance variables
-    shooterCameraSim = new PhotonCameraSim(getSimulationCamera(Limelight.FRONT_LEFT), cameraProperties);
+    shooterCameraSim =
+        new PhotonCameraSim(getSimulationCamera(Limelight.FRONT_LEFT), cameraProperties);
     visionSim
         .get()
         .addCamera(shooterCameraSim, VisionConstants.BACK_TRANSFORM); // check inverse things
