@@ -196,8 +196,8 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 20;
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
 
-    public static final double MAX_SPEED_METERS_PER_SECOND =
-        Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 4.5
+    public static final double MAX_SPEED_METERS_PER_SECOND = 4.85;
+        // Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 4.5
 
     public static final double REPULSOR_TRANSLATION_P = 0.050;
     public static final double REPULSOR_HEADING_P = 2.5;
