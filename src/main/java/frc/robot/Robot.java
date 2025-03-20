@@ -552,7 +552,8 @@ public class Robot extends LoggedRobot {
     SmartDashboard.putData("Auto Chooser", this.autoChooser);
     RobotModeTriggers.autonomous()
         .onChange(
-            new SetElevatorPosition(swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
     Trigger autoElevatorUpZone =
         new Trigger(
             () ->
@@ -568,12 +569,14 @@ public class Robot extends LoggedRobot {
     RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
     autoElevatorUpZone.whileTrue(
         Commands.sequence(
-            new SetElevatorPosition(swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
             new RunCommand(() -> SmartDashboard.putBoolean("UpZone", true))));
 
     autoHasCoral.whileFalse(
         Commands.sequence(
-            new SetElevatorPosition(swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
+            new SetElevatorPosition(
+                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
             new RunCommand(() -> SmartDashboard.putBoolean("UpZone", false))));
   }
 
