@@ -17,6 +17,9 @@ public interface ElevatorInterface {
     public double followerStatorCurrent = 0.0;
     public double leaderVelocity = 0.0;
     public double elevatorError = 0.0;
+
+    public double leaderTemp = 0.0;
+    public double followerTemp = 0.0;
   }
 
   public default void updateInputs(ElevatorInputs inputs) {}
@@ -44,4 +47,12 @@ public interface ElevatorInterface {
   public default void setFF(double kS, double kV, double kA, double kG) {}
 
   public default void resetElevatorPosition(double position) {}
+
+  public default boolean getReverseLimit() {
+    return false;
+  }
+
+  public default boolean getForwardLimit() {
+    return false;
+  }
 }

@@ -12,12 +12,12 @@ public class LEDSubsystem extends SubsystemBase {
 
   private LEDProcess process;
 
-  private boolean isRed;
+  public static boolean isRed;
 
   /** Creates a new LEDSubsystemImpl with the port in LEDConstants. */
   public LEDSubsystem() {
     ledSpark = new Spark(LEDConstants.LED_PORT);
-    setProcess(LEDProcess.OFF);
+    setProcess(LEDProcess.ALLIANCE_COLOR);
     isRed =
         DriverStation.getAlliance().isPresent()
             && (DriverStation.getAlliance().get() == Alliance.Red);

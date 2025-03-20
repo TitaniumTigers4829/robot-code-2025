@@ -49,7 +49,7 @@ public class SimWorld {
   private final VisionSystemSim aprilTagSim;
 
   private final SimMechanismConfig driveMotorCfg =
-      new SimMechanismConfig(new DCMotorExt(DCMotor.getKrakenX60Foc(1), 1))
+      new SimMechanismConfig(new DCMotorExt(DCMotor.getFalcon500Foc(1), 1))
           .withFriction(Volts.of(ModuleConstants.DRIVE_S), Volts.of(ModuleConstants.DRIVE_S * 0.8))
           .withGearRatio(GearRatio.reduction(ModuleConstants.DRIVE_GEAR_RATIO))
           .withNoise(0.00)
@@ -69,7 +69,7 @@ public class SimWorld {
   private final SimSwerveConfig swerveConfig =
       new SimSwerveConfig(
           60.0,
-          6.0,
+          7.0,
           Units.inchesToMeters(30.5),
           Units.inchesToMeters(30.5),
           DriveConstants.MODULE_TRANSLATIONS,

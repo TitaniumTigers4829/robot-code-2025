@@ -146,18 +146,17 @@ public class SwerveConstants {
     public static final double LOW_ANGULAR_SPEED_RADIANS_PER_SECOND = 5;
 
     public static final double MAX_SPEED_METERS_PER_SECOND =
-        Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 6.95
-    public static final double MAX_SHOOT_SPEED_METERS_PER_SECOND = 3;
-
-    public static final double HEADING_ACCEPTABLE_ERROR_RADIANS = Units.degreesToRadians(2.5);
-    public static final double HEADING_ACCEPTABLE_ERROR_MOVING_RADIANS = Units.degreesToRadians(4);
+        Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 4.5
   }
 
   public class ModuleConstants {
+    public static final double GYRO_MAX_PITCH = 30.0; // degrees
+    public static final double GYRO_MAX_ROLL = 30.0; // degrees
+
     public static final double DRIVE_GEAR_RATIO =
         Constants.getRobot() == RobotType.DEV_ROBOT ? 7.13 : 4.59; // 4.59
     public static final double TURN_GEAR_RATIO = 11.3142;
-    public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3.774788522800778);
+    public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(3.9);
 
     public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
     public static final double DRIVE_TO_METERS = WHEEL_CIRCUMFERENCE_METERS / DRIVE_GEAR_RATIO;
@@ -165,7 +164,7 @@ public class SwerveConstants {
         WHEEL_CIRCUMFERENCE_METERS / DRIVE_GEAR_RATIO;
 
     public static final double DRIVE_SUPPLY_LIMIT = 55.0;
-    public static final double DRIVE_STATOR_LIMIT = 80.0;
+    public static final double DRIVE_STATOR_LIMIT = 60.0;
 
     public static final double TURN_P = 1000.0;
     public static final double TURN_I = 0.0;
@@ -178,13 +177,13 @@ public class SwerveConstants {
     public static final double MAX_ANGULAR_SPEED_ROTATIONS_PER_SECOND = 30;
     public static final double MAX_ANGULAR_ACCELERATION_ROTATIONS_PER_SECOND_SQUARED = 24;
 
-    public static final double DRIVE_P = .345; // .85
+    public static final double DRIVE_P = 6.0;
     public static final double DRIVE_I = 0.0;
     public static final double DRIVE_D = 0.0;
 
     // These values were characterized using our characterization commands.
     public static final double DRIVE_S = .151315113225759;
-    public static final double DRIVE_V = 0.0272854272591;
+    public static final double DRIVE_V = 0.272854272591;
     public static final double DRIVE_A = 0.0;
   }
 

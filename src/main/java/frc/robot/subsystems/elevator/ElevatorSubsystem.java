@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -101,6 +102,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     elevatorInterface.enableLimits(forward, reverse);
   }
 
+  public void toggleLimits() {
+    elevatorInterface.enableLimits(
+        !elevatorInterface.getForwardLimit(), !elevatorInterface.getReverseLimit());
+  }
+
   @Override
   public void periodic() {
     elevatorInterface.updateInputs(inputs);
@@ -123,7 +129,15 @@ public class ElevatorSubsystem extends SubsystemBase {
   public Command manualElevator(DoubleSupplier joystickY) {
     return new RunCommand(
         // does this while command is active
-        () -> this.openLoop(joystickY.getAsDouble()),
+        () -> this.openLoop(MathUtil.applyDeadband(joystickY.getAsDouble(), .1)),
+        // requirements for command
+        this);
+  }
+
+  public Command manualElevator(double output) {
+    return new RunCommand(
+        // does this while command is active
+        () -> this.openLoop(output),
         // requirements for command
         this);
   }

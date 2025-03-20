@@ -10,14 +10,15 @@ package frc.robot.extras.util;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
 public final class ReefLocations {
   private ReefLocations() {}
 
-  private static final Pose2d[] BLUE_POSES;
-  private static final Pose2d[] RED_POSES;
+  public static final Pose2d[] BLUE_POSES;
+  public static final Pose2d[] RED_POSES;
 
   public static final Translation2d BLUE_REEF;
   public static final Translation2d RED_REEF;
@@ -27,26 +28,26 @@ public final class ReefLocations {
 
   static {
     BLUE_REEF = new Translation2d(4.495, FieldConstants.FIELD_WIDTH_METERS / 2);
-    var FIELD_CENTER =
+    Translation2d FIELD_CENTER =
         new Translation2d(
             FieldConstants.FIELD_LENGTH_METERS / 2, FieldConstants.FIELD_WIDTH_METERS / 2);
 
-    var A =
+    Pose2d A =
         new Pose2d(
             BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 + .144,
+            FieldConstants.FIELD_WIDTH_METERS / 2 + .144 - Units.inchesToMeters(2.5),
             Rotation2d.kZero);
-    var B =
+    Pose2d B =
         new Pose2d(
             BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 - .144,
+            FieldConstants.FIELD_WIDTH_METERS / 2 - .144 - Units.inchesToMeters(2.5),
             Rotation2d.kZero);
 
     BLUE_POSES = new Pose2d[12];
     BLUE_POSES[0] = A;
     BLUE_POSES[1] = B;
     for (int i = 2; i < 12; i += 2) {
-      var rotAngle = Rotation2d.fromDegrees(30 * i);
+      Rotation2d rotAngle = Rotation2d.fromDegrees(30 * i);
       BLUE_POSES[i] =
           new Pose2d(
               A.getTranslation().rotateAround(BLUE_REEF, rotAngle),
@@ -66,11 +67,12 @@ public final class ReefLocations {
               BLUE_POSES[i].getRotation().rotateBy(Rotation2d.kPi));
     }
 
-    var center = new Translation2d(BLUE_REEF.getX() - .85, FieldConstants.FIELD_WIDTH_METERS / 2);
+    Translation2d center =
+        new Translation2d(BLUE_REEF.getX() - .85, FieldConstants.FIELD_WIDTH_METERS / 2);
     BLUE_REEF_WALLS = new Translation2d[6];
     RED_REEF_WALLS = new Translation2d[6];
     for (int i = 0; i < 6; i++) {
-      var rotAngle = Rotation2d.fromDegrees(60 * i);
+      Rotation2d rotAngle = Rotation2d.fromDegrees(60 * i);
       BLUE_REEF_WALLS[i] = center.rotateAround(BLUE_REEF, rotAngle);
       RED_REEF_WALLS[i] = BLUE_REEF_WALLS[i].rotateAround(FIELD_CENTER, Rotation2d.kPi);
     }
@@ -117,11 +119,11 @@ public final class ReefLocations {
   }
 
   public static Pose2d getSelectedLocation(Translation2d currentPos, boolean left) {
-    var walls = AllianceFlipper.isRed() ? RED_REEF_WALLS : BLUE_REEF_WALLS;
+    Translation2d[] walls = AllianceFlipper.isRed() ? RED_REEF_WALLS : BLUE_REEF_WALLS;
     double closestDistance = Double.POSITIVE_INFINITY;
     ReefWalls closestWall = ReefWalls.AB;
-    for (var wall : ReefWalls.values()) {
-      var dist = walls[wall.id].getDistance(currentPos);
+    for (ReefWalls wall : ReefWalls.values()) {
+      double dist = walls[wall.id].getDistance(currentPos);
       if (dist < closestDistance) {
         closestWall = wall;
         closestDistance = dist;

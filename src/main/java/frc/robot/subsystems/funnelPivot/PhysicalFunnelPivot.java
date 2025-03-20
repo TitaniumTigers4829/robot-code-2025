@@ -30,25 +30,19 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
     funnelMotorConfig = new TalonFXConfiguration();
     mmPositionRequest = new MotionMagicVoltage(0);
-    funnelVoltage = funnelMotor.getMotorVoltage();
-    funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelMotor.getPosition();
-    funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
-    funnelStatorCurrent = funnelMotor.getStatorCurrent();
     voltageOut = new VoltageOut(0);
 
     funnelMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     funnelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     funnelMotorConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
 
-    funnelMotorConfig.Slot0.kP = FunnelConstants.PIVOT_P;
-    funnelMotorConfig.Slot0.kI = FunnelConstants.PIVOT_I;
-    funnelMotorConfig.Slot0.kD = FunnelConstants.PIVOT_D;
-
     funnelMotorConfig.MotionMagic.MotionMagicAcceleration =
         FunnelConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;
     funnelMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
         FunnelConstants.MAX_ACCELERATION_ROTATIONS_PER_SECOND;
+
+    funnelMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = false;
+    funnelMotorConfig.CurrentLimits.StatorCurrentLimitEnable = false;
 
     funnelMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = FunnelConstants.MAX_ANGLE;
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = FunnelConstants.MIN_ANGLE;
@@ -59,6 +53,13 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
 
+    funnelVoltage = funnelMotor.getMotorVoltage();
+    funnelVelocity = funnelMotor.getVelocity();
+    funnelAngle = funnelMotor.getPosition();
+    funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
+    funnelStatorCurrent = funnelMotor.getStatorCurrent();
+
+    funnelMotor.setPosition(0.0);
     BaseStatusSignal.setUpdateFrequencyForAll(
         100.0,
         funnelAngle,
@@ -67,7 +68,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
         funnelSupplyCurrent,
         funnelStatorCurrent);
 
-    funnelMotor.setPosition(FunnelConstants.startingPos);
+    funnelMotor.setPosition(FunnelConstants.ANGLE_ZERO);
     funnelMotor.optimizeBusUtilization();
   }
 
@@ -104,5 +105,15 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   @Override
   public double getFunnelPivotTarget() {
     return funnelTargetAngle;
+  }
+
+  @Override
+  public void setPID(double kP, double kI, double kD) {
+
+    funnelMotorConfig.Slot0.kP = kP;
+    funnelMotorConfig.Slot0.kI = kI;
+    funnelMotorConfig.Slot0.kD = kD;
+
+    funnelMotor.getConfigurator().apply(funnelMotorConfig);
   }
 }

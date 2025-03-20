@@ -4,13 +4,16 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import org.littletonrobotics.junction.Logger;
@@ -21,18 +24,21 @@ public class Autos {
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private SwerveDrive swerveDrive;
   private VisionSubsystem visionSubsystem;
+  private FunnelSubsystem funnelSubsystem;
 
   public Autos(
       AutoFactory autoFactory,
       ElevatorSubsystem elevatorSubsystem,
       CoralIntakeSubsystem coralIntakeSubsystem,
       SwerveDrive swerveDrive,
-      VisionSubsystem visionSubsystem) {
+      VisionSubsystem visionSubsystem,
+      FunnelSubsystem funnelSubsystem) {
     this.autoFactory = autoFactory;
     this.elevatorSubsystem = elevatorSubsystem;
     this.coralIntakeSubsystem = coralIntakeSubsystem;
     this.swerveDrive = swerveDrive;
     this.visionSubsystem = visionSubsystem;
+    this.funnelSubsystem = funnelSubsystem;
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -75,7 +81,18 @@ public class Autos {
         .active()
         .onTrue(
             Commands.sequence(
-                new RepulsorReef(swerveDrive, visionSubsystem, true),
+                new InstantCommand(
+                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new DriveCommand(
+                        swerveDrive,
+                        visionSubsystem,
+                        () -> -0.15,
+                        () -> 0.0,
+                        () -> 0,
+                        () -> false,
+                        () -> false)
+                    .withTimeout(3.5),
+                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
@@ -543,7 +560,7 @@ public class Autos {
     AutoTrajectory jToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_J_TO_LEFT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
-        routine.trajectory(AutoConstants.RED_LEFT_PICKUP_TO_L_TRAJECTORY);
+        routine.trajectory(AutoConstants.RED_LEFT_PICKUP_TO_H_TRAJECTORY);
 
     routine
         .active()
