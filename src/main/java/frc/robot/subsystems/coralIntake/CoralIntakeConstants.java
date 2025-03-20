@@ -11,9 +11,7 @@ public final class CoralIntakeConstants {
   public static final double REVERSE_INTAKE_SPEED = -200;
   public static final double NEUTRAL_INTAKE_SPEED = 0.0;
 
-  /**
-   * In seconds
-   */
+  /** In seconds */
   public static final double SENSOR_DEBOUNCE_TIME = 0.04;
 
   // PID and feedforward constants

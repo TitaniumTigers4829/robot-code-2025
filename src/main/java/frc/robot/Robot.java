@@ -77,7 +77,7 @@ public class Robot extends LoggedRobot {
   private FunnelSubsystem funnelSubsystem;
   private ClimbPivot climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
-  
+
   private Command autoCommand;
 
   private SimWorld simWorld;

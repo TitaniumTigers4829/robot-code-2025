@@ -9,14 +9,14 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
 
-  private Debouncer controlDebouncer = new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME, DebounceType.kRising);
+  private Debouncer controlDebouncer =
+      new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME, DebounceType.kRising);
 
   // States for the intake process
   public enum IntakeState {
@@ -30,7 +30,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private IntakeState currentState = IntakeState.IDLE;
   private boolean usedToHaveCoral = false;
   private boolean usedToHaveControl = false;
-
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
