@@ -642,7 +642,7 @@ public class SwerveDrive extends SubsystemBase {
                 goal.getRotation().getRadians()));
 
     var error = goal.minus(poseEstimator.getEstimatedPosition());
-    
+
     Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
