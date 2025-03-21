@@ -9,11 +9,17 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntakeSubsystem extends SubsystemBase {
   private CoralIntakeInterface coralIntakeInterface;
   private CoralIntakeInputsAutoLogged coralIntakeInputs = new CoralIntakeInputsAutoLogged();
+  private LEDSubsystem ledSubsystem;
+
+  // New Constants for Jam Handling
+  private static final double JAM_CURRENT_THRESHOLD = 20.0; // amps (adjust as needed)
+  private static final double JAM_CLEARING_DURATION = 0.5; // seconds (adjust as needed)
 
   private Debouncer controlDebouncer =
       new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME, DebounceType.kRising);
@@ -23,6 +29,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     IDLE, // Chilling, not doing anything
     WAITING, // Waiting for coral to show up
     INGESTING, // Pulling the coral in
+    JAM_CLEARING,
     REVERSING, // Backing up to position it
     STOPPED // All done, motor off
   }
@@ -30,9 +37,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private IntakeState currentState = IntakeState.IDLE;
   private boolean usedToHaveCoral = false;
   private boolean usedToHaveControl = false;
+  private boolean stuck = false;
+  private int stuckCounter = 0;
+
+  private double jamStartTime = 0;
 
   public CoralIntakeSubsystem(CoralIntakeInterface coralIntakeInterface) {
     this.coralIntakeInterface = coralIntakeInterface;
+    this.ledSubsystem = ledSubsystem;
   }
 
   /**
@@ -94,6 +106,13 @@ public class CoralIntakeSubsystem extends SubsystemBase {
         break;
 
       case INGESTING:
+        // If motor current is too high, a jam is likely – enter jam clearing state
+        // if (coralIntakeInputs.intakeStatorCurrentAmps > JAM_CURRENT_THRESHOLD) {
+        //   currentState = IntakeState.JAM_CLEARING;
+        //   jamStartTime = Timer.getFPGATimestamp();
+        //   coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
+        //   break;
+        // }
         if (!currentlyHasControl && currentlyHasCoral) {
           // Coral’s gone from the sensor: reverse to position it
           coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.REVERSE_INTAKE_SPEED);
@@ -108,6 +127,14 @@ public class CoralIntakeSubsystem extends SubsystemBase {
           currentState = IntakeState.STOPPED;
         }
         break;
+
+        // case JAM_CLEARING:
+        //   // Maintain reverse until the jam clearing duration has elapsed
+        //   if (Timer.getFPGATimestamp() - jamStartTime >= JAM_CLEARING_DURATION) {
+        //     // After jam clearing, return to waiting state to try ingestion again
+        //     currentState = IntakeState.WAITING;
+        //   }
+        //   break;
 
       case STOPPED:
         coralIntakeInterface.setIntakeVelocity(CoralIntakeConstants.NEUTRAL_INTAKE_SPEED);

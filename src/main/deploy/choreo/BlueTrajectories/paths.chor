@@ -253,8 +253,18 @@
    }
   },
   "mass":{
+<<<<<<< HEAD
    "exp":"115 lbs",
    "val":52.16312255
+=======
+<<<<<<< HEAD:src/main/deploy/choreo/Trajectories/paths.chor
+   "exp":"1125 lbs",
+   "val":510.29141625
+=======
+   "exp":"115 lbs",
+   "val":52.16312255
+>>>>>>> c2806f3dac4c9b2739db87d95b13628bce4d328d:src/main/deploy/choreo/BlueTrajectories/paths.chor
+>>>>>>> 600dc58d8ff0331199191f5ae91fbb6c6acda262
   },
   "inertia":{
    "exp":"7 kg m ^ 2",
