@@ -9,7 +9,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.leds.LEDConstants.LEDProcess;
 import frc.robot.subsystems.leds.LEDSubsystem;
 import org.littletonrobotics.junction.Logger;
 

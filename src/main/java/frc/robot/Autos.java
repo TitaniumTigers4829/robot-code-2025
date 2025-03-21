@@ -17,7 +17,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.elevator.IntakeCoral;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
@@ -385,7 +384,7 @@ public class Autos {
                 // elevatorSubsystem.manualElevator(-0.2).withTimeout(0.2),
                 // Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem),
                 lStartToJTrajectory.cmd()));
-                lStartToJTrajectory
+    lStartToJTrajectory
         .done()
         .onTrue(
             //         new WaitCommand(2.0)
@@ -470,8 +469,8 @@ public class Autos {
   public AutoRoutine redRightTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE);
 
-    AutoTrajectory mStartToETrajectory =
-        routine.trajectory(AutoConstants.RED_MID_START_TO_E_TRAJECTORY);
+    AutoTrajectory startToJTrajectory =
+        routine.trajectory(AutoConstants.RED_RIGHT_START_TO_E_TRAJECTORY);
     AutoTrajectory eToPickupTrajectory =
         routine.trajectory(AutoConstants.RED_E_TO_RIGHT_PICKUP_TRAJECTORY);
     AutoTrajectory pickupToLTrajectory =
@@ -505,9 +504,6 @@ public class Autos {
                                     coralIntakeSubsystem)
                                 .withTimeout(1.0))));
 
-    Logger.recordOutput("Trajectories/starttoj", startToJTrajectory.getRawTrajectory().getPoses());
-    Logger.recordOutput(
-        "Trajectories/jtopickup", jToPickupTrajectory.getRawTrajectory().getPoses());
     // Logger.recordOutput(
     // "Trajectories/pickuptoL", pickupToLTrajectory.getRawTrajectory().getPoses());
     // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());

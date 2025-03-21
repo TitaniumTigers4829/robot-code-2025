@@ -33,9 +33,7 @@ public class PhysicalVision implements VisionInterface {
   private Pose2dMovingAverageFilter pose2dMovingAverageFilter =
       new Pose2dMovingAverageFilter(VisionConstants.POSE_MOVING_AVERAGE_WINDOW_SIZE);
 
-  /**
-   * The pose estimates from the limelights in the following order (FRONT_LEFT, FRONT_RIGHT)
-   */
+  /** The pose estimates from the limelights in the following order (FRONT_LEFT, FRONT_RIGHT) */
   private final AtomicReferenceArray<MegatagPoseEstimate> limelightEstimates;
 
   /** The thread manager for the vision threads */
