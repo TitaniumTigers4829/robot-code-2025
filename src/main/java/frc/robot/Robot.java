@@ -199,7 +199,7 @@ public class Robot extends LoggedRobot {
         .leftBumper()
         .whileTrue(
             Commands.sequence(
-                // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
                 new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
                 Commands.runEnd(
                     () -> coralIntakeSubsystem.intakeCoral(),

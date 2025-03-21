@@ -1,6 +1,5 @@
 package frc.robot.subsystems.swerve.module;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -20,7 +19,7 @@ public interface ModuleInterface {
     public double driveDesiredPosition = 0.0;
     public double driveError = 0.0;
 
-    public Rotation2d turnAbsolutePosition = new Rotation2d();
+    public double turnAbsolutePosition = 0.0;
     public double turnVelocity = 0.0;
     public double turnAppliedVolts = 0.0;
     public double turnCurrentAmps = 0.0;

@@ -11,16 +11,16 @@ public class ElevatorConstants {
   public static final int ELEVATOR_LEADER_MOTOR_ID = 0;
   public static final int ELEVATOR_FOLLOWER_MOTOR_ID = 62;
 
-  public static final double ELEVATOR_P = 110;
+  public static final double ELEVATOR_P = 10;
   public static final double ELEVATOR_I = 0;
-  public static final double ELEVATOR_D = 2.5;
-  public static final double ELEVATOR_S = 0.39448793854367;
-  public static final double ELEVATOR_V = 1.027996641809018;
+  public static final double ELEVATOR_D = 0.0;
+  public static final double ELEVATOR_S = 0.20;
+  public static final double ELEVATOR_V = .8;
   public static final double ELEVATOR_A = 0.057759439794094;
-  public static final double ELEVATOR_G = 0.35;
+  public static final double ELEVATOR_G = -0.35;
 
   public static final double DRUM_RADIUS = 1;
-  public static final double ELEVATOR_GEAR_RATIO = 4.8; //29
+  public static final double ELEVATOR_GEAR_RATIO = 4.8; // 29
   public static final double ELEVATOR_CARRIAGE_MASS = 10;
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
@@ -38,18 +38,18 @@ public class ElevatorConstants {
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
 
   // limit
-  public static final double LIMIT = -0.01;
+  public static final double LIMIT = -0.02;
   public static final boolean LIMIT_ENABLE = true;
-  public static final double REVERSE_LIMIT = -9.6;
-  public static final boolean REVRESE_LIMIT_ENABLE = true;
+  public static final double REVERSE_LIMIT = -9.2;
+  public static final boolean REVERSE_LIMIT_ENABLE = true;
 
   // Elevator setpoints
   public enum ElevatorSetpoints {
     L1(-2.4),
     L2(-3.65),
-    L3(-5.845),
-    L4(-9.5),
-    FEEDER(-1.31103515625);
+    L3(-5.23),
+    L4(-9.09),
+    FEEDER(-0.480458984375);
 
     private final double position;
 

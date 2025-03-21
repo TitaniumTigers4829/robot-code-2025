@@ -119,6 +119,7 @@ public class SwerveModule {
     if (state.speedMetersPerSecond < 0.01) {
       moduleInterface.stopModule();
     }
+
     moduleInterface.setDesiredState(state);
     Logger.recordOutput("Drive/desired turn angle", state.angle.getRotations());
   }
@@ -134,7 +135,7 @@ public class SwerveModule {
    * @return the turn angle of the module 0 being forward, CCW being positive
    */
   public Rotation2d getTurnRotation() {
-    return moduleInputs.turnAbsolutePosition;
+    return Rotation2d.fromRotations(moduleInputs.turnAbsolutePosition);
   }
 
   /**
