@@ -4,7 +4,8 @@
 
 package frc.robot.subsystems.coralIntake;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,6 +21,9 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   // New Constants for Jam Handling
   private static final double JAM_CURRENT_THRESHOLD = 20.0; // amps (adjust as needed)
   private static final double JAM_CLEARING_DURATION = 0.5; // seconds (adjust as needed)
+
+  private Debouncer controlDebouncer =
+      new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME, DebounceType.kRising);
 
   // States for the intake process
   public enum IntakeState {
@@ -59,19 +63,19 @@ public class CoralIntakeSubsystem extends SubsystemBase {
    * @return true if the intake contains a coral game piece.
    */
   public boolean hasCoral() {
-    return SmartDashboard.getBoolean("Coral", true);
+    return coralIntakeInputs.hasCoral;
   }
 
-  // public void intakeCoral() {
-  //   if (currentState == IntakeState.IDLE) {
-  //     currentState = IntakeState.WAITING;
-  //     usedToHaveCoral = hasCoral(); // Set the starting sensor state
-  //     usedToHaveControl = hasControl();
-  //   }
-  // }
+  public void intakeCoral() {
+    if (isIntakeIdle() && !hasControl() && !hasCoral()) {
+      currentState = IntakeState.WAITING;
+      usedToHaveCoral = hasCoral(); // Set the starting sensor state
+      usedToHaveControl = hasControl();
+    }
+  }
 
   public boolean hasControl() {
-    return coralIntakeInputs.hasControl;
+    return controlDebouncer.calculate(coralIntakeInputs.hasControl);
   }
 
   // Tells you if the intake is done
@@ -81,10 +85,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
   public boolean isIntakeIdle() {
     return currentState == IntakeState.IDLE;
-  }
-
-  public void setStuckMode(boolean b) {
-    this.stuck = b;
   }
 
   @Override
@@ -168,37 +168,37 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     coralIntakeInterface.setIntakeVelocity(velocity);
   }
 
-  public Command intakeCoral() {
-    if (!this.hasCoral()) {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> {
-            this.setIntakeSpeed(CoralIntakeConstants.INGEST_SPEED);
-            ledSubsystem.setProcess(LEDProcess.ORANGE);
-          },
-          // sets speed when command ends
-          () -> {
-            this.setIntakeSpeed(0);
-            ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
-          },
-          // requirements for command
-          this);
-    } else {
-      return new StartEndCommand(
-          // sets speed while command is active
-          () -> {
-            this.setIntakeSpeed(0.0);
-            ledSubsystem.setProcess(LEDProcess.GREEN);
-          },
-          // sets speed when command ends
-          () -> {
-            this.setIntakeSpeed(0);
-            ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
-          },
-          // requirements for command
-          this);
-    }
-  }
+  // public Command intakeCoral() {
+  //   if (!this.hasCoral()) {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> {
+  //           this.setIntakeSpeed(CoralIntakeConstants.INGEST_SPEED);
+  //           ledSubsystem.setProcess(LEDProcess.ORANGE);
+  //         },
+  //         // sets speed when command ends
+  //         () -> {
+  //           this.setIntakeSpeed(0);
+  //           ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
+  //         },
+  //         // requirements for command
+  //         this);
+  //   } else {
+  //     return new StartEndCommand(
+  //         // sets speed while command is active
+  //         () -> {
+  //           this.setIntakeSpeed(0.0);
+  //           ledSubsystem.setProcess(LEDProcess.GREEN);
+  //         },
+  //         // sets speed when command ends
+  //         () -> {
+  //           this.setIntakeSpeed(0);
+  //           ledSubsystem.setProcess(LEDProcess.ALLIANCE_COLOR);
+  //         },
+  //         // requirements for command
+  //         this);
+  //   }
+  // }
 
   public Command ejectCoral() {
     return new StartEndCommand(

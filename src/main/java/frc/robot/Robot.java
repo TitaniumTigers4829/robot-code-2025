@@ -1,8 +1,5 @@
 package frc.robot;
 
-import choreo.auto.AutoChooser;
-import choreo.auto.AutoFactory;
-import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,13 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -85,12 +78,8 @@ public class Robot extends LoggedRobot {
   private LEDSubsystem ledSubsystem;
 
   private SimWorld simWorld;
-
-  private AutoFactory autoFactory;
-  private AutoChooser autoChooser;
   private Autos autos;
-
-  private boolean overrideElevator = false;
+  private Command autoCommand;
 
   public Robot() {
     checkGit();
@@ -122,15 +111,26 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    autos.update();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    autoCommand = autos.getSelectedCommand();
+    autoCommand.schedule();
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
+
+  @Override
+  public void autonomousExit() {
+    autoCommand.cancel();
+    autos.clear();
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -216,8 +216,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .rightTrigger()
@@ -246,8 +245,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .x()
@@ -257,8 +255,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .b()
@@ -268,8 +265,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .y()
@@ -279,8 +275,7 @@ public class Robot extends LoggedRobot {
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
-                                || coralIntakeSubsystem.isIntakeIdle())
-                            && !overrideElevator));
+                            || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .leftTrigger()
@@ -378,6 +373,7 @@ public class Robot extends LoggedRobot {
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
+        this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
       }
       case DEV_ROBOT -> {
@@ -427,7 +423,7 @@ public class Robot extends LoggedRobot {
 
         this.visionSubsystem =
             new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
-        this.swerveDrive.resetEstimatedPose(new Pose2d(10, 5, new Rotation2d()));
+        this.swerveDrive.resetEstimatedPose(new Pose2d(7, 4, new Rotation2d()));
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
@@ -459,125 +455,13 @@ public class Robot extends LoggedRobot {
   }
 
   private void setupAuto() {
-    SmartDashboard.putBoolean("Trajectory Done", false);
-
-    this.autoChooser = new AutoChooser();
-    // this sets up the auto factory
-    this.autoFactory =
-        new AutoFactory(
-            () ->
-                this.swerveDrive
-                    .getEstimatedPose(), // A function that returns the current robot pose
-            (Pose2d pose) ->
-                this.swerveDrive.resetEstimatedPose(
-                    pose), // A function that resets the current robot pose to the
-            (SwerveSample sample) -> {
-              FollowSwerveSampleCommand followSwerveSampleCommand =
-                  new FollowSwerveSampleCommand(this.swerveDrive, this.visionSubsystem, sample);
-              followSwerveSampleCommand.execute();
-              Logger.recordOutput("Trajectory/sample", sample.getPose());
-            }, // A function that follows a choreo trajectory
-            false, // If alliance flipping should be enabled
-            this.swerveDrive); // The drive subsystem
-
     this.autos =
         new Autos(
-            this.autoFactory,
             this.elevatorSubsystem,
             this.coralIntakeSubsystem,
             this.swerveDrive,
             this.visionSubsystem,
             this.funnelSubsystem);
-
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_MID_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.blueRightTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_LEFT_THREE_CORAL_AUTO_ROUTINE,
-        () -> this.autos.blueLeftThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_MID_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_RIGHT_THREE_CORAL_AUTO_ROUTINE,
-        () -> this.autos.blueRightThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_LEFT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueLeftFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_MID_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueMidFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.BLUE_RIGHT_FOUR_CORAL_AUTO_ROUTINE,
-        () -> this.autos.blueRightFourCoralAuto());
-
-    this.autoChooser.addRoutine(
-        AutoConstants.SIMPLE_REPULSOR_AUTO, () -> this.autos.simpleRepulsorAuto());
-
-    // this.autoChooser.addRoutine(AutoConstants.X_ONE_METER_AUTO, () ->
-    // this.autos.xOneMeterAuto());
-
-    // this.autoChooser.addRoutine(AutoConstants.Y_ONE_METER_AUTO, () ->
-    // this.autos.yOneMeterAuto());
-    // this.autoChooser.addRoutine(
-    //     AutoConstants.BLUE_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.blueThreeCoralAuto());
-    // this.autoChooser.addRoutine(
-    //     AutoConstants.BLUE_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.blueFourCoralAuto());
-
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_LEFT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_MID_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redMidTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_RIGHT_TWO_CORAL_AUTO_ROUTINE, () -> this.autos.redRightTwoCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_LEFT_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_MID_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redMidThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_RIGHT_THREE_CORAL_AUTO_ROUTINE,
-        () -> this.autos.redRightThreeCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_LEFT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redLeftFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_MID_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redMidFourCoralAuto());
-    this.autoChooser.addRoutine(
-        AutoConstants.RED_RIGHT_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redRightFourCoralAuto());
-
-    // this.autoChooser.addRoutine(
-    // AutoConstants.RED_THREE_CORAL_AUTO_ROUTINE, () -> this.autos.redThreeCoralAuto());
-    // this.autoChooser.addRoutine(
-    // AutoConstants.RED_FOUR_CORAL_AUTO_ROUTINE, () -> this.autos.redFourCoralAuto());
-    // This updates the auto chooser
-    SmartDashboard.putData("Auto Chooser", this.autoChooser);
-    RobotModeTriggers.autonomous()
-        .onChange(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()));
-    Trigger autoElevatorUpZone =
-        new Trigger(
-            () ->
-                (RobotModeTriggers.autonomous().getAsBoolean()
-                    && swerveDrive.isReefInRange()
-                    && coralIntakeSubsystem.hasCoral()));
-
-    Trigger autoHasCoral =
-        new Trigger(
-            () ->
-                (RobotModeTriggers.autonomous().getAsBoolean() && coralIntakeSubsystem.hasCoral()));
-
-    RobotModeTriggers.autonomous().whileTrue(this.autoChooser.selectedCommandScheduler());
-    autoElevatorUpZone.whileTrue(
-        Commands.sequence(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
-            new RunCommand(() -> SmartDashboard.putBoolean("UpZone", true))));
-
-    autoHasCoral.whileFalse(
-        Commands.sequence(
-            new SetElevatorPosition(
-                swerveDrive, elevatorSubsystem, ElevatorSetpoints.FEEDER.getPosition()),
-            new RunCommand(() -> SmartDashboard.putBoolean("UpZone", false))));
   }
 
   /** This function is called periodically during operator control. */

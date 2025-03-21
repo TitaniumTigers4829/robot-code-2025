@@ -20,7 +20,7 @@ public class ElevatorConstants {
   public static final double ELEVATOR_G = 0.35;
 
   public static final double DRUM_RADIUS = 1;
-  public static final double ELEVATOR_GEAR_RATIO = 8;
+  public static final double ELEVATOR_GEAR_RATIO = 5;
   public static final double ELEVATOR_CARRIAGE_MASS = 10;
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
@@ -32,8 +32,8 @@ public class ElevatorConstants {
   public static final boolean STATOR_CURRENT_LIMIT_ENABLE = true;
   public static final boolean SUPPLY_CURRENT_LIMIT_ENABLE = false;
 
-  public static final double MOTION_MAGIC_MAX_ACCELERATION = 160;
-  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100;
+  public static final double MOTION_MAGIC_MAX_ACCELERATION = 160 / 2.0;
+  public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100 / 2.0;
 
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
 
