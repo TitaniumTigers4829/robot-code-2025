@@ -182,7 +182,7 @@ public class SwerveDrive extends SubsystemBase {
             : new ChassisSpeeds(xSpeed, ySpeed, rotationSpeed);
 
     setpoint =
-        setpointGenerator.generateSetpoint(
+        setpointGenerator.generateSimpleSetpoint(
             setpoint, desiredSpeeds, HardwareConstants.LOOP_TIME_SECONDS);
 
     setModuleStates(setpoint.moduleStates());
