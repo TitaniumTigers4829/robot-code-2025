@@ -20,7 +20,7 @@ public class ElevatorConstants {
   public static final double ELEVATOR_G = 0.35;
 
   public static final double DRUM_RADIUS = 1;
-  public static final double ELEVATOR_GEAR_RATIO = 4.8;
+  public static final double ELEVATOR_GEAR_RATIO = 4.8; //29
   public static final double ELEVATOR_CARRIAGE_MASS = 10;
   public static final double MIN_HEIGHT = 0;
   public static final double MAX_HEIGHT = 3;
