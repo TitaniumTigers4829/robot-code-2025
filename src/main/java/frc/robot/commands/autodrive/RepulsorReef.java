@@ -40,8 +40,9 @@ public class RepulsorReef extends DriveCommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return swerveDrive.isReefInRange()
-        && Math.abs(swerveDrive.getChassisSpeeds().vxMetersPerSecond) < 0.075
-        && Math.abs(swerveDrive.getChassisSpeeds().vyMetersPerSecond) < 0.075;
+    return false;
+    // return swerveDrive.isReefInRange()
+    //     && Math.abs(swerveDrive.getChassisSpeeds().vxMetersPerSecond) < 0.075
+    //     && Math.abs(swerveDrive.getChassisSpeeds().vyMetersPerSecond) < 0.075;
   }
 }
