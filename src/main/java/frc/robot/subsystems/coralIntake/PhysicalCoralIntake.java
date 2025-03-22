@@ -41,7 +41,7 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
 
     intakeConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     intakeConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
+    intakeConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_DUTY_CYCLE_DEADBAND;
 
     intakeConfig.CurrentLimits.StatorCurrentLimit = CoralIntakeConstants.INTAKE_STATOR_LIMIT;
     intakeConfig.CurrentLimits.StatorCurrentLimitEnable =

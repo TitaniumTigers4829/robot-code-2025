@@ -268,9 +268,10 @@ public class RepulsorFieldPlanner {
     if (displacement.getNorm() == 0) {
       return new Translation2d();
     }
-    var direction = displacement.getAngle();
-    var mag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
-    return new Translation2d(mag, direction);
+    Rotation2d direction = displacement.getAngle();
+    double rawMag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
+    double cappedMag = Math.min(rawMag, 2); // e.g., someMaxValue = 10
+    return new Translation2d(cappedMag, direction);
   }
 
   Translation2d getObstacleForce(Translation2d curLocation, Translation2d target) {
@@ -293,18 +294,21 @@ public class RepulsorFieldPlanner {
 
   public RepulsorSample sampleField(
       Translation2d curTrans, double maxSpeed, double slowdownDistance) {
-    var err = curTrans.minus(goal);
-    var netForce = getForce(curTrans, goal);
+    Translation2d err = curTrans.minus(goal);
+    Translation2d netForce = getForce(curTrans, goal);
 
     double stepSize_m;
-    if (err.getNorm() < slowdownDistance) {
-      stepSize_m =
-          MathUtil.interpolate(
-              0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
-    } else {
-      stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
-    }
-    var step = new Translation2d(stepSize_m, netForce.getAngle());
+    double k = 2.0; // tuning parameter for smoothness
+    stepSize_m =
+        maxSpeed * Robot.defaultPeriodSecs * Math.exp(-k * err.getNorm() / slowdownDistance);
+    // if (err.getNorm() < slowdownDistance) {
+    //   stepSize_m =
+    //       MathUtil.interpolate(
+    //           0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
+    // } else {
+    //   stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
+    // }
+    Translation2d step = new Translation2d(stepSize_m, netForce.getAngle());
     return new RepulsorSample(
         curTrans.plus(step),
         step.getX() / Robot.defaultPeriodSecs,
