@@ -47,7 +47,7 @@ public class ElevatorConstants {
   public enum ElevatorSetpoints {
     L1(-2.4),
     L2(-3.65),
-    L3(-5.43),
+    L3(-5.68),
     L4(-9.03),
     FEEDER(-0.480458984375);
 
