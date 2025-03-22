@@ -189,7 +189,7 @@ public class Autos {
                         () -> false,
                         () -> false)
                     .withTimeout(3.5),
-                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
+                new RepulsorReef(swerveDrive, visionSubsystem, false).withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
