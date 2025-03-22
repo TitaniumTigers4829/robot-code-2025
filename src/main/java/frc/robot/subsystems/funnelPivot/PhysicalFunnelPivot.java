@@ -34,7 +34,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     funnelMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    funnelMotorConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
+    funnelMotorConfig.MotorOutput.DutyCycleNeutralDeadband =
+        HardwareConstants.MIN_DUTY_CYCLE_DEADBAND;
 
     funnelMotorConfig.MotionMagic.MotionMagicAcceleration =
         FunnelConstants.MAX_VELOCITY_ROTATIONS_PER_SECOND;

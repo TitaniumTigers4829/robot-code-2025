@@ -58,7 +58,7 @@ public class PhysicalElevator implements ElevatorInterface {
     // Limits
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ElevatorConstants.REVERSE_LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable =
-        ElevatorConstants.REVRESE_LIMIT_ENABLE;
+        ElevatorConstants.REVERSE_LIMIT_ENABLE;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ElevatorConstants.LIMIT;
     elevatorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = ElevatorConstants.LIMIT_ENABLE;
 

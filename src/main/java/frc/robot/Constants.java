@@ -7,9 +7,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
-  private static RobotType robotType = RobotType.SIM_ROBOT;
+  private static RobotType robotType = RobotType.COMP_ROBOT;
 
-  public static final boolean tuningMode = false;
+  public static final boolean tuningMode = true;
 
   /**
    * Gets if the robot type is valid, if not it will default to COMP_ROBOT
@@ -89,7 +89,7 @@ public final class Constants {
     public static final double RIO_SIGNAL_FREQUENCY = 50;
     public static final double CANIVORE_SIGNAL_FREQUENCY = 250;
 
-    public static final String CANIVORE_CAN_BUS_STRING = "canivore 1";
+    public static final String CANIVORE_CAN_BUS_STRING = "carnivore 1";
     public static final String RIO_CAN_BUS_STRING = "rio";
 
     /**
@@ -97,7 +97,9 @@ public final class Constants {
      * It makes it very hard to do precise movements, so with this constant we set the threshold to
      * the lowest possible value.
      */
-    public static final double MIN_FALCON_DEADBAND = 0.001;
+    public static final double MIN_DUTY_CYCLE_DEADBAND = 0.001;
+
+    public static final double MIN_TORQUE_DEADBAND = 5.0;
 
     public static final int HIGH_THREAD_PRIORITY = 99;
     public static final int LOW_THREAD_PRIORITY = 1;

@@ -52,7 +52,8 @@ public class PhysicalAlgaePivot implements AlgaePivotInterface {
 
     algaeMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     algaeMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    algaeMotorConfig.MotorOutput.DutyCycleNeutralDeadband = HardwareConstants.MIN_FALCON_DEADBAND;
+    algaeMotorConfig.MotorOutput.DutyCycleNeutralDeadband =
+        HardwareConstants.MIN_DUTY_CYCLE_DEADBAND;
 
     algaeMotorConfig.Slot0.kP = AlgaePivotConstants.PIVOT_P;
     algaeMotorConfig.Slot0.kI = AlgaePivotConstants.PIVOT_I;

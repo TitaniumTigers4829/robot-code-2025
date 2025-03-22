@@ -9,6 +9,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -617,16 +618,16 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
-    xRepulsorController.reset(goal.getX());
-    yRepulsorController.reset(goal.getY());
+    xRepulsorController.reset(getEstimatedPose().getX());
+    yRepulsorController.reset(getEstimatedPose().getY());
     headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
     RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .9,
-            1.25);
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .5,
+            2.0);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
@@ -641,7 +642,11 @@ public class SwerveDrive extends SubsystemBase {
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
-    var error = goal.minus(poseEstimator.getEstimatedPosition());
+    Logger.recordOutput("Repulsor/intermediatX", repulsorSample.intermediateGoal().getX());
+    Logger.recordOutput("Repulsor/intermediatY", repulsorSample.intermediateGoal().getY());
+    Logger.recordOutput("Repulsor/intermediatTheta", goal.getRotation().getRadians());
+
+    Transform2d error = goal.minus(poseEstimator.getEstimatedPosition());
     Logger.recordOutput("Repulsor/Error", error);
     Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);

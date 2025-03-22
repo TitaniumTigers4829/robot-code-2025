@@ -11,9 +11,9 @@ import org.photonvision.PhotonCamera;
 public final class VisionConstants {
   public enum Limelight {
     FRONT_LEFT(
-        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false),
+        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true),
     FRONT_RIGHT(
-        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true);
+        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false);
 
     private final int id;
     private final String name;
@@ -92,9 +92,9 @@ public final class VisionConstants {
   public static final double MEGA_TAG_TRANSLATION_DISCREPANCY_THRESHOLD = .5; // TODO: tune
   public static final double MEGA_TAG_ROTATION_DISCREPANCY_THREASHOLD = 45;
 
-  public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-shooter";
+  public static final String FRONT_LEFT_LIMELIGHT_NAME = "limelight-left";
   public static final int FRONT_LEFT_LIMELIGHT_NUMBER = 0;
-  public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-elevate";
+  public static final String FRONT_RIGHT_LIMELIGHT_NAME = "limelight-right";
   public static final int FRONT_RIGHT_LIMELIGHT_NUMBER = 1;
 
   // TODO: these need to be changed, maybe to 10 and 0?

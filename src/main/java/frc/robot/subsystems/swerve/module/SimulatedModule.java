@@ -2,7 +2,6 @@ package frc.robot.subsystems.swerve.module;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
@@ -59,7 +58,7 @@ public class SimulatedModule implements ModuleInterface {
     inputs.driveAppliedVolts = driveMotor.voltage().in(Volts);
     inputs.driveCurrentAmps = driveMotor.current().in(Amps);
 
-    inputs.turnAbsolutePosition = Rotation2d.fromRotations(steerMotor.position().in(Rotations));
+    // inputs.turnAbsolutePosition = Rotation2d.fromRotations(steerMotor.position().in(Rotations));
     inputs.turnVelocity = steerMotor.velocity().in(RotationsPerSecond);
 
     inputs.turnAppliedVolts = steerMotor.voltage().in(Volts);

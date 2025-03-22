@@ -6,7 +6,7 @@ import com.studica.frc.AHRS.NavXUpdateRate;
 
 public class PhysicalGyro implements GyroInterface {
 
-  private final AHRS gyro = new AHRS(NavXComType.kUSB1, NavXUpdateRate.k200Hz);
+  private final AHRS gyro = new AHRS(NavXComType.kUSB2, NavXUpdateRate.k200Hz);
 
   public PhysicalGyro() {}
 
