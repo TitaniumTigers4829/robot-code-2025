@@ -621,8 +621,8 @@ public class SwerveDrive extends SubsystemBase {
 
     // TODO: add current velocity to reset
     // TODO: why does this work? I don't think we need to reset unless we use I
-    xRepulsorController.reset(getEstimatedPose().getX());
-    yRepulsorController.reset(getEstimatedPose().getY());
+    xRepulsorController.reset(getEstimatedPose().getX(), getChassisSpeeds().vxMetersPerSecond);
+    yRepulsorController.reset(getEstimatedPose().getY(), getChassisSpeeds().vyMetersPerSecond);
     headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
