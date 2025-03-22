@@ -300,7 +300,7 @@ public class RepulsorFieldPlanner {
     double stepSize_m;
     if (err.getNorm() < slowdownDistance) {
       stepSize_m =
-          MathUtil.interpolate(  // TODO: maybe don't divide by distance
+          MathUtil.interpolate( // TODO: maybe don't divide by distance
               0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
     } else {
       stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
