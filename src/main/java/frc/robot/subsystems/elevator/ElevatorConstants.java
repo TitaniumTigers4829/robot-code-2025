@@ -48,7 +48,7 @@ public class ElevatorConstants {
     L1(-2.4),
     L2(-3.65),
     L3(-5.23),
-    L4(-9.09),
+    L4(-9.03),
     FEEDER(-0.480458984375);
 
     private final double position;
