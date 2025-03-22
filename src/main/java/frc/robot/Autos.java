@@ -233,7 +233,14 @@ public class Autos {
                                     coralIntakeSubsystem)
                                 .withTimeout(1.0)))
                 .andThen(jToPickupTrajectory.cmd()));
-    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd().alongWith(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition())));
+    jToPickupTrajectory
+        .done()
+        .onTrue(
+            pickupToLTrajectory
+                .cmd()
+                .alongWith(
+                    elevatorSubsystem.setElevationPosition(
+                        ElevatorSetpoints.FEEDER.getPosition())));
     pickupToLTrajectory
         .done()
         .onTrue(
