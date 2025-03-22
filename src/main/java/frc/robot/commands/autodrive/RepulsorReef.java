@@ -40,6 +40,6 @@ public class RepulsorReef extends DriveCommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false; // TODO: try swerveDrive.isReefInRange(); here
+    return swerveDrive.isReefInRange();
   }
 }
