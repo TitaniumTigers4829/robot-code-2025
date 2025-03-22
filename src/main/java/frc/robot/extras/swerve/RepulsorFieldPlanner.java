@@ -298,16 +298,16 @@ public class RepulsorFieldPlanner {
     Translation2d netForce = getForce(curTrans, goal);
 
     double stepSize_m;
-    double k = 2.0; // tuning parameter for smoothness
-    stepSize_m =
-        maxSpeed * Robot.defaultPeriodSecs * Math.exp(-k * err.getNorm() / slowdownDistance);
-    // if (err.getNorm() < slowdownDistance) {
-    //   stepSize_m =
-    //       MathUtil.interpolate(
-    //           0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
-    // } else {
-    //   stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
-    // }
+    // double k = 2.0; // tuning parameter for smoothness
+    // stepSize_m =
+    //     maxSpeed * Robot.defaultPeriodSecs * Math.exp(-k * err.getNorm() / slowdownDistance);
+    if (err.getNorm() < slowdownDistance) {
+      stepSize_m =
+          MathUtil.interpolate(
+              0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
+    } else {
+      stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
+    }
     Translation2d step = new Translation2d(stepSize_m, netForce.getAngle());
     return new RepulsorSample(
         curTrans.plus(step),
