@@ -38,7 +38,7 @@ public class ElevatorConstants {
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
 
   // limit
-  public static final double LIMIT = -0.01;
+  public static final double LIMIT = 0.0;
   public static final boolean LIMIT_ENABLE = true;
   public static final double REVERSE_LIMIT = -9.6;
   public static final boolean REVRESE_LIMIT_ENABLE = true;
