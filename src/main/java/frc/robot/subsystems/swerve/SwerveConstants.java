@@ -206,7 +206,7 @@ public class SwerveConstants {
     public static final double REPULSOR_HEADING_P = 2.5;
 
     public static final double REPULSOR_MAX_VELOCITY = 1.0;
-    public static final double REPULSOR_MAX_ACCELERATION = 1.5;
+    public static final double REPULSOR_MAX_ACCELERATION = 2;
 
     // Choreo Drive Constants
     public static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 4.5;
