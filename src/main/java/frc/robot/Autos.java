@@ -121,6 +121,8 @@ public class Autos {
     addRoutine("Red Left Two Coral", () -> redLeftTwoCoralAuto());
 
     addRoutine("Red Right Two Coral Auto", () -> redRightTwoCoralAuto());
+
+    addRoutine("middle auto", ()->simpleRepulsorAuto());
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
