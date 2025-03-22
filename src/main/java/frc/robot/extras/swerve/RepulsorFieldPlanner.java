@@ -13,9 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 import frc.robot.extras.util.ReefLocations;
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -302,7 +299,8 @@ public class RepulsorFieldPlanner {
 
     double stepSize_m;
     double k = 2.0; // tuning parameter for smoothness
-    stepSize_m = maxSpeed * Robot.defaultPeriodSecs * Math.exp(-k * err.getNorm() / slowdownDistance);
+    stepSize_m =
+        maxSpeed * Robot.defaultPeriodSecs * Math.exp(-k * err.getNorm() / slowdownDistance);
     // if (err.getNorm() < slowdownDistance) {
     //   stepSize_m =
     //       MathUtil.interpolate(
