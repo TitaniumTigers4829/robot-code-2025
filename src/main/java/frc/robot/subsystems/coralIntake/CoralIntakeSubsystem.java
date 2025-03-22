@@ -6,6 +6,7 @@ package frc.robot.subsystems.coralIntake;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -149,6 +150,9 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     // Remember the sensor state for next time
     usedToHaveCoral = currentlyHasCoral;
     usedToHaveControl = currentlyHasControl;
+
+    SmartDashboard.putBoolean("hasCoral", hasCoral());
+    SmartDashboard.putBoolean("hasControl", hasControl());
   }
 
   public void setIntakeState(IntakeState state) {
