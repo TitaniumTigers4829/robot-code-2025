@@ -56,10 +56,10 @@ public class PhysicalModule implements ModuleInterface {
 
   public PhysicalModule(ModuleConfig moduleConfig) {
     driveMotor =
-        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
-    turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
+        new TalonFX(moduleConfig.driveMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
+    turnMotor = new TalonFX(moduleConfig.turnMotorChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
     turnEncoder =
-        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.RIO_CAN_BUS_STRING);
+        new CANcoder(moduleConfig.turnEncoderChannel(), HardwareConstants.CANIVORE_CAN_BUS_STRING);
 
     turnEncoderConfig.MagnetSensor.MagnetOffset = -moduleConfig.angleZero();
     turnEncoderConfig.MagnetSensor.SensorDirection = moduleConfig.encoderReversed();
@@ -111,7 +111,7 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        HardwareConstants.RIO_SIGNAL_FREQUENCY,
+        HardwareConstants.CANIVORE_SIGNAL_FREQUENCY,
         drivePosition,
         turnEncoderAbsolutePosition,
         driveVelocity,
