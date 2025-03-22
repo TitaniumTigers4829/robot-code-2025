@@ -22,7 +22,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private static final double JAM_CLEARING_DURATION = 0.5; // seconds (adjust as needed)
 
   private Debouncer controlDebouncer =
-      new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME, DebounceType.kRising);
+      new Debouncer(CoralIntakeConstants.SENSOR_DEBOUNCE_TIME * 0.0, DebounceType.kRising);
 
   // States for the intake process
   public enum IntakeState {
