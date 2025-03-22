@@ -151,8 +151,8 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     usedToHaveCoral = currentlyHasCoral;
     usedToHaveControl = currentlyHasControl;
 
-    SmartDashboard.putBoolean("hasCoral", hasCoral());
-    SmartDashboard.putBoolean("hasControl", hasControl());
+    SmartDashboard.putBoolean("hasCoral", coralIntakeInterface.hasCoral());
+    SmartDashboard.putBoolean("hasControl", coralIntakeInterface.hasControl());
   }
 
   public void setIntakeState(IntakeState state) {
