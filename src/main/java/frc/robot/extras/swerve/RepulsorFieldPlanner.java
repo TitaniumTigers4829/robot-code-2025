@@ -270,7 +270,7 @@ public class RepulsorFieldPlanner {
     }
     Rotation2d direction = displacement.getAngle();
     double rawMag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
-    double cappedMag = Math.min(rawMag, 2); // e.g., someMaxValue = 10
+    double cappedMag = Math.min(rawMag, 1);
     return new Translation2d(cappedMag, direction);
   }
 
