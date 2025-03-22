@@ -629,8 +629,8 @@ public class SwerveDrive extends SubsystemBase {
     RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .5,
-            3.0);
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .75,
+            4.0);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
@@ -705,13 +705,13 @@ public class SwerveDrive extends SubsystemBase {
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                         .getTranslation())
-            <= .01
+            <= .001
         || getEstimatedPose()
                 .getTranslation()
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                         .getTranslation())
-            <= .01);
+            <= .001);
   }
 
   public boolean isRobotAlignedToLeftReef() {
