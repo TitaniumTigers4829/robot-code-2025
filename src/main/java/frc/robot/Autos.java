@@ -220,31 +220,24 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .withTimeout(2.0)
-                        .andThen(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(2.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0)))
-                .andThen(jToPickupTrajectory.cmd().alongWith(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()))));
+                        .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
+                .andThen(
+                    jToPickupTrajectory
+                        .cmd()
+                        .alongWith(
+                            elevatorSubsystem.setElevationPosition(
+                                ElevatorSetpoints.FEEDER.getPosition()))));
     jToPickupTrajectory
         .done()
-        .onTrue( Commands.sequence(
-            elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-            new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-            Commands.runEnd(
-                () -> coralIntakeSubsystem.intakeCoral(),
-                () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                coralIntakeSubsystem))
-        .andThen(pickupToLTrajectory.cmd()));
+        .onTrue(
+            Commands.sequence(
+                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                    Commands.runEnd(
+                        () -> coralIntakeSubsystem.intakeCoral(),
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                        coralIntakeSubsystem))
+                .andThen(pickupToLTrajectory.cmd()));
     pickupToLTrajectory
         .done()
         .onTrue(
