@@ -122,7 +122,7 @@ public class Autos {
 
     addRoutine("Red Right Two Coral Auto", () -> redRightTwoCoralAuto());
 
-    addRoutine("middle auto", ()->simpleRepulsorAuto());
+    addRoutine("middle auto", () -> simpleRepulsorAuto());
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -234,15 +234,17 @@ public class Autos {
                                             CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                                     coralIntakeSubsystem)
                                 .withTimeout(1.0)))
-                .andThen(jToPickupTrajectory.cmd()));
+                .andThen(jToPickupTrajectory.cmd().alongWith(elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()))));
     jToPickupTrajectory
         .done()
-        .onTrue(
-            pickupToLTrajectory
-                .cmd()
-                .alongWith(
-                    elevatorSubsystem.setElevationPosition(
-                        ElevatorSetpoints.FEEDER.getPosition())));
+        .onTrue( Commands.sequence(
+            elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+            new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+            Commands.runEnd(
+                () -> coralIntakeSubsystem.intakeCoral(),
+                () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                coralIntakeSubsystem))
+        .andThen(pickupToLTrajectory.cmd()));
     pickupToLTrajectory
         .done()
         .onTrue(
