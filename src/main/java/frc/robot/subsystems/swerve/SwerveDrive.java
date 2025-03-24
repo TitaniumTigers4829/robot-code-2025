@@ -618,6 +618,9 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
+
+    // TODO: add current velocity to reset
+    // TODO: why does this work? I don't think we need to reset unless we use I
     xRepulsorController.reset(getEstimatedPose().getX());
     yRepulsorController.reset(getEstimatedPose().getY());
     headingRepulsorController.reset(goal.getRotation().getRadians());
@@ -626,8 +629,8 @@ public class SwerveDrive extends SubsystemBase {
     RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .5,
-            2.0);
+            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .75,
+            4.0);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
@@ -702,13 +705,13 @@ public class SwerveDrive extends SubsystemBase {
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
                         .getTranslation())
-            <= .01
+            <= .001
         || getEstimatedPose()
                 .getTranslation()
                 .getDistance(
                     ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
                         .getTranslation())
-            <= .01);
+            <= .001);
   }
 
   public boolean isRobotAlignedToLeftReef() {
@@ -791,7 +794,6 @@ public class SwerveDrive extends SubsystemBase {
    */
   public void reefAlign(boolean left) {
     int bestBranchWall = 0;
-    boolean bestLeft = true;
     double bestScore = Double.POSITIVE_INFINITY;
 
     // There are 6 reef walls, and each wall has 2 branches (left/right)

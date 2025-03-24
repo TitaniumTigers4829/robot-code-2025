@@ -124,6 +124,16 @@ public class PhysicalCoralIntake implements CoralIntakeInterface {
   }
 
   @Override
+  public boolean hasCoral() {
+    return !innerCoralSensor.get();
+  }
+
+  @Override
+  public boolean hasControl() {
+    return !outerCoralSensor.get();
+  }
+
+  @Override
   public double getIntakeSpeed() {
     coralIntakeMotor.getVelocity().refresh();
     return coralIntakeMotor.getVelocity().getValueAsDouble();

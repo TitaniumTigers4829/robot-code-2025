@@ -27,35 +27,38 @@ public final class ReefLocations {
   private static final Translation2d[] RED_REEF_WALLS;
 
   static {
+    // We get the center of the field for this because it helps us do the rotation math
     BLUE_REEF = new Translation2d(4.495, FieldConstants.FIELD_WIDTH_METERS / 2);
     Translation2d FIELD_CENTER =
         new Translation2d(
             FieldConstants.FIELD_LENGTH_METERS / 2, FieldConstants.FIELD_WIDTH_METERS / 2);
 
-    Pose2d A =
+    Pose2d leftScoringPose =
         new Pose2d(
             BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 + .144 - Units.inchesToMeters(2.5),
+            FieldConstants.FIELD_WIDTH_METERS / 2
+                + Units.inchesToMeters(4.0), //  .154 - Units.inchesToMeters(3.6),
             Rotation2d.kZero);
-    Pose2d B =
+    Pose2d rightScoringPose =
         new Pose2d(
             BLUE_REEF.getX() - 1.45,
-            FieldConstants.FIELD_WIDTH_METERS / 2 - .144 - Units.inchesToMeters(2.5),
+            FieldConstants.FIELD_WIDTH_METERS / 2
+                - Units.inchesToMeters(9.5), // .154 - Units.inchesToMeters(3.6),
             Rotation2d.kZero);
 
     BLUE_POSES = new Pose2d[12];
-    BLUE_POSES[0] = A;
-    BLUE_POSES[1] = B;
+    BLUE_POSES[0] = leftScoringPose;
+    BLUE_POSES[1] = rightScoringPose;
     for (int i = 2; i < 12; i += 2) {
       Rotation2d rotAngle = Rotation2d.fromDegrees(30 * i);
       BLUE_POSES[i] =
           new Pose2d(
-              A.getTranslation().rotateAround(BLUE_REEF, rotAngle),
-              A.getRotation().rotateBy(rotAngle));
+              leftScoringPose.getTranslation().rotateAround(BLUE_REEF, rotAngle),
+              leftScoringPose.getRotation().rotateBy(rotAngle));
       BLUE_POSES[i + 1] =
           new Pose2d(
-              B.getTranslation().rotateAround(BLUE_REEF, rotAngle),
-              B.getRotation().rotateBy(rotAngle));
+              rightScoringPose.getTranslation().rotateAround(BLUE_REEF, rotAngle),
+              rightScoringPose.getRotation().rotateBy(rotAngle));
     }
 
     RED_REEF = BLUE_REEF.rotateAround(FIELD_CENTER, Rotation2d.kPi);

@@ -38,7 +38,7 @@ public class ElevatorConstants {
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
 
   // limit
-  public static final double LIMIT = -0.02;
+  public static final double LIMIT = 0.0;
   public static final boolean LIMIT_ENABLE = true;
   public static final double REVERSE_LIMIT = -9.2;
   public static final boolean REVERSE_LIMIT_ENABLE = true;
@@ -47,8 +47,8 @@ public class ElevatorConstants {
   public enum ElevatorSetpoints {
     L1(-2.4),
     L2(-3.65),
-    L3(-5.23),
-    L4(-9.09),
+    L3(-5.68),
+    L4(-9.03),
     FEEDER(-0.480458984375);
 
     private final double position;

@@ -24,6 +24,7 @@ import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.ReefLocations.ReefBranch;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
+import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
@@ -120,6 +121,8 @@ public class Autos {
     addRoutine("Red Left Two Coral", () -> redLeftTwoCoralAuto());
 
     addRoutine("Red Right Two Coral Auto", () -> redRightTwoCoralAuto());
+
+    addRoutine("middle auto", () -> simpleRepulsorAuto());
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -180,13 +183,13 @@ public class Autos {
                 new DriveCommand(
                         swerveDrive,
                         visionSubsystem,
-                        () -> -0.15,
+                        () -> -0.13,
                         () -> 0.0,
                         () -> 0,
                         () -> false,
                         () -> false)
                     .withTimeout(3.5),
-                new RepulsorReef(swerveDrive, visionSubsystem, true).withTimeout(4),
+                new RepulsorReef(swerveDrive, visionSubsystem, false).withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
@@ -213,13 +216,49 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            //         new WaitCommand(2.0)
-            //             .andThen(
-            new RepulsorReef(swerveDrive, visionSubsystem, false)
-                .withTimeout(2.0)
-                .andThen(jToPickupTrajectory.cmd()));
-    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
-    pickupToLTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
+            new WaitCommand(0.5)
+                .andThen(
+                    new RepulsorReef(swerveDrive, visionSubsystem, false)
+                        .withTimeout(2.0)
+                        .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
+                .andThen(
+                    jToPickupTrajectory
+                        .cmd()
+                        .alongWith(
+                            elevatorSubsystem.setElevationPosition(
+                                ElevatorSetpoints.FEEDER.getPosition()))));
+    jToPickupTrajectory
+        .done()
+        .onTrue(
+            Commands.sequence(
+                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                    Commands.runEnd(
+                        () -> coralIntakeSubsystem.intakeCoral(),
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                        coralIntakeSubsystem))
+                .andThen(pickupToLTrajectory.cmd()));
+    pickupToLTrajectory
+        .done()
+        .onTrue(
+            new WaitCommand(0.5)
+                .andThen(
+                    new RepulsorReef(swerveDrive, visionSubsystem, false)
+                        .withTimeout(2.0)
+                        .andThen(
+                            new SetElevatorPosition(
+                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                        .withTimeout(2.0)
+                        .andThen(
+                            Commands.runEnd(
+                                    () ->
+                                        coralIntakeSubsystem.setIntakeVelocity(
+                                            CoralIntakeConstants.EJECT_SPEED),
+                                    () ->
+                                        coralIntakeSubsystem.setIntakeVelocity(
+                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                                    coralIntakeSubsystem)
+                                .withTimeout(1.0))));
     //                     .alongWith(
     //                         new SetElevatorPosition(
     //                             swerveDrive, elevatorSubsystem,
@@ -296,7 +335,7 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new WaitCommand(2.0)
+            new WaitCommand(0.5)
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
@@ -312,56 +351,45 @@ public class Autos {
                                         coralIntakeSubsystem.setIntakeVelocity(
                                             CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
                                     coralIntakeSubsystem)
-                                .withTimeout(1.0))));
-    // Logger.recordOutput(
-    // "Trajectories/pickuptoL", pickupToLTrajectory.getRawTrajectory().getPoses());
-    // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
-    // startToJTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(pickupToLTrajectory.cmd());
+                                .withTimeout(1.0)))
+                .andThen(
+                    eToPickupTrajectory
+                        .cmd()
+                        .alongWith(
+                            elevatorSubsystem.setElevationPosition(
+                                ElevatorSetpoints.FEEDER.getPosition()))));
 
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(leftReefInRange).negate())
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new RepulsorReef(swerveDrive, visionSubsystem, true),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
+    eToPickupTrajectory
+        .done()
+        .onTrue(
+            Commands.sequence(
+                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                    Commands.runEnd(
+                        () -> coralIntakeSubsystem.intakeCoral(),
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                        coralIntakeSubsystem))
+                .andThen(pickupToLTrajectory.cmd()));
 
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(hasCoral))
-    //     .and(routine.observe(rightReefInRange))
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
-
-    // routine
-    //     .anyActive(jToPickupTrajectory)
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-
-    // routine
-    //     .observe(elevatorUpZone)
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger",
-    // true))));
-    // routine
-    //     .observe(elevatorUpZone.negate())
-    //     .or(routine.observe(hasNoCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem,
-    // ElevatorSetpoints.FEEDER.getPosition()),
-    //             new RunCommand(
-    //                 () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
+    pickupToLTrajectory
+        .done()
+        .onTrue(
+            new RepulsorReef(swerveDrive, visionSubsystem, false)
+                .withTimeout(2.0)
+                .andThen(
+                    new SetElevatorPosition(
+                        swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                .withTimeout(2.0)
+                .andThen(
+                    Commands.runEnd(
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.EJECT_SPEED),
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                            coralIntakeSubsystem)
+                        .withTimeout(1.0)));
     return routine;
   }
 
@@ -380,89 +408,66 @@ public class Autos {
         .onTrue(
             Commands.sequence(
                 autoFactory.resetOdometry(AutoConstants.RED_LEFT_START_TO_J_TRAJECTORY),
-                // funnelSubsystem.dropFunnel(),
-                // elevatorSubsystem.manualElevator(-0.2).withTimeout(0.2),
-                // Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem),
                 lStartToJTrajectory.cmd()));
     lStartToJTrajectory
         .done()
         .onTrue(
-            //         new WaitCommand(2.0)
-            //             .andThen(
+            new WaitCommand(.5)
+                .andThen(
+                    new RepulsorReef(swerveDrive, visionSubsystem, false)
+                        .withTimeout(2.0)
+                        .andThen(
+                            new SetElevatorPosition(
+                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                        .withTimeout(2.0)
+                        .andThen(
+                            Commands.runEnd(
+                                    () ->
+                                        coralIntakeSubsystem.setIntakeVelocity(
+                                            CoralIntakeConstants.EJECT_SPEED),
+                                    () ->
+                                        coralIntakeSubsystem.setIntakeVelocity(
+                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                                    coralIntakeSubsystem)
+                                .withTimeout(1.0)))
+                .andThen(
+                    jToPickupTrajectory
+                        .cmd()
+                        .alongWith(
+                            elevatorSubsystem.setElevationPosition(
+                                ElevatorSetpoints.FEEDER.getPosition()))));
+
+    jToPickupTrajectory
+        .done()
+        .onTrue(
+            Commands.sequence(
+                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                    Commands.runEnd(
+                        () -> coralIntakeSubsystem.intakeCoral(),
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                        coralIntakeSubsystem))
+                .andThen(pickupToLTrajectory.cmd()));
+
+    pickupToLTrajectory
+        .done()
+        .onTrue(
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .withTimeout(2.0)
-                .andThen(jToPickupTrajectory.cmd()));
-    jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
-    pickupToLTrajectory.done().onTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    //                     .alongWith(
-    //                         new SetElevatorPosition(
-    //                             swerveDrive, elevatorSubsystem,
-    // ElevatorSetpoints.L4.getPosition()))
-    //                     .withTimeout(4.0)
-    //                     .andThen(
-    //                         Commands.runEnd(
-    //                                 () ->
-    //                                     coralIntakeSubsystem.setIntakeVelocity(
-    //                                         CoralIntakeConstants.EJECT_SPEED),
-    //                                 () ->
-    //                                     coralIntakeSubsystem.setIntakeVelocity(
-    //                                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-    //                                 coralIntakeSubsystem)
-    //                             .withTimeout(1.0))));
-
-    // Logger.recordOutput("Trajectories/starttoj",
-    // startToJTrajectory.getRawTrajectory().getPoses());
-    // Logger.recordOutput(
-    //     "Trajectories/jtopickup", jToPickupTrajectory.getRawTrajectory().getPoses());
-    // Logger.recordOutput(
-    // "Trajectories/pickuptoL", pickupToLTrajectory.getRawTrajectory().getPoses());
-    // startToJTrajectory.done().onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory.done().onTrue(pickupToLTrajectory.cmd());
-    // startToJTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(jToPickupTrajectory.cmd());
-    // jToPickupTrajectory
-    //     .recentlyDone()
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(pickupToLTrajectory.cmd());
-
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(leftReefInRange).negate())
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new RepulsorReef(swerveDrive, visionSubsystem, true),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Repulsor Auto Trigger", true))));
-
-    // routine
-    //     .anyDone(startToJTrajectory, pickupToLTrajectory)
-    //     .and(routine.observe(hasCoral))
-    //     .and(routine.observe(rightReefInRange))
-    //     .onTrue(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem));
-
-    // routine
-    //     .anyActive(jToPickupTrajectory)
-    //     .and(routine.observe(hasNoCoral))
-    //     .onTrue(new IntakeCoral(elevatorSubsystem, coralIntakeSubsystem));
-
-    // routine
-    //     .observe(elevatorUpZone)
-    //     .and(routine.observe(hasCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()),
-    //             new RunCommand(() -> SmartDashboard.putBoolean("Elevator Up Auto Trigger",
-    // true))));
-    // routine
-    //     .observe(elevatorUpZone.negate())
-    //     .or(routine.observe(hasNoCoral))
-    //     .onTrue(
-    //         Commands.sequence(
-    //             new SetElevatorPosition(elevatorSubsystem,
-    // ElevatorSetpoints.FEEDER.getPosition()),
-    //             new RunCommand(
-    //                 () -> SmartDashboard.putBoolean("Elevator Up Auto Trigger", false))));
+                .andThen(
+                    new SetElevatorPosition(
+                        swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                .withTimeout(2.0)
+                .andThen(
+                    Commands.runEnd(
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.EJECT_SPEED),
+                            () ->
+                                coralIntakeSubsystem.setIntakeVelocity(
+                                    CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                            coralIntakeSubsystem)
+                        .withTimeout(1.0)));
     return routine;
   }
 

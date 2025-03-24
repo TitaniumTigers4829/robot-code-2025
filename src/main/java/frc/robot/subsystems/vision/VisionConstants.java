@@ -11,9 +11,10 @@ import org.photonvision.PhotonCamera;
 public final class VisionConstants {
   public enum Limelight {
     FRONT_LEFT(
-        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true),
-    FRONT_RIGHT(
-        FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR, false);
+        FRONT_LEFT_LIMELIGHT_NUMBER, FRONT_LEFT_LIMELIGHT_NAME, LL4_FOV_MARGIN_OF_ERROR, true);
+    // FRONT_RIGHT(
+    //     FRONT_RIGHT_LIMELIGHT_NUMBER, FRONT_RIGHT_LIMELIGHT_NAME, LL3G_FOV_MARGIN_OF_ERROR,
+    // false);
 
     private final int id;
     private final String name;
@@ -46,7 +47,7 @@ public final class VisionConstants {
     public static Limelight fromId(int id) {
       return switch (id) {
         case 0 -> FRONT_LEFT;
-        case 1 -> FRONT_RIGHT;
+          // case 1 -> FRONT_RIGHT;
         default -> throw new IllegalArgumentException("Invalid Limelight ID: " + id);
       };
     }
@@ -64,8 +65,8 @@ public final class VisionConstants {
   public static final Transform3d ELEVATOR_TRANSFORM = new Transform3d();
 
   public static final PhotonCamera BACK_CAMERA = new PhotonCamera(Limelight.FRONT_LEFT.getName());
-  public static final PhotonCamera ELEVATOR_CAMERA =
-      new PhotonCamera(Limelight.FRONT_RIGHT.getName());
+  // public static final PhotonCamera ELEVATOR_CAMERA =
+  //     new PhotonCamera(Limelight.FRONT_RIGHT.getName());
 
   public static final int THREAD_SLEEP_MS = 20;
 
