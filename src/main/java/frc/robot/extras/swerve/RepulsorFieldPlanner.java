@@ -14,13 +14,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 import frc.robot.extras.math.forces.Force;
 import frc.robot.extras.util.ReefLocations;
-
-import static edu.wpi.first.units.Units.Rotation;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import org.ejml.equation.IntegerSequence.For;
 
 public class RepulsorFieldPlanner {
   private abstract static class Obstacle {
