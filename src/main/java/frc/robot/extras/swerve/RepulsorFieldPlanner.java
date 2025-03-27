@@ -12,9 +12,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
+import frc.robot.extras.math.forces.Force;
 import frc.robot.extras.util.ReefLocations;
+
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.ejml.equation.IntegerSequence.For;
 
 public class RepulsorFieldPlanner {
   private abstract static class Obstacle {
@@ -26,7 +32,7 @@ public class RepulsorFieldPlanner {
       this.positive = positive;
     }
 
-    public abstract Translation2d getForceAtPosition(Translation2d position, Translation2d target);
+    public abstract Force getForceAtPosition(Translation2d position, Translation2d target);
 
     protected double distToForceMag(double dist, double maxRange) {
       if (Math.abs(dist) > maxRange) {
@@ -64,34 +70,34 @@ public class RepulsorFieldPlanner {
       this.tailLength = tailLength + primaryMaxRange;
     }
 
-    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
-      var targetToLoc = loc.minus(target);
-      var targetToLocAngle = targetToLoc.getAngle();
-      var sidewaysPoint = new Translation2d(tailLength, targetToLoc.getAngle()).plus(loc);
+    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+      Translation2d targetToLoc = loc.minus(target);
+      Rotation2d targetToLocAngle = targetToLoc.getAngle();
+      Translation2d sidewaysPoint = new Translation2d(tailLength, targetToLoc.getAngle()).plus(loc);
 
-      var positionToLocation = position.minus(loc);
-      var positionToLocationDistance = positionToLocation.getNorm();
-      Translation2d outwardsForce;
+      Translation2d positionToLocation = position.minus(loc);
+      double positionToLocationDistance = positionToLocation.getNorm();
+      Force outwardsForce;
       if (positionToLocationDistance <= primaryMaxRange) {
         outwardsForce =
-            new Translation2d(
+            new Force(
                 distToForceMag(
                     Math.max(positionToLocationDistance - primaryRadius, 0),
                     primaryMaxRange - primaryRadius),
                 positionToLocation.getAngle());
       } else {
-        outwardsForce = Translation2d.kZero;
+        outwardsForce = Force.kZero;
       }
 
-      var positionToLine = position.minus(loc).rotateBy(targetToLocAngle.unaryMinus());
-      var distanceAlongLine = positionToLine.getX();
+      Translation2d positionToLine = position.minus(loc).rotateBy(targetToLocAngle.unaryMinus());
+      double distanceAlongLine = positionToLine.getX();
 
-      Translation2d sidewaysForce;
-      var distanceScalar = distanceAlongLine / tailLength;
+      Force sidewaysForce;
+      double distanceScalar = distanceAlongLine / tailLength;
       if (distanceScalar >= 0 && distanceScalar <= 1) {
-        var secondaryMaxRange =
+        double secondaryMaxRange =
             MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
-        var distanceToLine = Math.abs(positionToLine.getY());
+        double distanceToLine = Math.abs(positionToLine.getY());
         if (distanceToLine <= secondaryMaxRange) {
           double strength;
           if (distanceAlongLine < primaryMaxRange) {
@@ -103,19 +109,19 @@ public class RepulsorFieldPlanner {
           }
           strength *= 1 - distanceToLine / secondaryMaxRange;
 
-          var sidewaysMag = tailStrength * strength * (secondaryMaxRange - distanceToLine);
+          double sidewaysMag = tailStrength * strength * (secondaryMaxRange - distanceToLine);
           // flip the sidewaysMag based on which side of the goal-sideways circle the robot is on
-          var sidewaysTheta =
+          Rotation2d sidewaysTheta =
               target.minus(position).getAngle().minus(position.minus(sidewaysPoint).getAngle());
           sidewaysForce =
-              new Translation2d(
+              new Force(
                   sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians())),
                   targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg));
         } else {
-          sidewaysForce = Translation2d.kZero;
+          sidewaysForce = Force.kZero;
         }
       } else {
-        sidewaysForce = Translation2d.kZero;
+        sidewaysForce = Force.kZero;
       }
 
       return outwardsForce.plus(sidewaysForce);
@@ -132,12 +138,12 @@ public class RepulsorFieldPlanner {
       this.maxRange = maxRange;
     }
 
-    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+    public Force getForceAtPosition(Translation2d position, Translation2d target) {
       var dist = Math.abs(position.getY() - y);
       if (dist > maxRange) {
-        return Translation2d.kZero;
+        return Force.kZero;
       }
-      return new Translation2d(0, distToForceMag(y - position.getY(), maxRange));
+      return new Force(0, distToForceMag(y - position.getY(), maxRange));
     }
   }
 
@@ -151,12 +157,12 @@ public class RepulsorFieldPlanner {
       this.maxRange = maxRange;
     }
 
-    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+    public Force getForceAtPosition(Translation2d position, Translation2d target) {
       var dist = Math.abs(position.getX() - x);
       if (dist > maxRange) {
-        return Translation2d.kZero;
+        return Force.kZero;
       }
-      return new Translation2d(distToForceMag(x - position.getX(), maxRange), 0);
+      return new Force(distToForceMag(x - position.getX(), maxRange), 0);
     }
   }
 
@@ -180,10 +186,10 @@ public class RepulsorFieldPlanner {
     }
 
     @Override
-    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+    public Force getForceAtPosition(Translation2d position, Translation2d target) {
       var positionToLine = position.minus(startPoint).rotateBy(inverseAngle);
       if (positionToLine.getX() > 0 && positionToLine.getX() < length) {
-        return new Translation2d(
+        return new Force(
             Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY()),
             angle.rotateBy(Rotation2d.kCCW_90deg));
       }
@@ -193,7 +199,7 @@ public class RepulsorFieldPlanner {
       } else {
         closerPoint = endPoint;
       }
-      return new Translation2d(
+      return new Force(
           distToForceMag(position.getDistance(closerPoint), maxRange),
           position.minus(closerPoint).getAngle());
     }
@@ -263,26 +269,26 @@ public class RepulsorFieldPlanner {
     return arrowList;
   }
 
-  Translation2d getGoalForce(Translation2d curLocation, Translation2d goal) {
+  Force getGoalForce(Translation2d curLocation, Translation2d goal) {
     var displacement = goal.minus(curLocation);
     if (displacement.getNorm() == 0) {
-      return new Translation2d();
+      return new Force();
     }
     Rotation2d direction = displacement.getAngle();
     double rawMag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
     // double cappedMag = Math.min(rawMag, 1);
-    return new Translation2d(rawMag, direction);
+    return new Force(rawMag, direction);
   }
 
-  Translation2d getObstacleForce(Translation2d curLocation, Translation2d target) {
-    var force = Translation2d.kZero;
+  Force getObstacleForce(Translation2d curLocation, Translation2d target) {
+    Force force = Force.kZero;
     for (Obstacle obs : FIELD_OBSTACLES) {
       force = force.plus(obs.getForceAtPosition(curLocation, target));
     }
     return force;
   }
 
-  Translation2d getForce(Translation2d curLocation, Translation2d target) {
+  Force getForce(Translation2d curLocation, Translation2d target) {
     return getGoalForce(curLocation, target).plus(getObstacleForce(curLocation, target));
   }
 
@@ -295,7 +301,7 @@ public class RepulsorFieldPlanner {
   public RepulsorSample sampleField(
       Translation2d curTrans, double maxSpeed, double slowdownDistance) {
     Translation2d err = curTrans.minus(goal);
-    Translation2d netForce = getForce(curTrans, goal);
+    Force netForce = getForce(curTrans, goal);
 
     double stepSize_m;
     if (err.getNorm() < slowdownDistance) {
