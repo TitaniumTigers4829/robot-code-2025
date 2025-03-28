@@ -46,6 +46,8 @@ public class SwerveConstants {
     public static final SwerveDriveKinematics DRIVE_KINEMATICS =
         new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
+    public static final int PIGEON_ID = 0;
+
     public static final class AquilaConstants {
       public static final int FRONT_LEFT_DRIVE_MOTOR_ID = 22;
       public static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 24;

@@ -40,7 +40,8 @@ import frc.robot.subsystems.leds.LEDSubsystem;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.swerve.gyro.GyroInterface;
-import frc.robot.subsystems.swerve.gyro.PhysicalGyro;
+import frc.robot.subsystems.swerve.gyro.PhysicalGyroNavX;
+import frc.robot.subsystems.swerve.gyro.PhysicalGyroPigeon;
 import frc.robot.subsystems.swerve.gyro.SimulatedGyro;
 import frc.robot.subsystems.swerve.module.ModuleInterface;
 import frc.robot.subsystems.swerve.module.PhysicalModule;
@@ -362,7 +363,7 @@ public class Robot extends LoggedRobot {
         /* Real robot, instantiate hardware IO implementations */
         this.swerveDrive =
             new SwerveDrive(
-                new PhysicalGyro(),
+                new PhysicalGyroPigeon(),
                 new PhysicalModule(SwerveConstants.compModuleConfigs[0]),
                 new PhysicalModule(SwerveConstants.compModuleConfigs[1]),
                 new PhysicalModule(SwerveConstants.compModuleConfigs[2]),
@@ -379,7 +380,7 @@ public class Robot extends LoggedRobot {
         /* Real robot, instantiate hardware IO implementations */
         this.swerveDrive =
             new SwerveDrive(
-                new PhysicalGyro(),
+                new PhysicalGyroNavX(),
                 new PhysicalModule(SwerveConstants.devModuleConfigs[0]),
                 new PhysicalModule(SwerveConstants.devModuleConfigs[1]),
                 new PhysicalModule(SwerveConstants.devModuleConfigs[2]),
@@ -396,7 +397,7 @@ public class Robot extends LoggedRobot {
         /* Real robot, instantiate hardware IO implementations */
         this.swerveDrive =
             new SwerveDrive(
-                new PhysicalGyro(),
+                new PhysicalGyroNavX(),
                 new PhysicalModule(SwerveConstants.aquilaModuleConfigs[0]),
                 new PhysicalModule(SwerveConstants.aquilaModuleConfigs[1]),
                 new PhysicalModule(SwerveConstants.aquilaModuleConfigs[2]),
