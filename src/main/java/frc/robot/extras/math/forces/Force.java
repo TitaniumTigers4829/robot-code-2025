@@ -10,6 +10,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.units.measure.Distance;
@@ -36,110 +37,151 @@ public class Force implements Interpolatable<Force>, ProtobufSerializable, Struc
    */
   public static final Force kZero = new Force();
 
-  private final double m_x;
-  private final double m_y;
+  private double m_x;
+    private double m_y;
+  
+    /** Constructs a Force with X and Y components equal to zero. */
+    public Force() {
+      this(0.0, 0.0);
+    }
+  
+    /**
+     * Constructs a Force with the X and Y components equal to the provided values.
+     *
+     * @param x The x component of the translation.
+     * @param y The y component of the translation.
+     */
+    @JsonCreator
+    public Force(
+        @JsonProperty(required = true, value = "x") double x,
+        @JsonProperty(required = true, value = "y") double y) {
+      m_x = x;
+      m_y = y;
+    }
+  
+    /**
+     * Constructs a Force with the provided distance and angle. This is essentially converting from
+     * polar coordinates to Cartesian coordinates.
+     *
+     * @param distance The distance from the origin to the end of the translation.
+     * @param angle The angle between the x-axis and the translation vector.
+     */
+    public Force(double distance, Rotation2d angle) {
+      m_x = distance * angle.getCos();
+      m_y = distance * angle.getSin();
+    }
+  
+    /**
+     * Constructs a Force with the X and Y components equal to the provided values. The X and Y
+     * components will be converted to and tracked as meters.
+     *
+     * @param x The x component of the translation.
+     * @param y The y component of the translation.
+     */
+    public Force(Distance x, Distance y) {
+      this(x.in(Meters), y.in(Meters));
+    }
+  
+    /**
+     * Constructs a Force from the provided translation vector's X and Y components. The values are
+     * assumed to be in meters.
+     *
+     * @param vector The translation vector to represent.
+     */
+    public Force(Vector<N2> vector) {
+      this(vector.get(0), vector.get(1));
+    }
+  
+    /**
+     * Calculates the distance between two translations in 2D space.
+     *
+     * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
+     *
+     * @param other The translation to compute the distance to.
+     * @return The distance between the two translations.
+     */
+    public double getDistance(Force other) {
+      return Math.hypot(other.m_x - m_x, other.m_y - m_y);
+    }
 
-  /** Constructs a Force with X and Y components equal to zero. */
-  public Force() {
-    this(0.0, 0.0);
+    /**
+     * Calculates the distance between two translations in 2D space.
+     *
+     * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
+     *
+     * @param other The translation to compute the distance to.
+     * @return The distance between the two translations.
+     */
+    public double getDistance(Translation2d other) {
+      return Math.hypot(other.getX() - m_x, other.getY() - m_y);
+    }
+  
+    /**
+     * Returns the X component of the translation.
+     *
+     * @return The X component of the translation.
+     */
+    @JsonProperty
+    public double getX() {
+      return m_x;
+    }
+  
+    /**
+     * Returns the Y component of the translation.
+     *
+     * @return The Y component of the translation.
+     */
+    @JsonProperty
+    public double getY() {
+      return m_y;
+    }
+  
+    /**
+     * Returns the X component of the translation in a measure.
+     *
+     * @return The x component of the translation in a measure.
+     */
+    public Distance getMeasureX() {
+      return Meters.of(m_x);
+    }
+  
+    /**
+     * Returns the Y component of the translation in a measure.
+     *
+     * @return The y component of the translation in a measure.
+     */
+    public Distance getMeasureY() {
+      return Meters.of(m_y);
+    }
+  
+    public void setX(double x) {
+      this.m_x = x;
   }
 
-  /**
-   * Constructs a Force with the X and Y components equal to the provided values.
-   *
-   * @param x The x component of the translation.
-   * @param y The y component of the translation.
-   */
-  @JsonCreator
-  public Force(
-      @JsonProperty(required = true, value = "x") double x,
-      @JsonProperty(required = true, value = "y") double y) {
-    m_x = x;
-    m_y = y;
+  public void setY(double y) {
+    this.m_y = y;
   }
 
-  /**
-   * Constructs a Force with the provided distance and angle. This is essentially converting from
-   * polar coordinates to Cartesian coordinates.
-   *
-   * @param distance The distance from the origin to the end of the translation.
-   * @param angle The angle between the x-axis and the translation vector.
-   */
-  public Force(double distance, Rotation2d angle) {
-    m_x = distance * angle.getCos();
-    m_y = distance * angle.getSin();
+  public void set(Translation2d other) {
+    m_x = other.getX();
+    m_y = other.getY();
   }
 
-  /**
-   * Constructs a Force with the X and Y components equal to the provided values. The X and Y
-   * components will be converted to and tracked as meters.
-   *
-   * @param x The x component of the translation.
-   * @param y The y component of the translation.
-   */
-  public Force(Distance x, Distance y) {
-    this(x.in(Meters), y.in(Meters));
+  public void set(Force other) {
+    m_x = other.getX();
+    m_y = other.getY();
   }
 
-  /**
-   * Constructs a Force from the provided translation vector's X and Y components. The values are
-   * assumed to be in meters.
-   *
-   * @param vector The translation vector to represent.
-   */
-  public Force(Vector<N2> vector) {
-    this(vector.get(0), vector.get(1));
+  public void set(double x, double y) {
+    this.m_x = x;
+    this.m_y = y;
   }
 
-  /**
-   * Calculates the distance between two translations in 2D space.
-   *
-   * <p>The distance between translations is defined as √((x₂−x₁)²+(y₂−y₁)²).
-   *
-   * @param other The translation to compute the distance to.
-   * @return The distance between the two translations.
-   */
-  public double getDistance(Force other) {
-    return Math.hypot(other.m_x - m_x, other.m_y - m_y);
+  public void setPolar(double distance, double radians) {
+    m_x = distance * Math.cos(radians);
+    m_y = distance * Math.sin(radians);
   }
 
-  /**
-   * Returns the X component of the translation.
-   *
-   * @return The X component of the translation.
-   */
-  @JsonProperty
-  public double getX() {
-    return m_x;
-  }
-
-  /**
-   * Returns the Y component of the translation.
-   *
-   * @return The Y component of the translation.
-   */
-  @JsonProperty
-  public double getY() {
-    return m_y;
-  }
-
-  /**
-   * Returns the X component of the translation in a measure.
-   *
-   * @return The x component of the translation in a measure.
-   */
-  public Distance getMeasureX() {
-    return Meters.of(m_x);
-  }
-
-  /**
-   * Returns the Y component of the translation in a measure.
-   *
-   * @return The y component of the translation in a measure.
-   */
-  public Distance getMeasureY() {
-    return Meters.of(m_y);
-  }
 
   /**
    * Returns a vector representation of this translation.
@@ -221,6 +263,18 @@ public class Force implements Interpolatable<Force>, ProtobufSerializable, Struc
   }
 
   /**
+   * Returns the sum of two translations in 2D space.
+   *
+   * <p>For example, Translation3d(1.0, 2.5) + Translation3d(2.0, 5.5) = Translation3d{3.0, 8.0).
+   *
+   * @param other The translation to add.
+   * @return The sum of the translations.
+   */
+  public Force plus(Translation2d other) {
+    return new Force(m_x + other.getX(), m_y + other.getY());
+  }
+
+  /**
    * Returns the difference between two translations.
    *
    * <p>For example, Force(5.0, 4.0) - Force(1.0, 2.0) = Force(4.0, 2.0).
@@ -230,6 +284,18 @@ public class Force implements Interpolatable<Force>, ProtobufSerializable, Struc
    */
   public Force minus(Force other) {
     return new Force(m_x - other.m_x, m_y - other.m_y);
+  }
+
+   /**
+   * Returns the difference between two translations.
+   *
+   * <p>For example, Force(5.0, 4.0) - Force(1.0, 2.0) = Force(4.0, 2.0).
+   *
+   * @param other The translation to subtract.
+   * @return The difference between the two translations.
+   */
+  public Force minus(Translation2d other) {
+    return new Force(m_x - other.getX(), m_y - other.getY());
   }
 
   /**
