@@ -8,7 +8,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 
 public class PhysicalGyroPigeon implements GyroInterface {
@@ -31,13 +30,13 @@ public class PhysicalGyroPigeon implements GyroInterface {
     gyroConfiguration = new Pigeon2Configuration();
 
     gyro.getConfigurator().setYaw(0.0);
-    yaw.setUpdateFrequency(HardwareConstants.CANIVORE_SIGNAL_FREQUENCY);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.CANIVORE_SIGNAL_FREQUENCY, yaw, yawVelocity);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.RIO_SIGNAL_FREQUENCY,
         pitch,
         roll,
-        yawVelocity,
         pitchVelocity,
         rollVelocity,
         xAccel,
