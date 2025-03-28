@@ -3,11 +3,14 @@ package frc.robot.subsystems.funnelPivot;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -16,7 +19,9 @@ import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final TalonFX funnelMotor;
+  private final CANcoder funnelEncoder; // Added encoder
   private final TalonFXConfiguration funnelMotorConfig;
+  private final CANcoderConfiguration funnelEncoderConfig; // Added encoder config
   private final StatusSignal<Voltage> funnelVoltage;
   private final StatusSignal<AngularVelocity> funnelVelocity;
   private StatusSignal<Angle> funnelAngle;
@@ -28,7 +33,9 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
+    funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID); // Initialize encoder
     funnelMotorConfig = new TalonFXConfiguration();
+    funnelEncoderConfig = new CANcoderConfiguration(); // Initialize encoder config
     mmPositionRequest = new MotionMagicVoltage(0);
     voltageOut = new VoltageOut(0);
 
@@ -52,11 +59,15 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
 
+    funnelEncoderConfig.MagnetSensor.MagnetOffset = FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
+    funnelEncoderConfig.MagnetSensor.SensorDirection = FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
+
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
+    funnelEncoder.getConfigurator().apply(funnelEncoderConfig); // Apply encoder config
 
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelMotor.getPosition();
+    funnelAngle = funnelEncoder.getPosition(); // Use encoder for angle
     funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
 
