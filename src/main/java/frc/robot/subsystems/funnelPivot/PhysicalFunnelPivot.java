@@ -15,6 +15,8 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalFunnelPivot implements FunnelPivotInterface {
@@ -30,6 +32,9 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final MotionMagicVoltage mmPositionRequest;
   private double funnelTargetAngle;
   private final VoltageOut voltageOut;
+  //alert shit
+  private final Alert funnelMotorDisconnectAlert = new Alert("Funnel Motor Disconnect Alert", AlertType.kError);
+  private final Alert funnelEncoderDiscconectAlert = new Alert("Funnel Encoder Disconnected Alert", AlertType.kError);
 
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
