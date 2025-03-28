@@ -8,10 +8,13 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.robot.Constants.HardwareConstants;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 
 public class PhysicalGyroPigeon implements GyroInterface {
 
-  private final Pigeon2 gyro = new Pigeon2(0, HardwareConstants.CANIVORE_CAN_BUS_STRING);
+  private final Pigeon2 gyro =
+      new Pigeon2(DriveConstants.PIGEON_ID, HardwareConstants.CANIVORE_CAN_BUS_STRING);
   private final Pigeon2Configuration gyroConfiguration;
 
   // TODO: Add BaseStatusSignal list
