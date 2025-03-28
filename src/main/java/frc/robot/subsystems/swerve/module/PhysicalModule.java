@@ -110,8 +110,8 @@ public class PhysicalModule implements ModuleInterface {
     turnMotorTorqueCurrent = turnMotor.getTorqueCurrent();
     turnMotorReference = turnMotor.getClosedLoopReference();
 
-    // driveMotor.setPosition(0.0);
-    // turnMotor.setPosition(0.0);
+    driveMotor.setPosition(0.0);
+    turnMotor.setPosition(0.0);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.CANIVORE_SIGNAL_FREQUENCY,
@@ -144,19 +144,14 @@ public class PhysicalModule implements ModuleInterface {
         turnMotorReference,
         turnMotorTorqueCurrent);
 
-    inputs.isConnected =
+    inputs.isDriveConnected =
         BaseStatusSignal.isAllGood(
-            drivePosition,
-            turnEncoderAbsolutePosition,
-            driveVelocity,
-            turnEncoderVelocity,
-            driveMotorTorque,
-            driveMotorReference,
-            turnEncoderVelocity,
-            turnMotorAppliedVolts,
-            turnMotorCurrent,
-            turnMotorReference,
-            turnMotorTorqueCurrent);
+            drivePosition, driveVelocity, driveMotorTorque, driveMotorReference);
+    inputs.isEncoderConnected =
+        BaseStatusSignal.isAllGood(turnEncoderAbsolutePosition, turnEncoderVelocity);
+    inputs.isTurnConnected =
+        BaseStatusSignal.isAllGood(
+            turnMotorAppliedVolts, turnMotorCurrent, turnMotorTorqueCurrent, turnMotorReference);
     inputs.driveVelocity = driveVelocity.getValueAsDouble();
     inputs.drivePosition = -drivePosition.getValueAsDouble();
     inputs.driveDesiredPosition = driveMotorReference.getValueAsDouble();

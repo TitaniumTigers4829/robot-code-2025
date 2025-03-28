@@ -64,7 +64,9 @@ public class SimulatedModule implements ModuleInterface {
     inputs.turnAppliedVolts = steerMotor.voltage().in(Volts);
     inputs.turnCurrentAmps = steerMotor.current().in(Amps);
 
-    inputs.isConnected = true;
+    inputs.isDriveConnected = true;
+    inputs.isEncoderConnected = true;
+    inputs.isTurnConnected = true;
   }
 
   @Override

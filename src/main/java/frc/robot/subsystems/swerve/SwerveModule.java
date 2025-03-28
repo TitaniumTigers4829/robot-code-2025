@@ -23,7 +23,9 @@ public class SwerveModule {
   private final String moduleName;
   private final ModuleInputsAutoLogged moduleInputs = new ModuleInputsAutoLogged();
 
-  private final Alert hardwareFaultAlert;
+  private final Alert driveFaultAlert;
+  private final Alert encoderFaultAlert;
+  private final Alert turnFaultAlert;
 
   private static final LoggedTunableNumber driveS = new LoggedTunableNumber("Drive/Module/DriveS");
   private static final LoggedTunableNumber driveV = new LoggedTunableNumber("Drive/Module/DriveV");
@@ -56,9 +58,15 @@ public class SwerveModule {
   public SwerveModule(ModuleInterface moduleInterface, String moduleName) {
     this.moduleInterface = moduleInterface;
     this.moduleName = moduleName;
-    this.hardwareFaultAlert =
-        new Alert("Module-" + moduleName + " Hardware Fault", AlertType.kError);
-    this.hardwareFaultAlert.set(false);
+    this.driveFaultAlert = new Alert("Drive-" + moduleName + " Hardware Fault", AlertType.kError);
+    this.driveFaultAlert.set(false);
+
+    this.encoderFaultAlert =
+        new Alert("Encoder-" + moduleName + " Hardware Fault", AlertType.kError);
+    this.encoderFaultAlert.set(false);
+
+    this.turnFaultAlert = new Alert("Turn-" + moduleName + " Hardware Fault", AlertType.kError);
+    this.turnFaultAlert.set(false);
   }
 
   /** Updates the module's odometry inputs. */
@@ -66,7 +74,9 @@ public class SwerveModule {
     moduleInterface.updateInputs(moduleInputs);
     Logger.processInputs("Drive/Module-" + moduleName, moduleInputs);
     Tracer.traceFunc("Module-" + moduleName, () -> moduleInterface.updateInputs(moduleInputs));
-    this.hardwareFaultAlert.set(!moduleInputs.isConnected);
+    this.driveFaultAlert.set(!moduleInputs.isDriveConnected);
+    this.encoderFaultAlert.set(!moduleInputs.isEncoderConnected);
+    this.turnFaultAlert.set(!moduleInputs.isTurnConnected);
   }
 
   /**

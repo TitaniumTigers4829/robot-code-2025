@@ -9,7 +9,9 @@ public interface ModuleInterface {
 
   @AutoLog
   class ModuleInputs {
-    public boolean isConnected = false;
+    public boolean isTurnConnected = false;
+    public boolean isDriveConnected = false;
+    public boolean isEncoderConnected = false;
 
     public double driveVelocity = 0.0;
     public double driveAppliedVolts = 0.0;
