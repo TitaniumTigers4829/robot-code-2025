@@ -30,6 +30,9 @@ public class PhysicalGyroPigeon implements GyroInterface {
     gyroConfiguration = new Pigeon2Configuration();
 
     gyro.getConfigurator().setYaw(0.0);
+
+    // We care most about the yaw from the gyro, so we set it to have a higher frequency than other
+    // signals
     BaseStatusSignal.setUpdateFrequencyForAll(
         HardwareConstants.CANIVORE_SIGNAL_FREQUENCY, yaw, yawVelocity);
 
