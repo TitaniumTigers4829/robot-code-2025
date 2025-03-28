@@ -1,12 +1,12 @@
 package frc.robot.subsystems.swerve.gyro;
 
-import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.studica.frc.AHRS;
-import com.studica.frc.AHRS.NavXComType;
-import com.studica.frc.AHRS.NavXUpdateRate;
-
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalGyroPigeon implements GyroInterface {
@@ -14,22 +14,48 @@ public class PhysicalGyroPigeon implements GyroInterface {
   private final Pigeon2 gyro = new Pigeon2(0, HardwareConstants.CANIVORE_CAN_BUS_STRING);
   private final Pigeon2Configuration gyroConfiguration;
 
+  // TODO: Add BaseStatusSignal list
+  private final StatusSignal<Angle> yaw = gyro.getYaw();
+  private final StatusSignal<Angle> pitch = gyro.getPitch();
+  private final StatusSignal<Angle> roll = gyro.getRoll();
+  private final StatusSignal<AngularVelocity> yawVelocity = gyro.getAngularVelocityZWorld();
+  private final StatusSignal<AngularVelocity> pitchVelocity = gyro.getAngularVelocityXWorld();
+  private final StatusSignal<AngularVelocity> rollVelocity = gyro.getAngularVelocityYWorld();
+  private final StatusSignal<LinearAcceleration> xAccel = gyro.getAccelerationX();
+  private final StatusSignal<LinearAcceleration> yAccel = gyro.getAccelerationY();
+
   public PhysicalGyroPigeon() {
     gyroConfiguration = new Pigeon2Configuration();
+
+    gyro.getConfigurator().setYaw(0.0);
+    yaw.setUpdateFrequency(HardwareConstants.CANIVORE_SIGNAL_FREQUENCY);
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        HardwareConstants.RIO_SIGNAL_FREQUENCY,
+        pitch,
+        roll,
+        yawVelocity,
+        pitchVelocity,
+        rollVelocity,
+        xAccel,
+        yAccel);
+    gyro.optimizeBusUtilization();
+    gyro.setYaw(0.0);
   }
 
   @Override
   public void updateInputs(GyroInputs inputs) {
+    BaseStatusSignal.refreshAll(
+        yaw, pitch, roll, yawVelocity, pitchVelocity, rollVelocity, xAccel, yAccel);
     inputs.isConnected = gyro.isConnected();
-    // These values are negated to make sure CCW is positive for our gyro rotation as is consistent
-    // with the rest of pose estimation. We do this
-    // because sometimes the gyro can be oriented differently, causing the reading to be negative.
-    inputs.yawVelocityDegreesPerSecond = gyro.getAngularVelocityZWorld().getValueAsDouble();
-    inputs.yawDegrees = gyro.getYaw().getValueAsDouble();
-    inputs.accelX = gyro.getAccelerationX().getValueAsDouble();
-    inputs.accelY = gyro.getAccelerationY().getValueAsDouble();
-    inputs.rollDegrees = gyro.getRoll().getValueAsDouble();
-    inputs.pitchDegrees = gyro.getPitch().getValueAsDouble();
+    inputs.yawVelocityDegreesPerSecond = yawVelocity.getValueAsDouble();
+    inputs.rollVelocityDegreesPerSecond = rollVelocity.getValueAsDouble();
+    inputs.pitchVelocityDegreesPerSecond = pitchVelocity.getValueAsDouble();
+    inputs.yawDegrees = yaw.getValueAsDouble();
+    inputs.accelX = xAccel.getValueAsDouble();
+    inputs.accelY = yAccel.getValueAsDouble();
+    inputs.rollDegrees = roll.getValueAsDouble();
+    inputs.pitchDegrees = pitch.getValueAsDouble();
   }
 
   @Override
