@@ -27,7 +27,6 @@ public class SwerveModule {
   private final Alert encoderFaultAlert;
   private final Alert turnFaultAlert;
 
-
   private static final LoggedTunableNumber driveS = new LoggedTunableNumber("Drive/Module/DriveS");
   private static final LoggedTunableNumber driveV = new LoggedTunableNumber("Drive/Module/DriveV");
   private static final LoggedTunableNumber driveP = new LoggedTunableNumber("Drive/Module/DriveP");
@@ -59,16 +58,14 @@ public class SwerveModule {
   public SwerveModule(ModuleInterface moduleInterface, String moduleName) {
     this.moduleInterface = moduleInterface;
     this.moduleName = moduleName;
-    this.driveFaultAlert =
-        new Alert("Drive-" + moduleName + " Hardware Fault", AlertType.kError);
+    this.driveFaultAlert = new Alert("Drive-" + moduleName + " Hardware Fault", AlertType.kError);
     this.driveFaultAlert.set(false);
-    
+
     this.encoderFaultAlert =
         new Alert("Encoder-" + moduleName + " Hardware Fault", AlertType.kError);
     this.encoderFaultAlert.set(false);
-    
-    this.turnFaultAlert =
-        new Alert("Turn-" + moduleName + " Hardware Fault", AlertType.kError);
+
+    this.turnFaultAlert = new Alert("Turn-" + moduleName + " Hardware Fault", AlertType.kError);
     this.turnFaultAlert.set(false);
   }
 
