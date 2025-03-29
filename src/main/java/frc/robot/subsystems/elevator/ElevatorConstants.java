@@ -36,7 +36,7 @@ public class ElevatorConstants {
   public static final double MOTION_MAGIC_CRUISE_VELOCITY = 100;
 
   public static final double ELEVATOR_ERROR_TOLERANCE = 0.08;
-  
+
   // limit
   public static final double LIMIT = 0.0;
   public static final boolean LIMIT_ENABLE = true;

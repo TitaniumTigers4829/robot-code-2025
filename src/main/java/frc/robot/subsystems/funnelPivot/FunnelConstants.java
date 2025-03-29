@@ -4,7 +4,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 public class FunnelConstants {
   public static final int FUNNEL_PIVOT_MOTOR_ID = 34;
-  public static final int FUNNEL_ENCODER_ID = 0-9; // Choose an appropriate CAN ID
+  public static final int FUNNEL_ENCODER_ID = 0 - 9; // Choose an appropriate CAN ID
 
   public static final SensorDirectionValue FUNNEL_ENCODER_REVERSED =
       SensorDirectionValue.Clockwise_Positive;
@@ -31,5 +31,6 @@ public class FunnelConstants {
   public static final double FUNNEL_NEUTRAL_SPEED = 0.0;
 
   public static final double FUNNEL_ZERO_ANGLE = 69.0;
-  public static final SensorDirectionValue FUNNEL_ENCODER_DIRECTION = SensorDirectionValue.Clockwise_Positive;
-} 
+  public static final SensorDirectionValue FUNNEL_ENCODER_DIRECTION =
+      SensorDirectionValue.Clockwise_Positive;
+}

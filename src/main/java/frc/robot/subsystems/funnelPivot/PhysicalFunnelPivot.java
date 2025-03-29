@@ -2,15 +2,14 @@ package frc.robot.subsystems.funnelPivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -32,11 +31,12 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final MotionMagicVoltage mmPositionRequest;
   private double funnelTargetAngle;
   private final VoltageOut voltageOut;
-  //alert shit
-  private final Alert funnelMotorDisconnectAlert = new Alert("Funnel Motor Disconnect Alert", AlertType.kError);
-  private final Alert funnelEncoderDiscconectAlert = new Alert("Funnel Encoder Disconnected Alert", AlertType.kError);
+  // alert shit
+  private final Alert funnelMotorDisconnectAlert =
+      new Alert("Funnel Motor Disconnect Alert", AlertType.kError);
+  private final Alert funnelEncoderDiscconectAlert =
+      new Alert("Funnel Encoder Disconnected Alert", AlertType.kError);
 
-  
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
     funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID); // Initialize encoder
@@ -65,8 +65,10 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
 
-    funnelEncoderConfig.MagnetSensor.MagnetOffset = FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
-    funnelEncoderConfig.MagnetSensor.SensorDirection = FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
+    funnelEncoderConfig.MagnetSensor.MagnetOffset =
+        FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
+    funnelEncoderConfig.MagnetSensor.SensorDirection =
+        FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
 
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
     funnelEncoder.getConfigurator().apply(funnelEncoderConfig); // Apply encoder config
@@ -135,11 +137,16 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
   }
 
-  public void checkAlerts() { // Check if motor or encoder is disconnected and set alerts periodically from main subsystem class
-    boolean motorConnected = BaseStatusSignal.refreshAll(
-        funnelVoltage, funnelVelocity, funnelSupplyCurrent, funnelStatorCurrent).isOK();
-    boolean encoderConnected = BaseStatusSignal.refreshAll(funnelAngle).isOK(); //dont ask how i got this code
-    
+  public void
+      checkAlerts() { // Check if motor or encoder is disconnected and set alerts periodically from
+    // main subsystem class
+    boolean motorConnected =
+        BaseStatusSignal.refreshAll(
+                funnelVoltage, funnelVelocity, funnelSupplyCurrent, funnelStatorCurrent)
+            .isOK();
+    boolean encoderConnected =
+        BaseStatusSignal.refreshAll(funnelAngle).isOK(); // dont ask how i got this code
+
     funnelMotorDisconnectAlert.set(!motorConnected);
     funnelEncoderDiscconectAlert.set(!encoderConnected);
   }
