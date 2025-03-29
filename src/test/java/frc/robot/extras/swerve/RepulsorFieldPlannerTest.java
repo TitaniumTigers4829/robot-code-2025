@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.extras.math.forces.Force;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class RepulsorFieldPlannerTest {
   @Test
   public void testGetGoalForceAtGoal() {
     Translation2d curLocation = new Translation2d(5, 5);
-    Force force = planner.getGoalForce(curLocation, new Translation2d(5, 5));
+    Translation2d force = planner.getGoalForce(curLocation, new Translation2d(5, 5));
     // Expect zero force if at the goal.
     assertEquals("Goal force should be zero when at the goal", 0, force.getNorm(), 1e-6);
   }
@@ -35,7 +34,7 @@ public class RepulsorFieldPlannerTest {
   public void testGetGoalForceAwayFromGoal() {
     Translation2d curLocation = new Translation2d(3, 3);
     Translation2d goal = new Translation2d(5, 5);
-    Force force = planner.getGoalForce(curLocation, goal);
+    Translation2d force = planner.getGoalForce(curLocation, goal);
     assertTrue("Goal force should be nonzero", force.getNorm() > 0);
 
     // Verify the force direction is roughly from curLocation toward goal.
@@ -53,7 +52,7 @@ public class RepulsorFieldPlannerTest {
   public void testGetForceCombinesGoalAndObstacle() {
     Translation2d curLocation = new Translation2d(2, 2);
     Translation2d goal = new Translation2d(5, 5);
-    Force totalForce = planner.getForce(curLocation, goal);
+    Translation2d totalForce = planner.getForce(curLocation, goal);
     // Since obstacles and the goal force combine, expect a nonzero force.
     assertTrue("Combined force should be nonzero", totalForce.getNorm() > 0);
   }
