@@ -14,9 +14,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
 import frc.robot.extras.util.Field;
 import frc.robot.extras.util.Obstacle;
-import frc.robot.extras.util.ReefLocations;
 import java.util.ArrayList;
-import java.util.List;
 
 public class RepulsorFieldPlanner {
 
