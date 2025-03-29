@@ -65,15 +65,17 @@ public abstract class Obstacle {
 
   /**
    * Computes a lateral (sideways) force based on the difference between the goal direction and the
-   * radial direction (from obstacle to position). The force is computed as:
-   *    lateralForce = scale * sign(sin(theta / divisor))
-   * where theta is the angular difference between (goal - position) and radialVector.
+   * radial direction (from obstacle to position). The force is computed as: lateralForce = scale *
+   * sign(sin(theta / divisor)) where theta is the angular difference between (goal - position) and
+   * radialVector.
    *
-   * @param radialVector the vector from the obstacle center (or secondary point) to the current position.
+   * @param radialVector the vector from the obstacle center (or secondary point) to the current
+   *     position.
    * @param position the current position.
    * @param goal the goal position.
    * @param scale the scaling factor (for example, half of the radial force magnitude).
-   * @param divisor divisor applied to theta before computing the sign (for a softer effect, try 2 or 1).
+   * @param divisor divisor applied to theta before computing the sign (for a softer effect, try 2
+   *     or 1).
    * @return a Translation2d representing the lateral force vector.
    */
   protected Translation2d lateralForce(
@@ -202,9 +204,10 @@ public abstract class Obstacle {
       Translation2d positionToLocation = position.minus(loc);
       double positionToLocationDistance = positionToLocation.getNorm();
       if (positionToLocationDistance <= primaryMaxRange) {
-        double forceMag = distToForceMag(
-            Math.max(positionToLocationDistance - primaryRadius, 0),
-            primaryMaxRange - primaryRadius);
+        double forceMag =
+            distToForceMag(
+                Math.max(positionToLocationDistance - primaryRadius, 0),
+                primaryMaxRange - primaryRadius);
         double angle = positionToLocation.getAngle().getRadians();
         outwardsForce = fromPolar(forceMag, angle);
       } else {
@@ -213,18 +216,23 @@ public abstract class Obstacle {
       // Determine a secondary point along the tail.
       Translation2d targetToLoc = loc.minus(goal);
       Rotation2d targetToLocAngle = targetToLoc.getAngle();
-      Translation2d sidewaysPoint = loc.plus(fromPolar(tailDistance, targetToLocAngle.getRadians()));
+      Translation2d sidewaysPoint =
+          loc.plus(fromPolar(tailDistance, targetToLocAngle.getRadians()));
       // Compute distance along tail direction.
       Translation2d positionToLine = rotate(position.minus(loc), targetToLocAngle.unaryMinus());
       double distanceAlongLine = positionToLine.getX();
       Translation2d lateral = new Translation2d(0, 0);
       double distanceScalar = distanceAlongLine / tailDistance;
       if (distanceScalar >= 0 && distanceScalar <= 1) {
-        double secondaryMaxRange = MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
+        double secondaryMaxRange =
+            MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
         double distanceToLine = Math.abs(positionToLine.getY());
         if (distanceToLine <= secondaryMaxRange) {
           // Use the lateralForce helper.
-          double scale = tailStrength * (1 - distanceScalar * distanceScalar) * (secondaryMaxRange - distanceToLine);
+          double scale =
+              tailStrength
+                  * (1 - distanceScalar * distanceScalar)
+                  * (secondaryMaxRange - distanceToLine);
           lateral = lateralForce(position.minus(sidewaysPoint), position, goal, scale, 1);
         }
       }
@@ -301,7 +309,8 @@ public abstract class Obstacle {
       // Rotate the relative vector by the inverse angle to align with the line.
       Translation2d posLine = rotate(relative, inverseAngle);
 
-      // If the projected point lies along the line segment, apply a force perpendicular to the line.
+      // If the projected point lies along the line segment, apply a force perpendicular to the
+      // line.
       if (posLine.getX() > 0 && posLine.getX() < length) {
         double forceMag = Math.copySign(distToForceMag(posLine.getY(), maxRange), posLine.getY());
         Rotation2d perp = angle.rotateBy(Rotation2d.kCCW_90deg);
