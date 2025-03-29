@@ -289,14 +289,6 @@ public abstract class Obstacle {
       this.maxRange = maxRange;
     }
 
-    // Immutable rotation helper: rotates a vector by a given Rotation2d.
-    private Translation2d rotate(Translation2d vector, Rotation2d rotation) {
-      double cos = Math.cos(rotation.getRadians());
-      double sin = Math.sin(rotation.getRadians());
-      return new Translation2d(
-          vector.getX() * cos - vector.getY() * sin, vector.getX() * sin + vector.getY() * cos);
-    }
-
     @Override
     public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       // Compute the vector from the line's start to the current position.
