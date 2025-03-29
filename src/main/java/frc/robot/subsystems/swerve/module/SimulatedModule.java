@@ -15,24 +15,25 @@ import frc.robot.sim.simController.UnitSafeControl.AngularVelocityPIDFeedback;
 import frc.robot.sim.simController.UnitSafeControl.FlywheelFeedforward;
 import frc.robot.sim.simController.UnitSafeMotorController;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
+import frc.robot.subsystems.swerve.SwerveConstants.ModuleConfig;
 import frc.robot.subsystems.swerve.SwerveConstants.ModuleConstants;
 
-/** Wrapper class around {@link SwerveModuleSimulation} */
-public class SimulatedModule implements ModuleInterface {
+public class SimulatedModule extends PhysicalModule {
   private final UnitSafeMotorController driveMotor;
   private final UnitSafeMotorController steerMotor;
   private final ClosedLoop<VoltageUnit, AngularVelocityUnit, AngleUnit> driveLoop;
   private final ClosedLoop<VoltageUnit, AngleUnit, AngleUnit> steerLoop;
 
-  private final MotorSimRunner driveSimRunner; 
+  private final MotorSimRunner driveSimRunner;
   private final MotorSimRunner steerSimRunner;
 
-  public SimulatedModule(int moduleId, SimSwerve simSwerve) {
+  public SimulatedModule(ModuleConfig config, int moduleId, SimSwerve simSwerve) {
+    super(config);
     driveMotor = new UnitSafeMotorController();
     steerMotor = new UnitSafeMotorController();
 
-    driveSimRunner = new MotorSimRunner(driveMotor, null, null);
-    steerSimRunner = new MotorSimRunner(steerMotor, null, null);
+    driveSimRunner = new MotorSimRunner(driveMotor, super.getDriveMotor());
+    steerSimRunner = new MotorSimRunner(steerMotor, super.getTurnMotor());
 
     driveLoop =
         ClosedLoop.forVoltageAngularVelocity(
@@ -73,6 +74,9 @@ public class SimulatedModule implements ModuleInterface {
     inputs.turnCurrentAmps = steerMotor.current().in(Amps);
 
     inputs.isConnected = true;
+
+    driveSimRunner.simulate();
+    steerSimRunner.simulate();
   }
 
   @Override

@@ -401,10 +401,14 @@ public class Robot extends LoggedRobot {
         this.swerveDrive =
             new SwerveDrive(
                 new SimulatedGyro(simWorld.robot().getDriveTrain().getGyro()),
-                new SimulatedModule(0, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(1, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(2, simWorld.robot().getDriveTrain()),
-                new SimulatedModule(3, simWorld.robot().getDriveTrain()));
+                new SimulatedModule(
+                    SwerveConstants.devModuleConfigs[0], 0, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(
+                    SwerveConstants.devModuleConfigs[1], 1, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(
+                    SwerveConstants.devModuleConfigs[2], 2, simWorld.robot().getDriveTrain()),
+                new SimulatedModule(
+                    SwerveConstants.devModuleConfigs[3], 3, simWorld.robot().getDriveTrain()));
 
         this.visionSubsystem =
             new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));

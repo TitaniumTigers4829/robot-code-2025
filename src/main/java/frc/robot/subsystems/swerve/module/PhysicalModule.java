@@ -216,6 +216,14 @@ public class PhysicalModule implements ModuleInterface {
         .getRotations();
   }
 
+  public TalonFX getDriveMotor() {
+    return driveMotor;
+  }
+
+  public TalonFX getTurnMotor() {
+    return turnMotor;
+  }
+
   @Override
   public double getDrivePositionRadians() {
     drivePosition.refresh();
