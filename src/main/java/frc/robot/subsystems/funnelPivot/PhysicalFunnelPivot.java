@@ -66,7 +66,11 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
 
     funnelEncoderConfig.MagnetSensor.MagnetOffset =
+<<<<<<< HEAD
         -FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
+=======
+        FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
+>>>>>>> 89ba3788e8b50c6bbf5f020ad3750a5110bacd43
     funnelEncoderConfig.MagnetSensor.SensorDirection =
         FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
 
