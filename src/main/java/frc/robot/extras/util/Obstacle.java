@@ -31,9 +31,15 @@ public abstract class Obstacle {
     return positive ? forceMag : -forceMag;
   }
 
-  // Helper method: rotates a value by a given angle (radians)
-  protected double rotateBy(double radians, double value) {
-    return Math.cos(radians) * value;
+  // Helper: create a Translation2d from polar coordinates.
+  protected Translation2d fromPolar(double magnitude, double angleRadians) {
+    return new Translation2d(
+        magnitude * Math.cos(angleRadians), magnitude * Math.sin(angleRadians));
+  }
+
+  // Helper: rotate a vector 90° counter-clockwise.
+  protected Translation2d rotate90(Translation2d vector) {
+    return new Translation2d(-vector.getY(), vector.getX());
   }
 
   // Helper method for rotating an immutable Translation2d by a Rotation2d.
@@ -64,25 +70,20 @@ public abstract class Obstacle {
       }
       double outwardsMag = distToForceMag(dist, effectMaxRange);
       double angle = positionToLoc.getAngle().getRadians();
-      Translation2d outwardsVector =
-          new Translation2d(outwardsMag * Math.cos(angle), outwardsMag * Math.sin(angle));
-
+      Translation2d outwardsVector = fromPolar(outwardsMag, angle);
       // Calculate an adjustment based on the angle between the goal-to-position and
       // obstacle-to-position.
       Rotation2d theta = goalToPosition.getAngle().minus(positionToLoc.getAngle());
       double magAdjustment = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
 
       // Create a sideways vector by rotating the outwards vector 90° CCW and normalizing.
-      Translation2d sidewaysVector =
-          new Translation2d(-outwardsVector.getY(), outwardsVector.getX());
-      double norm = Math.hypot(sidewaysVector.getX(), sidewaysVector.getY());
+      Translation2d sidewaysVector = rotate90(outwardsVector);
+      double norm = sidewaysVector.getNorm();
       if (norm != 0) {
         sidewaysVector =
             new Translation2d(sidewaysVector.getX() / norm, sidewaysVector.getY() / norm);
       }
-      sidewaysVector =
-          new Translation2d(
-              sidewaysVector.getX() * magAdjustment, sidewaysVector.getY() * magAdjustment);
+      sidewaysVector = fromPolar(magAdjustment, sidewaysVector.getAngle().getRadians());
 
       return new Translation2d(
           outwardsVector.getX() + sidewaysVector.getX(),
@@ -118,11 +119,7 @@ public abstract class Obstacle {
       // Compute vector from goal to obstacle
       Translation2d goalToLoc = loc.minus(goal);
       double angle = goalToLoc.getAngle().getRadians();
-      // sidewaysCircle = loc + polar(secondaryDistance, angle)
-      Translation2d sidewaysCircle =
-          loc.plus(
-              new Translation2d(
-                  secondaryDistance * Math.cos(angle), secondaryDistance * Math.sin(angle)));
+      Translation2d sidewaysCircle = loc.plus(fromPolar(secondaryDistance, angle));
       double dist = loc.getDistance(position);
       double sidewaysDist = sidewaysCircle.getDistance(position);
       if (dist > primaryMaxRange && sidewaysDist > secondaryMaxRange) {
@@ -131,9 +128,7 @@ public abstract class Obstacle {
       double sidewaysMag = distToForceMag(sidewaysDist, primaryMaxRange) / secondaryStrengthRatio;
       double outwardsMag = distToForceMag(dist, secondaryMaxRange);
       double initialAngle = position.minus(loc).getAngle().getRadians();
-      Translation2d initial =
-          new Translation2d(
-              outwardsMag * Math.cos(initialAngle), outwardsMag * Math.sin(initialAngle));
+      Translation2d initial = fromPolar(outwardsMag, initialAngle);
 
       double angle1 = goal.minus(position).getAngle().getRadians();
       double angle2 = position.minus(sidewaysCircle).getAngle().getRadians();
@@ -141,10 +136,9 @@ public abstract class Obstacle {
       double sideways = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
 
       // Rotate goalToLoc 90° counter-clockwise
-      Translation2d rotatedGoalToLoc = new Translation2d(-goalToLoc.getY(), goalToLoc.getX());
+      Translation2d rotatedGoalToLoc = rotate90(goalToLoc);
       double sidewaysAngle = rotatedGoalToLoc.getAngle().getRadians();
-      Translation2d output =
-          new Translation2d(sideways * Math.cos(sidewaysAngle), sideways * Math.sin(sidewaysAngle));
+      Translation2d output = fromPolar(sideways, sidewaysAngle);
       return output.plus(initial);
     }
   }
@@ -178,10 +172,7 @@ public abstract class Obstacle {
       Rotation2d targetToLocAngle = targetToLoc.getAngle();
       // sidewaysPoint = loc + polar(tailDistance, targetToLocAngle)
       Translation2d sidewaysPoint =
-          loc.plus(
-              new Translation2d(
-                  tailDistance * Math.cos(targetToLocAngle.getRadians()),
-                  tailDistance * Math.sin(targetToLocAngle.getRadians())));
+          loc.plus(fromPolar(tailDistance, targetToLocAngle.getRadians()));
       Translation2d positionToLocation = position.minus(loc);
       double positionToLocationDistance = positionToLocation.getNorm();
       Translation2d outwardsForce;
@@ -191,7 +182,7 @@ public abstract class Obstacle {
                 Math.max(positionToLocationDistance - primaryRadius, 0),
                 primaryMaxRange - primaryRadius);
         double angle = positionToLocation.getAngle().getRadians();
-        outwardsForce = new Translation2d(forceMag * Math.cos(angle), forceMag * Math.sin(angle));
+        outwardsForce = fromPolar(forceMag, angle);
       } else {
         outwardsForce = new Translation2d(0, 0);
       }
@@ -215,9 +206,7 @@ public abstract class Obstacle {
           double finalSidewaysMag = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
           Rotation2d rotated = targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg);
           double rotAngle = rotated.getRadians();
-          sidewaysForce =
-              new Translation2d(
-                  finalSidewaysMag * Math.cos(rotAngle), finalSidewaysMag * Math.sin(rotAngle));
+          sidewaysForce = fromPolar(finalSidewaysMag, rotAngle);
         } else {
           sidewaysForce = new Translation2d(0, 0);
         }
@@ -302,18 +291,14 @@ public abstract class Obstacle {
         double forceMag =
             Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY());
         Rotation2d rotatedAngle = angle.rotateBy(Rotation2d.kCCW_90deg);
-        return new Translation2d(
-            forceMag * Math.cos(rotatedAngle.getRadians()),
-            forceMag * Math.sin(rotatedAngle.getRadians()));
+        return fromPolar(forceMag, rotatedAngle.getRadians());
       }
 
       // Otherwise, determine which endpoint of the line is closer to the position.
       Translation2d closerPoint = (positionToLine.getX() <= 0) ? startPoint : endPoint;
       double forceMag = distToForceMag(position.getDistance(closerPoint), maxRange);
       Rotation2d forceAngle = position.minus(closerPoint).getAngle();
-      return new Translation2d(
-          forceMag * Math.cos(forceAngle.getRadians()),
-          forceMag * Math.sin(forceAngle.getRadians()));
+      return fromPolar(forceMag, forceAngle.getRadians());
     }
   }
 }
