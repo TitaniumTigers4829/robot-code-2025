@@ -3,21 +3,11 @@ package frc.robot.extras.util;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.extras.math.forces.Force;
 
-/**
- * Abstract base class for obstacles that exert a repulsive force.
- */
 public abstract class Obstacle {
-    protected double strength;
-    protected boolean positive;
+    protected final double strength;
+    protected final boolean positive;
 
-    /**
-     * Constructs an Obstacle.
-     *
-     * @param strength the strength of the obstacle's repulsive effect
-     * @param positive if true, the force is applied outward; if false, it is inverted
-     */
     public Obstacle(double strength, boolean positive) {
         this.strength = strength;
         this.positive = positive;
@@ -28,17 +18,10 @@ public abstract class Obstacle {
      *
      * @param position the position at which to compute the force
      * @param goal the goal or target position
-     * @return a mutable vector representing the force
+     * @return an immutable vector representing the force
      */
-    public abstract Force getForceAtPosition(Force position, Force goal);
+    public abstract Translation2d getForceAtPosition(Translation2d position, Translation2d goal);
 
-    /**
-     * Converts a distance to a force magnitude, based on the obstacle's strength and effective range.
-     *
-     * @param dist the distance from the obstacle
-     * @param maxRange the maximum effective range of the obstacle
-     * @return the calculated force magnitude
-     */
     protected double distToForceMag(double dist, double maxRange) {
         if (MathUtil.isNear(0, dist, 1e-2)) {
             dist = 1e-2;
@@ -48,74 +31,57 @@ public abstract class Obstacle {
         return positive ? forceMag : -forceMag;
     }
 
-    /**
-     * Helper method to rotate a value by a given angle (radians).
-     *
-     * @param radians the angle in radians
-     * @param value the value to be rotated
-     * @return the rotated value
-     */
+    // Helper method: rotates a value by a given angle (radians)
     protected double rotateBy(double radians, double value) {
         return Math.cos(radians) * value;
+    }
+
+    // Helper method for rotating an immutable Translation2d by a Rotation2d.
+    private static Translation2d rotate(Translation2d vector, Rotation2d rotation) {
+        double cos = Math.cos(rotation.getRadians());
+        double sin = Math.sin(rotation.getRadians());
+        return new Translation2d(vector.getX() * cos - vector.getY() * sin,
+                                 vector.getX() * sin + vector.getY() * cos);
     }
 
     /**
      * A simple point obstacle that exerts force within a limited range.
      */
     public static class PointObstacle extends Obstacle {
-        private final Force loc;
+        private final Translation2d loc;
         private final double effectMaxRange = 0.5;
-        private final Force positionToLoc = new Force();
-        private final Force goalToPosition = new Force();
-        private final Force outwardsVector = new Force();
-        private final Force sidewaysVector = new Force();
-        private final Force output = new Force();
 
-        /**
-         * Constructs a PointObstacle.
-         *
-         * @param loc the location of the obstacle
-         * @param strength the repulsive strength of the obstacle
-         * @param positive direction flag for the force
-         */
-        public PointObstacle(Force loc, double strength, boolean positive) {
+        public PointObstacle(Translation2d loc, double strength, boolean positive) {
             super(strength, positive);
             this.loc = loc;
         }
 
         @Override
-        public Force getForceAtPosition(Force position, Force goal) {
-            // Calculate the vector from position to obstacle location.
-            positionToLoc.set(position);
-            positionToLoc.minus(loc);
-
-            // Calculate the vector from goal to position.
-            goalToPosition.set(goal);
-            goalToPosition.minus(position);
-
-            // Reset output force.
-            output.set(Translation2d.kZero);
-
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
+            Translation2d positionToLoc = position.minus(loc);
+            Translation2d goalToPosition = goal.minus(position);
             double dist = loc.getDistance(position);
             if (dist > effectMaxRange) {
-                return output;
+                return new Translation2d(0, 0);
             }
-
             double outwardsMag = distToForceMag(dist, effectMaxRange);
-            outwardsVector.setPolar(outwardsMag, positionToLoc.getAngle().getRadians());
+            double angle = positionToLoc.getAngle().getRadians();
+            Translation2d outwardsVector = new Translation2d(outwardsMag * Math.cos(angle), outwardsMag * Math.sin(angle));
 
             // Calculate an adjustment based on the angle between the goal-to-position and obstacle-to-position.
-            Rotation2d theta = goalToPosition.getAngle().minus(position.minus(loc).getAngle());
+            Rotation2d theta = goalToPosition.getAngle().minus(positionToLoc.getAngle());
             double magAdjustment = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
 
-            sidewaysVector.set(outwardsVector);
-            sidewaysVector.rotateBy(Rotation2d.kCCW_90deg);
-            sidewaysVector.div(outwardsVector.getNorm());
-            sidewaysVector.times(magAdjustment);
+            // Create a sideways vector by rotating the outwards vector 90° CCW and normalizing.
+            Translation2d sidewaysVector = new Translation2d(-outwardsVector.getY(), outwardsVector.getX());
+            double norm = Math.hypot(sidewaysVector.getX(), sidewaysVector.getY());
+            if (norm != 0) {
+                sidewaysVector = new Translation2d(sidewaysVector.getX() / norm, sidewaysVector.getY() / norm);
+            }
+            sidewaysVector = new Translation2d(sidewaysVector.getX() * magAdjustment, sidewaysVector.getY() * magAdjustment);
 
-            output.set(outwardsVector);
-            output.plus(sidewaysVector);
-            return output;
+            return new Translation2d(outwardsVector.getX() + sidewaysVector.getX(),
+                                     outwardsVector.getY() + sidewaysVector.getY());
         }
     }
 
@@ -123,26 +89,13 @@ public abstract class Obstacle {
      * A snowman obstacle that combines a primary and a secondary effect.
      */
     public static class SnowmanObstacle extends Obstacle {
-        private final Force loc;
+        private final Translation2d loc;
         private final double primaryMaxRange;
         private final double secondaryDistance;
         private final double secondaryMaxRange;
         private final double secondaryStrengthRatio;
-        private final Force goalToLoc = new Force();
-        private final Force sidewaysCircle = new Force();
-        private final Force output = new Force();
 
-        /**
-         * Constructs a SnowmanObstacle.
-         *
-         * @param loc the location of the obstacle
-         * @param primaryStrength the primary repulsive strength
-         * @param primaryMaxRange the primary effective range
-         * @param secondaryDistance the distance for the secondary effect
-         * @param secondaryStrength the secondary repulsive strength
-         * @param secondaryMaxRange the secondary effective range
-         */
-        public SnowmanObstacle(Force loc,
+        public SnowmanObstacle(Translation2d loc,
                                double primaryStrength,
                                double primaryMaxRange,
                                double secondaryDistance,
@@ -157,28 +110,34 @@ public abstract class Obstacle {
         }
 
         @Override
-        public Force getForceAtPosition(Force position, Force goal) {
-            output.set(Translation2d.kZero);
-            goalToLoc.set(loc);
-            goalToLoc.minus(goal);
-            sidewaysCircle.setPolar(secondaryDistance, goalToLoc.getAngle().getRadians());
-            sidewaysCircle.plus(loc);
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
+            // Compute vector from goal to obstacle
+            Translation2d goalToLoc = loc.minus(goal);
+            double angle = goalToLoc.getAngle().getRadians();
+            // sidewaysCircle = loc + polar(secondaryDistance, angle)
+            Translation2d sidewaysCircle = loc.plus(new Translation2d(secondaryDistance * Math.cos(angle),
+                                                                       secondaryDistance * Math.sin(angle)));
             double dist = loc.getDistance(position);
             double sidewaysDist = sidewaysCircle.getDistance(position);
             if (dist > primaryMaxRange && sidewaysDist > secondaryMaxRange) {
-                return output;
+                return new Translation2d(0, 0);
             }
-            double sidewaysMag = distToForceMag(sidewaysCircle.getDistance(position), primaryMaxRange)
-                    / secondaryStrengthRatio;
-            double outwardsMag = distToForceMag(loc.getDistance(position), secondaryMaxRange);
-            Translation2d initial = new Translation2d(outwardsMag, position.minus(loc).getAngle());
-            Rotation2d sidewaysTheta = goal.minus(position).getAngle().minus(position.minus(sidewaysCircle).getAngle());
+            double sidewaysMag = distToForceMag(sidewaysDist, primaryMaxRange) / secondaryStrengthRatio;
+            double outwardsMag = distToForceMag(dist, secondaryMaxRange);
+            double initialAngle = position.minus(loc).getAngle().getRadians();
+            Translation2d initial = new Translation2d(outwardsMag * Math.cos(initialAngle), outwardsMag * Math.sin(initialAngle));
+
+            double angle1 = goal.minus(position).getAngle().getRadians();
+            double angle2 = position.minus(sidewaysCircle).getAngle().getRadians();
+            Rotation2d sidewaysTheta = new Rotation2d(angle1 - angle2);
             double sideways = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
-            goalToLoc.rotateBy(Rotation2d.kCCW_90deg);
-            double sidewaysAngle = goalToLoc.getAngle().getRadians();
-            output.setPolar(sideways, sidewaysAngle);
-            output.plus(initial);
-            return output;
+
+            // Rotate goalToLoc 90° counter-clockwise
+            Translation2d rotatedGoalToLoc = new Translation2d(-goalToLoc.getY(), goalToLoc.getX());
+            double sidewaysAngle = rotatedGoalToLoc.getAngle().getRadians();
+            Translation2d output = new Translation2d(sideways * Math.cos(sidewaysAngle),
+                                                     sideways * Math.sin(sidewaysAngle));
+            return output.plus(initial);
         }
     }
 
@@ -186,24 +145,13 @@ public abstract class Obstacle {
      * A teardrop obstacle that has a primary circular effect with a tapered tail.
      */
     public static class TeardropObstacle extends Obstacle {
-        private final Force loc;
+        private final Translation2d loc;
         private final double primaryMaxRange;
         private final double primaryRadius;
         private final double tailStrength;
         private final double tailDistance;
-        private final Force output = new Force();
 
-        /**
-         * Constructs a TeardropObstacle.
-         *
-         * @param loc the location of the obstacle
-         * @param primaryStrength the primary repulsive strength
-         * @param primaryMaxRange the primary effective range
-         * @param primaryRadius the radius within which the primary effect is diminished
-         * @param tailStrength the strength of the tail effect
-         * @param tailLength the length of the tail (added to primaryMaxRange)
-         */
-        public TeardropObstacle(Force loc,
+        public TeardropObstacle(Translation2d loc,
                                 double primaryStrength,
                                 double primaryMaxRange,
                                 double primaryRadius,
@@ -218,26 +166,27 @@ public abstract class Obstacle {
         }
 
         @Override
-        public Force getForceAtPosition(Force position, Force goal) {
-            Force targetToLoc = loc.minus(goal);
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
+            Translation2d targetToLoc = loc.minus(goal);
             Rotation2d targetToLocAngle = targetToLoc.getAngle();
-            Force sidewaysPoint = new Force(tailDistance, targetToLoc.getAngle()).plus(loc);
-
-            Force positionToLocation = position.minus(loc);
+            // sidewaysPoint = loc + polar(tailDistance, targetToLocAngle)
+            Translation2d sidewaysPoint = loc.plus(new Translation2d(tailDistance * Math.cos(targetToLocAngle.getRadians()),
+                                                                      tailDistance * Math.sin(targetToLocAngle.getRadians())));
+            Translation2d positionToLocation = position.minus(loc);
             double positionToLocationDistance = positionToLocation.getNorm();
-            Force outwardsForce;
+            Translation2d outwardsForce;
             if (positionToLocationDistance <= primaryMaxRange) {
-                outwardsForce = new Force(
-                        distToForceMag(Math.max(positionToLocationDistance - primaryRadius, 0),
-                                       primaryMaxRange - primaryRadius),
-                        positionToLocation.getAngle());
+                double forceMag = distToForceMag(Math.max(positionToLocationDistance - primaryRadius, 0),
+                                                 primaryMaxRange - primaryRadius);
+                double angle = positionToLocation.getAngle().getRadians();
+                outwardsForce = new Translation2d(forceMag * Math.cos(angle), forceMag * Math.sin(angle));
             } else {
-                outwardsForce = Force.kZero;
+                outwardsForce = new Translation2d(0, 0);
             }
-
-            Force positionToLine = position.minus(loc).rotateBy(targetToLocAngle.unaryMinus());
+            // Rotate (position - loc) by -targetToLocAngle.
+            Translation2d positionToLine = rotate(position.minus(loc), targetToLocAngle.unaryMinus());
             double distanceAlongLine = positionToLine.getX();
-            Force sidewaysForce;
+            Translation2d sidewaysForce;
             double distanceScalar = distanceAlongLine / tailDistance;
             if (distanceScalar >= 0 && distanceScalar <= 1) {
                 double secondaryMaxRange = MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
@@ -245,21 +194,21 @@ public abstract class Obstacle {
                 if (distanceToLine <= secondaryMaxRange) {
                     double sidewaysMag = tailStrength * (1 - distanceScalar * distanceScalar)
                                           * (secondaryMaxRange - distanceToLine);
-                    Rotation2d sidewaysTheta = goal.minus(position).getAngle()
-                                              .minus(position.minus(sidewaysPoint).getAngle());
-                    sidewaysForce = new Force(
-                            sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians())),
-                            targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg));
+                    double angle1 = goal.minus(position).getAngle().getRadians();
+                    double angle2 = position.minus(sidewaysPoint).getAngle().getRadians();
+                    Rotation2d sidewaysTheta = new Rotation2d(angle1 - angle2);
+                    double finalSidewaysMag = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
+                    Rotation2d rotated = targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg);
+                    double rotAngle = rotated.getRadians();
+                    sidewaysForce = new Translation2d(finalSidewaysMag * Math.cos(rotAngle),
+                                                      finalSidewaysMag * Math.sin(rotAngle));
                 } else {
-                    sidewaysForce = Force.kZero;
+                    sidewaysForce = new Translation2d(0, 0);
                 }
             } else {
-                sidewaysForce = Force.kZero;
+                sidewaysForce = new Translation2d(0, 0);
             }
-
-            output.set(outwardsForce);
-            output.plus(sidewaysForce);
-            return output;
+            return outwardsForce.plus(sidewaysForce);
         }
     }
 
@@ -269,16 +218,7 @@ public abstract class Obstacle {
     public static class HorizontalObstacle extends Obstacle {
         private final double y;
         private final double maxRange;
-        private final Force output = new Force();
 
-        /**
-         * Constructs a HorizontalObstacle.
-         *
-         * @param y the Y-coordinate of the obstacle
-         * @param strength the strength of the repulsive force
-         * @param maxRange the effective range of the obstacle
-         * @param positive direction flag for the force
-         */
         public HorizontalObstacle(double y, double strength, double maxRange, boolean positive) {
             super(strength, positive);
             this.y = y;
@@ -286,13 +226,12 @@ public abstract class Obstacle {
         }
 
         @Override
-        public Force getForceAtPosition(Force position, Force goal) {
-            output.set(Force.kZero);
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
             double dist = Math.abs(position.getY() - y);
             if (dist < maxRange) {
-                output.set(0, distToForceMag(y - position.getY(), maxRange));
+                return new Translation2d(0, distToForceMag(y - position.getY(), maxRange));
             }
-            return output;
+            return new Translation2d(0, 0);
         }
     }
 
@@ -302,16 +241,7 @@ public abstract class Obstacle {
     public static class VerticalObstacle extends Obstacle {
         private final double x;
         private final double maxRange;
-        private final Force output = new Force();
 
-        /**
-         * Constructs a VerticalObstacle.
-         *
-         * @param x the X-coordinate of the obstacle
-         * @param strength the strength of the repulsive force
-         * @param maxRange the effective range of the obstacle
-         * @param positive direction flag for the force
-         */
         public VerticalObstacle(double x, double strength, double maxRange, boolean positive) {
             super(strength, positive);
             this.x = x;
@@ -319,13 +249,70 @@ public abstract class Obstacle {
         }
 
         @Override
-        public Force getForceAtPosition(Force position, Force goal) {
-            output.set(Force.kZero);
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
             double dist = Math.abs(position.getX() - x);
             if (dist < maxRange) {
-                output.set(distToForceMag(x - position.getX(), maxRange), 0);
+                return new Translation2d(distToForceMag(x - position.getX(), maxRange), 0);
             }
-            return output;
+            return new Translation2d(0, 0);
         }
     }
+
+    public static class LineObstacle extends Obstacle {
+        private final Translation2d startPoint;
+        private final Translation2d endPoint;
+        private final double length;
+        private final Rotation2d angle;
+        private final Rotation2d inverseAngle;
+        private final double maxRange;
+    
+        public LineObstacle(Translation2d start, Translation2d end, double strength, double maxRange) {
+            super(strength, true);
+            this.startPoint = start;
+            this.endPoint = end;
+            Translation2d delta = end.minus(start);
+            this.length = delta.getNorm();
+            this.angle = delta.getAngle();
+            this.inverseAngle = angle.unaryMinus();
+            this.maxRange = maxRange;
+        }
+    
+        // Immutable rotation helper: rotates a vector by a given Rotation2d.
+        private Translation2d rotate(Translation2d vector, Rotation2d rotation) {
+            double cos = Math.cos(rotation.getRadians());
+            double sin = Math.sin(rotation.getRadians());
+            return new Translation2d(
+                vector.getX() * cos - vector.getY() * sin,
+                vector.getX() * sin + vector.getY() * cos
+            );
+        }
+    
+        @Override
+        public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
+            // Compute the vector from the line's start to the current position.
+            Translation2d relative = position.minus(startPoint);
+            // Rotate the relative vector by the inverse angle to align with the line.
+            Translation2d positionToLine = rotate(relative, inverseAngle);
+    
+            // If the projected point lies along the line segment, apply a force perpendicular to the line.
+            if (positionToLine.getX() > 0 && positionToLine.getX() < length) {
+                double forceMag = Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY());
+                Rotation2d rotatedAngle = angle.rotateBy(Rotation2d.kCCW_90deg);
+                return new Translation2d(
+                    forceMag * Math.cos(rotatedAngle.getRadians()),
+                    forceMag * Math.sin(rotatedAngle.getRadians())
+                );
+            }
+    
+            // Otherwise, determine which endpoint of the line is closer to the position.
+            Translation2d closerPoint = (positionToLine.getX() <= 0) ? startPoint : endPoint;
+            double forceMag = distToForceMag(position.getDistance(closerPoint), maxRange);
+            Rotation2d forceAngle = position.minus(closerPoint).getAngle();
+            return new Translation2d(
+                forceMag * Math.cos(forceAngle.getRadians()),
+                forceMag * Math.sin(forceAngle.getRadians())
+            );
+        }
+    }
+    
 }

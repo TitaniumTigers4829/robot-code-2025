@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Robot;
-import frc.robot.extras.math.forces.Force;
 import frc.robot.extras.util.ReefLocations;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class RepulsorFieldPlanner {
       this.positive = positive;
     }
 
-    public abstract Force getForceAtPosition(Translation2d position, Translation2d target);
+    public abstract Translation2d getForceAtPosition(Translation2d position, Translation2d target);
 
     protected double distToForceMag(double dist, double maxRange) {
       if (Math.abs(dist) > maxRange) {
@@ -65,29 +64,29 @@ public class RepulsorFieldPlanner {
       this.tailLength = tailLength + primaryMaxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       Translation2d targetToLoc = loc.minus(target);
       Rotation2d targetToLocAngle = targetToLoc.getAngle();
       Translation2d sidewaysPoint = new Translation2d(tailLength, targetToLoc.getAngle()).plus(loc);
 
       Translation2d positionToLocation = position.minus(loc);
       double positionToLocationDistance = positionToLocation.getNorm();
-      Force outwardsForce;
+      Translation2d outwardsForce;
       if (positionToLocationDistance <= primaryMaxRange) {
         outwardsForce =
-            new Force(
+            new Translation2d(
                 distToForceMag(
                     Math.max(positionToLocationDistance - primaryRadius, 0),
                     primaryMaxRange - primaryRadius),
                 positionToLocation.getAngle());
       } else {
-        outwardsForce = Force.kZero;
+        outwardsForce = Translation2d.kZero;
       }
 
       Translation2d positionToLine = position.minus(loc).rotateBy(targetToLocAngle.unaryMinus());
       double distanceAlongLine = positionToLine.getX();
 
-      Force sidewaysForce;
+      Translation2d sidewaysForce;
       double distanceScalar = distanceAlongLine / tailLength;
       if (distanceScalar >= 0 && distanceScalar <= 1) {
         double secondaryMaxRange =
@@ -109,14 +108,14 @@ public class RepulsorFieldPlanner {
           Rotation2d sidewaysTheta =
               target.minus(position).getAngle().minus(position.minus(sidewaysPoint).getAngle());
           sidewaysForce =
-              new Force(
+              new Translation2d(
                   sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians())),
                   targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg));
         } else {
-          sidewaysForce = Force.kZero;
+          sidewaysForce = Translation2d.kZero;
         }
       } else {
-        sidewaysForce = Force.kZero;
+        sidewaysForce = Translation2d.kZero;
       }
 
       return outwardsForce.plus(sidewaysForce);
@@ -133,12 +132,12 @@ public class RepulsorFieldPlanner {
       this.maxRange = maxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       var dist = Math.abs(position.getY() - y);
       if (dist > maxRange) {
-        return Force.kZero;
+        return Translation2d.kZero;
       }
-      return new Force(0, distToForceMag(y - position.getY(), maxRange));
+      return new Translation2d(0, distToForceMag(y - position.getY(), maxRange));
     }
   }
 
@@ -152,12 +151,12 @@ public class RepulsorFieldPlanner {
       this.maxRange = maxRange;
     }
 
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       var dist = Math.abs(position.getX() - x);
       if (dist > maxRange) {
-        return Force.kZero;
+        return Translation2d.kZero;
       }
-      return new Force(distToForceMag(x - position.getX(), maxRange), 0);
+      return new Translation2d(distToForceMag(x - position.getX(), maxRange), 0);
     }
   }
 
@@ -181,10 +180,10 @@ public class RepulsorFieldPlanner {
     }
 
     @Override
-    public Force getForceAtPosition(Translation2d position, Translation2d target) {
+    public Translation2d getForceAtPosition(Translation2d position, Translation2d target) {
       var positionToLine = position.minus(startPoint).rotateBy(inverseAngle);
       if (positionToLine.getX() > 0 && positionToLine.getX() < length) {
-        return new Force(
+        return new Translation2d(
             Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY()),
             angle.rotateBy(Rotation2d.kCCW_90deg));
       }
@@ -194,7 +193,7 @@ public class RepulsorFieldPlanner {
       } else {
         closerPoint = endPoint;
       }
-      return new Force(
+      return new Translation2d(
           distToForceMag(position.getDistance(closerPoint), maxRange),
           position.minus(closerPoint).getAngle());
     }
@@ -264,26 +263,26 @@ public class RepulsorFieldPlanner {
     return arrowList;
   }
 
-  Force getGoalForce(Translation2d curLocation, Translation2d goal) {
+  Translation2d getGoalForce(Translation2d curLocation, Translation2d goal) {
     var displacement = goal.minus(curLocation);
     if (displacement.getNorm() == 0) {
-      return new Force();
+      return new Translation2d();
     }
     Rotation2d direction = displacement.getAngle();
     double rawMag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
     // double cappedMag = Math.min(rawMag, 1);
-    return new Force(rawMag, direction);
+    return new Translation2d(rawMag, direction);
   }
 
-  Force getObstacleForce(Translation2d curLocation, Translation2d target) {
-    Force force = Force.kZero;
+  Translation2d getObstacleForce(Translation2d curLocation, Translation2d target) {
+    Translation2d force = Translation2d.kZero;
     for (Obstacle obs : FIELD_OBSTACLES) {
       force = force.plus(obs.getForceAtPosition(curLocation, target));
     }
     return force;
   }
 
-  Force getForce(Translation2d curLocation, Translation2d target) {
+  Translation2d getForce(Translation2d curLocation, Translation2d target) {
     return getGoalForce(curLocation, target).plus(getObstacleForce(curLocation, target));
   }
 
@@ -296,7 +295,7 @@ public class RepulsorFieldPlanner {
   public RepulsorSample sampleField(
       Translation2d curTrans, double maxSpeed, double slowdownDistance) {
     Translation2d err = curTrans.minus(goal);
-    Force netForce = getForce(curTrans, goal);
+    Translation2d netForce = getForce(curTrans, goal);
 
     double stepSize_m;
     if (err.getNorm() < slowdownDistance) {

@@ -4,6 +4,13 @@ import java.util.List;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.Obstacle.TeardropObstacle;
+import frc.robot.extras.util.Obstacle.VerticalObstacle;
+import frc.robot.extras.util.Obstacle.LineObstacle;
+import frc.robot.extras.util.Obstacle.PointObstacle;
+import frc.robot.extras.util.Obstacle.SnowmanObstacle;
+import frc.robot.extras.util.Obstacle.HorizontalObstacle;
+
+
 
 /**
  * The Field class encapsulates field dimensions and obstacles for the repulsor field planner.
