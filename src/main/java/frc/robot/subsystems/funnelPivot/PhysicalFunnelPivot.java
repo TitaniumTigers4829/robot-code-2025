@@ -36,6 +36,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final Alert funnelMotorDisconnectAlert = new Alert("Funnel Motor Disconnect Alert", AlertType.kError);
   private final Alert funnelEncoderDiscconectAlert = new Alert("Funnel Encoder Disconnected Alert", AlertType.kError);
 
+  
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
     funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID); // Initialize encoder
@@ -132,5 +133,14 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.Slot0.kD = kD;
 
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
+  }
+
+  public void checkAlerts() { // Check if motor or encoder is disconnected and set alerts periodically from main subsystem class
+    boolean motorConnected = BaseStatusSignal.refreshAll(
+        funnelVoltage, funnelVelocity, funnelSupplyCurrent, funnelStatorCurrent).isOK();
+    boolean encoderConnected = BaseStatusSignal.refreshAll(funnelAngle).isOK(); //dont ask how i got this code
+    
+    funnelMotorDisconnectAlert.set(!motorConnected);
+    funnelEncoderDiscconectAlert.set(!encoderConnected);
   }
 }

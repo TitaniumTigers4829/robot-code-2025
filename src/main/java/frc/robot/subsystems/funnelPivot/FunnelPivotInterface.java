@@ -35,4 +35,6 @@ public interface FunnelPivotInterface {
   }
 
   default void setPID(double kP, double kI, double kD) {}
+
+  default void checkAlerts() {}
 }
