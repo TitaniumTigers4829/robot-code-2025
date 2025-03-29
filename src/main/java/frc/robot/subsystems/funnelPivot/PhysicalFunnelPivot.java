@@ -20,9 +20,9 @@ import frc.robot.Constants.HardwareConstants;
 
 public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final TalonFX funnelMotor;
-  private final CANcoder funnelEncoder; // Added encoder
+  private final CANcoder funnelEncoder;
   private final TalonFXConfiguration funnelMotorConfig;
-  private final CANcoderConfiguration funnelEncoderConfig; // Added encoder config
+  private final CANcoderConfiguration funnelEncoderConfig;
   private final StatusSignal<Voltage> funnelVoltage;
   private final StatusSignal<AngularVelocity> funnelVelocity;
   private StatusSignal<Angle> funnelAngle;
@@ -31,7 +31,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final MotionMagicVoltage mmPositionRequest;
   private double funnelTargetAngle;
   private final VoltageOut voltageOut;
-  // alert shit
+
   private final Alert funnelMotorDisconnectAlert =
       new Alert("Funnel Motor Disconnect Alert", AlertType.kError);
   private final Alert funnelEncoderDiscconectAlert =
@@ -39,9 +39,9 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
-    funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID); // Initialize encoder
+    funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID);
     funnelMotorConfig = new TalonFXConfiguration();
-    funnelEncoderConfig = new CANcoderConfiguration(); // Initialize encoder config
+    funnelEncoderConfig = new CANcoderConfiguration();
     mmPositionRequest = new MotionMagicVoltage(0);
     voltageOut = new VoltageOut(0);
 
@@ -66,16 +66,16 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
 
     funnelEncoderConfig.MagnetSensor.MagnetOffset =
-        -FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point ezpz
+        -FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point offset
     funnelEncoderConfig.MagnetSensor.SensorDirection =
         FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
 
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
-    funnelEncoder.getConfigurator().apply(funnelEncoderConfig); // Apply encoder config
+    funnelEncoder.getConfigurator().apply(funnelEncoderConfig);
 
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelEncoder.getPosition(); // Use encoder for angle
+    funnelAngle = funnelEncoder.getPosition();
     funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
 
@@ -144,8 +144,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
         BaseStatusSignal.refreshAll(
                 funnelVoltage, funnelVelocity, funnelSupplyCurrent, funnelStatorCurrent)
             .isOK();
-    boolean encoderConnected =
-        BaseStatusSignal.refreshAll(funnelAngle).isOK(); // dont ask how i got this code
+    boolean encoderConnected = BaseStatusSignal.refreshAll(funnelAngle).isOK();
 
     funnelMotorDisconnectAlert.set(!motorConnected);
     funnelEncoderDiscconectAlert.set(!encoderConnected);
