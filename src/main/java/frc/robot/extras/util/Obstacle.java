@@ -50,6 +50,53 @@ public abstract class Obstacle {
         vector.getX() * cos - vector.getY() * sin, vector.getX() * sin + vector.getY() * cos);
   }
 
+  // Helper for obstacles that are based on a center point.
+  // Returns a radial force vector directed from center to position.
+  protected Translation2d radialForce(
+      Translation2d center, double maxRange, Translation2d position) {
+    double dist = center.getDistance(position);
+    if (dist > maxRange) {
+      return new Translation2d(0, 0);
+    }
+    double mag = distToForceMag(dist, maxRange);
+    double angle = position.minus(center).getAngle().getRadians();
+    return fromPolar(mag, angle);
+  }
+
+  /**
+   * Computes a lateral (sideways) force based on the difference between the goal direction and the
+   * radial direction (from obstacle to position). The force is computed as:
+   *    lateralForce = scale * sign(sin(theta / divisor))
+   * where theta is the angular difference between (goal - position) and radialVector.
+   *
+   * @param radialVector the vector from the obstacle center (or secondary point) to the current position.
+   * @param position the current position.
+   * @param goal the goal position.
+   * @param scale the scaling factor (for example, half of the radial force magnitude).
+   * @param divisor divisor applied to theta before computing the sign (for a softer effect, try 2 or 1).
+   * @return a Translation2d representing the lateral force vector.
+   */
+  protected Translation2d lateralForce(
+      Translation2d radialVector,
+      Translation2d position,
+      Translation2d goal,
+      double scale,
+      double divisor) {
+    // Calculate the angular difference between the goal direction and the radial vector.
+    Rotation2d theta = goal.minus(position).getAngle().minus(radialVector.getAngle());
+    // Compute adjustment magnitude using the sine of (theta/divisor)
+    double adjustment = scale * Math.signum(Math.sin(theta.getRadians() / divisor));
+    // Determine the lateral direction by rotating the radial vector 90° counter-clockwise.
+    Translation2d lateralDir = rotate90(radialVector);
+    double norm = lateralDir.getNorm();
+    if (norm != 0) {
+      lateralDir = new Translation2d(lateralDir.getX() / norm, lateralDir.getY() / norm);
+    }
+    return fromPolar(adjustment, lateralDir.getAngle().getRadians());
+  }
+
+  // ----------------- Obstacle Implementations -----------------
+
   /** A simple point obstacle that exerts force within a limited range. */
   public static class PointObstacle extends Obstacle {
     private final Translation2d loc;
@@ -63,31 +110,16 @@ public abstract class Obstacle {
     @Override
     public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
       Translation2d positionToLoc = position.minus(loc);
-      Translation2d goalToPosition = goal.minus(position);
       double dist = loc.getDistance(position);
       if (dist > effectMaxRange) {
         return new Translation2d(0, 0);
       }
+      // Compute radial (outwards) force.
       double outwardsMag = distToForceMag(dist, effectMaxRange);
-      double angle = positionToLoc.getAngle().getRadians();
-      Translation2d outwardsVector = fromPolar(outwardsMag, angle);
-      // Calculate an adjustment based on the angle between the goal-to-position and
-      // obstacle-to-position.
-      Rotation2d theta = goalToPosition.getAngle().minus(positionToLoc.getAngle());
-      double magAdjustment = outwardsMag * Math.signum(Math.sin(theta.getRadians() / 2)) / 2;
-
-      // Create a sideways vector by rotating the outwards vector 90° CCW and normalizing.
-      Translation2d sidewaysVector = rotate90(outwardsVector);
-      double norm = sidewaysVector.getNorm();
-      if (norm != 0) {
-        sidewaysVector =
-            new Translation2d(sidewaysVector.getX() / norm, sidewaysVector.getY() / norm);
-      }
-      sidewaysVector = fromPolar(magAdjustment, sidewaysVector.getAngle().getRadians());
-
-      return new Translation2d(
-          outwardsVector.getX() + sidewaysVector.getX(),
-          outwardsVector.getY() + sidewaysVector.getY());
+      Translation2d outwardsVector = fromPolar(outwardsMag, positionToLoc.getAngle().getRadians());
+      // Compute lateral force using the helper.
+      Translation2d lateralVector = lateralForce(positionToLoc, position, goal, outwardsMag / 2, 2);
+      return outwardsVector.plus(lateralVector);
     }
   }
 
@@ -116,30 +148,28 @@ public abstract class Obstacle {
 
     @Override
     public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
-      // Compute vector from goal to obstacle
-      Translation2d goalToLoc = loc.minus(goal);
-      double angle = goalToLoc.getAngle().getRadians();
+      // Primary radial effect from the main center.
+      Translation2d primaryForce = radialForce(loc, primaryMaxRange, position);
+
+      // Secondary effect: compute an offset center (sidewaysCircle)
+      double angle = loc.minus(goal).getAngle().getRadians();
       Translation2d sidewaysCircle = loc.plus(fromPolar(secondaryDistance, angle));
       double dist = loc.getDistance(position);
       double sidewaysDist = sidewaysCircle.getDistance(position);
       if (dist > primaryMaxRange && sidewaysDist > secondaryMaxRange) {
         return new Translation2d(0, 0);
       }
-      double sidewaysMag = distToForceMag(sidewaysDist, primaryMaxRange) / secondaryStrengthRatio;
+      // Secondary radial force.
+      double secondaryMag = distToForceMag(sidewaysDist, primaryMaxRange) / secondaryStrengthRatio;
+      // Compute the lateral force relative to the secondary center.
+      Translation2d lateralForceVec =
+          lateralForce(position.minus(sidewaysCircle), position, goal, secondaryMag, 1);
+      // Primary secondary effect from the offset center.
       double outwardsMag = distToForceMag(dist, secondaryMaxRange);
       double initialAngle = position.minus(loc).getAngle().getRadians();
       Translation2d initial = fromPolar(outwardsMag, initialAngle);
 
-      double angle1 = goal.minus(position).getAngle().getRadians();
-      double angle2 = position.minus(sidewaysCircle).getAngle().getRadians();
-      Rotation2d sidewaysTheta = new Rotation2d(angle1 - angle2);
-      double sideways = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
-
-      // Rotate goalToLoc 90° counter-clockwise
-      Translation2d rotatedGoalToLoc = rotate90(goalToLoc);
-      double sidewaysAngle = rotatedGoalToLoc.getAngle().getRadians();
-      Translation2d output = fromPolar(sideways, sidewaysAngle);
-      return output.plus(initial);
+      return initial.plus(lateralForceVec).plus(primaryForce);
     }
   }
 
@@ -168,52 +198,37 @@ public abstract class Obstacle {
 
     @Override
     public Translation2d getForceAtPosition(Translation2d position, Translation2d goal) {
-      Translation2d targetToLoc = loc.minus(goal);
-      Rotation2d targetToLocAngle = targetToLoc.getAngle();
-      // sidewaysPoint = loc + polar(tailDistance, targetToLocAngle)
-      Translation2d sidewaysPoint =
-          loc.plus(fromPolar(tailDistance, targetToLocAngle.getRadians()));
+      Translation2d outwardsForce;
       Translation2d positionToLocation = position.minus(loc);
       double positionToLocationDistance = positionToLocation.getNorm();
-      Translation2d outwardsForce;
       if (positionToLocationDistance <= primaryMaxRange) {
-        double forceMag =
-            distToForceMag(
-                Math.max(positionToLocationDistance - primaryRadius, 0),
-                primaryMaxRange - primaryRadius);
+        double forceMag = distToForceMag(
+            Math.max(positionToLocationDistance - primaryRadius, 0),
+            primaryMaxRange - primaryRadius);
         double angle = positionToLocation.getAngle().getRadians();
         outwardsForce = fromPolar(forceMag, angle);
       } else {
         outwardsForce = new Translation2d(0, 0);
       }
-      // Rotate (position - loc) by -targetToLocAngle.
+      // Determine a secondary point along the tail.
+      Translation2d targetToLoc = loc.minus(goal);
+      Rotation2d targetToLocAngle = targetToLoc.getAngle();
+      Translation2d sidewaysPoint = loc.plus(fromPolar(tailDistance, targetToLocAngle.getRadians()));
+      // Compute distance along tail direction.
       Translation2d positionToLine = rotate(position.minus(loc), targetToLocAngle.unaryMinus());
       double distanceAlongLine = positionToLine.getX();
-      Translation2d sidewaysForce;
+      Translation2d lateral = new Translation2d(0, 0);
       double distanceScalar = distanceAlongLine / tailDistance;
       if (distanceScalar >= 0 && distanceScalar <= 1) {
-        double secondaryMaxRange =
-            MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
+        double secondaryMaxRange = MathUtil.interpolate(primaryMaxRange, 0, distanceScalar * distanceScalar);
         double distanceToLine = Math.abs(positionToLine.getY());
         if (distanceToLine <= secondaryMaxRange) {
-          double sidewaysMag =
-              tailStrength
-                  * (1 - distanceScalar * distanceScalar)
-                  * (secondaryMaxRange - distanceToLine);
-          double angle1 = goal.minus(position).getAngle().getRadians();
-          double angle2 = position.minus(sidewaysPoint).getAngle().getRadians();
-          Rotation2d sidewaysTheta = new Rotation2d(angle1 - angle2);
-          double finalSidewaysMag = sidewaysMag * Math.signum(Math.sin(sidewaysTheta.getRadians()));
-          Rotation2d rotated = targetToLocAngle.rotateBy(Rotation2d.kCCW_90deg);
-          double rotAngle = rotated.getRadians();
-          sidewaysForce = fromPolar(finalSidewaysMag, rotAngle);
-        } else {
-          sidewaysForce = new Translation2d(0, 0);
+          // Use the lateralForce helper.
+          double scale = tailStrength * (1 - distanceScalar * distanceScalar) * (secondaryMaxRange - distanceToLine);
+          lateral = lateralForce(position.minus(sidewaysPoint), position, goal, scale, 1);
         }
-      } else {
-        sidewaysForce = new Translation2d(0, 0);
       }
-      return outwardsForce.plus(sidewaysForce);
+      return outwardsForce.plus(lateral);
     }
   }
 
@@ -259,6 +274,7 @@ public abstract class Obstacle {
     }
   }
 
+  /** A line obstacle that computes force either along the line or from its endpoints. */
   public static class LineObstacle extends Obstacle {
     private final Translation2d startPoint;
     private final Translation2d endPoint;
@@ -283,22 +299,20 @@ public abstract class Obstacle {
       // Compute the vector from the line's start to the current position.
       Translation2d relative = position.minus(startPoint);
       // Rotate the relative vector by the inverse angle to align with the line.
-      Translation2d positionToLine = rotate(relative, inverseAngle);
+      Translation2d posLine = rotate(relative, inverseAngle);
 
-      // If the projected point lies along the line segment, apply a force perpendicular to the
-      // line.
-      if (positionToLine.getX() > 0 && positionToLine.getX() < length) {
-        double forceMag =
-            Math.copySign(distToForceMag(positionToLine.getY(), maxRange), positionToLine.getY());
-        Rotation2d rotatedAngle = angle.rotateBy(Rotation2d.kCCW_90deg);
-        return fromPolar(forceMag, rotatedAngle.getRadians());
+      // If the projected point lies along the line segment, apply a force perpendicular to the line.
+      if (posLine.getX() > 0 && posLine.getX() < length) {
+        double forceMag = Math.copySign(distToForceMag(posLine.getY(), maxRange), posLine.getY());
+        Rotation2d perp = angle.rotateBy(Rotation2d.kCCW_90deg);
+        return fromPolar(forceMag, perp.getRadians());
       }
 
       // Otherwise, determine which endpoint of the line is closer to the position.
-      Translation2d closerPoint = (positionToLine.getX() <= 0) ? startPoint : endPoint;
-      double forceMag = distToForceMag(position.getDistance(closerPoint), maxRange);
-      Rotation2d forceAngle = position.minus(closerPoint).getAngle();
-      return fromPolar(forceMag, forceAngle.getRadians());
+      Translation2d closer = (posLine.getX() <= 0) ? startPoint : endPoint;
+      double forceMag = distToForceMag(position.getDistance(closer), maxRange);
+      double forceAngle = position.minus(closer).getAngle().getRadians();
+      return fromPolar(forceMag, forceAngle);
     }
   }
 }
