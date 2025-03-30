@@ -14,6 +14,7 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
@@ -194,8 +195,11 @@ public class Robot extends LoggedRobot {
             new InstantCommand(
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
 
-    // mb i didnt know where  to put this Ishan just do it bruh idk what binding they want
-    /** driverController .leftBumper() .whileTrue( new SetFunnelAngle(funnelSubsystem, null)); * */
+    driverController
+        .leftBumper()
+        .whileTrue(
+            new SetFunnelAngle(
+                funnelSubsystem)); // not exactly sure this works,  cus idk if it will know to stop
   }
 
   private void configureOperatorController() {

@@ -7,16 +7,13 @@ package frc.robot.commands.funnel;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.funnelPivot.FunnelConstants;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
-import java.util.function.DoubleSupplier;
 
 public class SetFunnelAngle extends Command {
 
   FunnelSubsystem funnelSubsystem;
-  DoubleSupplier joystickY;
 
-  public SetFunnelAngle(FunnelSubsystem funnelSubsystem, DoubleSupplier joystickY) {
+  public SetFunnelAngle(FunnelSubsystem funnelSubsystem) {
     this.funnelSubsystem = funnelSubsystem;
-    this.joystickY = joystickY;
     addRequirements(funnelSubsystem);
   }
 
@@ -27,7 +24,7 @@ public class SetFunnelAngle extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    funnelSubsystem.setFunnelAngle(joystickY.getAsDouble());
+    funnelSubsystem.setFunnelAngle(FunnelConstants.MIN_ANGLE);
   }
 
   // Called once the command ends or is interrupted.
