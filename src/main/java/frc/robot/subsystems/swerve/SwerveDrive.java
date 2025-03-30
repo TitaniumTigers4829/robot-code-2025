@@ -309,7 +309,7 @@ public class SwerveDrive extends SubsystemBase {
   public double getHeading() {
     return gyroInputs.yawDegrees;
   }
-
+  /** Returns the pitch of the robot as double*/
   public double getPitch() {
     return gyroInputs.pitchDegrees;
   }

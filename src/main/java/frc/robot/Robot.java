@@ -19,6 +19,7 @@ import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ManualElevator;
 import frc.robot.commands.elevator.ZeroElevator;
+import frc.robot.commands.intake.Eject;
 import frc.robot.extras.util.AllianceFlipper;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -328,10 +329,13 @@ public class Robot extends LoggedRobot {
             >= SwerveConstants
                 .MAX_PITCH_ANGLE) 
     {
+        new Eject(intakeSubsystem).schedule();
         elevatorSubsystem.setElevatorPosition(0);
+        
+
     }
     //extra elevator safety
-
+    
     //homing
     elevatorSubsystem.homing();
 
