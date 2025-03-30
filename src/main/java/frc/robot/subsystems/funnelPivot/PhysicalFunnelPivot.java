@@ -140,9 +140,10 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
   }
 
-  public void
-      checkAlerts() { // Check if motor or encoder is disconnected and set alerts periodically from
-    // main subsystem class
+  /**
+   * Check if motor or encoder is disconnected and set alerts periodically from main subsystem class
+   */
+  public void checkAlerts() {
     boolean motorConnected =
         BaseStatusSignal.refreshAll(
                 funnelVoltage, funnelVelocity, funnelSupplyCurrent, funnelStatorCurrent)
