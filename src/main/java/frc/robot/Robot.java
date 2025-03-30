@@ -193,6 +193,9 @@ public class Robot extends LoggedRobot {
         .onTrue(
             new InstantCommand(
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+
+    // mb i didnt know where  to put this Ishan just do it bruh idk what binding they want
+    /** driverController .leftBumper() .whileTrue( new SetFunnelAngle(funnelSubsystem, null)); * */
   }
 
   private void configureOperatorController() {
