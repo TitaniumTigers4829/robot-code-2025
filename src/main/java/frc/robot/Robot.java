@@ -200,6 +200,41 @@ public class Robot extends LoggedRobot {
         .whileTrue(
             new SetFunnelAngle(
                 funnelSubsystem)); // not exactly sure this works,  cus idk if it will know to stop
+
+    driverController
+        .y()
+        .whileTrue(
+            new SetElevatorPosition(
+                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
+
+    driverController
+        .b()
+        .whileTrue(
+            Commands.runEnd(
+                    () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
+                    () ->
+                        coralIntakeSubsystem.setIntakeVelocity(
+                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+                    coralIntakeSubsystem)
+                .andThen(
+                    Commands.runOnce(
+                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
+                        coralIntakeSubsystem)));
+
+    driverController
+        .x()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                    coralIntakeSubsystem)));
   }
 
   private void configureOperatorController() {

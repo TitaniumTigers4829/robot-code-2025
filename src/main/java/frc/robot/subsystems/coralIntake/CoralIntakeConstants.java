@@ -2,8 +2,8 @@ package frc.robot.subsystems.coralIntake;
 
 public final class CoralIntakeConstants {
   public static final int CORAL_INTAKE_MOTOR_ID = 30;
-  public static final int INNER_CORAL_SENSOR_ID = 5;
-  public static final int OUTER_CORAL_SENSOR_ID = 2;
+  public static final int INNER_CORAL_SENSOR_ID = 1;
+  public static final int OUTER_CORAL_SENSOR_ID = 0;
 
   public static final double WAITING_INTAKE_SPEED = 1500;
   public static final double INGEST_SPEED = 700;

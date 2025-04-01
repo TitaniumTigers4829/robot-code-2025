@@ -48,12 +48,21 @@ public abstract class DriveCommandBase extends Command {
     }
   }
 
+  private double isLimelight3(boolean hasIMU, double standardDeviation) {
+    if (hasIMU) {
+      return standardDeviation * 2;
+    } else {
+      return standardDeviation;
+    }
+  }
+
   /**
    * Calculates the pose from the limelight and adds it to the pose estimator.
    *
    * @param limelight The limelight to calculate the pose from
    */
   public void addLimelightVisionMeasurement(Limelight limelight) {
+    boolean hasIMU = limelight.hasInternalIMU();
     // Only do pose calculation if we can see the april tags
     if (vision.canSeeAprilTags(limelight) && vision.isValidMeasurement(limelight)) {
       Logger.recordOutput(
@@ -73,12 +82,16 @@ public abstract class DriveCommandBase extends Command {
         double[] standardDeviations =
             oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
-            standardDeviations[0], standardDeviations[1], standardDeviations[2]);
+            isLimelight3(hasIMU, standardDeviations[0]),
+            isLimelight3(hasIMU, standardDeviations[1]),
+            isLimelight3(hasIMU, standardDeviations[2]));
       } else if (vision.getNumberOfAprilTags(limelight) > 1) {
         double[] standardDeviations =
             twoAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
-            standardDeviations[0], standardDeviations[1], standardDeviations[2]);
+            isLimelight3(hasIMU, standardDeviations[0]),
+            isLimelight3(hasIMU, standardDeviations[1]),
+            isLimelight3(hasIMU, standardDeviations[2]));
       }
 
       // Adds the timestamped pose gotten from the limelights to our pose estimation

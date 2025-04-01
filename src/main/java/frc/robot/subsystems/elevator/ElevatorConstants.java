@@ -40,7 +40,7 @@ public class ElevatorConstants {
   // limit
   public static final double LIMIT = 0.0;
   public static final boolean LIMIT_ENABLE = true;
-  public static final double REVERSE_LIMIT = -9.2;
+  public static final double REVERSE_LIMIT = -9.3;
   public static final boolean REVERSE_LIMIT_ENABLE = true;
 
   // Elevator setpoints
@@ -48,7 +48,7 @@ public class ElevatorConstants {
     L1(-2.4),
     L2(-3.65),
     L3(-5.68),
-    L4(-9.03),
+    L4(-9.2),
     FEEDER(-0.480458984375);
 
     private final double position;

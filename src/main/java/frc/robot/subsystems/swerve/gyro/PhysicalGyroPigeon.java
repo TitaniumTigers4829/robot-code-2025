@@ -14,7 +14,6 @@ public class PhysicalGyroPigeon implements GyroInterface {
 
   private final Pigeon2 gyro =
       new Pigeon2(DriveConstants.PIGEON_ID, HardwareConstants.CANIVORE_CAN_BUS_STRING);
-  private final Pigeon2Configuration gyroConfiguration;
 
   // TODO: Add BaseStatusSignal list
   private final StatusSignal<Angle> yaw = gyro.getYaw();
@@ -27,7 +26,7 @@ public class PhysicalGyroPigeon implements GyroInterface {
   private final StatusSignal<LinearAcceleration> yAccel = gyro.getAccelerationY();
 
   public PhysicalGyroPigeon() {
-    gyroConfiguration = new Pigeon2Configuration();
+    gyro.getConfigurator().apply(new Pigeon2Configuration());
 
     gyro.getConfigurator().setYaw(0.0);
 
