@@ -11,19 +11,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.commands.autodrive.RepulsorCommand;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.extras.util.AllianceFlipper;
-import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.ReefLocations.ReefBranch;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
@@ -57,18 +54,18 @@ public class Autos {
           FieldConstants.FIELD_WIDTH_METERS - sourceRight.getY(),
           sourceRight.getRotation().unaryMinus());
 
-    @FunctionalInterface
-    private interface ReefRepulsorCommand {
-      Command goTo(ReefBranch branch);
-    }
+  //   @FunctionalInterface
+  //   private interface ReefRepulsorCommand {
+  //     Command goTo(ReefBranch branch);
+  //   }
 
-    @FunctionalInterface
-    private interface SourceRepulsorCommand {
-      Command goTo(Source source);
-    }
+  //   @FunctionalInterface
+  //   private interface SourceRepulsorCommand {
+  //     Command goTo(Source source);
+  //   }
 
-    private final ReefRepulsorCommand reefPathfinding;
-    private final SourceRepulsorCommand sourcePathfinding;
+  //   private final ReefRepulsorCommand reefPathfinding;
+  //   private final SourceRepulsorCommand sourcePathfinding;
 
   private String selectedCommandName = NONE_NAME;
   private Command selectedCommand = Commands.none();
@@ -102,21 +99,20 @@ public class Autos {
             false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    reefPathfinding =
-        branch ->
-            new RepulsorCommand(swerveDrive, visionSubsystem,
-    ReefLocations.getScoringLocation(branch))
-                .withName("Reef Align " + branch.name());
-    sourcePathfinding =
-        source -> {
-          Pose2d pose = source == Source.L ? sourceLeft : sourceRight;
-          if (AllianceFlipper.isRed()) {
-            pose = pose.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi);
-          }
-          return new RepulsorCommand(
-                  swerveDrive, visionSubsystem, pose)
-              .withName("Source Align " + source.name());
-        };
+    // reefPathfinding =
+    //     branch ->
+    //         new RepulsorCommand(
+    //                 swerveDrive, visionSubsystem, ReefLocations.getScoringLocation(branch))
+    //             .withName("Reef Align " + branch.name());
+    // sourcePathfinding =
+    //     source -> {
+    //       Pose2d pose = source == Source.L ? sourceLeft : sourceRight;
+    //       if (AllianceFlipper.isRed()) {
+    //         pose = pose.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi);
+    //       }
+    //       return new RepulsorCommand(swerveDrive, visionSubsystem, pose)
+    //           .withName("Source Align " + source.name());
+    //     };
     addRoutine("Blue Left Two Coral", () -> blueLeftTwoCoralAuto());
 
     addRoutine("Blue Right Two Coral", () -> blueRightTwoCoralAuto());
@@ -127,7 +123,24 @@ public class Autos {
 
     addRoutine("middle auto", () -> simpleRepulsorAuto());
 
-    addRoutine("fancy things", ()-> createRoutine(autoFactory, swerveDrive, visionSubsystem, elevatorSubsystem, coralIntakeSubsystem, Source.L, ReefBranch.J, ReefBranch.K));
+    addRoutine("x two meter", () -> xOneMeterAuto());
+
+    addRoutine("y one meter", () -> yOneMeterAuto());
+
+    addRoutine("y one meter and rotation", () -> yOneMeterAndRotationAuto());
+
+    // addRoutine(
+    //     "fancy things",
+    //     () ->
+    //         createRoutine(
+    //             autoFactory,
+    //             swerveDrive,
+    //             visionSubsystem,
+    //             elevatorSubsystem,
+    //             coralIntakeSubsystem,
+    //             Source.L,
+    //             ReefBranch.J,
+    //             ReefBranch.K));
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -221,49 +234,50 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new WaitCommand(0.5)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
-                .andThen(
-                    jToPickupTrajectory
-                        .cmd()
-                        .alongWith(
-                            elevatorSubsystem.setElevationPosition(
-                                ElevatorSetpoints.FEEDER.getPosition()))));
-    jToPickupTrajectory
-        .done()
-        .onTrue(
-            Commands.sequence(
-                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                    Commands.runEnd(
-                        () -> coralIntakeSubsystem.intakeCoral(),
-                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                        coralIntakeSubsystem))
-                .andThen(pickupToLTrajectory.cmd()));
-    pickupToLTrajectory
-        .done()
-        .onTrue(
-            new WaitCommand(0.5)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(2.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+            new WaitCommand(0.5).andThen(new RepulsorReef(swerveDrive, visionSubsystem, false)));
+    //         .withTimeout(2.0)
+    //         .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
+    // .andThen(
+    //     jToPickupTrajectory
+    //         .cmd()
+    //         .alongWith(
+    //             elevatorSubsystem.setElevationPosition(
+    //                 ElevatorSetpoints.FEEDER.getPosition()))));
+    // jToPickupTrajectory
+    //     .done()
+    //     .onTrue(
+    //         Commands.sequence(
+    //
+    // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+    //                 new InstantCommand(() ->
+    // coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+    //                 Commands.runEnd(
+    //                     () -> coralIntakeSubsystem.intakeCoral(),
+    //                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+    //                     coralIntakeSubsystem))
+    //             .andThen(pickupToLTrajectory.cmd()));
+    // pickupToLTrajectory
+    //     .done()
+    //     .onTrue(
+    //         new WaitCommand(0.5)
+    //             .andThen(
+    //                 new RepulsorReef(swerveDrive, visionSubsystem, false)
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         new SetElevatorPosition(
+    //                             swerveDrive, elevatorSubsystem,
+    // ElevatorSetpoints.L4.getPosition()))
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         Commands.runEnd(
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.EJECT_SPEED),
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+    //                                 coralIntakeSubsystem)
+    //                             .withTimeout(1.0))));
     //                     .alongWith(
     //                         new SetElevatorPosition(
     //                             swerveDrive, elevatorSubsystem,
@@ -566,81 +580,81 @@ public class Autos {
     return routine;
   }
 
-    private AutoRoutine createRoutine(
-        AutoFactory factory,
-        SwerveDrive swerve,
-        VisionSubsystem visionSubsystem,
-        ElevatorSubsystem elevatorSubsystem,
-        CoralIntakeSubsystem coralIntakeSubsystem,
-        Source source,
-        ReefBranch initialBranch,
-        ReefBranch... cyclingBranches) {
-      AutoRoutine routine = factory.newRoutine("Autogenerated Routine");
+  //   private AutoRoutine createRoutine(
+  //       AutoFactory factory,
+  //       SwerveDrive swerve,
+  //       VisionSubsystem visionSubsystem,
+  //       ElevatorSubsystem elevatorSubsystem,
+  //       CoralIntakeSubsystem coralIntakeSubsystem,
+  //       Source source,
+  //       ReefBranch initialBranch,
+  //       ReefBranch... cyclingBranches) {
+  //     AutoRoutine routine = factory.newRoutine("Autogenerated Routine");
 
-      AutoTrajectory[] reefToSource = new AutoTrajectory[cyclingBranches.length];
-      AutoTrajectory[] sourceToReef = new AutoTrajectory[cyclingBranches.length];
-      reefToSource[0] = getTrajectory(routine, initialBranch, source);
-      sourceToReef[0] = getTrajectory(routine, source, cyclingBranches[0]);
-      for (int i = 1; i < cyclingBranches.length; i++) {
-        reefToSource[i] = getTrajectory(routine, cyclingBranches[i - 1], source);
-        sourceToReef[i] = getTrajectory(routine, source, cyclingBranches[i]);
-      }
-      var nextCycleSpwnCmd = new Command[sourceToReef.length];
-      for (int i = 0; i < sourceToReef.length - 1; i++) {
-        nextCycleSpwnCmd[i] = reefToSource[i + 1].spawnCmd();
-      }
-      nextCycleSpwnCmd[sourceToReef.length - 1] =
-          new ScheduleCommand(
-              getTrajectory(routine, cyclingBranches[cyclingBranches.length - 1], source)
-                  .cmd()
-                  .andThen(sourcePathfinding.goTo(source)));
+  //     AutoTrajectory[] reefToSource = new AutoTrajectory[cyclingBranches.length];
+  //     AutoTrajectory[] sourceToReef = new AutoTrajectory[cyclingBranches.length];
+  //     reefToSource[0] = getTrajectory(routine, initialBranch, source);
+  //     sourceToReef[0] = getTrajectory(routine, source, cyclingBranches[0]);
+  //     for (int i = 1; i < cyclingBranches.length; i++) {
+  //       reefToSource[i] = getTrajectory(routine, cyclingBranches[i - 1], source);
+  //       sourceToReef[i] = getTrajectory(routine, source, cyclingBranches[i]);
+  //     }
+  //     var nextCycleSpwnCmd = new Command[sourceToReef.length];
+  //     for (int i = 0; i < sourceToReef.length - 1; i++) {
+  //       nextCycleSpwnCmd[i] = reefToSource[i + 1].spawnCmd();
+  //     }
+  //     nextCycleSpwnCmd[sourceToReef.length - 1] =
+  //         new ScheduleCommand(
+  //             getTrajectory(routine, cyclingBranches[cyclingBranches.length - 1], source)
+  //                 .cmd()
+  //                 .andThen(sourcePathfinding.goTo(source)));
 
-      routine
-          .active()
-          .onTrue(
-              reefPathfinding
-                  .goTo(initialBranch)
-                  // Commands.run(
-                  //         () ->
-                  // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
-                  //     .onlyIf(() -> swerveDrive.isReefInRange())
-                  //     .deadlineFor(reefPathfinding.goTo(initialBranch))
-                  .withName("ScoreAt" + initialBranch.name())
-                  .andThen(reefToSource[0].spawnCmd())
-                  // .andThen(sourcePathfinding.goTo(source))
-                  .withName("StartTo" + initialBranch.name()));
+  //     routine
+  //         .active()
+  //         .onTrue(
+  //             reefPathfinding
+  //                 .goTo(initialBranch)
+  //                 // Commands.run(
+  //                 //         () ->
+  //                 // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
+  //                 //     .onlyIf(() -> swerveDrive.isReefInRange())
+  //                 //     .deadlineFor(reefPathfinding.goTo(initialBranch))
+  //                 .withName("ScoreAt" + initialBranch.name())
+  //                 .andThen(reefToSource[0].spawnCmd())
+  //                 // .andThen(sourcePathfinding.goTo(source))
+  //                 .withName("StartTo" + initialBranch.name()));
 
-      for (int i = 0; i < cyclingBranches.length; i++) {
-        reefToSource[i]
-            .done()
-            .onTrue(
-                //   waitUntil(() -> coralIntakeSubsystem.hasControl())
-                // .withTimeout(.5) // ONLY RUN IN SIM
-                //   .deadlineFor(
-                sourcePathfinding
-                    .goTo(source)
-                    // )
-                    .andThen(sourceToReef[i].spawnCmd())
-                    .withName("Source" + source.name()));
+  //     for (int i = 0; i < cyclingBranches.length; i++) {
+  //       reefToSource[i]
+  //           .done()
+  //           .onTrue(
+  //               //   waitUntil(() -> coralIntakeSubsystem.hasControl())
+  //               // .withTimeout(.5) // ONLY RUN IN SIM
+  //               //   .deadlineFor(
+  //               sourcePathfinding
+  //                   .goTo(source)
+  //                   // )
+  //                   .andThen(sourceToReef[i].spawnCmd())
+  //                   .withName("Source" + source.name()));
 
-        sourceToReef[i]
-            .atTimeBeforeEnd(.5)
-            .onTrue(
-                //   Commands.run(
-                //           () ->
-                //
-                // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
-                //       .onlyIf(() -> swerveDrive.isReefInRange())
-                //   .deadlineFor(
-                Commands.waitUntil(sourceToReef[i].done())
-                    .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
-                    //   )
-                    .andThen(nextCycleSpwnCmd[i])
-                    .withName("ScoreAt" + cyclingBranches[i].name()));
-      }
+  //       sourceToReef[i]
+  //           .atTimeBeforeEnd(.5)
+  //           .onTrue(
+  //               //   Commands.run(
+  //               //           () ->
+  //               //
+  //               // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
+  //               //       .onlyIf(() -> swerveDrive.isReefInRange())
+  //               //   .deadlineFor(
+  //               Commands.waitUntil(sourceToReef[i].done())
+  //                   .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
+  //                   //   )
+  //                   .andThen(nextCycleSpwnCmd[i])
+  //                   .withName("ScoreAt" + cyclingBranches[i].name()));
+  //     }
 
-      return routine;
-    }
+  //     return routine;
+  //   }
 
   private final Alert selectedNonexistentAuto =
       new Alert("Selected an auto that isn't an option!", Alert.AlertType.kError);

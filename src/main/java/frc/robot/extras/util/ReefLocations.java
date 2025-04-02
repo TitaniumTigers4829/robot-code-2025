@@ -35,15 +35,15 @@ public final class ReefLocations {
 
     Pose2d leftScoringPose =
         new Pose2d(
-            BLUE_REEF.getX() - 1.45 - Units.inchesToMeters(.75),
+            BLUE_REEF.getX() - 1.42 + Units.inchesToMeters(.5),
             FieldConstants.FIELD_WIDTH_METERS / 2
-                + Units.inchesToMeters(4.5), //  .154 - Units.inchesToMeters(3.6),
+                + Units.inchesToMeters(5.5), //  .154 - Units.inchesToMeters(3.6),
             Rotation2d.kZero);
     Pose2d rightScoringPose =
         new Pose2d(
-            BLUE_REEF.getX() - 1.45 - Units.inchesToMeters(.75),
+            BLUE_REEF.getX() - 1.42 + Units.inchesToMeters(.5),
             FieldConstants.FIELD_WIDTH_METERS / 2
-                - Units.inchesToMeters(7.2), // .154 - Units.inchesToMeters(3.6),
+                - Units.inchesToMeters(7.26 - .4829), // .154 - Units.inchesToMeters(3.6),
             Rotation2d.kZero);
 
     BLUE_POSES = new Pose2d[12];
