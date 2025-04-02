@@ -14,7 +14,6 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
-import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
@@ -32,6 +31,10 @@ import frc.robot.subsystems.elevator.ElevatorInterface;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.PhysicalElevator;
 import frc.robot.subsystems.elevator.SimulatedElevator;
+import frc.robot.subsystems.flywheel.FlywheelInterface;
+import frc.robot.subsystems.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.flywheel.PhysicalFlywheel;
+import frc.robot.subsystems.flywheel.SimulatedFlywheel;
 import frc.robot.subsystems.funnelPivot.FunnelPivotInterface;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.funnelPivot.PhysicalFunnelPivot;
@@ -76,6 +79,7 @@ public class Robot extends LoggedRobot {
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private FunnelSubsystem funnelSubsystem;
   private ClimbPivot climbPivotSubsystem;
+  private FlywheelSubsystem flywheelSubsystem;
   private LEDSubsystem ledSubsystem;
 
   private SimWorld simWorld;
@@ -292,16 +296,25 @@ public class Robot extends LoggedRobot {
                         () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
                         coralIntakeSubsystem)));
 
+    // Make a better way to do this, all of our button bindings are taken up
     operatorController
         .povUp()
         .whileTrue(
             climbPivotSubsystem.manualPivotClimb(
-                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
+                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftX(), 2)));
     operatorController
-        .povDown()
+        .povUp()
         .whileTrue(
             funnelSubsystem.manualFunnel(
                 () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
+
+    operatorController
+        .povDown()
+        .whileTrue(
+            Commands.sequence(
+                Commands.run(
+                    () -> coralIntakeSubsystem.setIntakeSpeed(operatorController.getRightY())),
+                flywheelSubsystem.setFlyhweelSpeed(operatorController.getRightY())));
   }
 
   private void checkGit() {
@@ -373,6 +386,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
+        this.flywheelSubsystem = new FlywheelSubsystem(new PhysicalFlywheel());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
@@ -407,6 +421,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
+        this.flywheelSubsystem = new FlywheelSubsystem(new FlywheelInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
         this.simWorld = null;
       }
@@ -430,6 +445,7 @@ public class Robot extends LoggedRobot {
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
         this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
+        this.flywheelSubsystem = new FlywheelSubsystem(new SimulatedFlywheel());
         SmartDashboard.putBoolean("Coral", false);
       }
 
@@ -449,6 +465,7 @@ public class Robot extends LoggedRobot {
         this.funnelSubsystem = new FunnelSubsystem(new FunnelPivotInterface() {});
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
         this.climbPivotSubsystem = new ClimbPivot(new ClimbPivotInterface() {});
+        this.flywheelSubsystem = new FlywheelSubsystem(new FlywheelInterface() {});
         this.simWorld = null;
       }
     }
