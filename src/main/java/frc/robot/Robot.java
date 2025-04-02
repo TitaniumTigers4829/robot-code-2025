@@ -11,10 +11,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.RepulsorReef;
+import frc.robot.commands.autodrive.AutoAlign;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
-import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
@@ -182,10 +181,8 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
-    driverController
-        .rightTrigger()
-        .whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, false));
-    driverController.leftTrigger().whileTrue(new RepulsorReef(swerveDrive, visionSubsystem, true));
+    driverController.rightTrigger().whileTrue(new AutoAlign(swerveDrive, visionSubsystem, false));
+    driverController.leftTrigger().whileTrue(new AutoAlign(swerveDrive, visionSubsystem, true));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag

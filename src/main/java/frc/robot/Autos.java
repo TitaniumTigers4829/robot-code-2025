@@ -101,8 +101,8 @@ public class Autos {
 
     // reefPathfinding =
     //     branch ->
-    //         new RepulsorReef(swerveDrive, visionSubsystem,
-    // ReefLocations.getSelectedLocation(branch))
+    //         new RepulsorCommand(
+    //                 swerveDrive, visionSubsystem, ReefLocations.getScoringLocation(branch))
     //             .withName("Reef Align " + branch.name());
     // sourcePathfinding =
     //     source -> {
@@ -110,8 +110,7 @@ public class Autos {
     //       if (AllianceFlipper.isRed()) {
     //         pose = pose.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi);
     //       }
-    //       return new RepulsorCommand(
-    //               swerveDrive, visionSubsystem, pose, swerveDrive.getEstimatedPose())
+    //       return new RepulsorCommand(swerveDrive, visionSubsystem, pose)
     //           .withName("Source Align " + source.name());
     //     };
     addRoutine("Blue Left Two Coral", () -> blueLeftTwoCoralAuto());
@@ -123,6 +122,25 @@ public class Autos {
     addRoutine("Red Right Two Coral Auto", () -> redRightTwoCoralAuto());
 
     addRoutine("middle auto", () -> simpleRepulsorAuto());
+
+    addRoutine("x two meter", () -> xOneMeterAuto());
+
+    addRoutine("y one meter", () -> yOneMeterAuto());
+
+    addRoutine("y one meter and rotation", () -> yOneMeterAndRotationAuto());
+
+    // addRoutine(
+    //     "fancy things",
+    //     () ->
+    //         createRoutine(
+    //             autoFactory,
+    //             swerveDrive,
+    //             visionSubsystem,
+    //             elevatorSubsystem,
+    //             coralIntakeSubsystem,
+    //             Source.L,
+    //             ReefBranch.J,
+    //             ReefBranch.K));
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -216,49 +234,50 @@ public class Autos {
     startToJTrajectory
         .done()
         .onTrue(
-            new WaitCommand(0.5)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
-                .andThen(
-                    jToPickupTrajectory
-                        .cmd()
-                        .alongWith(
-                            elevatorSubsystem.setElevationPosition(
-                                ElevatorSetpoints.FEEDER.getPosition()))));
-    jToPickupTrajectory
-        .done()
-        .onTrue(
-            Commands.sequence(
-                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                    Commands.runEnd(
-                        () -> coralIntakeSubsystem.intakeCoral(),
-                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                        coralIntakeSubsystem))
-                .andThen(pickupToLTrajectory.cmd()));
-    pickupToLTrajectory
-        .done()
-        .onTrue(
-            new WaitCommand(0.5)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(2.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+            new WaitCommand(0.5).andThen(new RepulsorReef(swerveDrive, visionSubsystem, false)));
+    //         .withTimeout(2.0)
+    //         .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
+    // .andThen(
+    //     jToPickupTrajectory
+    //         .cmd()
+    //         .alongWith(
+    //             elevatorSubsystem.setElevationPosition(
+    //                 ElevatorSetpoints.FEEDER.getPosition()))));
+    // jToPickupTrajectory
+    //     .done()
+    //     .onTrue(
+    //         Commands.sequence(
+    //
+    // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+    //                 new InstantCommand(() ->
+    // coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+    //                 Commands.runEnd(
+    //                     () -> coralIntakeSubsystem.intakeCoral(),
+    //                     () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+    //                     coralIntakeSubsystem))
+    //             .andThen(pickupToLTrajectory.cmd()));
+    // pickupToLTrajectory
+    //     .done()
+    //     .onTrue(
+    //         new WaitCommand(0.5)
+    //             .andThen(
+    //                 new RepulsorReef(swerveDrive, visionSubsystem, false)
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         new SetElevatorPosition(
+    //                             swerveDrive, elevatorSubsystem,
+    // ElevatorSetpoints.L4.getPosition()))
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         Commands.runEnd(
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.EJECT_SPEED),
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+    //                                 coralIntakeSubsystem)
+    //                             .withTimeout(1.0))));
     //                     .alongWith(
     //                         new SetElevatorPosition(
     //                             swerveDrive, elevatorSubsystem,
@@ -627,7 +646,7 @@ public class Autos {
   //               // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
   //               //       .onlyIf(() -> swerveDrive.isReefInRange())
   //               //   .deadlineFor(
-  //               waitUntil(sourceToReef[i].done())
+  //               Commands.waitUntil(sourceToReef[i].done())
   //                   .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
   //                   //   )
   //                   .andThen(nextCycleSpwnCmd[i])
