@@ -13,18 +13,15 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 public class RepulsorCommand extends DriveCommandBase {
   private SwerveDrive swerveDrive;
   private final Pose2d setpoint;
-  private final Pose2d estimatedPose;
 
   /** Creates a new RepulsorCommand. */
   public RepulsorCommand(
       SwerveDrive swerveDrive,
       VisionSubsystem visionSubsystem,
-      Pose2d setpoint,
-      Pose2d estimatedPose) {
+      Pose2d setpoint) {
     super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
     this.setpoint = setpoint;
-    this.estimatedPose = estimatedPose;
     addRequirements(swerveDrive);
   }
 
