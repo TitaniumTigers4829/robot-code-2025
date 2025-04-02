@@ -6,7 +6,7 @@ package frc.robot.subsystems.flywheel;
 
 /** Add your docs here. */
 public class FlywheelConstants {
-  public static final int FLYWHEEL_MOTOR_ID = 0 - 9;
+  public static final int FLYWHEEL_MOTOR_ID = 4;
   public static final double FLYWHEEL_GEAR_RATIO = 1;
 
   public static final double FLYWHEEL_P = 0 - 9;
