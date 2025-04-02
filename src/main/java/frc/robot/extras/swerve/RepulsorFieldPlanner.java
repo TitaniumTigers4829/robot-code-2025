@@ -11,7 +11,9 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Robot;
+import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.util.ReefLocations;
 import java.util.ArrayList;
 import java.util.List;
@@ -293,28 +295,80 @@ public class RepulsorFieldPlanner {
   public record RepulsorSample(Translation2d intermediateGoal, double vx, double vy) {}
 
   public RepulsorSample sampleField(
-      Translation2d curTrans, double maxSpeed, double slowdownDistance) {
-    Translation2d err = curTrans.minus(goal);
-    Translation2d netForce = getForce(curTrans, goal);
-    double dampingCoefficient = 0.5;
-    Translation2d velocity = new Translation2d();
+      Translation2d curTrans,
+      ChassisSpeeds
+          currentSpeed, // current speed in m/s (if known; otherwise, you might assume maxSpeed)
+      double maxSpeed,
+      double slowdownDistance) {
 
-    double stepSize_m;
-    if (err.getNorm() < slowdownDistance) {
-      stepSize_m =
-          MathUtil.interpolate( // TODO: maybe don't divide by distance
-              0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
-      Translation2d dampingForce =
-          velocity.times(-dampingCoefficient * (1 - err.getNorm() / slowdownDistance));
-      netForce =
-          new Translation2d(netForce.getNorm() + dampingForce.getNorm(), netForce.getAngle());
-    } else {
-      stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
+    // Control period (dt in seconds)
+    double dt = Robot.defaultPeriodSecs;
+
+    // Calculate the error vector from current position to goal (in meters)
+    Translation2d error = goal.minus(curTrans);
+
+    // -----------------------------
+    // Method 1: Displacement-Based Approach
+    // -----------------------------
+    // Compute net force as a displacement vector (in meters)
+    Translation2d netForceDisp = getForce(curTrans, goal);
+
+    // Determine a step size that scales down when near the goal.
+    double stepSize =
+        (error.getNorm() < slowdownDistance)
+            ? MathUtil.interpolate(0, maxSpeed * dt, error.getNorm() / slowdownDistance)
+            : maxSpeed * dt;
+
+    // Create a displacement step in the direction of the net force
+    Translation2d step1 = new Translation2d(stepSize, netForceDisp.getAngle()).plus(netForceDisp);
+
+    // -----------------------------
+    // Method 2: Velocity-Based Approach
+    // -----------------------------
+    // Convert the displacement (net force) into a velocity increment (m/s) over dt
+    Velocity2d netForceVel = Velocity2d.fromTranslation(netForceDisp, dt);
+
+    // Use currentSpeed to form a current velocity vector.
+    Velocity2d currentVelocity =
+        new Velocity2d(currentSpeed.vxMetersPerSecond, currentSpeed.vyMetersPerSecond);
+
+    // Compute how close we are to the goal (1 when far, 0 when at the goal)
+    double distanceRatio = Math.min(1.0, error.getNorm() / slowdownDistance);
+
+    // Apply damping proportional to the current velocity when near the goal
+    double dampingCoefficient = 0.5; // adjust as needed
+    Velocity2d dampingVelocity = currentVelocity.times(dampingCoefficient * (1 - distanceRatio));
+
+    // Compute a damped velocity change
+    Velocity2d deltaVelocity = netForceVel.minus(dampingVelocity);
+
+    // Update the current velocity with the delta; limit to maxSpeed
+    Velocity2d newVelocity = currentVelocity.plus(deltaVelocity);
+    if (newVelocity.getSpeed() > maxSpeed) {
+      newVelocity = newVelocity.times(maxSpeed / newVelocity.getSpeed());
     }
-    Translation2d step = new Translation2d(stepSize_m, netForce.getAngle());
-    return new RepulsorSample(
-        curTrans.plus(step),
-        step.getX() / Robot.defaultPeriodSecs,
-        step.getY() / Robot.defaultPeriodSecs);
+
+    // Convert the new velocity into a displacement over dt
+    Translation2d step2 = newVelocity.toTranslation2d(dt);
+
+    // -----------------------------
+    // Blend the Two Approaches
+    // -----------------------------
+    // Set a blending factor alpha (0 = all displacement, 1 = all velocity-based)
+    double alpha = 0.5; // adjust between 0.0 and 1.0 as desired
+
+    double blendedX = (1 - alpha) * step1.getX() + alpha * step2.getX();
+    double blendedY = (1 - alpha) * step1.getY() + alpha * step2.getY();
+
+    Translation2d blendedStep = new Translation2d(blendedX, blendedY);
+
+    // Compute the new position based on the blended step
+    Translation2d newPosition = curTrans.plus(blendedStep);
+
+    // Calculate the corresponding velocities (m/s) from the blended step
+    double vx = blendedStep.getX() / dt;
+    double vy = blendedStep.getY() / dt;
+
+    return new RepulsorSample(newPosition, vx, vy);
   }
 }

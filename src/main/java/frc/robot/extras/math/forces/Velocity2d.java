@@ -7,6 +7,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N2;
@@ -66,6 +67,29 @@ public class Velocity2d implements Interpolatable<Velocity2d>, StructSerializabl
    */
   public Velocity2d(Vector<N2> vector) {
     this(vector.get(0), vector.get(1));
+  }
+
+  // In Velocity2d.java, add:
+
+  /**
+   * Converts a displacement (Translation2d) over a period dt into a velocity.
+   *
+   * @param t the displacement (in meters)
+   * @param dt the time period in seconds
+   * @return the corresponding Velocity2d (in m/s)
+   */
+  public static Velocity2d fromTranslation(Translation2d t, double dt) {
+    return new Velocity2d(t.getX() / dt, t.getY() / dt);
+  }
+
+  /**
+   * Converts this velocity into a displacement (Translation2d) over a period dt.
+   *
+   * @param dt the time period in seconds
+   * @return the displacement as Translation2d (in meters)
+   */
+  public Translation2d toTranslation2d(double dt) {
+    return new Translation2d(m_vx * dt, m_vy * dt);
   }
 
   /**

@@ -629,8 +629,9 @@ public class SwerveDrive extends SubsystemBase {
     RepulsorSample repulsorSample =
         repulsorFieldPlanner.sampleField(
             poseEstimator.getEstimatedPosition().getTranslation(),
+            getChassisSpeeds(),
             DriveConstants.MAX_SPEED_METERS_PER_SECOND * .75,
-            4.0);
+            1.25);
 
     ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
