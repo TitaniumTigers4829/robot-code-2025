@@ -309,14 +309,9 @@ public class SwerveDrive extends SubsystemBase {
   public void followSwerveSample(SwerveSample sample) {
     xChoreoController.reset();
     yChoreoController.reset();
-    rotationChoreoController.reset(sample.heading);
+    rotationChoreoController.reset(getOdometryRotation2d().getRadians());
     // Use the summed forces in the drive method
-    ChassisSpeeds chassisSpeeds;
-    // if (fieldRelative) {
-    //   chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //       totalForceX + moveX, totalForceY + moveY, moveTheta, getOdometryRotation2d());
-    // } else {
-    chassisSpeeds =
+    ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             sample.vx
                 // + totalForcesX
@@ -324,19 +319,17 @@ public class SwerveDrive extends SubsystemBase {
             sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y),
             sample.omega
                 + rotationChoreoController.calculate(
-                    getEstimatedPose().getRotation().getRadians(), sample.heading),
+                    getOdometryRotation2d().getRadians(), sample.heading),
             getOdometryRotation2d());
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
     Logger.recordOutput("Trajectories/vx", sample.vx);
-    // }
-    // double moveX = sample.vx;
-    // // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
-    // double moveY = sample.vy;
-    // // + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
-    // double moveTheta = sample.omega;
-    //     + rotationChoreoController.calculate(
-    //         getOdometryRotation2d().getRadians(), sample.heading);
+    Logger.recordOutput("Trajectories/omega", sample.omega);
+    Logger.recordOutput(
+        "Trajectories/headingOutput",
+        rotationChoreoController.calculate(getOdometryRotation2d().getRadians(), sample.heading));
+    Logger.recordOutput("Trajectories/desiredHeading", sample.heading);
+
     chassisSpeeds = Robot.isSimulation() ? chassisSpeeds : chassisSpeeds.unaryMinus();
     drive(chassisSpeeds, false);
   }
@@ -694,18 +687,21 @@ public class SwerveDrive extends SubsystemBase {
    * @return a trigger that is true when the robot is within 1 meter of the reef.
    */
   public boolean isReefInRange() {
-    return (getEstimatedPose()
-                .getTranslation()
-                .getDistance(
-                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                        .getTranslation())
-            <= .005
-        || getEstimatedPose()
-                .getTranslation()
-                .getDistance(
-                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
-                        .getTranslation())
-            <= .005);
+    return (Math.abs(
+                getEstimatedPose()
+                    .getTranslation()
+                    .getDistance(
+                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                            .getTranslation()))
+            <= .0124829
+        || Math.abs(
+                getEstimatedPose()
+                    .getTranslation()
+                    .getDistance(
+                        ReefLocations.getSelectedLocation(
+                                getEstimatedPose().getTranslation(), false)
+                            .getTranslation()))
+            <= .0124829);
   }
 
   public boolean isRobotAlignedToLeftReef() {

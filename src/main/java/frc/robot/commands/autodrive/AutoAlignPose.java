@@ -10,31 +10,38 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.commands.drive.DriveCommandBase;
-import frc.robot.extras.util.ReefLocations;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AutoAlign extends DriveCommandBase {
+public class AutoAlignPose extends DriveCommandBase {
   private final SwerveDrive swerveDrive;
-  private final boolean left;
+  private final Pose2d pose;
 
   private Pose2d currentPose;
   private Pose2d desiredPose;
 
+  private final Consumer<Boolean> isAligned;
+
   private ProfiledPIDController xTranslationController =
-      new ProfiledPIDController(4.8, 0, 0.29, new Constraints(1, 2));
+      new ProfiledPIDController(4.8, 0, 0.29, new Constraints(3.0, 2)); // 2
   private ProfiledPIDController yTranslationController =
-      new ProfiledPIDController(4.8, 0, 0.29, new Constraints(1, 2));
+      new ProfiledPIDController(4.8, 0, 0.29, new Constraints(3.0, 2));
   private ProfiledPIDController rotationController =
       new ProfiledPIDController(4.8, 0, 0.29, new Constraints(2, 4));
 
   /** Creates a new RepulsorReef. */
-  public AutoAlign(SwerveDrive swerveDrive, VisionSubsystem visionSubsystem, boolean left) {
+  public AutoAlignPose(
+      SwerveDrive swerveDrive,
+      VisionSubsystem visionSubsystem,
+      Pose2d pose,
+      Consumer<Boolean> isAligned) {
     super(swerveDrive, visionSubsystem);
     this.swerveDrive = swerveDrive;
-    this.left = left;
+    this.pose = pose;
+    this.isAligned = isAligned;
     addRequirements(swerveDrive);
     // Use addRequirements() here to declare subsystem dependencies.
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
@@ -45,7 +52,7 @@ public class AutoAlign extends DriveCommandBase {
   public void initialize() {
     currentPose = swerveDrive.getEstimatedPose();
 
-    desiredPose = ReefLocations.getSelectedLocation(currentPose.getTranslation(), left);
+    desiredPose = pose;
 
     // TODO: reset vels here
     xTranslationController.reset(currentPose.getX());
@@ -69,8 +76,8 @@ public class AutoAlign extends DriveCommandBase {
 
     ChassisSpeeds outputSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            MathUtil.clamp(scalar(distance) * xOutput, -.5, .5),
-            MathUtil.clamp(scalar(distance) * yOutput, -.5, .5),
+            MathUtil.clamp(scalar(distance) * xOutput, -.75, .75),
+            MathUtil.clamp(scalar(distance) * yOutput, -.75, .75),
             rotationOutput,
             swerveDrive.getOdometryRotation2d());
 
@@ -85,6 +92,7 @@ public class AutoAlign extends DriveCommandBase {
         "AutoAlign/ProfileVelocityY", -yTranslationController.getSetpoint().velocity);
     Logger.recordOutput(
         "AutoAlign/ProfileVelocityHeading", rotationController.getSetpoint().velocity);
+    isAligned.accept(swerveDrive.isReefInRange());
   }
 
   // Called once the command ends or is interrupted.
@@ -95,7 +103,7 @@ public class AutoAlign extends DriveCommandBase {
   @Override
   public boolean isFinished() {
     // return false;
-    return swerveDrive.isReefInRange()
+    return currentPose.getTranslation().getDistance(pose.getTranslation()) <= 0.02
         && Math.abs(swerveDrive.getChassisSpeeds().vxMetersPerSecond) < 0.075
         && Math.abs(swerveDrive.getChassisSpeeds().vyMetersPerSecond) < 0.075;
   }

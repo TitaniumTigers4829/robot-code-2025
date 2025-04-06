@@ -25,7 +25,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
   private final CANcoderConfiguration funnelEncoderConfig;
   private final StatusSignal<Voltage> funnelVoltage;
   private final StatusSignal<AngularVelocity> funnelVelocity;
-  private StatusSignal<Angle> funnelAngle;
+  private final StatusSignal<Angle> funnelAngle;
   private final StatusSignal<Current> funnelSupplyCurrent;
   private final StatusSignal<Current> funnelStatorCurrent;
   private final MotionMagicVoltage mmPositionRequest;
@@ -39,7 +39,8 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
   public PhysicalFunnelPivot() {
     funnelMotor = new TalonFX(FunnelConstants.FUNNEL_PIVOT_MOTOR_ID);
-    funnelEncoder = new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID);
+    funnelEncoder =
+        new CANcoder(FunnelConstants.FUNNEL_ENCODER_ID, HardwareConstants.CANIVORE_CAN_BUS_STRING);
     funnelMotorConfig = new TalonFXConfiguration();
     funnelEncoderConfig = new CANcoderConfiguration();
     mmPositionRequest = new MotionMagicVoltage(0);
@@ -64,43 +65,39 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
-    funnelMotorConfig.Slot0.kP = FunnelConstants.PIVOT_P;
-    funnelMotorConfig.Slot0.kI = FunnelConstants.PIVOT_I;
-    funnelMotorConfig.Slot0.kD = FunnelConstants.PIVOT_D;
-
-    funnelEncoderConfig.MagnetSensor.MagnetOffset =
-        -FunnelConstants.FUNNEL_ZERO_ANGLE; // Configure encoder zero point offset
-    funnelEncoderConfig.MagnetSensor.SensorDirection =
-        FunnelConstants.FUNNEL_ENCODER_DIRECTION; // Configure encoder direction
-
-    funnelMotor.getConfigurator().apply(funnelMotorConfig);
-    funnelEncoder.getConfigurator().apply(funnelEncoderConfig);
+    // funnelMotorConfig.Slot0.kP = FunnelConstants.PIVOT_P;
+    // funnelMotorConfig.Slot0.kI = FunnelConstants.PIVOT_I;
+    // funnelMotorConfig.Slot0.kD = FunnelConstants.PIVOT_D;
 
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
-    funnelAngle = funnelEncoder.getPosition();
+    funnelAngle = funnelMotor.getPosition();
     funnelSupplyCurrent = funnelMotor.getSupplyCurrent();
     funnelStatorCurrent = funnelMotor.getStatorCurrent();
 
     funnelMotor.setPosition(0.0);
+
     BaseStatusSignal.setUpdateFrequencyForAll(
-        100.0,
+        50.0,
         funnelAngle,
         funnelVelocity,
         funnelVoltage,
         funnelSupplyCurrent,
-        funnelStatorCurrent);
+        funnelStatorCurrent,
+        funnelMotor.getClosedLoopReference());
 
-    funnelMotor.setPosition(FunnelConstants.ANGLE_ZERO);
     funnelMotor.optimizeBusUtilization();
+
+    funnelMotor.getConfigurator().apply(funnelMotorConfig);
   }
 
   @Override
   public void updateInputs(FunnelPivotInputs inputs) {
-    BaseStatusSignal.refreshAll(funnelAngle);
+    BaseStatusSignal.refreshAll(funnelAngle, funnelMotor.getClosedLoopReference());
     inputs.funnelAngle = funnelAngle.getValueAsDouble();
     inputs.funnelVelocity = funnelVelocity.getValueAsDouble();
     inputs.funnelVoltage = funnelVoltage.getValueAsDouble();
+    inputs.closedLoop = funnelMotor.getClosedLoopReference().getValueAsDouble();
   }
 
   @Override

@@ -220,7 +220,7 @@ public class SwerveConstants {
     public static final double AUTO_TRANSLATION_I = 0;
     public static final double AUTO_TRANSLATION_D = 0.0;
 
-    public static final double AUTO_THETA_P = 2.5; // 5
+    public static final double AUTO_THETA_P = 0.0; // 5
     public static final double AUTO_THETA_I = 0;
     public static final double AUTO_THETA_D = 0;
 

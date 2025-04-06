@@ -44,7 +44,7 @@ public class PhysicalGyroPigeon implements GyroInterface {
         rollVelocity,
         xAccel,
         yAccel);
-    gyro.optimizeBusUtilization();
+    // gyro.optimizeBusUtilization();
     gyro.setYaw(0.0);
   }
 

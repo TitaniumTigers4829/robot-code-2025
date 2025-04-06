@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,9 +12,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.HardwareConstants;
-import frc.robot.commands.autodrive.AutoAlign;
+import frc.robot.commands.autodrive.AutoAlignReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
 import frc.robot.subsystems.climbPivot.ClimbPivot;
@@ -140,6 +142,16 @@ public class Robot extends LoggedRobot {
     configureOperatorController();
   }
 
+  private void alignCallback(boolean isAligned) {
+    if (isAligned) {
+      driverController.setRumble(RumbleType.kBothRumble, 0.5);
+      operatorController.setRumble(RumbleType.kBothRumble, 0.5);
+    } else {
+      driverController.setRumble(RumbleType.kBothRumble, 0.0);
+      operatorController.setRumble(RumbleType.kBothRumble, 0.0);
+    }
+  }
+
   private void configureDriverController() {
     // Driver Left Stick
     DoubleSupplier driverLeftStick[] =
@@ -166,7 +178,8 @@ public class Robot extends LoggedRobot {
             // Robot relative
             () -> !driverController.rightBumper().getAsBoolean(),
             // Rotation speed
-            () -> driverController.rightStick().getAsBoolean());
+            () -> driverController.rightStick().getAsBoolean(),
+            this::alignCallback);
     swerveDrive.setDefaultCommand(driveCommand);
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
@@ -181,8 +194,12 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
-    driverController.rightTrigger().whileTrue(new AutoAlign(swerveDrive, visionSubsystem, false));
-    driverController.leftTrigger().whileTrue(new AutoAlign(swerveDrive, visionSubsystem, true));
+    driverController
+        .rightTrigger()
+        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback));
+    driverController
+        .leftTrigger()
+        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
@@ -191,6 +208,7 @@ public class Robot extends LoggedRobot {
         .onTrue(
             new InstantCommand(
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
+    driverController.povUp().whileTrue(new SetFunnelAngle(funnelSubsystem));
   }
 
   private void configureOperatorController() {

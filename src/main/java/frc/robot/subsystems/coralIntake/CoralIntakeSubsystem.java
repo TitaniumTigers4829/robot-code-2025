@@ -67,7 +67,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   }
 
   public void intakeCoral() {
-    if (isIntakeIdle() && !hasControl() && !hasCoral()) {
+    if (isIntakeIdle()) {
       currentState = IntakeState.WAITING;
       usedToHaveCoral = hasCoral(); // Set the starting sensor state
       usedToHaveControl = hasControl();
