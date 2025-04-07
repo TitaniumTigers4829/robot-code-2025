@@ -26,7 +26,6 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.Robot;
 import frc.robot.extras.logging.Tracer;
 import frc.robot.extras.swerve.RepulsorFieldPlanner;
-import frc.robot.extras.swerve.RepulsorFieldPlanner.RepulsorSample;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpoint;
 import frc.robot.extras.swerve.setpointGen.SwerveSetpointGenerator;
 import frc.robot.extras.util.AllianceFlipper;
@@ -80,6 +79,7 @@ public class SwerveDrive extends SubsystemBase {
           BigDecimal.ZERO.doubleValue(),
           new Constraints(
               DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+
   private final ProfiledPIDController yRepulsorController =
       new ProfiledPIDController(
           DriveConstants.REPULSOR_TRANSLATION_P,
@@ -87,6 +87,7 @@ public class SwerveDrive extends SubsystemBase {
           BigDecimal.ZERO.doubleValue(),
           new Constraints(
               DriveConstants.REPULSOR_MAX_VELOCITY, DriveConstants.REPULSOR_MAX_ACCELERATION));
+
   private final ProfiledPIDController headingRepulsorController =
       new ProfiledPIDController(
           DriveConstants.REPULSOR_HEADING_P,
@@ -308,14 +309,9 @@ public class SwerveDrive extends SubsystemBase {
   public void followSwerveSample(SwerveSample sample) {
     xChoreoController.reset();
     yChoreoController.reset();
-    rotationChoreoController.reset(sample.heading);
+    rotationChoreoController.reset(getOdometryRotation2d().getRadians());
     // Use the summed forces in the drive method
-    ChassisSpeeds chassisSpeeds;
-    // if (fieldRelative) {
-    //   chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-    //       totalForceX + moveX, totalForceY + moveY, moveTheta, getOdometryRotation2d());
-    // } else {
-    chassisSpeeds =
+    ChassisSpeeds chassisSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             sample.vx
                 // + totalForcesX
@@ -323,19 +319,17 @@ public class SwerveDrive extends SubsystemBase {
             sample.vy + yChoreoController.calculate(getEstimatedPose().getY(), sample.y),
             sample.omega
                 + rotationChoreoController.calculate(
-                    getEstimatedPose().getRotation().getRadians(), sample.heading),
+                    getOdometryRotation2d().getRadians(), sample.heading),
             getOdometryRotation2d());
     Logger.recordOutput("Trajectories/CurrentX", getEstimatedPose().getX());
     Logger.recordOutput("Trajectories/DesiredX", sample.x);
     Logger.recordOutput("Trajectories/vx", sample.vx);
-    // }
-    // double moveX = sample.vx;
-    // // + xChoreoController.calculate(getEstimatedPose().getX(), sample.x);
-    // double moveY = sample.vy;
-    // // + yChoreoController.calculate(getEstimatedPose().getY(), sample.y);
-    // double moveTheta = sample.omega;
-    //     + rotationChoreoController.calculate(
-    //         getOdometryRotation2d().getRadians(), sample.heading);
+    Logger.recordOutput("Trajectories/omega", sample.omega);
+    Logger.recordOutput(
+        "Trajectories/headingOutput",
+        rotationChoreoController.calculate(getOdometryRotation2d().getRadians(), sample.heading));
+    Logger.recordOutput("Trajectories/desiredHeading", sample.heading);
+
     chassisSpeeds = Robot.isSimulation() ? chassisSpeeds : chassisSpeeds.unaryMinus();
     drive(chassisSpeeds, false);
   }
@@ -618,68 +612,61 @@ public class SwerveDrive extends SubsystemBase {
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
-
-    // TODO: add current velocity to reset
-    // TODO: why does this work? I don't think we need to reset unless we use I
-    xRepulsorController.reset(getEstimatedPose().getX());
-    yRepulsorController.reset(getEstimatedPose().getY());
+    xRepulsorController.reset(poseEstimator.getEstimatedPosition().getX());
+    yRepulsorController.reset(poseEstimator.getEstimatedPosition().getY());
     headingRepulsorController.reset(goal.getRotation().getRadians());
     Logger.recordOutput("Repulsor/Goal", goal);
 
-    RepulsorSample repulsorSample =
-        repulsorFieldPlanner.sampleField(
-            poseEstimator.getEstimatedPosition().getTranslation(),
-            DriveConstants.MAX_SPEED_METERS_PER_SECOND * .75,
-            4.0);
+    // RepulsorSample repulsorSample =
+    //     repulsorFieldPlanner.sampleField(
+    //         poseEstimator.getEstimatedPosition().getTranslation(),
+    //         DriveConstants.MAX_SPEED_METERS_PER_SECOND * .75,
+    //         1.5);
 
-    ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
+    // ChassisSpeeds feedforward = new ChassisSpeeds(repulsorSample.vx(), repulsorSample.vy(), 0);
     ChassisSpeeds feedback =
         new ChassisSpeeds(
-            xRepulsorController.calculate(
-                poseEstimator.getEstimatedPosition().getX(),
-                repulsorSample.intermediateGoal().getX()),
-            yRepulsorController.calculate(
-                poseEstimator.getEstimatedPosition().getY(),
-                repulsorSample.intermediateGoal().getY()),
+            xRepulsorController.calculate(poseEstimator.getEstimatedPosition().getX(), goal.getX()),
+            yRepulsorController.calculate(poseEstimator.getEstimatedPosition().getY(), goal.getY()),
             headingRepulsorController.calculate(
                 poseEstimator.getEstimatedPosition().getRotation().getRadians(),
                 goal.getRotation().getRadians()));
 
-    Logger.recordOutput("Repulsor/intermediatX", repulsorSample.intermediateGoal().getX());
-    Logger.recordOutput("Repulsor/intermediatY", repulsorSample.intermediateGoal().getY());
-    Logger.recordOutput("Repulsor/intermediatTheta", goal.getRotation().getRadians());
+    // Logger.recordOutput("Repulsor/intermediatX", repulsorSample.intermediateGoal().getX());
+    // Logger.recordOutput("Repulsor/intermediatY", repulsorSample.intermediateGoal().getY());
+    // Logger.recordOutput("Repulsor/intermediatTheta", goal.getRotation().getRadians());
 
     Transform2d error = goal.minus(poseEstimator.getEstimatedPosition());
     Logger.recordOutput("Repulsor/Error", error);
-    Logger.recordOutput("Repulsor/Feedforward", feedforward);
+    // Logger.recordOutput("Repulsor/Feedforward", feedforward);
     Logger.recordOutput("Repulsor/Feedback", feedback);
 
-    ChassisSpeeds outputFieldRelative = feedforward.plus(feedback);
+    ChassisSpeeds outputFieldRelative = feedback;
 
-    if (nudgeSupplier != null) {
-      Translation2d nudge = nudgeSupplier.get();
-      if (nudge.getNorm() > .1) {
-        double nudgeScalar =
-            Math.min(error.getTranslation().getNorm() / 3, 1)
-                * Math.min(error.getTranslation().getNorm() / 3, 1)
-                * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
+    // if (nudgeSupplier != null) {
+    //   Translation2d nudge = nudgeSupplier.get();
+    //   if (nudge.getNorm() > .1) {
+    //     double nudgeScalar =
+    //         Math.min(error.getTranslation().getNorm() / 3, 1)
+    //             * Math.min(error.getTranslation().getNorm() / 3, 1)
+    //             * DriveConstants.MAX_SPEED_METERS_PER_SECOND;
 
-        if (AllianceFlipper.isRed()) {
-          nudge = new Translation2d(-nudge.getX(), -nudge.getY());
-        }
-        nudgeScalar *=
-            Math.abs(
-                nudge
-                    .getAngle()
-                    .minus(
-                        new Rotation2d(
-                            outputFieldRelative.vxMetersPerSecond,
-                            outputFieldRelative.vyMetersPerSecond))
-                    .getSin());
-        outputFieldRelative.vxMetersPerSecond += nudge.getX() * nudgeScalar;
-        outputFieldRelative.vyMetersPerSecond += nudge.getY() * nudgeScalar;
-      }
-    }
+    //     if (AllianceFlipper.isRed()) {
+    //       nudge = new Translation2d(-nudge.getX(), -nudge.getY());
+    //     }
+    //     nudgeScalar *=
+    //         Math.abs(
+    //             nudge
+    //                 .getAngle()
+    //                 .minus(
+    //                     new Rotation2d(
+    //                         outputFieldRelative.vxMetersPerSecond,
+    //                         outputFieldRelative.vyMetersPerSecond))
+    //                 .getSin());
+    //     outputFieldRelative.vxMetersPerSecond += nudge.getX() * nudgeScalar;
+    //     outputFieldRelative.vyMetersPerSecond += nudge.getY() * nudgeScalar;
+    //   }
+    // }
 
     ChassisSpeeds outputRobotRelative =
         ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -700,18 +687,21 @@ public class SwerveDrive extends SubsystemBase {
    * @return a trigger that is true when the robot is within 1 meter of the reef.
    */
   public boolean isReefInRange() {
-    return (getEstimatedPose()
-                .getTranslation()
-                .getDistance(
-                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                        .getTranslation())
-            <= .001
-        || getEstimatedPose()
-                .getTranslation()
-                .getDistance(
-                    ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
-                        .getTranslation())
-            <= .001);
+    return (Math.abs(
+                getEstimatedPose()
+                    .getTranslation()
+                    .getDistance(
+                        ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
+                            .getTranslation()))
+            <= .0124829
+        || Math.abs(
+                getEstimatedPose()
+                    .getTranslation()
+                    .getDistance(
+                        ReefLocations.getSelectedLocation(
+                                getEstimatedPose().getTranslation(), false)
+                            .getTranslation()))
+            <= .0124829);
   }
 
   public boolean isRobotAlignedToLeftReef() {

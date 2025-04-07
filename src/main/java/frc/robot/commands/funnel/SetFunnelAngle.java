@@ -24,13 +24,13 @@ public class SetFunnelAngle extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    funnelSubsystem.setFunnelAngle(FunnelConstants.MIN_ANGLE);
+    funnelSubsystem.setFunnelAngle(FunnelConstants.ANGLE_INTAKE);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    funnelSubsystem.setFunnelAngle(FunnelConstants.MAX_ANGLE); // whatever the default angle is
+    // funnelSubsystem.setFunnelAngle(FunnelConstants.MAX_ANGLE); // whatever the default angle is
   }
 
   // Returns true when the command should end.

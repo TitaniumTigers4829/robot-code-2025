@@ -12,6 +12,7 @@ public interface FunnelPivotInterface {
     public double funnelTemp = 0.0;
     public double funnelSupplyCurrentAmps = 0.0;
     public double funnelTorqueCurrentAmps = 0.0;
+    public double closedLoop = 0.0;
   }
 
   default void updateInputs(FunnelPivotInputs inputs) {}

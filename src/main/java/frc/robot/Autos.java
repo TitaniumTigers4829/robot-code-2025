@@ -11,16 +11,21 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.commands.autodrive.AutoAlignPose;
+import frc.robot.commands.autodrive.AutoAlignReef;
 import frc.robot.commands.autodrive.RepulsorReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.drive.FollowSwerveSampleCommand;
 import frc.robot.commands.elevator.ScoreL4;
 import frc.robot.commands.elevator.SetElevatorPosition;
+import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.AllianceFlipper;
+import frc.robot.extras.util.ReefLocations;
 import frc.robot.extras.util.ReefLocations.ReefBranch;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
@@ -47,25 +52,30 @@ public class Autos {
 
   private final HashMap<String, Supplier<Command>> routines = new HashMap<>();
 
-  private final Pose2d sourceRight = new Pose2d(1.61, .67, Rotation2d.fromDegrees(54));
+  private final Pose2d sourceRight = new Pose2d(1.17, 1.23, Rotation2d.fromDegrees(54));
+
+  Pose2d sourceRightFlipped =
+      AllianceFlipper.isRed()
+          ? sourceRight.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi)
+          : sourceRight;
   private final Pose2d sourceLeft =
       new Pose2d(
-          sourceRight.getX(),
-          FieldConstants.FIELD_WIDTH_METERS - sourceRight.getY(),
-          sourceRight.getRotation().unaryMinus());
+          sourceRightFlipped.getX(),
+          FieldConstants.FIELD_WIDTH_METERS - sourceRightFlipped.getY(),
+          sourceRightFlipped.getRotation().unaryMinus());
 
-  //   @FunctionalInterface
-  //   private interface ReefRepulsorCommand {
-  //     Command goTo(ReefBranch branch);
-  //   }
+  @FunctionalInterface
+  private interface ReefRepulsorCommand {
+    Command goTo(ReefBranch branch);
+  }
 
-  //   @FunctionalInterface
-  //   private interface SourceRepulsorCommand {
-  //     Command goTo(Source source);
-  //   }
+  @FunctionalInterface
+  private interface SourceRepulsorCommand {
+    Command goTo(Source source);
+  }
 
-  //   private final ReefRepulsorCommand reefPathfinding;
-  //   private final SourceRepulsorCommand sourcePathfinding;
+  private final ReefRepulsorCommand reefPathfinding;
+  private final SourceRepulsorCommand sourcePathfinding;
 
   private String selectedCommandName = NONE_NAME;
   private Command selectedCommand = Commands.none();
@@ -99,21 +109,23 @@ public class Autos {
             false, // If alliance flipping should be enabled
             this.swerveDrive); // The drive subsystem
 
-    // reefPathfinding =
-    //     branch ->
-    //         new RepulsorReef(swerveDrive, visionSubsystem,
-    // ReefLocations.getSelectedLocation(branch))
-    //             .withName("Reef Align " + branch.name());
-    // sourcePathfinding =
-    //     source -> {
-    //       Pose2d pose = source == Source.L ? sourceLeft : sourceRight;
-    //       if (AllianceFlipper.isRed()) {
-    //         pose = pose.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi);
-    //       }
-    //       return new RepulsorCommand(
-    //               swerveDrive, visionSubsystem, pose, swerveDrive.getEstimatedPose())
-    //           .withName("Source Align " + source.name());
-    //     };
+    reefPathfinding =
+        branch ->
+            new AutoAlignPose(
+                    swerveDrive,
+                    visionSubsystem,
+                    ReefLocations.getScoringLocation(branch),
+                    this::alignCallback)
+                .withName("Reef Align " + branch.name());
+    sourcePathfinding =
+        source -> {
+          Pose2d pose = source == Source.L ? sourceLeft : sourceRight;
+          if (AllianceFlipper.isRed()) {
+            pose = pose.rotateAround(FieldConstants.FIELD_CENTER, Rotation2d.kPi);
+          }
+          return new AutoAlignPose(swerveDrive, visionSubsystem, pose, this::alignCallback)
+              .withName("Source Align " + source.name());
+        };
     addRoutine("Blue Left Two Coral", () -> blueLeftTwoCoralAuto());
 
     addRoutine("Blue Right Two Coral", () -> blueRightTwoCoralAuto());
@@ -123,6 +135,29 @@ public class Autos {
     addRoutine("Red Right Two Coral Auto", () -> redRightTwoCoralAuto());
 
     addRoutine("middle auto", () -> simpleRepulsorAuto());
+
+    addRoutine("x two meter", () -> xOneMeterAuto());
+
+    addRoutine("y one meter", () -> yOneMeterAuto());
+
+    addRoutine("y one meter and rotation", () -> yOneMeterAndRotationAuto());
+
+    addRoutine(
+        "fancy things",
+        () ->
+            createRoutine(
+                autoFactory,
+                swerveDrive,
+                visionSubsystem,
+                elevatorSubsystem,
+                coralIntakeSubsystem,
+                Source.L,
+                ReefBranch.J,
+                ReefBranch.K));
+
+    addRoutine("dummy", () -> dumbShit());
+
+    addRoutine("dummy again", () -> dumbShitRIght());
   }
 
   Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
@@ -187,12 +222,149 @@ public class Autos {
                         () -> 0.0,
                         () -> 0,
                         () -> false,
-                        () -> false)
-                    .withTimeout(3.5),
-                new RepulsorReef(swerveDrive, visionSubsystem, false).withTimeout(4),
+                        () -> false,
+                        this::alignCallback)
+                    .withTimeout(2.4829)
+                    .andThen(new SetFunnelAngle(funnelSubsystem).withTimeout(1.24829)),
+                new InstantCommand(
+                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
+                    .withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
     return routine;
   }
+
+  public AutoRoutine dumbShit() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.SIMPLE_REPULSOR_AUTO);
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                new InstantCommand(
+                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new DriveCommand(
+                        swerveDrive,
+                        visionSubsystem,
+                        () -> -0.24829,
+                        () -> 0.0,
+                        () -> 0,
+                        () -> false,
+                        () -> false,
+                        this::alignCallback)
+                    .withTimeout(1.94829)
+                    .alongWith(new SetFunnelAngle(funnelSubsystem).withTimeout(1.248294829)),
+                new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
+                    .withTimeout(4),
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
+                    .andThen(
+                        elevatorSubsystem
+                            .setElevationPosition(ElevatorSetpoints.FEEDER.getPosition())
+                            .alongWith(
+                                new AutoAlignPose(
+                                    swerveDrive, visionSubsystem, sourceLeft, this::alignCallback))
+                            .raceWith(
+                                Commands.sequence(
+                                        // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                                        new InstantCommand(
+                                            () ->
+                                                coralIntakeSubsystem.setIntakeState(
+                                                    IntakeState.IDLE)),
+                                        Commands.run(
+                                            () -> coralIntakeSubsystem.intakeCoral(),
+                                            coralIntakeSubsystem))
+                                    .until(() -> coralIntakeSubsystem.isIntakeComplete()))
+                            .andThen(
+                                new DriveCommand(
+                                        swerveDrive,
+                                        visionSubsystem,
+                                        () -> -0.4829 + .24 + 0.04829,
+                                        () -> -0.075,
+                                        () -> -0.04829 + 0.035,
+                                        () -> false,
+                                        () -> false,
+                                        this::alignCallback)
+                                    .withTimeout(2.04829),
+                                new WaitCommand(0.2),
+                                new AutoAlignReef(
+                                        swerveDrive, visionSubsystem, false, this::alignCallback)
+                                    .withTimeout(4),
+                                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))));
+    return routine;
+  }
+
+  public AutoRoutine dumbShitRIght() {
+    AutoRoutine routine = autoFactory.newRoutine(AutoConstants.SIMPLE_REPULSOR_AUTO);
+    routine
+        .active()
+        .onTrue(
+            Commands.sequence(
+                new InstantCommand(
+                    () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
+                new DriveCommand(
+                        swerveDrive,
+                        visionSubsystem,
+                        () -> -0.24829,
+                        () -> 0.0,
+                        () -> 0,
+                        () -> false,
+                        () -> false,
+                        this::alignCallback)
+                    .withTimeout(1.94829)
+                    .alongWith(new SetFunnelAngle(funnelSubsystem).withTimeout(1.248294829)),
+                new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback)
+                    .withTimeout(4),
+                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
+                    .andThen(
+                        new WaitCommand(0.554829)
+                            .andThen(
+                                elevatorSubsystem.setElevationPosition(
+                                    ElevatorSetpoints.FEEDER.getPosition()))
+                            .alongWith(
+                                new AutoAlignPose(
+                                    swerveDrive,
+                                    visionSubsystem,
+                                    sourceRightFlipped,
+                                    this::alignCallback))
+                            .raceWith(
+                                Commands.sequence(
+                                        // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                                        new InstantCommand(
+                                            () ->
+                                                coralIntakeSubsystem.setIntakeState(
+                                                    IntakeState.IDLE)),
+                                        Commands.run(
+                                            () -> coralIntakeSubsystem.intakeCoral(),
+                                            coralIntakeSubsystem))
+                                    .until(() -> coralIntakeSubsystem.isIntakeComplete()))
+                            .andThen(
+                                new DriveCommand(
+                                        swerveDrive,
+                                        visionSubsystem,
+                                        () -> -0.4829 + .24 + 0.04829,
+                                        () -> 0.075,
+                                        () -> 0.04829 - 0.035,
+                                        () -> false,
+                                        () -> false,
+                                        this::alignCallback)
+                                    .withTimeout(1.94829),
+                                new DriveCommand(
+                                        swerveDrive,
+                                        visionSubsystem,
+                                        () -> 0.0,
+                                        () -> 0.0,
+                                        () -> 0.0,
+                                        () -> false,
+                                        () -> false,
+                                        this::alignCallback)
+                                    .withTimeout(0.35),
+                                new AutoAlignReef(
+                                        swerveDrive, visionSubsystem, false, this::alignCallback)
+                                    .withTimeout(4),
+                                new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))));
+    return routine;
+  }
+
+  private void alignCallback(boolean isAligned) {}
 
   public AutoRoutine blueLeftTwoCoralAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.BLUE_LEFT_TWO_CORAL_AUTO_ROUTINE);
@@ -218,47 +390,70 @@ public class Autos {
         .onTrue(
             new WaitCommand(0.5)
                 .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)))
+                    new InstantCommand(
+                        () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())))
                 .andThen(
-                    jToPickupTrajectory
-                        .cmd()
-                        .alongWith(
-                            elevatorSubsystem.setElevationPosition(
-                                ElevatorSetpoints.FEEDER.getPosition()))));
-    jToPickupTrajectory
-        .done()
-        .onTrue(
-            Commands.sequence(
-                    elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                    new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                    Commands.runEnd(
-                        () -> coralIntakeSubsystem.intakeCoral(),
-                        () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                        coralIntakeSubsystem))
-                .andThen(pickupToLTrajectory.cmd()));
-    pickupToLTrajectory
-        .done()
-        .onTrue(
-            new WaitCommand(0.5)
-                .andThen(
-                    new RepulsorReef(swerveDrive, visionSubsystem, false)
-                        .withTimeout(2.0)
-                        .andThen(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
-                        .withTimeout(2.0)
-                        .andThen(
-                            Commands.runEnd(
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.EJECT_SPEED),
-                                    () ->
-                                        coralIntakeSubsystem.setIntakeVelocity(
-                                            CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
-                                    coralIntakeSubsystem)
-                                .withTimeout(1.0))));
+                    new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback))
+                .withTimeout(4.0));
+    // .andThen(new WaitCommand(0.1))
+    // .andThen(
+    //     new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback))
+    // .withTimeout(0.5)
+    // .andThen(new WaitCommand(2)));
+
+    //             //             .andThen(new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)));
+    //             .andThen(jToPickupTrajectory.cmd())
+    //             //         .alongWith(
+    //             //             elevatorSubsystem.setElevationPosition(
+    //             //                 ElevatorSetpoints.FEEDER.getPosition())))
+    //             // .andThen(
+    //             //     new InstantCommand(
+    //             //         () ->
+    // swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())))
+    //             .andThen(
+    //                 new AutoAlignPose(
+    //                     swerveDrive, visionSubsystem, sourceLeft, this::alignCallback)));
+    // jToPickupTrajectory
+    //     .done()
+    //     .onTrue(
+    //         //         Commands.sequence(
+    //         //
+    //         // elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+    //         //                 new InstantCommand(() ->
+    //         // coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+    //         //                 Commands.runEnd(
+    //         //                     () -> coralIntakeSubsystem.intakeCoral(),
+    //         //                     () ->
+    // coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+    //         //                     coralIntakeSubsystem))
+    //         // .andThen(
+    //         pickupToLTrajectory
+    //             .cmd()
+    //             .andThen(
+    //                 new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback)));
+    // );
+    // pickupToLTrajectory
+    //     .done()
+    //     .onTrue(
+    //         new WaitCommand(0.5)
+    //             .andThen(
+    //                 new RepulsorReef(swerveDrive, visionSubsystem, false)
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         new SetElevatorPosition(
+    //                             swerveDrive, elevatorSubsystem,
+    // ElevatorSetpoints.L4.getPosition()))
+    //                     .withTimeout(2.0)
+    //                     .andThen(
+    //                         Commands.runEnd(
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.EJECT_SPEED),
+    //                                 () ->
+    //                                     coralIntakeSubsystem.setIntakeVelocity(
+    //                                         CoralIntakeConstants.NEUTRAL_INTAKE_SPEED),
+    //                                 coralIntakeSubsystem)
+    //                             .withTimeout(1.0))));
     //                     .alongWith(
     //                         new SetElevatorPosition(
     //                             swerveDrive, elevatorSubsystem,
@@ -561,81 +756,81 @@ public class Autos {
     return routine;
   }
 
-  //   private AutoRoutine createRoutine(
-  //       AutoFactory factory,
-  //       SwerveDrive swerve,
-  //       VisionSubsystem visionSubsystem,
-  //       ElevatorSubsystem elevatorSubsystem,
-  //       CoralIntakeSubsystem coralIntakeSubsystem,
-  //       Source source,
-  //       ReefBranch initialBranch,
-  //       ReefBranch... cyclingBranches) {
-  //     AutoRoutine routine = factory.newRoutine("Autogenerated Routine");
+  private AutoRoutine createRoutine(
+      AutoFactory factory,
+      SwerveDrive swerve,
+      VisionSubsystem visionSubsystem,
+      ElevatorSubsystem elevatorSubsystem,
+      CoralIntakeSubsystem coralIntakeSubsystem,
+      Source source,
+      ReefBranch initialBranch,
+      ReefBranch... cyclingBranches) {
+    AutoRoutine routine = factory.newRoutine("Autogenerated Routine");
 
-  //     AutoTrajectory[] reefToSource = new AutoTrajectory[cyclingBranches.length];
-  //     AutoTrajectory[] sourceToReef = new AutoTrajectory[cyclingBranches.length];
-  //     reefToSource[0] = getTrajectory(routine, initialBranch, source);
-  //     sourceToReef[0] = getTrajectory(routine, source, cyclingBranches[0]);
-  //     for (int i = 1; i < cyclingBranches.length; i++) {
-  //       reefToSource[i] = getTrajectory(routine, cyclingBranches[i - 1], source);
-  //       sourceToReef[i] = getTrajectory(routine, source, cyclingBranches[i]);
-  //     }
-  //     var nextCycleSpwnCmd = new Command[sourceToReef.length];
-  //     for (int i = 0; i < sourceToReef.length - 1; i++) {
-  //       nextCycleSpwnCmd[i] = reefToSource[i + 1].spawnCmd();
-  //     }
-  //     nextCycleSpwnCmd[sourceToReef.length - 1] =
-  //         new ScheduleCommand(
-  //             getTrajectory(routine, cyclingBranches[cyclingBranches.length - 1], source)
-  //                 .cmd()
-  //                 .andThen(sourcePathfinding.goTo(source)));
+    AutoTrajectory[] reefToSource = new AutoTrajectory[cyclingBranches.length];
+    AutoTrajectory[] sourceToReef = new AutoTrajectory[cyclingBranches.length];
+    reefToSource[0] = getTrajectory(routine, initialBranch, source);
+    sourceToReef[0] = getTrajectory(routine, source, cyclingBranches[0]);
+    for (int i = 1; i < cyclingBranches.length; i++) {
+      reefToSource[i] = getTrajectory(routine, cyclingBranches[i - 1], source);
+      sourceToReef[i] = getTrajectory(routine, source, cyclingBranches[i]);
+    }
+    var nextCycleSpwnCmd = new Command[sourceToReef.length];
+    for (int i = 0; i < sourceToReef.length - 1; i++) {
+      nextCycleSpwnCmd[i] = reefToSource[i + 1].spawnCmd();
+    }
+    nextCycleSpwnCmd[sourceToReef.length - 1] =
+        new ScheduleCommand(
+            getTrajectory(routine, cyclingBranches[cyclingBranches.length - 1], source)
+                .cmd()
+                .andThen(sourcePathfinding.goTo(source)));
 
-  //     routine
-  //         .active()
-  //         .onTrue(
-  //             reefPathfinding
-  //                 .goTo(initialBranch)
-  //                 // Commands.run(
-  //                 //         () ->
-  //                 // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
-  //                 //     .onlyIf(() -> swerveDrive.isReefInRange())
-  //                 //     .deadlineFor(reefPathfinding.goTo(initialBranch))
-  //                 .withName("ScoreAt" + initialBranch.name())
-  //                 .andThen(reefToSource[0].spawnCmd())
-  //                 // .andThen(sourcePathfinding.goTo(source))
-  //                 .withName("StartTo" + initialBranch.name()));
+    routine
+        .active()
+        .onTrue(
+            reefPathfinding
+                .goTo(initialBranch)
+                // Commands.run(
+                //         () ->
+                // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
+                //     .onlyIf(() -> swerveDrive.isReefInRange())
+                //     .deadlineFor(reefPathfinding.goTo(initialBranch))
+                .withName("ScoreAt" + initialBranch.name())
+                .andThen(reefToSource[0].spawnCmd())
+                // .andThen(sourcePathfinding.goTo(source))
+                .withName("StartTo" + initialBranch.name()));
 
-  //     for (int i = 0; i < cyclingBranches.length; i++) {
-  //       reefToSource[i]
-  //           .done()
-  //           .onTrue(
-  //               //   waitUntil(() -> coralIntakeSubsystem.hasControl())
-  //               // .withTimeout(.5) // ONLY RUN IN SIM
-  //               //   .deadlineFor(
-  //               sourcePathfinding
-  //                   .goTo(source)
-  //                   // )
-  //                   .andThen(sourceToReef[i].spawnCmd())
-  //                   .withName("Source" + source.name()));
+    for (int i = 0; i < cyclingBranches.length; i++) {
+      reefToSource[i]
+          .done()
+          .onTrue(
+              //   waitUntil(() -> coralIntakeSubsystem.hasControl())
+              // .withTimeout(.5) // ONLY RUN IN SIM
+              //   .deadlineFor(
+              sourcePathfinding
+                  .goTo(source)
+                  // )
+                  .andThen(sourceToReef[i].spawnCmd())
+                  .withName("Source" + source.name()));
 
-  //       sourceToReef[i]
-  //           .atTimeBeforeEnd(.5)
-  //           .onTrue(
-  //               //   Commands.run(
-  //               //           () ->
-  //               //
-  //               // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
-  //               //       .onlyIf(() -> swerveDrive.isReefInRange())
-  //               //   .deadlineFor(
-  //               waitUntil(sourceToReef[i].done())
-  //                   .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
-  //                   //   )
-  //                   .andThen(nextCycleSpwnCmd[i])
-  //                   .withName("ScoreAt" + cyclingBranches[i].name()));
-  //     }
+      sourceToReef[i]
+          .atTimeBeforeEnd(.5)
+          .onTrue(
+              //   Commands.run(
+              //           () ->
+              //
+              // elevatorSubsystem.setElevatorPosition(ElevatorSetpoints.L4.getPosition()))
+              //       .onlyIf(() -> swerveDrive.isReefInRange())
+              //   .deadlineFor(
+              Commands.waitUntil(sourceToReef[i].done())
+                  .andThen(reefPathfinding.goTo(cyclingBranches[i]).asProxy())
+                  //   )
+                  .andThen(nextCycleSpwnCmd[i])
+                  .withName("ScoreAt" + cyclingBranches[i].name()));
+    }
 
-  //     return routine;
-  //   }
+    return routine;
+  }
 
   private final Alert selectedNonexistentAuto =
       new Alert("Selected an auto that isn't an option!", Alert.AlertType.kError);

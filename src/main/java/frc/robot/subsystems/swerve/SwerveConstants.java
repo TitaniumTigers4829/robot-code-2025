@@ -204,11 +204,11 @@ public class SwerveConstants {
     public static final double MAX_SPEED_METERS_PER_SECOND = 4.85;
     // Constants.getRobot() == RobotType.DEV_ROBOT ? 4.5 : 6.95; // 4.5
 
-    public static final double REPULSOR_TRANSLATION_P = 10.0;
+    public static final double REPULSOR_TRANSLATION_P = 2.5;
     public static final double REPULSOR_HEADING_P = 2.5;
 
     public static final double REPULSOR_MAX_VELOCITY = 1.0;
-    public static final double REPULSOR_MAX_ACCELERATION = 2;
+    public static final double REPULSOR_MAX_ACCELERATION = 2.0;
 
     // Choreo Drive Constants
     public static final double AUTO_MAX_SPEED_METERS_PER_SECOND = 4.5;
@@ -216,11 +216,11 @@ public class SwerveConstants {
     public static final double AUTO_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND = 4 * Math.PI;
     public static final double AUTO_MAX_ANGULAR_SPEED_RADIANS_PER_SECOND_SQUARED = 6 * Math.PI;
 
-    public static final double AUTO_TRANSLATION_P = 0.75; // 1
+    public static final double AUTO_TRANSLATION_P = 1.0; // 1
     public static final double AUTO_TRANSLATION_I = 0;
     public static final double AUTO_TRANSLATION_D = 0.0;
 
-    public static final double AUTO_THETA_P = 2.0; // 5
+    public static final double AUTO_THETA_P = 0.0; // 5
     public static final double AUTO_THETA_I = 0;
     public static final double AUTO_THETA_D = 0;
 
