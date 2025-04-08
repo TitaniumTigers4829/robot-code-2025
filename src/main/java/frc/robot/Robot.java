@@ -17,7 +17,7 @@ import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
-import frc.robot.subsystems.climbPivot.ClimbPivot;
+import frc.robot.subsystems.climbPivot.ClimbPivotSubsystem;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
 import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
@@ -75,7 +75,7 @@ public class Robot extends LoggedRobot {
   private ElevatorSubsystem elevatorSubsystem;
   private CoralIntakeSubsystem coralIntakeSubsystem;
   private FunnelSubsystem funnelSubsystem;
-  private ClimbPivot climbPivotSubsystem;
+  private ClimbPivotSubsystem climbPivotSubsystem;
   private LEDSubsystem ledSubsystem;
 
   private SimWorld simWorld;
@@ -372,7 +372,7 @@ public class Robot extends LoggedRobot {
         this.visionSubsystem = new VisionSubsystem(new PhysicalVision());
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
-        this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
+        this.climbPivotSubsystem = new ClimbPivotSubsystem(new PhysicalClimbPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
         this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
@@ -390,7 +390,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new PhysicalElevator());
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new PhysicalCoralIntake());
-        this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
+        this.climbPivotSubsystem = new ClimbPivotSubsystem(new PhysicalClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         this.simWorld = null;
       }
@@ -407,7 +407,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new PhysicalFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.climbPivotSubsystem = new ClimbPivot(new PhysicalClimbPivot());
+        this.climbPivotSubsystem = new ClimbPivotSubsystem(new PhysicalClimbPivot());
         this.simWorld = null;
       }
 
@@ -428,7 +428,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new SimulatedCoralntake());
-        this.climbPivotSubsystem = new ClimbPivot(new SimulatedClimbPivot());
+        this.climbPivotSubsystem = new ClimbPivotSubsystem(new SimulatedClimbPivot());
         this.ledSubsystem = new LEDSubsystem();
         SmartDashboard.putBoolean("Coral", false);
       }
@@ -448,7 +448,7 @@ public class Robot extends LoggedRobot {
         this.elevatorSubsystem = new ElevatorSubsystem(new ElevatorInterface() {});
         this.funnelSubsystem = new FunnelSubsystem(new FunnelPivotInterface() {});
         this.coralIntakeSubsystem = new CoralIntakeSubsystem(new CoralIntakeInterface() {});
-        this.climbPivotSubsystem = new ClimbPivot(new ClimbPivotInterface() {});
+        this.climbPivotSubsystem = new ClimbPivotSubsystem(new ClimbPivotInterface() {});
         this.simWorld = null;
       }
     }
