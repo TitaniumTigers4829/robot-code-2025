@@ -16,6 +16,5 @@ public class ScoreL4 extends SequentialCommandGroup {
                 () -> coralIntakeSubsystem.setIntakeVelocity(CoralIntakeConstants.EJECT_SPEED),
                 coralIntakeSubsystem)
             .until(() -> !coralIntakeSubsystem.hasCoral()));
-    // .withTimeout(.4829));
   }
 }

@@ -48,12 +48,8 @@ public abstract class DriveCommandBase extends Command {
     }
   }
 
-  private double isLimelight3(boolean hasIMU, double standardDeviation) {
-    if (hasIMU) {
-      return standardDeviation * 2;
-    } else {
-      return standardDeviation;
-    }
+  private double scaleStandardDeviations(Limelight limelight, double standardDeviation) {
+    return limelight.hasInternalIMU() ? standardDeviation : standardDeviation * 1.5;
   }
 
   /**
@@ -62,7 +58,6 @@ public abstract class DriveCommandBase extends Command {
    * @param limelight The limelight to calculate the pose from
    */
   public void addLimelightVisionMeasurement(Limelight limelight) {
-    boolean hasIMU = limelight.hasInternalIMU();
     // Only do pose calculation if we can see the april tags
     if (vision.canSeeAprilTags(limelight) && vision.isValidMeasurement(limelight)) {
       Logger.recordOutput(
@@ -82,16 +77,16 @@ public abstract class DriveCommandBase extends Command {
         double[] standardDeviations =
             oneAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
-            isLimelight3(hasIMU, standardDeviations[0]),
-            isLimelight3(hasIMU, standardDeviations[1]),
-            isLimelight3(hasIMU, standardDeviations[2]));
+            scaleStandardDeviations(limelight, standardDeviations[0]),
+            scaleStandardDeviations(limelight, standardDeviations[1]),
+            scaleStandardDeviations(limelight, standardDeviations[2]));
       } else if (vision.getNumberOfAprilTags(limelight) > 1) {
         double[] standardDeviations =
             twoAprilTagLookupTable.getLookupValue(distanceFromClosestAprilTag);
         swerveDrive.setPoseEstimatorVisionConfidence(
-            isLimelight3(hasIMU, standardDeviations[0]),
-            isLimelight3(hasIMU, standardDeviations[1]),
-            isLimelight3(hasIMU, standardDeviations[2]));
+            scaleStandardDeviations(limelight, standardDeviations[0]),
+            scaleStandardDeviations(limelight, standardDeviations[1]),
+            scaleStandardDeviations(limelight, standardDeviations[2]));
       }
 
       // Adds the timestamped pose gotten from the limelights to our pose estimation
