@@ -55,11 +55,6 @@ public class DriveCommand extends DriveCommandBase {
 
   @Override
   public void execute() {
-
-    Supplier<Translation2d> driveTranslationalControlSupplier =
-        () -> {
-          return new Translation2d(leftJoystickX.getAsDouble(), leftJoystickY.getAsDouble());
-        };
     // Most of the time the driver prefers that the robot rotates slowly, as it gives them more
     // control
     // but sometimes (e.g. when fighting defense bots) being able to rotate quickly is necessary

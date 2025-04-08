@@ -272,8 +272,8 @@ public class SwerveDrive extends SubsystemBase {
     double[] wheelPositions = new double[swerveModules.length];
 
     // Iterate over all the swerve modules, get their positions and add them to the array
-    for (SwerveModule module : swerveModules) {
-      wheelPositions[swerveModules.length - 1] = module.getDrivePositionRadians();
+    for (int i = 0; i < 4; i++) {
+      wheelPositions[i] = swerveModules[i].getDrivePositionRadians();
     }
     return wheelPositions;
   }
@@ -373,7 +373,7 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Gets the current roll of the gyro
    *
-   * @return idk
+   * @return the current roll in degrees
    */
   public double getGyroRoll() {
     return gyroInputs.rollDegrees;
@@ -382,7 +382,7 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Gets the current pitch of the gyro
    *
-   * @return smthn
+   * @return the current pitch in degrees
    */
   public double getGyroPitch() {
     return gyroInputs.pitchDegrees;
@@ -570,6 +570,10 @@ public class SwerveDrive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
+  /**
+   * Checks if the robot is near the source.
+   * @return true if the robot is near the source
+   */
   @AutoLogOutput
   public boolean nearSource() {
     double maxX = 3.5;
@@ -581,8 +585,12 @@ public class SwerveDrive extends SubsystemBase {
     }
   }
 
+  /**
+   * Aligns the robot's heading to the source.
+   *
+   * @param translationalControlSupplier The translational control for the robot.
+   */
   public void sourceAlign(Supplier<Translation2d> translationalControlSupplier) {
-    // headingController.reset();
     double targetAngle = Units.degreesToRadians(54);
     if (AllianceFlipper.isRed()) {
       targetAngle = Math.PI - targetAngle;
@@ -605,10 +613,21 @@ public class SwerveDrive extends SubsystemBase {
     drive(commandedRobotSpeeds, false);
   }
 
+  /**
+   * Follows the repulsor field to the goal.
+   * 
+   * @param goal the goal to follow to
+   */
   public void followRepulsorField(Pose2d goal) {
     followRepulsorField(goal, null);
   }
 
+  /**
+   * Follows the repulsor field to the goal.
+   *
+   * @param goal the goal to follow to
+   * @param nudgeSupplier a supplier for the nudge vector
+   */
   public void followRepulsorField(Pose2d goal, Supplier<Translation2d> nudgeSupplier) {
 
     repulsorFieldPlanner.setGoal(goal.getTranslation());
@@ -702,24 +721,6 @@ public class SwerveDrive extends SubsystemBase {
                                 getEstimatedPose().getTranslation(), false)
                             .getTranslation()))
             <= .0124829);
-  }
-
-  public boolean isRobotAlignedToLeftReef() {
-    return getEstimatedPose()
-            .getTranslation()
-            .getDistance(
-                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), true)
-                    .getTranslation())
-        <= .01;
-  }
-
-  public boolean isRobotAlignedToRightReef() {
-    return getEstimatedPose()
-            .getTranslation()
-            .getDistance(
-                ReefLocations.getSelectedLocation(getEstimatedPose().getTranslation(), false)
-                    .getTranslation())
-        <= .01;
   }
 
   /**

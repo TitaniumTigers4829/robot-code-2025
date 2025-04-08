@@ -32,6 +32,7 @@ import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem;
 import frc.robot.subsystems.coralIntake.CoralIntakeSubsystem.IntakeState;
 import frc.robot.subsystems.elevator.ElevatorConstants.ElevatorSetpoints;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.funnelPivot.FunnelConstants;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -40,6 +41,9 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+/**
+ * This class is where all the auto routines are created. It also contains the auto chooser
+ */
 public class Autos {
   private final LoggedDashboardChooser<String> chooser;
   private final AutoFactory autoFactory;
@@ -159,13 +163,7 @@ public class Autos {
 
     addRoutine("dummy again", () -> dumbShitRIght());
   }
-
-  Trigger hasCoral = new Trigger(() -> coralIntakeSubsystem.hasCoral());
-  Trigger hasNoCoral = hasCoral.negate();
-
-  Trigger leftReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToLeftReef());
-  Trigger rightReefInRange = new Trigger(() -> swerveDrive.isRobotAlignedToRightReef());
-
+  
   public AutoRoutine xOneMeterAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.X_ONE_METER_AUTO);
     AutoTrajectory xOneMeterTrajectory = routine.trajectory(AutoConstants.X_ONE_METER_TRAJECTORY);
@@ -225,7 +223,7 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(2.4829)
-                    .andThen(new SetFunnelAngle(funnelSubsystem).withTimeout(1.24829)),
+                    .andThen(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.24829)),
                 new InstantCommand(
                     () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
                 new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
@@ -252,7 +250,7 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(1.94829)
-                    .alongWith(new SetFunnelAngle(funnelSubsystem).withTimeout(1.248294829)),
+                    .alongWith(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.248294829)),
                 new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
                     .withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
@@ -310,7 +308,7 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(1.94829)
-                    .alongWith(new SetFunnelAngle(funnelSubsystem).withTimeout(1.248294829)),
+                    .alongWith(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.248294829)),
                 new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback)
                     .withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
@@ -534,8 +532,7 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(
@@ -572,8 +569,7 @@ public class Autos {
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .withTimeout(2.0)
                 .andThen(
-                    new SetElevatorPosition(
-                        swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                    new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                 .withTimeout(2.0)
                 .andThen(
                     Commands.runEnd(
@@ -612,8 +608,7 @@ public class Autos {
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .withTimeout(2.0)
                         .andThen(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(2.0)
                         .andThen(
                             Commands.runEnd(
@@ -650,8 +645,7 @@ public class Autos {
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .withTimeout(2.0)
                 .andThen(
-                    new SetElevatorPosition(
-                        swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                    new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                 .withTimeout(2.0)
                 .andThen(
                     Commands.runEnd(
@@ -690,8 +684,7 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition(
-                                swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(

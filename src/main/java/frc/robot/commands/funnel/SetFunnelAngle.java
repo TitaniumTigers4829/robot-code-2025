@@ -9,11 +9,12 @@ import frc.robot.subsystems.funnelPivot.FunnelConstants;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 
 public class SetFunnelAngle extends Command {
+  private final FunnelSubsystem funnelSubsystem;
+  private double angle;
 
-  FunnelSubsystem funnelSubsystem;
-
-  public SetFunnelAngle(FunnelSubsystem funnelSubsystem) {
+  public SetFunnelAngle(FunnelSubsystem funnelSubsystem, double angle) {
     this.funnelSubsystem = funnelSubsystem;
+    this.angle = angle;
     addRequirements(funnelSubsystem);
   }
 
@@ -24,14 +25,12 @@ public class SetFunnelAngle extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    funnelSubsystem.setFunnelAngle(FunnelConstants.ANGLE_INTAKE);
+    funnelSubsystem.setFunnelAngle(angle);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    // funnelSubsystem.setFunnelAngle(FunnelConstants.MAX_ANGLE); // whatever the default angle is
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

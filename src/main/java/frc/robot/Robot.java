@@ -15,11 +15,10 @@ import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlignReef;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
-import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
-import frc.robot.subsystems.climbPivot.ClimbPivotSubsystem;
 import frc.robot.subsystems.climbPivot.ClimbPivotInterface;
+import frc.robot.subsystems.climbPivot.ClimbPivotSubsystem;
 import frc.robot.subsystems.climbPivot.PhysicalClimbPivot;
 import frc.robot.subsystems.climbPivot.SimulatedClimbPivot;
 import frc.robot.subsystems.coralIntake.CoralIntakeConstants;
@@ -142,6 +141,11 @@ public class Robot extends LoggedRobot {
     configureOperatorController();
   }
 
+  /**
+   * Callback for the auto align command, will rumble the controllers when aligned
+   *
+   * @param isAligned whether the robot is aligned
+   */
   private void alignCallback(boolean isAligned) {
     if (isAligned) {
       driverController.setRumble(RumbleType.kBothRumble, 0.5);
@@ -152,6 +156,7 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** Configures the driver controller buttons and axes to control the robot */
   private void configureDriverController() {
     // Driver Left Stick
     DoubleSupplier driverLeftStick[] =
@@ -164,7 +169,6 @@ public class Robot extends LoggedRobot {
                   driverController::getLeftX, driverController::getLeftY, 3)[0]
         };
 
-    // DRIVER BUTTONS
     Command driveCommand =
         new DriveCommand(
             swerveDrive,
@@ -180,7 +184,19 @@ public class Robot extends LoggedRobot {
             // Rotation speed
             () -> driverController.rightStick().getAsBoolean(),
             this::alignCallback);
+
+    // Sets the default command for the swerve drive to the drive command
     swerveDrive.setDefaultCommand(driveCommand);
+
+    // Auto align command for the right reef
+    driverController
+        .rightTrigger()
+        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback));
+
+    // Auto align command for the left reef
+    driverController
+        .leftTrigger()
+        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback));
 
     // Resets the robot angle in the odometry, factors in which alliance the robot is on
     driverController
@@ -194,13 +210,6 @@ public class Robot extends LoggedRobot {
                             swerveDrive.getEstimatedPose().getY(),
                             Rotation2d.fromDegrees(swerveDrive.getAllianceAngleOffset())))));
 
-    driverController
-        .rightTrigger()
-        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback));
-    driverController
-        .leftTrigger()
-        .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback));
-
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag
     driverController
@@ -208,22 +217,15 @@ public class Robot extends LoggedRobot {
         .onTrue(
             new InstantCommand(
                 () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())));
-    driverController.povUp().whileTrue(new SetFunnelAngle(funnelSubsystem));
   }
 
+  /** Configures the operator controller buttons and axes to control the robot */
   private void configureOperatorController() {
-    operatorController
-        .leftBumper()
-        .whileTrue(
-            Commands.sequence(
-                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
-                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
-                Commands.runEnd(
-                    () -> coralIntakeSubsystem.intakeCoral(),
-                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
-                    coralIntakeSubsystem)));
+    // ELEVATOR COMMANDS
+    // Toggle the elevator limits
     operatorController.povLeft().onTrue(new InstantCommand(elevatorSubsystem::toggleLimits));
 
+    // Manual elevator control
     operatorController
         .rightBumper()
         .whileTrue(
@@ -234,9 +236,49 @@ public class Robot extends LoggedRobot {
                         (coralIntakeSubsystem.isIntakeComplete()
                             || coralIntakeSubsystem.isIntakeIdle())));
 
+    // Zero the elevator position
     operatorController
         .rightTrigger()
         .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
+    // Sets the elevator to L1 position
+    operatorController
+        .a()
+        .whileTrue(
+            new SetElevatorPosition(
+                    elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
+    // Sets the elevator to L2 position
+    operatorController
+        .x()
+        .whileTrue(
+            new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
+    // Sets the elevator to L3 position
+    operatorController
+        .b()
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
+    // Sets the elevator to L4 position
+    operatorController
+        .y()
+        .whileTrue(
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+                .onlyIf(
+                    () ->
+                        (coralIntakeSubsystem.isIntakeComplete()
+                            || coralIntakeSubsystem.isIntakeIdle())));
+    // INTAKE COMMANDS
+    // Reverse intake command
     operatorController
         .povRight()
         .whileTrue(
@@ -253,46 +295,7 @@ public class Robot extends LoggedRobot {
                         () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
                         coralIntakeSubsystem)));
 
-    operatorController
-        .a()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
-
-    operatorController
-        .x()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
-
-    operatorController
-        .b()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
-
-    operatorController
-        .y()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
-
+    // Eject command
     operatorController
         .leftTrigger()
         .whileTrue(
@@ -307,11 +310,27 @@ public class Robot extends LoggedRobot {
                         () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
                         coralIntakeSubsystem)));
 
+    // Intake command
+    operatorController
+        .leftBumper()
+        .whileTrue(
+            Commands.sequence(
+                elevatorSubsystem.setElevationPosition(ElevatorSetpoints.FEEDER.getPosition()),
+                new InstantCommand(() -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE)),
+                Commands.runEnd(
+                    () -> coralIntakeSubsystem.intakeCoral(),
+                    () -> coralIntakeSubsystem.setIntakeState(IntakeState.STOPPED),
+                    coralIntakeSubsystem)));
+
+    // OTHER COMMANDS
+    // Manual climb control
     operatorController
         .povUp()
         .whileTrue(
             climbPivotSubsystem.manualPivotClimb(
                 () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
+
+    // Manual funnel control
     operatorController
         .povDown()
         .whileTrue(
@@ -319,6 +338,7 @@ public class Robot extends LoggedRobot {
                 () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
   }
 
+  /** Checks the git status and records it to the log */
   private void checkGit() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -341,6 +361,7 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** Sets up the AdvantageKit logger */
   private void setupLogging() {
     // Set up data receivers & replay source
     switch (Constants.getMode()) {
@@ -373,6 +394,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {}
 
+  /** Sets up the subsystems based on the robot type */
   private void setupSubsystems() {
     switch (Constants.getRobot()) {
       case COMP_ROBOT -> {
@@ -470,6 +492,7 @@ public class Robot extends LoggedRobot {
     ledSubsystem.setProcess(LEDProcess.DEFAULT);
   }
 
+  /** Sets up the auto commands */
   private void setupAuto() {
     this.autos =
         new Autos(
