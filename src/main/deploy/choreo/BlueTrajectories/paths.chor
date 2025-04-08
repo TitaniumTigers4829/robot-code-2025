@@ -234,45 +234,35 @@
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"11.5 in",
+    "val":0.29209999999999997
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"11.5 in",
+    "val":0.29209999999999997
    }
   },
   "backLeft":{
    "x":{
-    "exp":"-11 in",
-    "val":-0.2794
+    "exp":"-11.5 in",
+    "val":-0.29209999999999997
    },
    "y":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"11.5 in",
+    "val":0.29209999999999997
    }
   },
   "mass":{
-<<<<<<< HEAD
    "exp":"115 lbs",
    "val":52.16312255
-=======
-<<<<<<< HEAD:src/main/deploy/choreo/Trajectories/paths.chor
-   "exp":"1125 lbs",
-   "val":510.29141625
-=======
-   "exp":"115 lbs",
-   "val":52.16312255
->>>>>>> c2806f3dac4c9b2739db87d95b13628bce4d328d:src/main/deploy/choreo/BlueTrajectories/paths.chor
->>>>>>> 600dc58d8ff0331199191f5ae91fbb6c6acda262
   },
   "inertia":{
    "exp":"7 kg m ^ 2",
    "val":7.0
   },
   "gearing":{
-   "exp":"7.13",
-   "val":7.13
+   "exp":"6.48",
+   "val":6.48
   },
   "radius":{
    "exp":"1.95 in",
@@ -283,8 +273,8 @@
    "val":628.3185307179587
   },
   "tmax":{
-   "exp":"0.5 N * m",
-   "val":0.5
+   "exp":"1.47829 N * m",
+   "val":1.47829
   },
   "cof":{
    "exp":"1.6",

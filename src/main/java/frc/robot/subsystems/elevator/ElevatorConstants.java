@@ -45,10 +45,10 @@ public class ElevatorConstants {
 
   // Elevator setpoints
   public enum ElevatorSetpoints {
-    L1(-2.4),
-    L2(-3.65),
-    L3(-5.68),
-    L4(-9.2),
+    L1(-2.50),
+    L2(-3.8 + .00004829),
+    L3(-5.7),
+    L4(-8.89), // -9.2
     FEEDER(-0.480458984375);
 
     private final double position;

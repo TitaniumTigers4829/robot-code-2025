@@ -207,8 +207,8 @@ public class RepulsorFieldPlanner {
   static final List<Obstacle> FIELD_OBSTACLES =
       List.of(
           // Reef
-          new TeardropObstacle(ReefLocations.BLUE_REEF, 1, 2, .83, 3, 2),
-          new TeardropObstacle(ReefLocations.RED_REEF, 1, 2, .83, 3, 2),
+          new TeardropObstacle(ReefLocations.BLUE_REEF, 1, 2.5, .83, 3, 2),
+          new TeardropObstacle(ReefLocations.RED_REEF, 1, 2.5, .83, 3, 2),
           // Walls
           new HorizontalObstacle(0.0, 0.5, .5, true),
           new HorizontalObstacle(FIELD_WIDTH, 0.5, .5, false),
@@ -270,7 +270,6 @@ public class RepulsorFieldPlanner {
     }
     Rotation2d direction = displacement.getAngle();
     double rawMag = (1 + 1.0 / (1e-6 + displacement.getNorm()));
-    // double cappedMag = Math.min(rawMag, 1);
     return new Translation2d(rawMag, direction);
   }
 
@@ -296,18 +295,12 @@ public class RepulsorFieldPlanner {
       Translation2d curTrans, double maxSpeed, double slowdownDistance) {
     Translation2d err = curTrans.minus(goal);
     Translation2d netForce = getForce(curTrans, goal);
-    double dampingCoefficient = 0.5;
-    Translation2d velocity = new Translation2d();
 
     double stepSize_m;
     if (err.getNorm() < slowdownDistance) {
       stepSize_m =
-          MathUtil.interpolate( // TODO: maybe don't divide by distance
+          MathUtil.interpolate(
               0, maxSpeed * Robot.defaultPeriodSecs, err.getNorm() / slowdownDistance);
-      Translation2d dampingForce =
-          velocity.times(-dampingCoefficient * (1 - err.getNorm() / slowdownDistance));
-      netForce =
-          new Translation2d(netForce.getNorm() + dampingForce.getNorm(), netForce.getAngle());
     } else {
       stepSize_m = maxSpeed * Robot.defaultPeriodSecs;
     }
