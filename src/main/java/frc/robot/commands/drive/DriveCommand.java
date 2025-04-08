@@ -1,13 +1,11 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.subsystems.swerve.SwerveConstants.DriveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
 
 public class DriveCommand extends DriveCommandBase {
 

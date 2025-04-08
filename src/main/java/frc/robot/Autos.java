@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.autodrive.AutoAlignPose;
@@ -41,9 +40,7 @@ import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-/**
- * This class is where all the auto routines are created. It also contains the auto chooser
- */
+/** This class is where all the auto routines are created. It also contains the auto chooser */
 public class Autos {
   private final LoggedDashboardChooser<String> chooser;
   private final AutoFactory autoFactory;
@@ -163,7 +160,7 @@ public class Autos {
 
     addRoutine("dummy again", () -> dumbShitRIght());
   }
-  
+
   public AutoRoutine xOneMeterAuto() {
     AutoRoutine routine = autoFactory.newRoutine(AutoConstants.X_ONE_METER_AUTO);
     AutoTrajectory xOneMeterTrajectory = routine.trajectory(AutoConstants.X_ONE_METER_TRAJECTORY);
@@ -223,7 +220,9 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(2.4829)
-                    .andThen(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.24829)),
+                    .andThen(
+                        new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE)
+                            .withTimeout(1.24829)),
                 new InstantCommand(
                     () -> swerveDrive.resetEstimatedPose(visionSubsystem.getLastSeenPose())),
                 new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
@@ -250,7 +249,9 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(1.94829)
-                    .alongWith(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.248294829)),
+                    .alongWith(
+                        new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE)
+                            .withTimeout(1.248294829)),
                 new AutoAlignReef(swerveDrive, visionSubsystem, false, this::alignCallback)
                     .withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
@@ -308,7 +309,9 @@ public class Autos {
                         () -> false,
                         this::alignCallback)
                     .withTimeout(1.94829)
-                    .alongWith(new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE).withTimeout(1.248294829)),
+                    .alongWith(
+                        new SetFunnelAngle(funnelSubsystem, FunnelConstants.ANGLE_INTAKE)
+                            .withTimeout(1.248294829)),
                 new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback)
                     .withTimeout(4),
                 new ScoreL4(elevatorSubsystem, coralIntakeSubsystem)
@@ -532,7 +535,8 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition(
+                                elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(
@@ -608,7 +612,8 @@ public class Autos {
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .withTimeout(2.0)
                         .andThen(
-                            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition(
+                                elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(2.0)
                         .andThen(
                             Commands.runEnd(
@@ -645,7 +650,7 @@ public class Autos {
             new RepulsorReef(swerveDrive, visionSubsystem, false)
                 .withTimeout(2.0)
                 .andThen(
-                    new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                    new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                 .withTimeout(2.0)
                 .andThen(
                     Commands.runEnd(
@@ -684,7 +689,8 @@ public class Autos {
                 .andThen(
                     new RepulsorReef(swerveDrive, visionSubsystem, false)
                         .alongWith(
-                            new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
+                            new SetElevatorPosition(
+                                elevatorSubsystem, ElevatorSetpoints.L4.getPosition()))
                         .withTimeout(4.0)
                         .andThen(
                             Commands.runEnd(

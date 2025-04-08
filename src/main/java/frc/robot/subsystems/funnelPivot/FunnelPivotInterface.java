@@ -20,33 +20,35 @@ public interface FunnelPivotInterface {
 
   /**
    * Sets the funnel speed
+   *
    * @param speed the speed to set the funnel to
    */
   default void setFunnelSpeed(double speed) {}
 
   /**
    * Sets the funnel angle
+   *
    * @param angle the angle to set the funnel to
    */
   default void setFunnelAngle(double angle) {}
 
   /**
    * Sets the funnel voltage
+   *
    * @param voltage the voltage to set the funnel to
    */
   default void setFunnelVoltage(double voltage) {}
 
   /**
    * Checks if the funnel pivot is within an acceptable error
+   *
    * @return true if the funnel pivot is within an acceptable error
    */
   default boolean isPivotWithinAcceptapleError() {
     return false;
   }
 
-  /**
-   * Returns the angle of the funnel pivot
-   */
+  /** Returns the angle of the funnel pivot */
   default double getFunnelAngle() {
     return 0.0;
   }
@@ -58,15 +60,13 @@ public interface FunnelPivotInterface {
 
   /**
    * Sets the PID values for the funnel pivot
-   * 
+   *
    * @param kP the proportional gain
    * @param kI the integral gain
    * @param kD the derivative gain
    */
   default void setPID(double kP, double kI, double kD) {}
 
-  /**
-   * Check for alerts and log them if they exist
-   */
+  /** Check for alerts and log them if they exist */
   default void checkAlerts() {}
 }

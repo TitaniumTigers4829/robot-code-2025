@@ -244,8 +244,7 @@ public class Robot extends LoggedRobot {
     operatorController
         .a()
         .whileTrue(
-            new SetElevatorPosition(
-                    elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
@@ -254,7 +253,7 @@ public class Robot extends LoggedRobot {
     operatorController
         .x()
         .whileTrue(
-            new SetElevatorPosition( elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+            new SetElevatorPosition(elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()

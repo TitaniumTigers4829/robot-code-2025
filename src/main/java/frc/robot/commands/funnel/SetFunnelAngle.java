@@ -5,7 +5,6 @@
 package frc.robot.commands.funnel;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.funnelPivot.FunnelConstants;
 import frc.robot.subsystems.funnelPivot.FunnelSubsystem;
 
 public class SetFunnelAngle extends Command {

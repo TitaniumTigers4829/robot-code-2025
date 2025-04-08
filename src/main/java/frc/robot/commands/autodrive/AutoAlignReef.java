@@ -16,9 +16,7 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
-/**
- * This command is used to align the robot to a specific reef using the vision subsystem.
- */
+/** This command is used to align the robot to a specific reef using the vision subsystem. */
 public class AutoAlignReef extends DriveCommandBase {
   private final SwerveDrive swerveDrive;
   private final boolean left;

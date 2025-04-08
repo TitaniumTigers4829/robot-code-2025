@@ -572,6 +572,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Checks if the robot is near the source.
+   *
    * @return true if the robot is near the source
    */
   @AutoLogOutput
@@ -615,7 +616,7 @@ public class SwerveDrive extends SubsystemBase {
 
   /**
    * Follows the repulsor field to the goal.
-   * 
+   *
    * @param goal the goal to follow to
    */
   public void followRepulsorField(Pose2d goal) {

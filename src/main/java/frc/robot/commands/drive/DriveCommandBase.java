@@ -49,7 +49,7 @@ public abstract class DriveCommandBase extends Command {
   }
 
   private double scaleStandardDeviations(Limelight limelight, double standardDeviation) {
-      return limelight.hasInternalIMU() ? standardDeviation * 1.5 : standardDeviation;
+    return limelight.hasInternalIMU() ? standardDeviation * 1.5 : standardDeviation;
   }
 
   /**
