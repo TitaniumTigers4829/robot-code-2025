@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlignReef;
 import frc.robot.commands.drive.DriveCommand;
-import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.funnel.SetFunnelAngle;
 import frc.robot.extras.util.JoystickUtil;
 import frc.robot.sim.SimWorld;
@@ -138,7 +137,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    configureDriverController();
+    // configureDriverController();
     configureOperatorController();
   }
 
@@ -212,6 +211,26 @@ public class Robot extends LoggedRobot {
   }
 
   private void configureOperatorController() {
+    // Control robot with one controller
+    // Only allows the operator to turn the robot
+
+    Command driveCommand =
+        new DriveCommand(
+            swerveDrive,
+            visionSubsystem,
+            // Translation in the X direction
+            () -> 0.0,
+            // Translation in the Y direction
+            () -> 0.0,
+            // Rotation
+            () -> JoystickUtil.modifyAxis(operatorController::getLeftX, 3),
+            // Robot relative
+            () -> true,
+            // Rotation speed
+            () -> operatorController.rightStick().getAsBoolean(),
+            this::alignCallback);
+    swerveDrive.setDefaultCommand(driveCommand);
+
     operatorController
         .leftBumper()
         .whileTrue(
@@ -228,15 +247,15 @@ public class Robot extends LoggedRobot {
         .rightBumper()
         .whileTrue(
             elevatorSubsystem
-                .manualElevator(() -> operatorController.getLeftY())
+                .manualElevator(() -> operatorController.getLeftY() * 0.3)
                 .onlyIf(
                     () ->
                         (coralIntakeSubsystem.isIntakeComplete()
                             || coralIntakeSubsystem.isIntakeIdle())));
 
-    operatorController
-        .rightTrigger()
-        .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
+    // operatorController
+    //     .rightTrigger()
+    //     .onTrue(Commands.runOnce(() -> elevatorSubsystem.resetPosition(0.0), elevatorSubsystem));
     operatorController
         .povRight()
         .whileTrue(
@@ -253,45 +272,45 @@ public class Robot extends LoggedRobot {
                         () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
                         coralIntakeSubsystem)));
 
-    operatorController
-        .a()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+    // operatorController
+    //     .a()
+    //     .whileTrue(
+    //         new SetElevatorPosition(
+    //                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.L1.getPosition())
+    //             .onlyIf(
+    //                 () ->
+    //                     (coralIntakeSubsystem.isIntakeComplete()
+    //                         || coralIntakeSubsystem.isIntakeIdle())));
 
-    operatorController
-        .x()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+    // operatorController
+    //     .x()
+    //     .whileTrue(
+    //         new SetElevatorPosition(
+    //                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.L2.getPosition())
+    //             .onlyIf(
+    //                 () ->
+    //                     (coralIntakeSubsystem.isIntakeComplete()
+    //                         || coralIntakeSubsystem.isIntakeIdle())));
 
-    operatorController
-        .b()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+    // operatorController
+    //     .b()
+    //     .whileTrue(
+    //         new SetElevatorPosition(
+    //                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.L3.getPosition())
+    //             .onlyIf(
+    //                 () ->
+    //                     (coralIntakeSubsystem.isIntakeComplete()
+    //                         || coralIntakeSubsystem.isIntakeIdle())));
 
-    operatorController
-        .y()
-        .whileTrue(
-            new SetElevatorPosition(
-                    swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
-                .onlyIf(
-                    () ->
-                        (coralIntakeSubsystem.isIntakeComplete()
-                            || coralIntakeSubsystem.isIntakeIdle())));
+    // operatorController
+    //     .y()
+    //     .whileTrue(
+    //         new SetElevatorPosition(
+    //                 swerveDrive, elevatorSubsystem, ElevatorSetpoints.L4.getPosition())
+    //             .onlyIf(
+    //                 () ->
+    //                     (coralIntakeSubsystem.isIntakeComplete()
+    //                         || coralIntakeSubsystem.isIntakeIdle())));
 
     operatorController
         .leftTrigger()
@@ -307,16 +326,16 @@ public class Robot extends LoggedRobot {
                         () -> coralIntakeSubsystem.setIntakeState(IntakeState.IDLE),
                         coralIntakeSubsystem)));
 
-    operatorController
-        .povUp()
-        .whileTrue(
-            climbPivotSubsystem.manualPivotClimb(
-                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
-    operatorController
-        .povDown()
-        .whileTrue(
-            funnelSubsystem.manualFunnel(
-                () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
+    // operatorController
+    //     .povUp()
+    //     .whileTrue(
+    //         climbPivotSubsystem.manualPivotClimb(
+    //             () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
+    // operatorController
+    //     .povDown()
+    //     .whileTrue(
+    //         funnelSubsystem.manualFunnel(
+    //             () -> JoystickUtil.modifyAxis(() -> operatorController.getLeftY(), 2)));
   }
 
   private void checkGit() {
