@@ -22,10 +22,17 @@ import java.util.List;
  * obstacles.
  */
 public class RepulsorFieldPlanner {
+
+  /*
+   * This class is used to create an obstacle for the repulsor field.
+   */
   private abstract static class Obstacle {
     double strength;
     boolean positive;
 
+    /**
+     * Constructor for the Obstacle class.
+     */
     public Obstacle(double strength, boolean positive) {
       this.strength = strength;
       this.positive = positive;
