@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.HardwareConstants;
 import frc.robot.commands.autodrive.AutoAlignReef;
+import frc.robot.commands.characterization.FeedForwardCharacterization;
 import frc.robot.commands.drive.DriveCommand;
 import frc.robot.commands.elevator.SetElevatorPosition;
 import frc.robot.commands.funnel.SetFunnelAngle;
@@ -200,6 +201,14 @@ public class Robot extends LoggedRobot {
     driverController
         .leftTrigger()
         .whileTrue(new AutoAlignReef(swerveDrive, visionSubsystem, true, this::alignCallback));
+
+    driverController
+        .y()
+        .whileTrue(
+            new FeedForwardCharacterization(
+                coralIntakeSubsystem,
+                coralIntakeSubsystem::setIntakeVoltage,
+                coralIntakeSubsystem::getIntakeVelocity));
 
     // Reset robot odometry based on the most recent vision pose measurement from april tags
     // This should be pressed when looking at an april tag

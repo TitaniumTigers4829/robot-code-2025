@@ -1,8 +1,7 @@
 package frc.robot.sim;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.logging.RuntimeLog;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.configs.SimDriveTrainConfig;
@@ -69,10 +68,11 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void simTick() {
     driveTrain.simTick();
-    // TODO: fix SimBattery :/
-    // final Voltage batVolts = battery.getBatteryVoltage();
+    battery.updateAndGetBatteryVoltage(); // updates the battery state based on the loads
+
+    final Voltage batVolts = battery.getLastVoltage();
     for (var mechanism : mechanisms) {
-      mechanism.update(Volts.of(12.0));
+      mechanism.update(batVolts);
     }
   }
 
