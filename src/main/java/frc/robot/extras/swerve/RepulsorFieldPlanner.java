@@ -16,6 +16,11 @@ import frc.robot.extras.util.ReefLocations;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is used to plan a path for the robot to follow using a repulsor field. The field is
+ * created by a set of obstacles, and the robot is attracted to the goal while being repelled by the
+ * obstacles.
+ */
 public class RepulsorFieldPlanner {
   private abstract static class Obstacle {
     double strength;

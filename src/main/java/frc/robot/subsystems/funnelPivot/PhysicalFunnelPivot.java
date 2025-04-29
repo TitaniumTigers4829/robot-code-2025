@@ -65,9 +65,6 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
 
     funnelMotorConfig.Feedback.SensorToMechanismRatio = FunnelConstants.FUNNEL_GEAR_RATIO;
-    // funnelMotorConfig.Slot0.kP = FunnelConstants.PIVOT_P;
-    // funnelMotorConfig.Slot0.kI = FunnelConstants.PIVOT_I;
-    // funnelMotorConfig.Slot0.kD = FunnelConstants.PIVOT_D;
 
     funnelVoltage = funnelMotor.getMotorVoltage();
     funnelVelocity = funnelMotor.getVelocity();
@@ -129,7 +126,6 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
 
   @Override
   public void setPID(double kP, double kI, double kD) {
-
     funnelMotorConfig.Slot0.kP = kP;
     funnelMotorConfig.Slot0.kI = kI;
     funnelMotorConfig.Slot0.kD = kD;
@@ -137,9 +133,7 @@ public class PhysicalFunnelPivot implements FunnelPivotInterface {
     funnelMotor.getConfigurator().apply(funnelMotorConfig);
   }
 
-  /**
-   * Check if motor or encoder is disconnected and set alerts periodically from main subsystem class
-   */
+  @Override
   public void checkAlerts() {
     boolean motorConnected =
         BaseStatusSignal.refreshAll(

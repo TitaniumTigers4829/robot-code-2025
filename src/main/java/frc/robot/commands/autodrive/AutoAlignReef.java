@@ -16,7 +16,7 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/** This command is used to align the robot to a specific reef using the vision subsystem. */
 public class AutoAlignReef extends DriveCommandBase {
   private final SwerveDrive swerveDrive;
   private final boolean left;
@@ -33,7 +33,7 @@ public class AutoAlignReef extends DriveCommandBase {
   private ProfiledPIDController rotationController =
       new ProfiledPIDController(4.8, 0, 0.29, new Constraints(2, 4));
 
-  /** Creates a new RepulsorReef. */
+  /** Creates a new AutoAlignReef. */
   public AutoAlignReef(
       SwerveDrive swerveDrive,
       VisionSubsystem visionSubsystem,
@@ -73,12 +73,10 @@ public class AutoAlignReef extends DriveCommandBase {
         rotationController.calculate(
             currentPose.getRotation().getRadians(), desiredPose.getRotation().getRadians());
 
-    double distance = desiredPose.getTranslation().getDistance(currentPose.getTranslation());
-
     ChassisSpeeds outputSpeeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
-            MathUtil.clamp(scalar(distance) * xOutput, -.6, .6),
-            MathUtil.clamp(scalar(distance) * yOutput, -.6, .6),
+            MathUtil.clamp(xOutput, -.6, .6),
+            MathUtil.clamp(yOutput, -.6, .6),
             rotationOutput,
             swerveDrive.getOdometryRotation2d());
 
@@ -107,14 +105,5 @@ public class AutoAlignReef extends DriveCommandBase {
     return swerveDrive.isReefInRange()
         && Math.abs(swerveDrive.getChassisSpeeds().vxMetersPerSecond) < 0.075
         && Math.abs(swerveDrive.getChassisSpeeds().vyMetersPerSecond) < 0.075;
-  }
-
-  public double scalar(double distance) {
-    // if (distance < 1) {
-    //   return MathUtil.clamp((1 / (1 - (-.1)) * (distance - (-.1))), 0, 1);
-    // } else {
-    //   return 1.0;
-    // }
-    return 1;
   }
 }
