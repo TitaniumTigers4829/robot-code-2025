@@ -14,7 +14,6 @@ import frc.robot.sim.simMechanism.SimIndexer;
 import frc.robot.sim.simMechanism.SimIntake;
 import frc.robot.sim.simMechanism.SimMechanism;
 import frc.robot.sim.simMechanism.simBattery.LeadAcidBatterySim;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -69,10 +68,11 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void simTick() {
     driveTrain.simTick();
-    
+
     battery.update(0.02);
 
-    final Voltage batVolts = battery.getLastVoltage(); // updates the battery state based on the loads
+    final Voltage batVolts =
+        battery.getLastVoltage(); // updates the battery state based on the loads
     for (var mechanism : mechanisms) {
       mechanism.update(batVolts);
     }
