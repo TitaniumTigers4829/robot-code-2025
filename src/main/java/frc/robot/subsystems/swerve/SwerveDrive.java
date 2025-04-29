@@ -257,10 +257,10 @@ public class SwerveDrive extends SubsystemBase {
   }
 
   /**
-   * @param omegaspeed Controls the rotation speed of the drivetrain for characterization.
+   * @param omegaSpeed Controls the rotation speed of the drivetrain for characterization.
    */
-  public void runWheelRadiusCharacterization(double omegaspeed) {
-    drive(0, 0, omegaspeed, false);
+  public void runWheelRadiusCharacterization(double omegaSpeed) {
+    drive(0, 0, omegaSpeed, false);
   }
 
   /**

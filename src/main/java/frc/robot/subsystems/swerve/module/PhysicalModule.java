@@ -128,6 +128,15 @@ public class PhysicalModule implements ModuleInterface {
     turnMotor.optimizeBusUtilization();
     turnEncoder.optimizeBusUtilization();
   }
+ 
+  /**
+   * Returns the current angle of the module in rotations.
+   */
+  public double getTurnRotations() {
+    turnEncoder.getAbsolutePosition().refresh();
+    return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
+        .getRotations();
+  }
 
   @Override
   public void updateInputs(ModuleInputs inputs) {
@@ -204,12 +213,6 @@ public class PhysicalModule implements ModuleInterface {
             .withPosition(Rotations.of(desiredState.angle.getRotations()))
             .withUseTimesync(true)
             .withOverrideCoastDurNeutral(true));
-  }
-
-  public double getTurnRotations() {
-    turnEncoder.getAbsolutePosition().refresh();
-    return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
-        .getRotations();
   }
 
   @Override
