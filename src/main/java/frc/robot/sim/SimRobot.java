@@ -9,11 +9,12 @@ import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simField.SimGamePiece;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
-import frc.robot.sim.simMechanism.SimBattery;
 import frc.robot.sim.simMechanism.SimDriveTrain;
 import frc.robot.sim.simMechanism.SimIndexer;
 import frc.robot.sim.simMechanism.SimIntake;
 import frc.robot.sim.simMechanism.SimMechanism;
+import frc.robot.sim.simMechanism.simBattery.LeadAcidBatterySim;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -34,7 +35,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   private final DrvTrn driveTrain;
   // may move towards multi indexers soon
   private final SimIndexer gamePieceStorage;
-  private final SimBattery battery = new SimBattery();
+  private final LeadAcidBatterySim battery = new LeadAcidBatterySim(0, 0, 0, 0, 0, 0);
   private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
   private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
 
@@ -68,9 +69,10 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void simTick() {
     driveTrain.simTick();
-    battery.updateAndGetBatteryVoltage(); // updates the battery state based on the loads
+    
+    battery.update(0.02);
 
-    final Voltage batVolts = battery.getLastVoltage();
+    final Voltage batVolts = battery.getLastVoltage(); // updates the battery state based on the loads
     for (var mechanism : mechanisms) {
       mechanism.update(batVolts);
     }
