@@ -182,7 +182,7 @@ public class SwerveModule {
 
   /**
    * Gets the measured state of the module, which includes the drive velocity and turn rotation.
-   * 
+   *
    * @return a SwerveModuleState object containing the drive velocity and turn rotation
    */
   public SwerveModuleState getMeasuredState() {
