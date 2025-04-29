@@ -1,6 +1,6 @@
-# LeadAcidBatterySim - Lead-Acid Battery Simulation for FRC Robots
+# LeadAcidBatterySim
 
-This project provides a simulation of a **Lead-Acid Battery** using a **two-RC-branch Thévenin model**. It models the internal dynamics of the battery, including its **State of Charge (SOC)**, **Open Circuit Voltage (OCV)**, and **polarization effects** over time. The simulation can be integrated into **FIRST Robotics Competition (FRC)** robot code using WPILib’s simulation framework.
+This project provides a simulation of a **Lead-Acid Battery** using a **two-RC-branch Thévenin model**. It models the internal dynamics of the battery, including its **State of Charge (SOC)**, **Open Circuit Voltage (OCV)**, and **polarization effects** over time.
 
 ### Features
 - **State of Charge (SOC)**: Tracks the battery's energy level and updates it based on the current draw.
