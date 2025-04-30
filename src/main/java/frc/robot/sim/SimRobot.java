@@ -1,5 +1,7 @@
 package frc.robot.sim;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.logging.RuntimeLog;
@@ -34,7 +36,8 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   private final DrvTrn driveTrain;
   // may move towards multi indexers soon
   private final SimIndexer gamePieceStorage;
-  private final LeadAcidBatterySim battery = new LeadAcidBatterySim(0, 0, 0, 0, 0, 0);
+  private final LeadAcidBatterySim battery =
+      new LeadAcidBatterySim(18, 0.015, 0.015, 2000, 0.050, 500);
   private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
   private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
 
@@ -69,12 +72,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   public void simTick() {
     driveTrain.simTick();
 
-    battery.update(0.02);
+    battery.update(timing().dt().in(Seconds));
 
     final Voltage batVolts =
         battery.getLastVoltage(); // updates the battery state based on the loads
     for (var mechanism : mechanisms) {
       mechanism.update(batVolts);
+      // driveTrain.simTick();
     }
   }
 
@@ -85,6 +89,10 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public SimEnvTiming timing() {
     return arena.timing;
+  }
+
+  public LeadAcidBatterySim getBattery() {
+    return battery;
   }
 
   /**
