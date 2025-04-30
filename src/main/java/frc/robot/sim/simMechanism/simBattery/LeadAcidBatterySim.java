@@ -22,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
  * toward bulkSOC (faster at rest) 4) vp1, vp2 integrate dvp/dt = −vp/τ + I/C 5) ocv = f(surfaceSOC)
  * 6) sag = I·R₀(T) + vp1 + vp2 7) Vterm = ocv − sag → RoboRioSim
  */
-public class LeadAcidBatterySim {
+public class LeadAcidBatterySim implements BatterySimInterface {
   // === Constructor Parameters ===
   private final double QNom; // capacity [C]
   private final double R0_ref; // base ohmic resistance [Ω]
@@ -68,6 +68,7 @@ public class LeadAcidBatterySim {
   }
 
   /** Register a mechanism’s current draw. */
+  @Override
   public void addMechanism(SimMechanism mech) {
     Supplier<Current> sup = () -> mech.motorVariables().statorCurrent();
     mechMap.put(mech, sup);
@@ -75,6 +76,7 @@ public class LeadAcidBatterySim {
   }
 
   /** Unregister a mechanism’s draw. */
+  @Override
   public boolean removeMechanism(SimMechanism mech) {
     Supplier<Current> sup = mechMap.remove(mech);
     return sup != null && appliances.remove(sup);
@@ -86,6 +88,7 @@ public class LeadAcidBatterySim {
   }
 
   /** Advance simulation by dt seconds. */
+  @Override
   public void update(double dt) {
     // 1) Sum all mechanism currents (A)
     double I = appliances.stream().mapToDouble(s -> s.get().in(Units.Amps)).sum();
@@ -126,20 +129,22 @@ public class LeadAcidBatterySim {
     // 9) Push into WPILib sim framework
     RoboRioSim.setVInVoltage(lastVoltage);
     // TODO: Check out the following:
-    // RoboRioSim.setVInCurrent(totalAmps);
-    // BatterySim.calculate...
+    RoboRioSim.setVInCurrent(I);
     Logger.recordOutput("LeadAcidBattery/terminalVoltage", lastVoltage);
     Logger.recordOutput("LeadAcidBattery/controllerVoltage", RobotController.getBatteryVoltage());
+    Logger.recordOutput("LeadAcidBattery/current", I);
   }
 
   /**
    * @return the most recent terminal voltage (V).
    */
-  public Voltage getLastVoltage() {
+  @Override
+  public Voltage getVoltage() {
     return Units.Volts.of(lastVoltage);
   }
 
   /** Reset to fully-charged, zero polarization. */
+  @Override
   public void reset() {
     bulkSOC = 1.0;
     surfaceSOC = 1.0;

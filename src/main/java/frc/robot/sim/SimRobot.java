@@ -15,7 +15,7 @@ import frc.robot.sim.simMechanism.SimDriveTrain;
 import frc.robot.sim.simMechanism.SimIndexer;
 import frc.robot.sim.simMechanism.SimIntake;
 import frc.robot.sim.simMechanism.SimMechanism;
-import frc.robot.sim.simMechanism.simBattery.LeadAcidBatterySim;
+import frc.robot.sim.simMechanism.simBattery.BatterySimInterface;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -36,8 +36,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   private final DrvTrn driveTrain;
   // may move towards multi indexers soon
   private final SimIndexer gamePieceStorage;
-  private final LeadAcidBatterySim battery =
-      new LeadAcidBatterySim(18, 0.015, 0.015, 2000, 0.050, 500);
+  private final BatterySimInterface battery;
   private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
   private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
 
@@ -51,8 +50,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    * @param gamePieceStorageCapacity The capacity for storing game pieces.
    */
   public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(
-      SimArena arena, String name, C drivetrainConfig, int gamePieceStorageCapacity) {
+      SimArena arena,
+      String name,
+      C drivetrainConfig,
+      int gamePieceStorageCapacity,
+      BatterySimInterface batterySim) {
     this.arena = arena;
+    battery = batterySim;
     arena.robots.add(this);
     this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
     arena.withWorld(world -> world.addBody(driveTrain.chassis));
@@ -74,11 +78,9 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
 
     battery.update(timing().dt().in(Seconds));
 
-    final Voltage batVolts =
-        battery.getLastVoltage(); // updates the battery state based on the loads
-    for (var mechanism : mechanisms) {
+    final Voltage batVolts = battery.getVoltage(); // updates the battery state based on the loads
+    for (SimMechanism mechanism : mechanisms) {
       mechanism.update(batVolts);
-      // driveTrain.simTick();
     }
   }
 
@@ -91,7 +93,10 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     return arena.timing;
   }
 
-  public LeadAcidBatterySim getBattery() {
+  /*
+   * Returns the battery simulation object for the robot.
+   */
+  public BatterySimInterface getBattery() {
     return battery;
   }
 
