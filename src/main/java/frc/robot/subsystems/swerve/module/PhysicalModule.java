@@ -68,8 +68,7 @@ public class PhysicalModule implements ModuleInterface {
 
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     driveConfig.MotorOutput.Inverted = moduleConfig.driveReversed();
-    driveConfig.MotorOutput.DutyCycleNeutralDeadband =
-        0.01; // 0.005; // HardwareConstants.MIN_DUTY_CYCLE_DEADBAND;
+    driveConfig.MotorOutput.DutyCycleNeutralDeadband = 0.01;
     driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = ModuleConstants.DRIVE_SUPPLY_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimit = ModuleConstants.DRIVE_STATOR_LIMIT;
@@ -128,6 +127,13 @@ public class PhysicalModule implements ModuleInterface {
     driveMotor.optimizeBusUtilization();
     turnMotor.optimizeBusUtilization();
     turnEncoder.optimizeBusUtilization();
+  }
+
+  /** Returns the current angle of the module in rotations. */
+  public double getTurnRotations() {
+    turnEncoder.getAbsolutePosition().refresh();
+    return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
+        .getRotations();
   }
 
   @Override
@@ -205,12 +211,6 @@ public class PhysicalModule implements ModuleInterface {
             .withPosition(Rotations.of(desiredState.angle.getRotations()))
             .withUseTimesync(true)
             .withOverrideCoastDurNeutral(true));
-  }
-
-  public double getTurnRotations() {
-    turnEncoder.getAbsolutePosition().refresh();
-    return Rotation2d.fromRotations(turnEncoder.getAbsolutePosition().getValueAsDouble())
-        .getRotations();
   }
 
   @Override
