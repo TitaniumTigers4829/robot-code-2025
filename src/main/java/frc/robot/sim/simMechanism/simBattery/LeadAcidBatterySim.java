@@ -129,7 +129,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
     // 9) Push into WPILib sim framework
     RoboRioSim.setVInVoltage(lastVoltage);
     // TODO: Check out the following:
-    RoboRioSim.setVInCurrent(I);
+    // RoboRioSim.setVInCurrent(I);
     Logger.recordOutput("LeadAcidBattery/terminalVoltage", lastVoltage);
     Logger.recordOutput("LeadAcidBattery/controllerVoltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("LeadAcidBattery/current", I);
@@ -158,8 +158,8 @@ public class LeadAcidBatterySim implements BatterySimInterface {
 
   /** Logistic-like OCV curve: ~11.8 V (0%) → 12.7 V (100%), knee at 60%. */
   private double computeOCV(double soc) {
-    soc = clamp(soc, 0.01, 0.999);
-    return 11.8 + 0.9 / (1 + Math.exp(-10 * (soc - 0.6)));
+    soc = clamp(soc, 0.01, 0.99);
+    return 11.8 + 0.9 / (1.0 + Math.exp(-4.0 * (soc - 0.6))); // exponent 4 instead of 10
   }
 
   /** Clamp x into [min, max]. */

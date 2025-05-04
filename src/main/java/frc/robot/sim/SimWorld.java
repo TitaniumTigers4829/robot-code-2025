@@ -86,7 +86,7 @@ public class SimWorld {
             "User",
             swerveConfig,
             1,
-            new LeadAcidBatterySim(18, 0.015, 0.015, 2000, 0.050, 500));
+            new LeadAcidBatterySim(18, 0.02, 0.015, 150, 0.050, 250));
 
     aprilTagSim = new VisionSystemSim("AprilTags");
     aprilTagSim.addAprilTags(VisionConstants.FIELD_LAYOUT);
