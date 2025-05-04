@@ -77,8 +77,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     driveTrain.simTick();
 
     battery.update(timing().dt().in(Seconds));
-
-    final Voltage batVolts = battery.getVoltage(); // updates the battery state based on the loads
+    final Voltage batVolts = battery.getVoltage();
     for (SimMechanism mechanism : mechanisms) {
       mechanism.update(batVolts);
     }

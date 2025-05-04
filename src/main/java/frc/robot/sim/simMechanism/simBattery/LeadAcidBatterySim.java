@@ -70,7 +70,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
   /** Register a mechanism’s current draw. */
   @Override
   public void addMechanism(SimMechanism mech) {
-    Supplier<Current> sup = () -> mech.motorVariables().statorCurrent();
+    Supplier<Current> sup = () -> mech.motorVariables().supplyCurrent();
     mechMap.put(mech, sup);
     appliances.add(sup);
   }
@@ -95,6 +95,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
 
     // 2) bulkSOC: Coulomb counting dSOC = I·dt / QNom
     bulkSOC = clamp(bulkSOC - (I * dt) / QNom, 0.0, 1.0);
+    Logger.recordOutput("LeadAcidBattery/bulkSOC", bulkSOC);
 
     // 3) surfaceSOC: recovery toward bulkSOC (electrolyte stratification)
     double rate =
@@ -102,6 +103,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
             ? 1.0 / (DEFAULT_RECOVERY_TAU / REST_FACTOR)
             : 1.0 / DEFAULT_RECOVERY_TAU;
     surfaceSOC = clamp(surfaceSOC + (bulkSOC - surfaceSOC) * rate * dt, 0.0, 1.0);
+    Logger.recordOutput("LeadAcidBattery/surfaceSOC", surfaceSOC);
 
     // 4) Polarization: dvp/dt = -vp/τ + I/C
     vp1 += ((-vp1 / tau1) + (I / Cp1)) * dt;
@@ -133,6 +135,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
     Logger.recordOutput("LeadAcidBattery/terminalVoltage", lastVoltage);
     Logger.recordOutput("LeadAcidBattery/controllerVoltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("LeadAcidBattery/current", I);
+    Logger.recordOutput("LeadAcidBattery/dt", dt);
   }
 
   /**
@@ -159,7 +162,8 @@ public class LeadAcidBatterySim implements BatterySimInterface {
   /** Logistic-like OCV curve: ~11.8 V (0%) → 12.7 V (100%), knee at 60%. */
   private double computeOCV(double soc) {
     soc = clamp(soc, 0.01, 0.99);
-    return 11.8 + 0.9 / (1.0 + Math.exp(-4.0 * (soc - 0.6))); // exponent 4 instead of 10
+    return 11.8 + 0.9 * soc;
+    // / (1.0 + Math.exp(-4.0 * (soc - 0.6))); // exponent 4 instead of 10
   }
 
   /** Clamp x into [min, max]. */
