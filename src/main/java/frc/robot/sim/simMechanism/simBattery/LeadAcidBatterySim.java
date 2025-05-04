@@ -1,5 +1,8 @@
 package frc.robot.sim.simMechanism.simBattery;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
@@ -71,6 +74,18 @@ public class LeadAcidBatterySim implements BatterySimInterface {
   @Override
   public void addMechanism(SimMechanism mech) {
     Supplier<Current> sup = () -> mech.motorVariables().supplyCurrent();
+    Logger.recordOutput(
+        "LeadAcidBattery/supplyCurrent " + mech.name(),
+        mech.motorVariables().supplyCurrent().in(Amps));
+    Logger.recordOutput(
+        "LeadAcidBattery/supplyVoltage " + mech.name(),
+        mech.motorVariables().supplyVoltage().in(Volts));
+    Logger.recordOutput(
+        "LeadAcidBattery/statorVoltage " + mech.name(),
+        mech.motorVariables().statorVoltage().in(Volts));
+    Logger.recordOutput(
+        "LeadAcidBattery/statorCurrent " + mech.name(),
+        mech.motorVariables().statorCurrent().in(Amps));
     mechMap.put(mech, sup);
     appliances.add(sup);
   }
