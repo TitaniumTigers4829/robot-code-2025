@@ -330,8 +330,7 @@ public class SwerveDrive extends SubsystemBase {
         rotationChoreoController.calculate(getOdometryRotation2d().getRadians(), sample.heading));
     Logger.recordOutput("Trajectories/desiredHeading", sample.heading);
 
-    chassisSpeeds = Robot.isSimulation() ? chassisSpeeds : chassisSpeeds.unaryMinus();
-    drive(chassisSpeeds, false);
+    drive(chassisSpeeds.unaryMinus(), false);
   }
 
   /** Runs the SwerveModules periodic methods */
@@ -692,13 +691,10 @@ public class SwerveDrive extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             outputFieldRelative, poseEstimator.getEstimatedPosition().getRotation());
 
-    outputRobotRelative =
-        Robot.isSimulation() ? outputRobotRelative : outputRobotRelative.unaryMinus();
-
     Logger.recordOutput("Repulsor/Speeds", outputRobotRelative);
     // Logger.recordOutput(getName(), null);
 
-    drive(outputRobotRelative, false);
+    drive(outputRobotRelative.unaryMinus(), false);
   }
 
   /**
