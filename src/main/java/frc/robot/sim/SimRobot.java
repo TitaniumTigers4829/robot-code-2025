@@ -1,6 +1,8 @@
 package frc.robot.sim;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.units.measure.Voltage;
@@ -75,12 +77,29 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void simTick() {
     driveTrain.simTick();
+    // 1. Use previous battery voltage for motor simulation
+    Voltage batteryVoltage = battery.getVoltage();
 
-    battery.update(timing().dt().in(Seconds));
-    final Voltage batVolts = battery.getVoltage();
-    for (SimMechanism mechanism : mechanisms) {
-      mechanism.update(batVolts);
+    double totalCurrentDraw = 0.0;
+    if (batteryVoltage.in(Volts) < 1e-6) {
+      //   for (SimMechanism mechanism : mechanisms) {
+      //     // The motor update uses the batteryVoltage internally (via RoboRioSim)
+      //         mechanism.setState(); // supply current from this motor
+      // }
+      battery.update(totalCurrentDraw, timing().dt().in(Seconds));
+      return;
     }
+
+    // 2. Simulate each mechanism/motor controller at this batteryVoltage
+    for (SimMechanism mechanism : mechanisms) {
+      // The motor update uses the batteryVoltage internally (via RoboRioSim)
+      mechanism.update(batteryVoltage);
+      totalCurrentDraw +=
+          mechanism.motorVariables().supplyCurrent().in(Amps); // supply current from this motor
+    }
+
+    // 3. Update the battery model with total current
+    battery.update(totalCurrentDraw, timing().dt().in(Seconds));
   }
 
   /**
@@ -129,13 +148,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void addMechanism(SimMechanism mechanism) {
     mechanisms.add(mechanism);
-    battery.addMechanism(mechanism);
+    // battery.addMechanism(mechanism);
     RuntimeLog.debug("Added SimMechanism to SimRobot");
   }
 
   public void removeMechanism(SimMechanism mechanism) {
     mechanisms.remove(mechanism);
-    battery.removeMechanism(mechanism);
+    // battery.removeMechanism(mechanism);
     RuntimeLog.debug("Removed SimMechanism from SimRobot");
   }
 

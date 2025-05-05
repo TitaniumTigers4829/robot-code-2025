@@ -10,7 +10,7 @@ public interface BatterySimInterface {
    *
    * @param dt Time step in seconds (e.g. 0.02 for 20 ms)
    */
-  void update(double dt);
+  void update(double I, double dt);
 
   /**
    * @return The latest terminal voltage [V]

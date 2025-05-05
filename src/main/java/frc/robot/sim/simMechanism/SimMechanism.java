@@ -204,8 +204,7 @@ public class SimMechanism {
 
     public Current supplyCurrent() {
       // https://www.chiefdelphi.com/t/current-limiting-talonfx-values/374780/10;
-      return statorCurrent.times(Volts.of(1).div(supplyVoltage));
-      // statorCurrent.times(statorVoltage.div(supplyVoltage)).div(kMotorEfficiency);
+      return statorCurrent.times(statorVoltage.div(supplyVoltage)).div(kMotorEfficiency);
     }
 
     public static MechanismVariables of(

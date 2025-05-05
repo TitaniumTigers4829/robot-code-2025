@@ -11,6 +11,7 @@ import frc.robot.sim.simMechanism.SimMechanism;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * A very simple battery sim using WPILib’s default 12 V, 0.02 Ω model, but with
@@ -39,20 +40,22 @@ public class SimpleBatterySim implements BatterySimInterface {
   }
 
   @Override
-  public void update(double dt) {
+  public void update(double I, double dt) {
     // 1) Sum all currents (I > 0 = discharge)
     double totalAmps =
         suppliers.stream().mapToDouble(s -> s.get().in(edu.wpi.first.units.Units.Amps)).sum();
 
     // 2) Use WPILib’s single‐resistor sag model
-    double loaded = BatterySim.calculateDefaultBatteryLoadedVoltage(totalAmps);
+    double loaded = BatterySim.calculateDefaultBatteryLoadedVoltage(I);
 
     // 3) Clamp to [0,12]
-    lastVoltage = MathUtil.clamp(loaded, 0, 12);
+    lastVoltage = MathUtil.clamp(loaded, 0, 12.7);
 
     // 4) Push into RoboRioSim
     RoboRioSim.setVInVoltage(lastVoltage);
     RoboRioSim.setVInCurrent(totalAmps);
+    Logger.recordOutput("SimpleBatterySim/Voltage", lastVoltage);
+    Logger.recordOutput("SimpleBatterySim/Current", I);
   }
 
   @Override

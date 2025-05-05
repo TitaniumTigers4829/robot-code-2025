@@ -89,9 +89,9 @@ public class LeadAcidBatterySim implements BatterySimInterface {
 
   /** Advance simulation by dt seconds. */
   @Override
-  public void update(double dt) {
+  public void update(double I, double dt) {
     // 1) Sum all mechanism currents (A)
-    double I = appliances.stream().mapToDouble(s -> s.get().in(Units.Amps)).sum();
+    // double I = appliances.stream().mapToDouble(s -> s.get().in(Units.Amps)).sum();
 
     // 2) bulkSOC: Coulomb counting dSOC = I·dt / QNom
     bulkSOC = clamp(bulkSOC - (I * dt) / QNom, 0.0, 1.0);
@@ -130,8 +130,8 @@ public class LeadAcidBatterySim implements BatterySimInterface {
 
     // 9) Push into WPILib sim framework
     RoboRioSim.setVInVoltage(lastVoltage);
-    // TODO: Check out the following:
-    // RoboRioSim.setVInCurrent(I);
+    RoboRioSim.setVInCurrent(I);
+
     Logger.recordOutput("LeadAcidBattery/terminalVoltage", lastVoltage);
     Logger.recordOutput("LeadAcidBattery/controllerVoltage", RobotController.getBatteryVoltage());
     Logger.recordOutput("LeadAcidBattery/current", I);
@@ -162,8 +162,7 @@ public class LeadAcidBatterySim implements BatterySimInterface {
   /** Logistic-like OCV curve: ~11.8 V (0%) → 12.7 V (100%), knee at 60%. */
   private double computeOCV(double soc) {
     soc = clamp(soc, 0.01, 0.99);
-    return 11.8 + 0.9 * soc;
-    // / (1.0 + Math.exp(-4.0 * (soc - 0.6))); // exponent 4 instead of 10
+    return 11.8 + 0.9 / (1.0 + Math.exp(-4.0 * (soc - 0.6))); // exponent 4 instead of 10
   }
 
   /** Clamp x into [min, max]. */
