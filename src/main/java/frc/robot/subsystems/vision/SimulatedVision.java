@@ -13,6 +13,7 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  *
@@ -119,7 +120,7 @@ public class SimulatedVision extends PhysicalVision {
                     ));
         // Add RawFiducials
         // This is super inefficient but it's sim only, who cares.
-        for (var target : result.targets) {
+        for (PhotonTrackedTarget target : result.targets) {
           pose_data.add((double) target.getFiducialId()); // 0: id
           pose_data.add(target.getYaw()); // 1: txnc
           pose_data.add(target.getPitch()); // 2: tync
