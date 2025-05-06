@@ -81,9 +81,9 @@ public class SimulatedVision extends PhysicalVision {
 
     for (Limelight limelight : Limelight.values()) {
       writeToTable(
-          getSimulationCamera(limelight).getAllUnreadResults(),
-          getLimelightTable(limelight),
-          limelight);
+          getSimulationCamera(Limelight.FRONT_LEFT).getAllUnreadResults(),
+          getLimelightTable(Limelight.FRONT_LEFT),
+          Limelight.FRONT_LEFT);
     }
     super.updateInputs(inputs);
   }
