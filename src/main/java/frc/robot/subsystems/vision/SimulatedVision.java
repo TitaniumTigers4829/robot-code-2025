@@ -27,18 +27,18 @@ import org.photonvision.targeting.PhotonPipelineResult;
  * href="https://github.com/PhotonVision/photonvision/blob/2a6fa1b6ac81f239c59d724da5339f608897c510/photonlib-java-examples/swervedriveposeestsim/src/main/java/frc/robot/Vision.java">PhotonVision
  * example</a> for an example of odometry simulation using PhotonVision.
  *
- * @author Ishan
+ * @author @Ishan1522
  */
 public class SimulatedVision extends PhysicalVision {
   PhotonCameraSim shooterCameraSim;
-  // private final VisionSystemSim visionSim;
-  // private final Supplier<Pose2d> robotSimulationPose;
+  private final VisionSystemSim visionSim;
 
   private final int kResWidth = 1280;
   private final int kResHeight = 800;
 
   public SimulatedVision(Supplier<VisionSystemSim> visionSim) {
     super();
+    this.visionSim = visionSim.get();
     // this.robotSimulationPose = robotSimulationPose;
     // Create the vision system simulation which handles cameras and targets on the
     // field.
@@ -46,17 +46,15 @@ public class SimulatedVision extends PhysicalVision {
 
     // Add all the AprilTags inside the tag layout as visible targets to this
     // simulated field.
-    // visionSim.addAprilTags(VisionConstants.FIELD_LAYOUT);
-    // visionSim.addVisionTargets(TargetModel.kAprilTag36h11);
 
     // Create simulated camera properties. These can be set to mimic your actual
     // camera.
     var cameraProperties = new SimCameraProperties();
-    // cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
-    // cameraProperties.setCalibError(0.35, 0.10);
-    // cameraProperties.setFPS(15);
-    // cameraProperties.setAvgLatencyMs(20);
-    // cameraProperties.setLatencyStdDevMs(5);
+    cameraProperties.setCalibration(kResWidth, kResHeight, Rotation2d.fromDegrees(97.7));
+    cameraProperties.setCalibError(0.35, 0.10);
+    cameraProperties.setFPS(15);
+    cameraProperties.setAvgLatencyMs(20);
+    cameraProperties.setLatencyStdDevMs(5);
 
     // Create a PhotonCameraSim which will update the linked PhotonCamera's values
     // with visible
@@ -81,12 +79,12 @@ public class SimulatedVision extends PhysicalVision {
   public void updateInputs(VisionInputs inputs) {
     // Abuse the updateInputs periodic call to update the sim
 
-    // for (Limelight limelight : Limelight.values()) {
-    //   writeToTable(
-    //       getSimulationCamera(limelight).getAllUnreadResults(),
-    //       getLimelightTable(limelight),
-    //       limelight);
-    // }
+    for (Limelight limelight : Limelight.values()) {
+      writeToTable(
+          getSimulationCamera(limelight).getAllUnreadResults(),
+          getLimelightTable(limelight),
+          limelight);
+    }
     super.updateInputs(inputs);
   }
 
