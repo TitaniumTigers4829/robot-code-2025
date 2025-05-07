@@ -14,10 +14,10 @@ import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.math.mathutils.GeomUtil;
-import org.dyn4j.dynamics.Body;
+import org.ode4j.ode.internal.DxBody;
 
 /** A Dyn4j Body with additional methods for serialization and conversion to WPILib types. */
-public class FrcBody extends Body {
+public class FrcBody extends DxBody {
 
   /**
    * A snapshot of the state of a {@link FrcBody}.
