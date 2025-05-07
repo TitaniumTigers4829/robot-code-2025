@@ -13,10 +13,13 @@ import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
-import org.dyn4j.geometry.Geometry;
-import org.dyn4j.geometry.Mass;
-import org.dyn4j.geometry.Vector2;
+import org.ode4j.math.DVector3C;
 import org.littletonrobotics.junction.Logger;
+import org.ode4j.math.DVector3;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DMassC;
+import org.ode4j.ode.internal.DxMass;
+import org.ode4j.ode.internal.DxWorld;
 
 /**
  *
@@ -36,8 +39,8 @@ public class SimDriveTrain {
 
   /** https://simple.wikipedia.org/wiki/Coefficient_of_restitution */
   public static final double kBumperCoR = 0.005;
-
-  public final FrcBody chassis = new FrcBody();
+DxWorld world;
+  public final FrcBody chassis = new FrcBody(world);
   private final SimEnvTiming timing;
 
   /**
@@ -64,8 +67,10 @@ public class SimDriveTrain {
         0.0, // zero density; mass is set explicitly
         kBumperCoF,
         kBumperCoR);
-
-    chassis.setMass(new Mass(new Vector2(), config.robotMassKg, config.robotMoI));
+DxMass mass = new DxMass();
+// mass.
+    chassis.setMass(mass.(config.robotMassKg));
+      // new DxMass(new DVector3C(), config.robotMassKg, config.robotMoI));
   }
 
   /**

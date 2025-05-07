@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.NewtonMeters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Mass;
@@ -13,58 +14,22 @@ import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructGenerator;
 import edu.wpi.first.util.struct.StructSerializable;
 import frc.robot.extras.math.forces.Velocity2d;
+import frc.robot.extras.math.forces.Velocity3d;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import org.ode4j.ode.internal.DxBody;
+import org.ode4j.ode.internal.DxWorld;
 
 /** A Dyn4j Body with additional methods for serialization and conversion to WPILib types. */
 public class FrcBody extends DxBody {
 
-  /**
-   * A snapshot of the state of a {@link FrcBody}.
-   *
-   * <p>Used for serialization and deserialization.
-   *
-   * <p>Contains all the information needed to recreate a {@link FrcBody} at a later time.
-   *
-   * <p>Contains the following fields:
-   *
-   * <ul>
-   *   <li>{@link Pose2d} pose - the pose of the body. This is the position and rotation of the
-   *       body.
-   *   <li>{@link Mass} mass - the mass of the body. in kilograms.
-   *   <li>{@link MomentOfInertia} momentOfInertia - the moment of inertia of the body. Which is the
-   *       resistance of the body to rotation.
-   *   <li>{@link Velocity2d} velocity - the linear velocity of the body. This is the rate at which
-   *       the body is moving.
-   *   <li>{@link AngularVelocity} angularVelocity - the angular velocity of the body. This is the
-   *       rate at which the body is rotating.
-   *   <li>double linearDamping - the linear damping of the body. This is the rate at which the body
-   *       loses linear velocity.
-   *   <li>double angularDamping - the angular damping of the body. This is the rate at which the
-   *       body loses angular velocity.
-   *   <li>double gravityScale - the gravity scale of the body. This is the factor by which gravity
-   *       affects the body.
-   *   <li>boolean isBullet - whether the body is a bullet. A bullet body is a body that is not
-   *       affected by other bodies during a simulation step.
-   *   <li>double atRestTime - the time the body has been at rest. This is the time the body has not
-   *       been moving.
-   *   <li>{@link Translation2d} forces - the forces acting on the body. This is the force that
-   *       causes the body to move.
-   *   <li>{@link Torque} torque - the torque acting on the body. This is the force that causes the
-   *       body to rotate.
-   *   <li>{@link Translation2d} accumulatedForce - the accumulated forces acting on the body. This
-   *       is the sum of all the forces acting on the body.
-   *   <li>{@link Torque} accumulatedTorque - the accumulated torque acting on the body. This is the
-   *       sum of all the torques acting on the body.
-   * </ul>
-   *
-   * <p>Implements {@link StructSerializable} for serialization and deserialization.
-   */
+  public FrcBody(DxWorld world) {
+    super(world);
+  }
   public record FrcBodySnapshot(
-      Pose2d pose,
+      Pose3d pose,
       Mass mass,
       MomentOfInertia momentOfInertia,
-      Velocity2d velocity,
+      Velocity3d velocity,
       AngularVelocity angularVelocity,
       double linearDamping,
       double angularDamping,
@@ -82,11 +47,11 @@ public class FrcBody extends DxBody {
 
   public FrcBodySnapshot snapshot() {
     return new FrcBodySnapshot(
-        GeomUtil.toWpilibPose2d(get()),
-        GeomUtil.toWpilibUnit(getMass()).getFirst(),
-        GeomUtil.toWpilibUnit(getMass()).getSecond(),
-        new Velocity2d(getLinearVel()., getLinearVel().y),
-        RadiansPerSecond.of(-getAngularVel()),
+        GeomUtil.toWpilibPose(getPosition(), getQuaternion()),
+        GeomUtil.toWpilibUnit(getMass().getMass(), getMass().),
+        GeomUtil.toWpilibUnitTorque(getTorque()),
+        new Velocity3d(getLinearVel().get0(), getLinearVel().get1(), getLinearVel().get2()),
+        RadiansPerSecond.of(-getAngularVel().get2()), // TODO: check this one
         getLinearDamping(),
         getAngularDamping(),
         getGravityMode(),
