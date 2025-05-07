@@ -1,8 +1,11 @@
 package frc.robot.sim;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.extras.logging.RuntimeLog;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.configs.SimDriveTrainConfig;
@@ -10,11 +13,11 @@ import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simField.SimGamePiece;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
-import frc.robot.sim.simMechanism.SimBattery;
 import frc.robot.sim.simMechanism.SimDriveTrain;
 import frc.robot.sim.simMechanism.SimIndexer;
 import frc.robot.sim.simMechanism.SimIntake;
 import frc.robot.sim.simMechanism.SimMechanism;
+import frc.robot.sim.simMechanism.simBattery.BatterySimInterface;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -35,7 +38,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
   private final DrvTrn driveTrain;
   // may move towards multi indexers soon
   private final SimIndexer gamePieceStorage;
-  private final SimBattery battery = new SimBattery();
+  private final BatterySimInterface battery;
   private final ConcurrentLinkedQueue<SimIntake> intakes = new ConcurrentLinkedQueue<>();
   private final ConcurrentLinkedQueue<SimMechanism> mechanisms = new ConcurrentLinkedQueue<>();
 
@@ -49,8 +52,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    * @param gamePieceStorageCapacity The capacity for storing game pieces.
    */
   public <C extends SimDriveTrainConfig<DrvTrn, C>> SimRobot(
-      SimArena arena, String name, C drivetrainConfig, int gamePieceStorageCapacity) {
+      SimArena arena,
+      String name,
+      C drivetrainConfig,
+      int gamePieceStorageCapacity,
+      BatterySimInterface batterySim) {
     this.arena = arena;
+    battery = batterySim;
     arena.robots.add(this);
     this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
     arena.withWorld(world -> world.addBody(driveTrain.chassis));
@@ -69,11 +77,29 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void simTick() {
     driveTrain.simTick();
-    // TODO: fix SimBattery :/
-    // final Voltage batVolts = battery.getBatteryVoltage();
-    for (var mechanism : mechanisms) {
-      mechanism.update(Volts.of(12.0));
+    // 1. Use previous battery voltage for motor simulation
+    Voltage batteryVoltage = battery.getVoltage();
+
+    double totalCurrentDraw = 0.0;
+    if (batteryVoltage.in(Volts) < 1e-6) {
+      //   for (SimMechanism mechanism : mechanisms) {
+      //     // The motor update uses the batteryVoltage internally (via RoboRioSim)
+      //         mechanism.setState(); // supply current from this motor
+      // }
+      battery.update(totalCurrentDraw, timing().dt().in(Seconds));
+      return;
     }
+
+    // 2. Simulate each mechanism/motor controller at this batteryVoltage
+    for (SimMechanism mechanism : mechanisms) {
+      // The motor update uses the batteryVoltage internally (via RoboRioSim)
+      mechanism.update(batteryVoltage);
+      totalCurrentDraw +=
+          mechanism.motorVariables().supplyCurrent().in(Amps); // supply current from this motor
+    }
+
+    // 3. Update the battery model with total current
+    battery.update(totalCurrentDraw, timing().dt().in(Seconds));
   }
 
   /**
@@ -83,6 +109,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public SimEnvTiming timing() {
     return arena.timing;
+  }
+
+  /*
+   * Returns the battery simulation object for the robot.
+   */
+  public BatterySimInterface getBattery() {
+    return battery;
   }
 
   /**
@@ -115,13 +148,13 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    */
   public void addMechanism(SimMechanism mechanism) {
     mechanisms.add(mechanism);
-    battery.addMechanism(mechanism);
+    // battery.addMechanism(mechanism);
     RuntimeLog.debug("Added SimMechanism to SimRobot");
   }
 
   public void removeMechanism(SimMechanism mechanism) {
     mechanisms.remove(mechanism);
-    battery.removeMechanism(mechanism);
+    // battery.removeMechanism(mechanism);
     RuntimeLog.debug("Removed SimMechanism from SimRobot");
   }
 

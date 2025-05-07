@@ -460,6 +460,7 @@ public class Robot extends LoggedRobot {
 
         this.visionSubsystem =
             new VisionSubsystem(new SimulatedVision(() -> simWorld.aprilTagSim()));
+
         this.swerveDrive.resetEstimatedPose(new Pose2d(7, 4, new Rotation2d()));
         this.elevatorSubsystem = new ElevatorSubsystem(new SimulatedElevator());
         this.funnelSubsystem = new FunnelSubsystem(new SimulatedFunnelPivot());
