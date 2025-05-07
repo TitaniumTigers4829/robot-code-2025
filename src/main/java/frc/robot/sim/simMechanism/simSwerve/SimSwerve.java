@@ -1,17 +1,11 @@
 package frc.robot.sim.simMechanism.simSwerve;
 
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.NewtonMeters;
-import static edu.wpi.first.units.Units.Newtons;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static frc.robot.extras.math.mathutils.MeasureMath.*;
+import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,12 +13,10 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.logging.RuntimeLog;
-import frc.robot.extras.math.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.math.mathutils.MeasureMath;
+import frc.robot.extras.math.mathutils.MassMath.PhysicsMass;
 import frc.robot.extras.math.mathutils.MeasureMath.XY;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimSwerveConfig;
@@ -32,228 +24,188 @@ import frc.robot.sim.simController.SimMotorController;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.SimDriveTrain;
 import java.util.Arrays;
-import org.dyn4j.geometry.Vector2;
 import org.littletonrobotics.junction.Logger;
+import org.ode4j.math.DVector3;
 
-/** The class which simulates the swerve drive. */
+/** The class which simulates the swerve drive using ODE4j. */
 public class SimSwerve extends SimDriveTrain {
-  protected final SimEnvTiming timing;
-  protected final SimSwerveModule[] moduleSimulations;
-  protected final SimGyro gyroSimulation;
-  private final SimSwerveConfig config;
-  private final SimRobot<SimSwerve> robot;
+  private final SimEnvTiming timing;
+  private final SimSwerveModule[] moduleSimulations;
+  private final SimGyro gyroSimulation;
   private final PhysicsMass chassisMass;
   private final SwerveDriveKinematics kinematics;
 
   private MomentOfInertia rotorInertia;
-
   private final MomentOfInertia rotorInertiaWhenTranslating;
   private final MomentOfInertia rotorInertiaWhenRotating;
 
-  /**
-   * Creates a Swerve Drive Simulation.
-   *
-   * <p>This constructor initializes a swerve drive simulation with the given robot mass, bumper
-   * dimensions, module simulations, module translations, gyro simulation.
-   *
-   * @param config a {@link SimSwerveConfig} instance containing the configurations of * this
-   *     drivetrain
-   */
   public SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
     super(config, robot.timing());
-    RuntimeLog.debug("initializing sim swerve");
-    this.robot = robot;
     this.timing = robot.timing();
-    this.config = config;
-    this.moduleSimulations = new SimSwerveModule[config.moduleTranslations.length];
-    final Force gravityForceOnEachModule =
-        Newtons.of(config.robotMassKg * 9.8).div(moduleSimulations.length);
-    for (int i = 0; i < moduleSimulations.length; i++) {
-      RuntimeLog.debug("initializing module simulation " + i);
-      moduleSimulations[i] =
-          new SimSwerveModule(
-              robot,
-              config,
-              i,
-              gravityForceOnEachModule,
-              () -> rotorInertia,
-              SimMotorController.none(),
-              SimMotorController.none());
-    }
 
-    RuntimeLog.debug("initializing gyro sim");
+    // initialize modules & gyro
+    this.moduleSimulations = new SimSwerveModule[config.moduleTranslations.length];
+    Force gravityPerModule = Newtons.of(config.robotMassKg * 9.81)
+                                    .div(moduleSimulations.length);
+    for (int i = 0; i < moduleSimulations.length; i++) {
+      moduleSimulations[i] = new SimSwerveModule(
+        robot, config, i, gravityPerModule,
+        () -> rotorInertia,
+        SimMotorController.none(), SimMotorController.none()
+      );
+    }
     this.gyroSimulation = new SimGyro(timing, config.gyroConfig);
 
-    this.chassisMass =
-        new PhysicsMass(Kilograms.of(config.robotMassKg), KilogramSquareMeters.of(config.robotMoI));
+    // chassis mass/inertia
+    this.chassisMass = new PhysicsMass(
+      Kilograms.of(config.robotMassKg),
+      KilogramSquareMeters.of(config.robotMoI)
+    );
     this.kinematics = new SwerveDriveKinematics(config.moduleTranslations);
 
-    // pre-calculate the rotor inertia for the chassis when translating and rotating
-    // to interpolate between them based on the propulsion forces
-    RuntimeLog.debug("calculating robot values");
-    final Distance wheelRadius = Meters.of(config.swerveModuleConfig.wheelsRadiusMeters);
-    final Distance wheelBase = XY.of(config.moduleTranslations[0]).magnitude();
-    final Mass rotationalMass =
-        div(chassisMass.moi(), wheelBase.times(wheelBase)).div(moduleSimulations.length);
-    this.rotorInertiaWhenTranslating =
-        times(chassisMass.mass().div(moduleSimulations.length), wheelRadius.times(wheelRadius));
-    this.rotorInertiaWhenRotating = times(rotationalMass, wheelRadius.times(wheelRadius));
+    // precompute rotor inertias
+    Distance wheelRadius = Meters.of(config.swerveModuleConfig.wheelsRadiusMeters);
+    Distance wheelBase   = XY.of(config.moduleTranslations[0]).magnitude();
+    var rotationalMass    = chassisMass.moi()
+                              .div(wheelBase.times(wheelBase))
+                              .div(moduleSimulations.length);
+    this.rotorInertiaWhenTranslating = chassisMass.mass()
+      .div(moduleSimulations.length)
+      .times(wheelRadius.times(wheelRadius));
+    this.rotorInertiaWhenRotating = rotationalMass
+      .times(wheelRadius.times(wheelRadius));
     this.rotorInertia = rotorInertiaWhenTranslating;
-
-    RuntimeLog.debug("created swerve drive simulation");
   }
 
   @Override
   public void simTick() {
     simulateModulePropulsion();
     simulateModuleFriction();
+
+    // update gyro
     gyroSimulation.updateSimulationSubTick(
-        this.getChassisWorldPose().getRotation().getMeasure(), this.getTickTwist());
+      getChassisWorldPose().getRotation().toRotation2d().getRadians(),
+      getTickTwist()
+    );
+
     Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
     super.simTick();
   }
 
-  /** Simulates the friction on the swerve modules. */
-  private void simulateModuleFriction() {
-    final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
-    final ChassisSpeeds chassisSpeeds = this.getChassisWorldSpeeds();
-
-    // sum up all the acceleration due to friction from each module
-    LinearAcceleration xFrictionAccel = MetersPerSecondPerSecond.zero();
-    LinearAcceleration yFrictionAccel = MetersPerSecondPerSecond.zero();
-    AngularAcceleration angularFrictionAccel = RadiansPerSecondPerSecond.zero();
-    for (int i = 0; i < moduleSimulations.length; i++) {
-      final XY<Force> frictionForce = moduleSimulations[i].friction(chassisSpeeds, chassisRotation);
-      final var pack =
-          chassisMass.accelerationsDueToForce(
-              frictionForce, XY.of(moduleSimulations[i].translation().rotateBy(chassisRotation)));
-      xFrictionAccel = xFrictionAccel.plus(pack.getFirst().x());
-      yFrictionAccel = yFrictionAccel.plus(pack.getFirst().y());
-      angularFrictionAccel = angularFrictionAccel.plus(pack.getSecond());
-
-      Logger.recordOutput(
-          "Forces/SwerveForces/Friction/module" + i + "/frictionForce", frictionForce);
-      Logger.recordOutput(
-          "Forces/SwerveForces/Friction/module" + i + "/xyFrictionAccel", pack.getFirst());
-      Logger.recordOutput(
-          "Forces/SwerveForces/Friction/module" + i + "/angularFrictionAccel", pack.getSecond());
-    }
-
-    // clamp the friction acceleration to prevent the robot from accelerating in the opposite
-    // direction
-    final ChassisSpeeds wheelSpeeds =
-        kinematics.toChassisSpeeds(
-            Arrays.stream(moduleSimulations)
-                .map(SimSwerveModule::state)
-                .toArray(SwerveModuleState[]::new));
-    ChassisSpeeds newWheelSpeeds =
-        ChassisSpeeds.fromRobotRelativeSpeeds(wheelSpeeds, chassisRotation);
-    final ChassisSpeeds unwantedSpeeds = newWheelSpeeds.minus(chassisSpeeds);
-
-    Logger.recordOutput("Forces/SwerveForces/Friction/wheelSpeeds", wheelSpeeds);
-    Logger.recordOutput("Forces/SwerveForces/Friction/unwantedSpeeds", unwantedSpeeds);
-
-    final LinearAcceleration xAccelNeededToStop =
-        MeasureMath.negate(MetersPerSecond.of(unwantedSpeeds.vxMetersPerSecond)).div(timing.dt());
-    final LinearAcceleration yAccelNeededToStop =
-        MeasureMath.negate(MetersPerSecond.of(unwantedSpeeds.vyMetersPerSecond)).div(timing.dt());
-    final AngularAcceleration angularAccelNeededToStop =
-        MeasureMath.negate(RadiansPerSecond.of(unwantedSpeeds.omegaRadiansPerSecond))
-            .div(timing.dt());
-
-    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccelPreClamp", xFrictionAccel);
-    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccelPreClamp", yFrictionAccel);
-    Logger.recordOutput(
-        "Forces/SwerveForces/Friction/angularFrictionAccelPreClamp", angularFrictionAccel);
-
-    xFrictionAccel = MeasureMath.clamp(xFrictionAccel, xAccelNeededToStop);
-    yFrictionAccel = MeasureMath.clamp(yFrictionAccel, yAccelNeededToStop);
-    angularFrictionAccel = MeasureMath.clamp(angularFrictionAccel, angularAccelNeededToStop);
-
-    Logger.recordOutput("Forces/SwerveForces/Friction/xAccelNeededToStop", xAccelNeededToStop);
-    Logger.recordOutput("Forces/SwerveForces/Friction/yAccelNeededToStop", yAccelNeededToStop);
-    Logger.recordOutput(
-        "Forces/SwerveForces/Friction/angularAccelNeededToStop", angularAccelNeededToStop);
-
-    Logger.recordOutput("Forces/SwerveForces/Friction/xFrictionAccel", xFrictionAccel);
-    Logger.recordOutput("Forces/SwerveForces/Friction/yFrictionAccel", yFrictionAccel);
-    Logger.recordOutput("Forces/SwerveForces/Friction/angularFrictionAccel", angularFrictionAccel);
-
-    // Convert the frictional acceleration to forces and torques and apply them to the chassis.
-    final Force xFrictionForce = chassisMass.forceDueToAcceleration(xFrictionAccel);
-    final Force yFrictionForce = chassisMass.forceDueToAcceleration(yFrictionAccel);
-    final Torque angularFrictionTorque = chassisMass.torqueDueToAcceleration(angularFrictionAccel);
-    chassis.applyForce(new Vector2(xFrictionForce.in(Newtons), yFrictionForce.in(Newtons)));
-    chassis.applyTorque(angularFrictionTorque.in(NewtonMeters));
-  }
-
-  /** Simulates the propulsion forces on the swerve modules. */
   private void simulateModulePropulsion() {
-    final Rotation2d chassisRotation = getChassisWorldPose().getRotation();
+    Rotation2d rot = getChassisWorldPose().getRotation().toRotation2d();
+    Force totalForceX = Newtons.zero();
+    Force totalForceY = Newtons.zero();
+    Torque totalTorque = NewtonMeters.zero();
 
-    // apply propulsion forces to chassis
-    Force propulsionForceTotal = Newtons.zero();
-    Force propulsionForceX = Newtons.zero();
-    Force propulsionForceY = Newtons.zero();
-    Torque propulsionTorque = NewtonMeters.zero();
+    for (SimSwerveModule mod : moduleSimulations) {
+      XY<Distance> pos = XY.of(mod.translation().rotateBy(rot));
+      XY<Force> propulsion = mod.force(rot);
+      var pack = chassisMass.forcesDueToOffsetForces(propulsion, pos);
 
-    //
-    for (final SimSwerveModule module : moduleSimulations) {
-      final XY<Distance> forcePosition = XY.of(module.translation().rotateBy(chassisRotation));
-      final XY<Force> propulsion = module.force(chassisRotation);
+      totalForceX  = totalForceX.plus(pack.getFirst().x());
+      totalForceY  = totalForceY.plus(pack.getFirst().y());
+      totalTorque  = totalTorque.plus(pack.getSecond());
 
-      propulsionForceTotal = propulsionForceTotal.plus(propulsion.magnitude());
-
-      final var pack = chassisMass.forcesDueToOffsetForces(propulsion, forcePosition);
-      propulsionForceX = propulsionForceX.plus(pack.getFirst().x());
-      propulsionForceY = propulsionForceY.plus(pack.getFirst().y());
-      propulsionTorque = propulsionTorque.plus(pack.getSecond());
-
-      Logger.recordOutput(
-          "Forces/SwerveForces/Propulsion/module" + module.id() + "/forces", pack.getFirst());
-      Logger.recordOutput(
-          "Forces/SwerveForces/Propulsion/module" + module.id() + "/torque", pack.getSecond());
+      Logger.recordOutput("Propulsion/Module" + mod.id() + "/force", pack.getFirst());
+      Logger.recordOutput("Propulsion/Module" + mod.id() + "/torque", pack.getSecond());
     }
 
-    // The rotor inertia can very depending on how the modules are driving the chassis.
-    // How the propulsion impacts the chassis determines how the rotor inertia is calculated.
-    // Figure out what proportion of the propulsion force is in the x and y axis versus the yaw
-    // axis.
-    // This will determine how the rotor inertia is calculated.
-    final double propulsionForceXMag = propulsionForceX.in(Newtons);
-    final double propulsionForceYMag = propulsionForceY.in(Newtons);
-    final double propulsionForceTotalMag = propulsionForceTotal.in(Newtons);
-    if (Math.abs(propulsionForceTotalMag) > 1e-3) {
-      final double xPropulsionRatio = propulsionForceXMag / propulsionForceTotalMag;
-      final double yPropulsionRatio = propulsionForceYMag / propulsionForceTotalMag;
-      final double translationRatio = Math.hypot(xPropulsionRatio, yPropulsionRatio);
+    // apply to body in 3D
+    DVector3 f = new DVector3(
+      totalForceX.in(Newtons),
+      totalForceY.in(Newtons),
+      0.0
+    );
+    DVector3 τ = new DVector3(0.0, 0.0, totalTorque.in(NewtonMeters));
+    chassis.addForce(f);
+    chassis.addTorque(τ);
 
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", xPropulsionRatio);
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", yPropulsionRatio);
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", translationRatio);
-
-      // Calculate the rotor inertia based on the propulsion ratios
-      this.rotorInertia =
-          rotorInertiaWhenTranslating
-              .times(translationRatio)
-              .plus(rotorInertiaWhenRotating.times(1 - translationRatio));
-    } else {
-      this.rotorInertia = rotorInertiaWhenTranslating;
-
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/xPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/yPropulsionRatio", 0.0);
-      Logger.recordOutput("Forces/SwerveForces/RotorInertia/translationRatio", 0.0);
-    }
-
-    Logger.recordOutput("Forces/SwerveForces/Propulsion/propulsionTorque", propulsionTorque);
-    Logger.recordOutput(
-        "Forces/SwerveForces/Propulsion/propulsionForce",
-        new XY<>(propulsionForceX, propulsionForceY));
-
-    chassis.applyForce(new Vector2(propulsionForceX.in(Newtons), propulsionForceY.in(Newtons)));
-    chassis.applyTorque(propulsionTorque.in(NewtonMeters));
+    Logger.recordOutput("Propulsion/TotalForce", new XY<>(totalForceX, totalForceY));
+    Logger.recordOutput("Propulsion/TotalTorque", totalTorque);
   }
 
+  private void simulateModuleFriction() {
+    Rotation2d rot = getChassisWorldPose().getRotation().toRotation2d();
+    ChassisSpeeds speeds = getChassisWorldSpeeds();
+
+    LinearAcceleration ax = MetersPerSecondPerSecond.zero();
+    LinearAcceleration ay = MetersPerSecondPerSecond.zero();
+    AngularAcceleration α = RadiansPerSecondPerSecond.zero();
+
+    for (int i = 0; i < moduleSimulations.length; i++) {
+      XY<Force> friction = moduleSimulations[i].friction(speeds, rot);
+      Pair<XY<LinearAcceleration>, AngularAcceleration> pack = chassisMass.accelerationsDueToForce(
+        friction, XY.of(moduleSimulations[i].translation().rotateBy(rot))
+      );
+      ax = ax.plus(pack.getFirst().x());
+      ay = ay.plus(pack.getFirst().y());
+      α  = α.plus(pack.getSecond());
+
+      Logger.recordOutput("Friction/Module" + i + "/force", friction);
+      Logger.recordOutput("Friction/Module" + i + "/linearAccel", pack.getFirst());
+      Logger.recordOutput("Friction/Module" + i + "/angularAccel", pack.getSecond());
+    }
+
+    // clamp to no-reverse
+    ChassisSpeeds currentWs = kinematics.toChassisSpeeds(
+      Arrays.stream(moduleSimulations)
+            .map(SimSwerveModule::state)
+            .toArray(SwerveModuleState[]::new)
+    );
+    ChassisSpeeds unwanted = currentWs.minus(speeds);
+
+    var axStop = MetersPerSecond.of(-unwanted.vxMetersPerSecond)
+                   .div(timing.dt());
+    var ayStop = MetersPerSecond.of(-unwanted.vyMetersPerSecond)
+                   .div(timing.dt());
+    var αStop  = RadiansPerSecond.of(-unwanted.omegaRadiansPerSecond)
+                   .div(timing.dt());
+
+    ax = MeasureMath.clamp(ax, axStop);
+    ay = MeasureMath.clamp(ay, ayStop);
+    α  = MeasureMath.clamp(α, αStop);
+
+    // convert to forces & torque, apply
+    Force fx = chassisMass.forceDueToAcceleration(ax);
+    Force fy = chassisMass.forceDueToAcceleration(ay);
+    Torque τ  = chassisMass.torqueDueToAcceleration(α);
+
+    DVector3 f = new DVector3(fx.in(Newtons), fy.in(Newtons), 0.0);
+    DVector3 t = new DVector3(0, 0, τ.in(NewtonMeters));
+    chassis.addForce(f);
+    chassis.addTorque(t);
+
+    Logger.recordOutput("Friction/TotalForce", new XY<>(fx, fy));
+    Logger.recordOutput("Friction/TotalTorque", τ);
+  }
+  
+// **
+//  * Computes the small‐time‐step twist (dx, dy, dθ) from the change in chassis
+//  * position and heading since the last tick.
+//  */
+public Twist2d getTickTwist() {
+  // Get the chassis’s change in position in robot‐local coordinates:
+  // You’ll need to track the previous pose each tick.
+  Pose2d prev = lastPose;                // store this at end of simTick()
+  Pose2d curr = getChassisWorldPose();
+
+  // Compute the delta in world frame:
+  double dx = curr.getX() - prev.getX();
+  double dy = curr.getY() - prev.getY();
+  double dtheta = curr.getRotation().minus(prev.getRotation()).getRadians();
+
+  // Rotate that world‐delta back into robot’s local frame at prev heading:
+  double sin = Math.sin(-prev.getRotation().getRadians());
+  double cos = Math.cos(-prev.getRotation().getRadians());
+  double localDx =  dx * cos - dy * sin;
+  double localDy =  dx * sin + dy * cos;
+
+  // Update lastPose for next tick
+  lastPose = curr;
+
+  return new Twist2d(localDx, localDy, dtheta);
+}
   /**
    * Gets the swerve modules.
    *

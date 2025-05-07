@@ -3,7 +3,9 @@ package frc.robot.sim.simMechanism;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.extras.util.FrcBody;
@@ -13,161 +15,96 @@ import frc.robot.sim.configs.SimSwerveConfig;
 import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
-import org.ode4j.math.DVector3C;
 import org.littletonrobotics.junction.Logger;
+import org.ode4j.math.DQuaternionC;
 import org.ode4j.math.DVector3;
-import org.ode4j.ode.DMass;
-import org.ode4j.ode.DMassC;
-import org.ode4j.ode.internal.DxMass;
-import org.ode4j.ode.internal.DxWorld;
 
 /**
- *
- *
- * <h1>Represents an Abstract Drivetrain Simulation.</h1>
- *
- * <h3>Simulates the Mass, Collision Space, and Friction of the Drivetrain.</h3>
- *
- * <p>This class models the physical properties of a drivetrain, including mass and collision space.
- *
- * <p>It also provides APIs to obtain the status (position, velocity etc.) in WPILib geometry
- * classes.
+ * Abstract drivetrain simulation using ODE4j in full 3D.
  */
 public class SimDriveTrain {
-  /** https://en.wikipedia.org/wiki/Friction#Coefficient_of_friction */
   public static final double kBumperCoF = 0.65;
-
-  /** https://simple.wikipedia.org/wiki/Coefficient_of_restitution */
   public static final double kBumperCoR = 0.005;
-DxWorld world;
-  public final FrcBody chassis = new FrcBody(world);
+
+  private final OdeWorld ode;
+  protected final org.ode4j.ode.DBody chassis;
   private final SimEnvTiming timing;
 
-  /**
-   *
-   *
-   * <h2>Creates a Simulation of a Drivetrain.</h2>
-   *
-   * <h3>Sets Up the Collision Space and Mass of the Chassis.</h3>
-   *
-   * <p>Since this is an abstract class, the constructor must be called from a subclass.
-   *
-   * <p>Note that the chassis does not appear on the simulation field upon creation. Refer to {@link
-   * SimArena.ShamArena} for instructions on how to add it to the simulation world.
-   *
-   * @param config a {@link ShamDriveTrainConfig} instance containing the configurations of this
-   *     drivetrain
-   * @param timing the simulation environment timing
-   */
   @SuppressWarnings("unchecked")
   protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
     this.timing = timing;
-    chassis.addFixture(
-        Geometry.createRectangle(config.bumperLengthXMeters, config.bumperWidthYMeters),
-        0.0, // zero density; mass is set explicitly
-        kBumperCoF,
-        kBumperCoR);
-DxMass mass = new DxMass();
-// mass.
-    chassis.setMass(mass.(config.robotMassKg));
-      // new DxMass(new DVector3C(), config.robotMassKg, config.robotMoI));
+
+    // 1) Create a 3D world and box‐shaped chassis body
+    this.ode = new OdeWorld();
+    double bumperHeight = 0.1; // a thin chassis in Z
+    this.chassis = ode.createBoxBody(
+      config.bumperLengthXMeters,
+      config.bumperWidthYMeters,
+      bumperHeight,
+      config.robotMassKg
+    );
+
+    // 2) (Optional) set restitution & friction on the geom 
+    //    (not shown: you could cast to DGeom and call setSurfaceFriction, setBounce, etc.)
+
+    // 3) Teleport to origin initially
+    setChassisWorldPose(new Pose3d(), true);
   }
 
-  /**
-   * Sets the Robot's Current Pose in the Simulation World.
-   *
-   * <p>This method instantly teleports the robot to the specified pose in the simulation world. The
-   * robot does not drive to the new pose; it is moved directly.
-   *
-   * @param robotPose the desired robot pose, represented as a {@link Pose2d}
-   * @param resetVelocity whether to reset the robot's velocity to zero after teleporting
-   */
-  public void setChassisWorldPose(Pose2d robotPose, boolean resetVelocity) {
-    chassis.setTransform(GeomUtil.toDyn4jTransform(robotPose));
+  public void setChassisWorldPose(Pose3d robotPose, boolean resetVelocity) {
+    // Position in 3D (Z=0)
+    DVector3 pos = new DVector3(robotPose.getX(), robotPose.getY(), 0.0);
+    chassis.setPosition(pos.get0(), pos.get1(), pos.get2());
+
+    // Orientation about Z axis
+    DQuaternionC q = GeomUtil.toOdeQuaternion(robotPose.getRotation());
+    chassis.setQuaternion(q);
+
     if (resetVelocity) {
-      chassis.setLinearVelocity(0, 0);
-      chassis.setAngularVelocity(0);
+      chassis.setLinearVel(0, 0, 0);
+      // zero out angular velocity vector
+      chassis.setAngularVel(0, 0, 0);
     }
+
     Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
   }
 
-  /**
-   * Sets the chassis's Speeds to the Given ChassisSpeeds.
-   *
-   * <p>The robot does not accelerate smoothly to these speeds; instead, it jumps to the velocity
-   * Instantaneously.
-   *
-   * @param givenSpeeds the desired field-relative {@link ChassisSpeeds}
-   */
   public void setChassisWorldSpeeds(ChassisSpeeds givenSpeeds) {
-    chassis.setLinearVelocity(GeomUtil.toDyn4jLinearVelocity(givenSpeeds));
-    chassis.setAngularVelocity(givenSpeeds.omegaRadiansPerSecond);
+    // Linear XY, zero Z
+    chassis.setLinearVel(
+      givenSpeeds.vxMetersPerSecond,
+      givenSpeeds.vyMetersPerSecond,
+      0.0 // unfortunately, the chassis does not fly :(
+    );
+    // Angular velocity only about Z axis
+    chassis.setAngularVel(0, 0, givenSpeeds.omegaRadiansPerSecond);
   }
 
-  /**
-   * Gets the Actual Pose of the Drivetrain in the Simulation World.
-   *
-   * <p><strong>Note:</strong> Do not use this method to simulate odometry! For a more realistic
-   * odometry simulation, use a {@link SimSwerve} together with a {@link
-   * edu.wpi.first.math.estimator.SwerveDrivePoseEstimator}.
-   *
-   * @return a {@link Pose2d} object yielding the current world pose of the robot in the simulation
-   */
-  public Pose2d getChassisWorldPose() {
-    return GeomUtil.toWpilibPose2d(chassis.getTransform());
+  public Pose3d getChassisWorldPose() {
+    // read 3D pos + quaternion, then extract Pose2d
+    
+    DQuaternionC quat = chassis.getQuaternion(); // {w, x, y, z}
+    Rotation3d rot = GeomUtil.toWpilibRotation(quat);
+    return new Pose3d(GeomUtil.toWpilibTranslation(chassis.getPosition()), rot);
   }
 
-  /**
-   * Gets the Actual Field-Relative Chassis Speeds from the Simulation World.
-   *
-   * @return the actual chassis speeds in the simulation world, <strong>Field-Relative</strong>
-   */
   public ChassisSpeeds getChassisWorldSpeeds() {
-    return GeomUtil.toWpilibChassisSpeeds(
-        chassis.getLinearVelocity(), -chassis.getAngularVelocity());
+    double[] lin = chassis.getLinearVel().toDoubleArray();   // {vx, vy, vz}
+    double[] ang = chassis.getAngularVel().toDoubleArray();  // {wx, wy, wz}
+    // we only care about Z‐rotation rate
+    return new ChassisSpeeds(lin[0], lin[1], ang[2]);
   }
 
-  public Twist2d getTickTwist() {
-    Vector2 dXY = chassis.getChangeInPosition();
-    double dTheta = -chassis.getAngularVelocity() * timing.dt().in(Seconds);
-    return new Twist2d(dXY.x, dXY.y, dTheta);
-  }
-
-  /**
-   * Abstract Simulation Sub-Tick Method.
-   *
-   * <p>This method is called every time the simulation world is updated.
-   *
-   * <p>It is implemented in the sub-classes of {@link SimDriveTrain}.
-   *
-   * <p>It is responsible for applying the propelling forces to the robot during each sub-tick of
-   * the simulation.
-   */
   public void simTick() {
-    Logger.recordOutput("Forces/DriveTrainForces/pose", chassis.snapshot().pose());
-    Logger.recordOutput("Forces/DriveTrainForces/velocity", chassis.snapshot().velocity());
-    Logger.recordOutput("Forces/DriveTrainForces/forces", chassis.snapshot().forces());
-    Logger.recordOutput("Forces/DriveTrainForces/torque", chassis.snapshot().torque());
-    Logger.recordOutput(
-        "Forces/DriveTrainForces/accumulatedForce", chassis.snapshot().accumulatedForce());
-    Logger.recordOutput(
-        "Forces/DriveTrainForces/accumulatedTorque", chassis.snapshot().accumulatedTorque());
+    Logger.recordOutput("Forces/DriveTrainForces/pose", getChassisWorldPose());
+    Logger.recordOutput("Forces/DriveTrainForces/velocity", getChassisWorldSpeeds());
+    // then step world
+    ode.step(timing.dt().in(Seconds));
   }
 
-  /**
-   * Creates a drivetrain simulation with the given configuration and initial pose on the field.
-   *
-   * @param <T> the type of the drivetrain simulation
-   * @param <C> the type of the drivetrain simulation configuration
-   * @param robot the robot to which the drivetrain simulation belongs
-   * @param config the configuration of the drivetrain simulation
-   * @return the created drivetrain simulation
-   */
   @SuppressWarnings("unchecked")
   public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>> T createDriveTrain(
       SimRobot<T> robot, C config) {
-    // Don't forget to update this method when adding new drivetrain configurations
-
     if (config instanceof SimSwerveConfig) {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }
