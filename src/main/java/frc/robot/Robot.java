@@ -525,7 +525,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     if (simWorld != null) {
-      simWorld.update(() -> new Pose2d(2, 2, new Rotation2d()));
+      simWorld.update(() -> swerveDrive.getEstimatedPose());
     }
   }
 }
