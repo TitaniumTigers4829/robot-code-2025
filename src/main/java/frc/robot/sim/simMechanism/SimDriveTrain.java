@@ -78,12 +78,12 @@ public class SimDriveTrain {
    * @param resetVelocity whether to reset the robot's velocity to zero after teleporting
    */
   public void setChassisWorldPose(Pose2d robotPose, boolean resetVelocity) {
-    // chassis.setTransform(GeomUtil.toDyn4jTransform(robotPose));
+    chassis.setTransform(GeomUtil.toDyn4jTransform(robotPose));
     if (resetVelocity) {
       chassis.setLinearVelocity(0, 0);
       chassis.setAngularVelocity(0);
     }
-    // Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
+    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
   }
 
   /**
