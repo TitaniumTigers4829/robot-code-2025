@@ -82,16 +82,16 @@ public class FrcBody extends DxBody {
 
   public FrcBodySnapshot snapshot() {
     return new FrcBodySnapshot(
-        GeomUtil.toWpilibPose2d(getTransform()),
+        GeomUtil.toWpilibPose2d(get()),
         GeomUtil.toWpilibUnit(getMass()).getFirst(),
         GeomUtil.toWpilibUnit(getMass()).getSecond(),
-        new Velocity2d(getLinearVelocity().x, getLinearVelocity().y),
-        RadiansPerSecond.of(-getAngularVelocity()),
+        new Velocity2d(getLinearVel()., getLinearVel().y),
+        RadiansPerSecond.of(-getAngularVel()),
         getLinearDamping(),
         getAngularDamping(),
-        getGravityScale(),
-        isBullet(),
-        this.atRestTime,
+        getGravityMode(),
+        isKinematic(),
+        this.world,
         new Translation2d(getForce().x, getForce().y),
         NewtonMeters.of(getTorque()),
         new Translation2d(getAccumulatedForce().x, getAccumulatedForce().y),
