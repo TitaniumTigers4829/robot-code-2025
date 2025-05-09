@@ -19,7 +19,7 @@ import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.dyn4j.geometry.Geometry;
+import org.ode4j.ode.OdeHelper;
 
 public class ReefscapeSim {
   private static List<GamePieceTarget> createCoralTargets() {
@@ -115,7 +115,7 @@ public class ReefscapeSim {
           "Algae",
           Units.inchesToMeters(16),
           0.4,
-          Geometry.createCircle(0.176),
+          OdeHelper.createSphere(0.176),
           ALGAE_TARGETS,
           true,
           0.2);
@@ -124,7 +124,7 @@ public class ReefscapeSim {
           "Coral",
           Units.inchesToMeters(16),
           0.4,
-          Geometry.createCircle(0.176),
+          OdeHelper.createCylinder(0.176, Units.inchesToMeters(16)),
           CORAL_TARGETS,
           true,
           0.2);

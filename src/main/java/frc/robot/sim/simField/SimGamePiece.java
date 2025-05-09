@@ -30,6 +30,7 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.MassType;
+import org.ode4j.ode.DGeom;
 
 /**
  * A base class used for all gamepieces in the simulation.
@@ -61,7 +62,7 @@ public class SimGamePiece implements StructSerializable {
       String type,
       double height,
       double mass,
-      Convex shape,
+      DGeom shape,
       List<GamePieceTarget> targets,
       boolean placeOnFieldWhenTouchGround,
       double landingDampening) {
