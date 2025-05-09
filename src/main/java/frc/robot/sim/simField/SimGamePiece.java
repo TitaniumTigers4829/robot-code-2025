@@ -17,6 +17,7 @@ import frc.robot.extras.math.forces.ProjectileUtil.ProjectileDynamics;
 import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.math.forces.Velocity3d;
 import frc.robot.extras.math.mathutils.GeomUtil;
+import frc.robot.extras.util.PhysicsHelper;
 import frc.robot.sim.simMechanism.OdeWorld;
 
 import java.util.ArrayList;
@@ -28,10 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import org.dyn4j.dynamics.Body;
-import org.dyn4j.dynamics.BodyFixture;
-import org.dyn4j.geometry.Convex;
-import org.dyn4j.geometry.MassType;
 import org.ode4j.ode.DBody;
 import org.ode4j.ode.DContact;
 import org.ode4j.ode.DGeom;
@@ -45,6 +42,7 @@ import org.ode4j.ode.internal.DxWorld;
  *
  * <p>Used to keep continuity between the different states gamepieces can be in.
  */
+// TODO: fix
 public class SimGamePiece implements StructSerializable {
   /**
    * Represents a rectangular prism volume in 3d space.
@@ -278,21 +276,24 @@ public class SimGamePiece implements StructSerializable {
       body.geom.dGeomSetData(gp.variant.shape);
 
       DContact contact = new DContact();
-      contact.surface.mode = Mu;
-      body.setFri(COEFFICIENT_OF_FRICTION);
-      bodyFixture.setRestitution(COEFFICIENT_OF_RESTITUTION);
-      bodyFixture.setRestitutionVelocity(MINIMUM_BOUNCING_VELOCITY);
+      // contact.surface.mode = Mu;
+      PhysicsHelper.applyLinearDamping(body, COEFFICIENT_OF_FRICTION);
+      // PhysicsHelper.applyAngularDamping(body, COEFFICIENT_OF_FRICTION);
+      // bodyFixture.setRestitution(COEFFICIENT_OF_RESTITUTION);
+      // bodyFixture.setRestitutionVelocity(MINIMUM_BOUNCING_VELOCITY);
+      // PhysicsHelper.
 
-      bodyFixture.setDensity(gp.variant.mass / gp.variant.shape.getArea());
-      body.setMass(MassType.NORMAL);
+      // body.invMass - 2;
+      // bodyFixture.setDensity(gp.variant.mass / gp.variant.shape.getArea());
+      body.setMass(body.getMass());
 
-      body.translate(GeomUtil.toDyn4jVector2(initialPosition));
+      body.setPosition(GeomUtil.toOdeVector(new Translation3d(initialPosition)));
 
       body.setLinearDamping(LINEAR_DAMPING);
       body.setAngularDamping(ANGULAR_DAMPING);
-      body.setBullet(true);
+      // body.setKinematic(true);
 
-      body.setLinearVelocity(GeomUtil.toDyn4jVector2(initialVelocity));
+      body.setLinearVel(GeomUtil.toOdeVector(new Velocity3d(initialVelocity)));
 
       return body;
     }
