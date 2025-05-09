@@ -5,6 +5,8 @@ import frc.robot.sim.simField.SimGamePiece.GamePieceCollisionBody;
 import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+
 import org.ode4j.ode.DBody;
 import org.ode4j.ode.DGeom;
 import org.ode4j.ode.DSpace;
@@ -30,7 +32,7 @@ public class SimIntake {
   public SimIntake(
       SimDriveTrain driveTrain,
       SimIndexer storage,
-      java.util.function.Function<DSpace, DGeom> shapeBuilder,
+      Function<DSpace, DGeom> shapeBuilder,
       GamePieceVariant... variants) {
     this.chassisBody = driveTrain.getChassisBody();
     this.space       = driveTrain.getOdeWorld().getSpace();
