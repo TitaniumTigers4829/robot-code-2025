@@ -4,39 +4,37 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.math.mathutils.GeomUtil;
-import frc.robot.extras.util.FrcBody;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.configs.SimSwerveConfig;
-import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import org.littletonrobotics.junction.Logger;
 import org.ode4j.math.DQuaternionC;
-import org.ode4j.math.DVector3;
+import org.ode4j.math.DVector3C;
+import org.ode4j.ode.DBody;
 
 /**
- * Abstract drivetrain simulation using ODE4j in full 3D.
+ * Abstract drivetrain simulation using ODE4j in full 3D, but exposes a 2D interface.
  */
 public class SimDriveTrain {
   public static final double kBumperCoF = 0.65;
   public static final double kBumperCoR = 0.005;
 
   private final OdeWorld ode;
-  protected final org.ode4j.ode.DBody chassis;
+  protected final DBody      chassis;
   private final SimEnvTiming timing;
 
   @SuppressWarnings("unchecked")
   protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
     this.timing = timing;
+    this.ode     = new OdeWorld();
 
-    // 1) Create a 3D world and box‐shaped chassis body
-    this.ode = new OdeWorld();
-    double bumperHeight = 0.1; // a thin chassis in Z
+    // Create a 3D box body (chassis)
+    double bumperHeight = 0.1; // thin Z dimension
     this.chassis = ode.createBoxBody(
       config.bumperLengthXMeters,
       config.bumperWidthYMeters,
@@ -44,70 +42,62 @@ public class SimDriveTrain {
       config.robotMassKg
     );
 
-    // 2) (Optional) set restitution & friction on the geom 
-    //    (not shown: you could cast to DGeom and call setSurfaceFriction, setBounce, etc.)
-
-    // 3) Teleport to origin initially
-    setChassisWorldPose(new Pose3d(), true);
+    // Teleport to origin (Pose2d)
+    setChassisWorldPose(new Pose2d(), true);
   }
 
-  public void setChassisWorldPose(Pose3d robotPose, boolean resetVelocity) {
-    // Position in 3D (Z=0)
-    DVector3 pos = new DVector3(robotPose.getX(), robotPose.getY(), 0.0);
-    chassis.setPosition(pos.get0(), pos.get1(), pos.get2());
-
-    // Orientation about Z axis
-    DQuaternionC q = GeomUtil.toOdeQuaternion(robotPose.getRotation());
+  /** Teleport chassis to given 2D pose (Z=0). */
+  // TODO: Use Pose3d!
+  public void setChassisWorldPose(Pose2d pose, boolean resetVel) {
+    chassis.setPosition(pose.getX(), pose.getY(), 0.0);
+    DQuaternionC q = GeomUtil.toOdeQuaternion(new Rotation3d(pose.getRotation()));
     chassis.setQuaternion(q);
-
-    if (resetVelocity) {
+    if (resetVel) {
       chassis.setLinearVel(0, 0, 0);
-      // zero out angular velocity vector
       chassis.setAngularVel(0, 0, 0);
     }
-
-    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
+    Logger.recordOutput("Odometry/ChassisPose3d", getChassisWorldPose3d());
   }
 
-  public void setChassisWorldSpeeds(ChassisSpeeds givenSpeeds) {
-    // Linear XY, zero Z
-    chassis.setLinearVel(
-      givenSpeeds.vxMetersPerSecond,
-      givenSpeeds.vyMetersPerSecond,
-      0.0 // unfortunately, the chassis does not fly :(
-    );
-    // Angular velocity only about Z axis
-    chassis.setAngularVel(0, 0, givenSpeeds.omegaRadiansPerSecond);
+  /** Instantly set linear (XY) and angular (Z) speeds. */
+  public void setChassisWorldSpeeds(ChassisSpeeds speeds) {
+    chassis.setLinearVel(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, 0.0);
+    chassis.setAngularVel(0, 0, speeds.omegaRadiansPerSecond);
   }
 
-  public Pose3d getChassisWorldPose() {
-    // read 3D pos + quaternion, then extract Pose2d
-    
-    DQuaternionC quat = chassis.getQuaternion(); // {w, x, y, z}
-    Rotation3d rot = GeomUtil.toWpilibRotation(quat);
-    return new Pose3d(GeomUtil.toWpilibTranslation(chassis.getPosition()), rot);
+  /** Read back current pose from the 3D body. */
+  public Pose3d getChassisWorldPose3d() {
+    return GeomUtil.toWpilibPose(chassis.getPosition(), chassis.getQuaternion());
   }
 
+   /** Read back current 2D pose from the 3D body. */
+   public Pose2d getChassisWorldPose2d() {
+    return getChassisWorldPose3d().toPose2d();
+  }
+
+  /** Read back current chassis speeds (vx, vy, ωz). */
   public ChassisSpeeds getChassisWorldSpeeds() {
-    double[] lin = chassis.getLinearVel().toDoubleArray();   // {vx, vy, vz}
-    double[] ang = chassis.getAngularVel().toDoubleArray();  // {wx, wy, wz}
-    // we only care about Z‐rotation rate
-    return new ChassisSpeeds(lin[0], lin[1], ang[2]);
+    return GeomUtil.toWpilibChassisSpeeds(chassis.getLinearVel(), chassis.getAngularVel());
   }
 
+  /** Step the physics world and log. */
   public void simTick() {
-    Logger.recordOutput("Forces/DriveTrainForces/pose", getChassisWorldPose());
-    Logger.recordOutput("Forces/DriveTrainForces/velocity", getChassisWorldSpeeds());
-    // then step world
+    Logger.recordOutput("Forces/DriveTrainPose2d", getChassisWorldPose2d());
+    Logger.recordOutput("Forces/DriveTrainSpeeds", getChassisWorldSpeeds());
     ode.step(timing.dt().in(Seconds));
   }
 
+  /** Factory for different drivetrain types. */
   @SuppressWarnings("unchecked")
-  public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>> T createDriveTrain(
-      SimRobot<T> robot, C config) {
+  public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>>
+  T createDriveTrain(SimRobot<T> robot, C config) {
     if (config instanceof SimSwerveConfig) {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }
     throw new IllegalArgumentException("Unknown drivetrain configuration");
   }
+
+  // Expose for attachments (e.g. SimIntake):
+  public OdeWorld getOdeWorld() { return ode; }
+  public DBody    getChassisBody() { return chassis; }
 }

@@ -92,11 +92,11 @@ public class GeomUtil {
     );
   }
 
-  public static ChassisSpeeds toWpilibChassisSpeeds(DVector3 linVel, double angVelRadPerSec) {
+  public static ChassisSpeeds toWpilibChassisSpeeds(DVector3C linVel, DVector3C angVelRadPerSec) {
     return new ChassisSpeeds(
       linVel.get0(),
       linVel.get1(),
-      angVelRadPerSec
+      angVelRadPerSec.get2()
     );
   }
 
