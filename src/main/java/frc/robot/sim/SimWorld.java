@@ -121,8 +121,8 @@ public class SimWorld {
     robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
 
-    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose();
+    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose2d();
     aprilTagSim.update(robotPose);
-    Logger.recordOutput("Odometry/ChassisPose", robot().getDriveTrain().getChassisWorldPose());
+    Logger.recordOutput("Odometry/ChassisPose", robot().getDriveTrain().getChassisWorldPose2d());
   }
 }

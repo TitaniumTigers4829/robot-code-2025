@@ -84,16 +84,16 @@ public class SimSwerve extends SimDriveTrain {
 
     // update gyro
     gyroSimulation.updateSimulationSubTick(
-      getChassisWorldPose().getRotation().toRotation2d().getRadians(),
+      getChassisWorldPose2d().getRotation().getMeasure(),
       getTickTwist()
     );
 
-    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose());
+    Logger.recordOutput("Odometry/ChassisPose", getChassisWorldPose2d());
     super.simTick();
   }
 
   private void simulateModulePropulsion() {
-    Rotation2d rot = getChassisWorldPose().getRotation().toRotation2d();
+    Rotation2d rot = getChassisWorldPose2d().getRotation();
     Force totalForceX = Newtons.zero();
     Force totalForceY = Newtons.zero();
     Torque totalTorque = NewtonMeters.zero();
@@ -126,7 +126,7 @@ public class SimSwerve extends SimDriveTrain {
   }
 
   private void simulateModuleFriction() {
-    Rotation2d rot = getChassisWorldPose().getRotation().toRotation2d();
+    Rotation2d rot = getChassisWorldPose2d().getRotation();
     ChassisSpeeds speeds = getChassisWorldSpeeds();
 
     LinearAcceleration ax = MetersPerSecondPerSecond.zero();
@@ -188,7 +188,7 @@ public Twist2d getTickTwist() {
   // Get the chassis’s change in position in robot‐local coordinates:
   // You’ll need to track the previous pose each tick.
   Pose2d prev = lastPose;                // store this at end of simTick()
-  Pose2d curr = getChassisWorldPose();
+  Pose2d curr = getChassisWorldPose2d();
 
   // Compute the delta in world frame:
   double dx = curr.getX() - prev.getX();
