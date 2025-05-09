@@ -17,6 +17,8 @@ import frc.robot.extras.math.forces.ProjectileUtil.ProjectileDynamics;
 import frc.robot.extras.math.forces.Velocity2d;
 import frc.robot.extras.math.forces.Velocity3d;
 import frc.robot.extras.math.mathutils.GeomUtil;
+import frc.robot.sim.simMechanism.OdeWorld;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +32,13 @@ import org.dyn4j.dynamics.Body;
 import org.dyn4j.dynamics.BodyFixture;
 import org.dyn4j.geometry.Convex;
 import org.dyn4j.geometry.MassType;
+import org.ode4j.ode.DBody;
+import org.ode4j.ode.DContact;
 import org.ode4j.ode.DGeom;
+import org.ode4j.ode.DJoint;
+import org.ode4j.ode.OdeHelper;
+import org.ode4j.ode.internal.DxBody;
+import org.ode4j.ode.internal.DxWorld;
 
 /**
  * A base class used for all gamepieces in the simulation.
@@ -138,17 +146,17 @@ public class SimGamePiece implements StructSerializable {
     public record OnField(GamePieceCollisionBody body) implements GamePieceStateData {
       @Override
       public void onEnter(SimGamePiece gp, SimArena arena) {
-        arena.withWorld(world -> world.addBody(body));
+        arena.gamePieces.add(gp);
       }
 
       @Override
       public void onExit(SimGamePiece gp, SimArena arena) {
-        arena.withWorld(world -> world.removeBody(body));
+        arena.gamePieces.remove(gp);
       }
 
       @Override
       public Pose3d pose(SimGamePiece gp, SimArena arena) {
-        var pose2d = GeomUtil.toWpilibPose2d(body.getTransform());
+        var pose2d = body.gp.state.pose(gp, arena).toPose2d();
         var t = pose2d.getTranslation();
         return new Pose3d(
             t.getX(),
@@ -247,11 +255,12 @@ public class SimGamePiece implements StructSerializable {
    * A class representing the collision body of a game piece. This is used to provide extra info in
    * the dyn4j functions when doing collision handling.
    */
-  public static class GamePieceCollisionBody extends Body {
+  public static class GamePieceCollisionBody extends DxBody{
     public final SimGamePiece gp;
 
+
     private GamePieceCollisionBody(SimGamePiece gp) {
-      super();
+      super(DxWorld.dWorldCreate()); // uh
       this.gp = gp;
     }
 
@@ -265,9 +274,12 @@ public class SimGamePiece implements StructSerializable {
 
       var body = new GamePieceCollisionBody(gp);
 
-      BodyFixture bodyFixture = body.addFixture(gp.variant.shape);
+      // var bodyFixture = 
+      body.geom.dGeomSetData(gp.variant.shape);
 
-      bodyFixture.setFriction(COEFFICIENT_OF_FRICTION);
+      DContact contact = new DContact();
+      contact.surface.mode = Mu;
+      body.setFri(COEFFICIENT_OF_FRICTION);
       bodyFixture.setRestitution(COEFFICIENT_OF_RESTITUTION);
       bodyFixture.setRestitutionVelocity(MINIMUM_BOUNCING_VELOCITY);
 
