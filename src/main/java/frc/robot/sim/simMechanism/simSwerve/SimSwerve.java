@@ -66,12 +66,9 @@ public class SimSwerve extends SimDriveTrain {
     // precompute rotor inertias
     Distance wheelRadius = Meters.of(config.swerveModuleConfig.wheelsRadiusMeters);
     Distance wheelBase   = XY.of(config.moduleTranslations[0]).magnitude();
-    var rotationalMass    = chassisMass.moi()
-                              .div(wheelBase.times(wheelBase))
-                              .div(moduleSimulations.length);
+    var rotationalMass    = MeasureMath.div(chassisMass.moi(), wheelBase.times(wheelBase)).div(moduleSimulations.length);
     this.rotorInertiaWhenTranslating = MeasureMath.times(chassisMass.mass().div(moduleSimulations.length), wheelRadius.times(wheelRadius));
-    this.rotorInertiaWhenRotating = rotationalMass
-      .times(wheelRadius.times(wheelRadius));
+    this.rotorInertiaWhenRotating = MeasureMath.times(rotationalMass, wheelRadius.times(wheelRadius));
     this.rotorInertia = rotorInertiaWhenTranslating;
   }
 
