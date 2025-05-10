@@ -32,6 +32,8 @@ public class SimSwerve extends SimDriveTrain {
   private final SimEnvTiming timing;
   private final SimSwerveModule[] moduleSimulations;
   private final SimGyro gyroSimulation;
+  private final SimSwerveConfig config;
+  private final SimRobot<SimSwerve> robot;
   private final PhysicsMass chassisMass;
   private final SwerveDriveKinematics kinematics;
 
@@ -41,8 +43,9 @@ public class SimSwerve extends SimDriveTrain {
 
   public SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
     super(config, robot.timing());
+    this.robot = robot;
     this.timing = robot.timing();
-
+    this.config = config;
     // initialize modules & gyro
     this.moduleSimulations = new SimSwerveModule[config.moduleTranslations.length];
     Force gravityPerModule = Newtons.of(config.robotMassKg * 9.81)
