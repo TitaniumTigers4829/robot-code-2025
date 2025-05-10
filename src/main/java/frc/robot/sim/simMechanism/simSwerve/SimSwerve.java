@@ -69,9 +69,11 @@ public class SimSwerve extends SimDriveTrain {
     var rotationalMass    = chassisMass.moi()
                               .div(wheelBase.times(wheelBase))
                               .div(moduleSimulations.length);
-    this.rotorInertiaWhenTranslating = chassisMass.mass()
-      .div(moduleSimulations.length)
+    this.rotorInertiaWhenTranslating = (chassisMass.mass().div(moduleSimulations.length))
       .times(wheelRadius.times(wheelRadius));
+    // .mass()
+      // .div(moduleSimulations.length)
+      // .times(wheelRadius.times(wheelRadius));
     this.rotorInertiaWhenRotating = rotationalMass
       .times(wheelRadius.times(wheelRadius));
     this.rotorInertia = rotorInertiaWhenTranslating;
@@ -187,7 +189,7 @@ public class SimSwerve extends SimDriveTrain {
 public Twist2d getTickTwist() {
   // Get the chassis’s change in position in robot‐local coordinates:
   // You’ll need to track the previous pose each tick.
-  Pose2d prev = lastPose;                // store this at end of simTick()
+  Pose2d prev = new Pose2d();   // TODO: make lastPose variable   // store this at end of simTick()
   Pose2d curr = getChassisWorldPose2d();
 
   // Compute the delta in world frame:
@@ -202,7 +204,7 @@ public Twist2d getTickTwist() {
   double localDy =  dx * sin + dy * cos;
 
   // Update lastPose for next tick
-  lastPose = curr;
+  prev = curr;
 
   return new Twist2d(localDx, localDy, dtheta);
 }

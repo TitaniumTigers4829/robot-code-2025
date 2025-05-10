@@ -53,7 +53,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     this.arena = arena;
     arena.robots.add(this);
     this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
-    arena.withWorld(world -> world.addBody(driveTrain.chassis));
+    arena.(world -> world.addBody(driveTrain.chassis));
     this.gamePieceStorage = new SimIndexer(gamePieceStorageCapacity);
   }
 
