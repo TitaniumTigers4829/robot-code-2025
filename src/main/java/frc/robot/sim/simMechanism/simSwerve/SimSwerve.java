@@ -69,8 +69,10 @@ public class SimSwerve extends SimDriveTrain {
     var rotationalMass    = chassisMass.moi()
                               .div(wheelBase.times(wheelBase))
                               .div(moduleSimulations.length);
-    this.rotorInertiaWhenTranslating = (chassisMass.mass().div(moduleSimulations.length))
-      .times(wheelRadius.times(wheelRadius));
+    this.rotorInertiaWhenTranslating = MeasureMath.times(chassisMass.mass().div(moduleSimulations.length), wheelRadius.times(wheelRadius));
+
+    // (chassisMass.mass().div(moduleSimulations.length))
+    //   .times(wheelRadius.times(wheelRadius));
     // .mass()
       // .div(moduleSimulations.length)
       // .times(wheelRadius.times(wheelRadius));
