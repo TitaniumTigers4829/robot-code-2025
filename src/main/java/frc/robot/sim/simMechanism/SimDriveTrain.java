@@ -1,7 +1,5 @@
 package frc.robot.sim.simMechanism;
 
-import static edu.wpi.first.units.Units.Seconds;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -10,34 +8,37 @@ import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.SimRobot;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.configs.SimSwerveConfig;
+import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import org.littletonrobotics.junction.Logger;
 import org.ode4j.math.DQuaternionC;
 import org.ode4j.ode.DBody;
+import org.ode4j.ode.DBox;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DWorld;
+import org.ode4j.ode.OdeHelper;
 
 /** Abstract drivetrain simulation using ODE4j in full 3D, but exposes a 2D interface. */
 public class SimDriveTrain {
   public static final double kBumperCoF = 0.65;
   public static final double kBumperCoR = 0.005;
 
-  private final OdeWorld ode;
+  private final DSpace space;
+  private final DWorld world;
   protected final DBody chassis;
   private final SimEnvTiming timing;
 
   @SuppressWarnings("unchecked")
-  protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
-    this.timing = timing;
-    this.ode = new OdeWorld();
+  protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimArena arena) {
+    this.timing = arena.timing;
+    this.world = arena.getWorld();
+    this.space = arena.getSpace();
 
     // Create a 3D box body (chassis)
-    double bumperHeight = 0.1; // thin Z dimension
-    this.chassis =
-        ode.createBoxBody(
-            config.bumperLengthXMeters,
-            config.bumperWidthYMeters,
-            bumperHeight,
-            config.robotMassKg);
+    // double bumperHeight = 0.1; // thin Z dimension
+    this.chassis = createBoxBody(world, space, config, timing);
 
     // Teleport to origin (Pose2d)
     setChassisWorldPose(new Pose2d(), true);
@@ -67,7 +68,21 @@ public class SimDriveTrain {
     return GeomUtil.toWpilibPose(chassis.getPosition(), chassis.getQuaternion());
   }
 
-  /** Read back current 2D pose from the 3D body. */
+  private static DBody createBoxBody(
+      DWorld world, DSpace space, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
+    DBody body = OdeHelper.createBody(world);
+    // set mass and attach geom created in the *same* space
+    DMass m = OdeHelper.createMass();
+    m.setBox(1.0, config.bumperLengthXMeters / 2.0, config.bumperWidthYMeters / 2.0, 0.1 / 2.0);
+    m.adjust(config.robotMassKg);
+    body.setMass(m);
+    DBox geom =
+        OdeHelper.createBox(space, config.bumperLengthXMeters, config.bumperWidthYMeters, 0.1);
+    geom.setBody(body);
+    return body;
+  }
+
+  /** Re ad back current 2D pose from the 3D body. */
   public Pose2d getChassisWorldPose2d() {
     return getChassisWorldPose3d().toPose2d();
   }
@@ -81,7 +96,7 @@ public class SimDriveTrain {
   public void simTick() {
     Logger.recordOutput("Forces/DriveTrainPose2d", getChassisWorldPose2d());
     Logger.recordOutput("Forces/DriveTrainSpeeds", getChassisWorldSpeeds());
-    ode.step(timing.dt().in(Seconds));
+    // world.step(timing.dt.in(Seconds));
   }
 
   /** Factory for different drivetrain types. */
@@ -94,9 +109,12 @@ public class SimDriveTrain {
     throw new IllegalArgumentException("Unknown drivetrain configuration");
   }
 
-  // Expose for attachments (e.g. SimIntake):
-  public OdeWorld getOdeWorld() {
-    return ode;
+  public DSpace getSpace() {
+    return space;
+  }
+
+  public DWorld getWorld() {
+    return world;
   }
 
   public DBody getChassisBody() {

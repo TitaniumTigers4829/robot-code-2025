@@ -108,6 +108,10 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     return null;
   }
 
+  public SimArena arena() {
+    return arena;
+  }
+
   /**
    * Adds a {@link SimMechanism} to the robot.
    *

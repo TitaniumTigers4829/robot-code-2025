@@ -30,7 +30,7 @@ public class SimIntake {
       Function<DSpace, DGeom> shapeBuilder,
       GamePieceVariant... variants) {
     this.chassisBody = driveTrain.getChassisBody();
-    this.space = driveTrain.getOdeWorld().getSpace();
+    this.space = driveTrain.getSpace();
     this.storage = storage;
     this.variants = List.of(variants);
 

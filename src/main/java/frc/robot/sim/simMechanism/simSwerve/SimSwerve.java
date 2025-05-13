@@ -42,7 +42,7 @@ public class SimSwerve extends SimDriveTrain {
   private final MomentOfInertia rotorInertiaWhenRotating;
 
   public SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
-    super(config, robot.timing());
+    super(config, robot.arena());
     this.robot = robot;
     this.timing = robot.timing();
     this.config = config;
@@ -115,9 +115,9 @@ public class SimSwerve extends SimDriveTrain {
 
     // apply to body in 3D
     DVector3 f = new DVector3(totalForceX.in(Newtons), totalForceY.in(Newtons), 0.0);
-    DVector3 τ = new DVector3(0.0, 0.0, totalTorque.in(NewtonMeters));
+    DVector3 tau = new DVector3(0.0, 0.0, totalTorque.in(NewtonMeters));
     chassis.addForce(f);
-    chassis.addTorque(τ);
+    chassis.addTorque(tau);
 
     Logger.recordOutput("Propulsion/TotalForce", new XY<>(totalForceX, totalForceY));
     Logger.recordOutput("Propulsion/TotalTorque", totalTorque);
@@ -129,7 +129,7 @@ public class SimSwerve extends SimDriveTrain {
 
     LinearAcceleration ax = MetersPerSecondPerSecond.zero();
     LinearAcceleration ay = MetersPerSecondPerSecond.zero();
-    AngularAcceleration α = RadiansPerSecondPerSecond.zero();
+    AngularAcceleration alpha = RadiansPerSecondPerSecond.zero();
 
     for (int i = 0; i < moduleSimulations.length; i++) {
       XY<Force> friction = moduleSimulations[i].friction(speeds, rot);
@@ -138,7 +138,7 @@ public class SimSwerve extends SimDriveTrain {
               friction, XY.of(moduleSimulations[i].translation().rotateBy(rot)));
       ax = ax.plus(pack.getFirst().x());
       ay = ay.plus(pack.getFirst().y());
-      α = α.plus(pack.getSecond());
+      alpha = alpha.plus(pack.getSecond());
 
       Logger.recordOutput("Friction/Module" + i + "/force", friction);
       Logger.recordOutput("Friction/Module" + i + "/linearAccel", pack.getFirst());
@@ -155,24 +155,24 @@ public class SimSwerve extends SimDriveTrain {
 
     var axStop = MetersPerSecond.of(-unwanted.vxMetersPerSecond).div(timing.dt());
     var ayStop = MetersPerSecond.of(-unwanted.vyMetersPerSecond).div(timing.dt());
-    var αStop = RadiansPerSecond.of(-unwanted.omegaRadiansPerSecond).div(timing.dt());
+    var alphaStop = RadiansPerSecond.of(-unwanted.omegaRadiansPerSecond).div(timing.dt());
 
     ax = MeasureMath.clamp(ax, axStop);
     ay = MeasureMath.clamp(ay, ayStop);
-    α = MeasureMath.clamp(α, αStop);
+    alpha = MeasureMath.clamp(alpha, alphaStop);
 
     // convert to forces & torque, apply
     Force fx = chassisMass.forceDueToAcceleration(ax);
     Force fy = chassisMass.forceDueToAcceleration(ay);
-    Torque τ = chassisMass.torqueDueToAcceleration(α);
+    Torque tau = chassisMass.torqueDueToAcceleration(alpha);
 
     DVector3 f = new DVector3(fx.in(Newtons), fy.in(Newtons), 0.0);
-    DVector3 t = new DVector3(0, 0, τ.in(NewtonMeters));
+    DVector3 t = new DVector3(0, 0, tau.in(NewtonMeters));
     chassis.addForce(f);
     chassis.addTorque(t);
 
     Logger.recordOutput("Friction/TotalForce", new XY<>(fx, fy));
-    Logger.recordOutput("Friction/TotalTorque", τ);
+    Logger.recordOutput("Friction/TotalTorque", tau);
   }
 
   // **
