@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
 import frc.robot.extras.logging.RuntimeLog;
-import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.configs.SimDriveTrainConfig;
 import frc.robot.sim.simField.SimArena;
 import frc.robot.sim.simField.SimArena.SimEnvTiming;
@@ -53,7 +52,7 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
     this.arena = arena;
     arena.robots.add(this);
     this.driveTrain = SimDriveTrain.createDriveTrain(this, drivetrainConfig);
-    arena.(world -> world.addBody(driveTrain.chassis));
+    arena.addDriveTrain(driveTrain);
     this.gamePieceStorage = new SimIndexer(gamePieceStorageCapacity);
   }
 
@@ -94,18 +93,19 @@ public class SimRobot<DrvTrn extends SimDriveTrain> {
    *     types are provided, the intake will accept all types of game pieces.
    * @return the newly created intake.
    */
+  // TODO: fix
   public SimIntake createIntake(
       Rectangle2d boundingBox, GamePieceVariant... acceptedGamePieceVariants) {
-    var intake =
-        new SimIntake(
-            driveTrain,
-            gamePieceStorage,
-            GeomUtil.toDyn4jRectangle(boundingBox),
-            acceptedGamePieceVariants);
-    intakes.add(intake);
-    arena.withWorld(world -> world.addContactListener(intake.getGamePieceContactListener()));
+    // var intake =
+    //     new SimIntake(
+    //         driveTrain,
+    //         gamePieceStorage,
+    //         GeomUtil.toDyn4jRectangle(boundingBox),
+    //         acceptedGamePieceVariants);
+    // intakes.add(intake);
+    // arena.withWorld(world -> world.addContactListener(intake.getGamePieceContactListener()));
     RuntimeLog.debug("Created IntakeSimulation");
-    return intake;
+    return null;
   }
 
   /**

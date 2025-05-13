@@ -1,16 +1,15 @@
 package frc.robot.sim.simMechanism;
 
-import org.ode4j.ode.DWorld;
-import org.ode4j.ode.DSpace;
-import org.ode4j.ode.OdeHelper;
 import org.ode4j.ode.DBody;
-import org.ode4j.ode.DGeom;
-import org.ode4j.ode.DMass;
 import org.ode4j.ode.DBox;
+import org.ode4j.ode.DMass;
+import org.ode4j.ode.DSpace;
+import org.ode4j.ode.DWorld;
+import org.ode4j.ode.OdeHelper;
 
 /**
- * Simple wrapper around an ODE4j world and bodies to replace Dyn4j's world/body,
- * now fully in 3D (no 2D embeddings).
+ * Simple wrapper around an ODE4j world and bodies to replace Dyn4j's world/body, now fully in 3D
+ * (no 2D embeddings).
  */
 public class OdeWorld {
   private final DWorld world;
@@ -33,6 +32,7 @@ public class OdeWorld {
 
   /**
    * Creates a body with a box fixture in the world.
+   *
    * @param length X dimension (m)
    * @param width Y dimension (m)
    * @param height Z dimension (m)
@@ -47,7 +47,7 @@ public class OdeWorld {
     DMass m = OdeHelper.createMass();
     // setBox expects density and half extents
     double hx = length / 2.0;
-    double hy = width  / 2.0;
+    double hy = width / 2.0;
     double hz = height / 2.0;
     m.setBox(1.0, hx, hy, hz);
     // adjust total mass
@@ -63,6 +63,7 @@ public class OdeWorld {
 
   /**
    * Creates a body with a sphere fixture in the world.
+   *
    * @param radius sphere radius (m)
    * @param massValue total mass (kg)
    * @return the created DBody
@@ -81,6 +82,7 @@ public class OdeWorld {
 
   /**
    * Creates a body with a capsule fixture in the world.
+   *
    * @param radius capsule radius (m)
    * @param length capsule length (m)
    * @param massValue total mass (kg)
@@ -100,6 +102,7 @@ public class OdeWorld {
 
   /**
    * Step the world simulation forward by dt seconds.
+   *
    * @param dt time step (s)
    */
   public void step(double dt) {

@@ -14,33 +14,30 @@ import frc.robot.sim.simField.SimArena.SimEnvTiming;
 import frc.robot.sim.simMechanism.simSwerve.SimSwerve;
 import org.littletonrobotics.junction.Logger;
 import org.ode4j.math.DQuaternionC;
-import org.ode4j.math.DVector3C;
 import org.ode4j.ode.DBody;
 
-/**
- * Abstract drivetrain simulation using ODE4j in full 3D, but exposes a 2D interface.
- */
+/** Abstract drivetrain simulation using ODE4j in full 3D, but exposes a 2D interface. */
 public class SimDriveTrain {
   public static final double kBumperCoF = 0.65;
   public static final double kBumperCoR = 0.005;
 
   private final OdeWorld ode;
-  protected final DBody      chassis;
+  protected final DBody chassis;
   private final SimEnvTiming timing;
 
   @SuppressWarnings("unchecked")
   protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
     this.timing = timing;
-    this.ode     = new OdeWorld();
+    this.ode = new OdeWorld();
 
     // Create a 3D box body (chassis)
     double bumperHeight = 0.1; // thin Z dimension
-    this.chassis = ode.createBoxBody(
-      config.bumperLengthXMeters,
-      config.bumperWidthYMeters,
-      bumperHeight,
-      config.robotMassKg
-    );
+    this.chassis =
+        ode.createBoxBody(
+            config.bumperLengthXMeters,
+            config.bumperWidthYMeters,
+            bumperHeight,
+            config.robotMassKg);
 
     // Teleport to origin (Pose2d)
     setChassisWorldPose(new Pose2d(), true);
@@ -70,8 +67,8 @@ public class SimDriveTrain {
     return GeomUtil.toWpilibPose(chassis.getPosition(), chassis.getQuaternion());
   }
 
-   /** Read back current 2D pose from the 3D body. */
-   public Pose2d getChassisWorldPose2d() {
+  /** Read back current 2D pose from the 3D body. */
+  public Pose2d getChassisWorldPose2d() {
     return getChassisWorldPose3d().toPose2d();
   }
 
@@ -89,8 +86,8 @@ public class SimDriveTrain {
 
   /** Factory for different drivetrain types. */
   @SuppressWarnings("unchecked")
-  public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>>
-  T createDriveTrain(SimRobot<T> robot, C config) {
+  public static <T extends SimDriveTrain, C extends SimDriveTrainConfig<T, C>> T createDriveTrain(
+      SimRobot<T> robot, C config) {
     if (config instanceof SimSwerveConfig) {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }
@@ -98,6 +95,11 @@ public class SimDriveTrain {
   }
 
   // Expose for attachments (e.g. SimIntake):
-  public OdeWorld getOdeWorld() { return ode; }
-  public DBody    getChassisBody() { return chassis; }
+  public OdeWorld getOdeWorld() {
+    return ode;
+  }
+
+  public DBody getChassisBody() {
+    return chassis;
+  }
 }
