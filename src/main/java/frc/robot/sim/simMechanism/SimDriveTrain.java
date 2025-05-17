@@ -30,6 +30,8 @@ public class SimDriveTrain {
   protected final DBody chassis;
   private final SimEnvTiming timing;
 
+  private boolean chassisAdded = false;
+
   @SuppressWarnings("unchecked")
   protected SimDriveTrain(SimDriveTrainConfig<?, ?> config, SimArena arena) {
     this.timing = arena.timing;
@@ -38,10 +40,23 @@ public class SimDriveTrain {
 
     // Create a 3D box body (chassis)
     // double bumperHeight = 0.1; // thin Z dimension
-    this.chassis = createBoxBody(world, space, config, timing);
+    this.chassis = createBoxBody(world, config, timing);
 
     // Teleport to origin (Pose2d)
     setChassisWorldPose(new Pose2d(), true);
+  }
+
+  /**
+   * Ensure the chassis geom is added exactly once (call from SimArena instead of manual
+   * odeSpace.add).
+   */
+  public void addToSpace() {
+    if (!chassisAdded) {
+      // Grab the geom you created in createBoxBody()
+      DBox boxGeom = (DBox) chassis.getFirstGeom();
+      space.add(boxGeom);
+      chassisAdded = true;
+    }
   }
 
   /** Teleport chassis to given 2D pose (Z=0). */
@@ -68,17 +83,33 @@ public class SimDriveTrain {
     return GeomUtil.toWpilibPose(chassis.getPosition(), chassis.getQuaternion());
   }
 
+  // private static DBody createBoxBody(
+  //     DWorld world, DSpace space, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
+  //   DBody body = OdeHelper.createBody(world);
+  //   // set mass and attach geom created in the *same* space
+  //   DMass m = OdeHelper.createMass();
+  //   m.setBox(1.0, config.bumperLengthXMeters / 2.0, config.bumperWidthYMeters / 2.0, 0.1 / 2.0);
+  //   m.adjust(config.robotMassKg);
+  //   body.setMass(m);
+  //   DBox geom =
+  //       OdeHelper.createBox(space, config.bumperLengthXMeters, config.bumperWidthYMeters, 0.1);
+  //   geom.setBody(body);
+  //   return body;
+  // }
+
   private static DBody createBoxBody(
-      DWorld world, DSpace space, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
+      DWorld world, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
     DBody body = OdeHelper.createBody(world);
-    // set mass and attach geom created in the *same* space
     DMass m = OdeHelper.createMass();
     m.setBox(1.0, config.bumperLengthXMeters / 2.0, config.bumperWidthYMeters / 2.0, 0.1 / 2.0);
     m.adjust(config.robotMassKg);
     body.setMass(m);
+
+    // Create the geom *un‑attached*
     DBox geom =
-        OdeHelper.createBox(space, config.bumperLengthXMeters, config.bumperWidthYMeters, 0.1);
+        OdeHelper.createBox(null, config.bumperLengthXMeters, config.bumperWidthYMeters, 0.1);
     geom.setBody(body);
+
     return body;
   }
 

@@ -50,7 +50,7 @@ public abstract class SimArena {
   // Simulation objects
   public final Set<SimRobot<?>> robots = ConcurrentHashMap.newKeySet();
   public final Set<SimGamePiece> gamePieces = ConcurrentHashMap.newKeySet();
-  private final List<SimDriveTrain> drivetrains = new ArrayList<>();
+  // private final List<SimDriveTrain> drivetrains = new ArrayList<>();
   private final List<SimIntake> intakes = new ArrayList<>();
 
   public final SimEnvTiming timing;
@@ -85,8 +85,9 @@ public abstract class SimArena {
 
   /** Add a drivetrain’s chassis into the physics space. */
   public void addDriveTrain(SimDriveTrain drive) {
-    drivetrains.add(drive);
-    odeSpace.add(drive.getChassisBody().getFirstGeom());
+    // drivetrains.add(drive);
+    // odeSpace.add(drive.getChassisBody().getFirstGeom());
+    drive.addToSpace();
   }
 
   /** Add an intake into the physics space and enable its collisions. */
