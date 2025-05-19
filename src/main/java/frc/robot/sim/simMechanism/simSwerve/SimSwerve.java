@@ -41,6 +41,8 @@ public class SimSwerve extends SimDriveTrain {
   private final MomentOfInertia rotorInertiaWhenTranslating;
   private final MomentOfInertia rotorInertiaWhenRotating;
 
+  private Pose2d lastPose;
+
   public SimSwerve(SimRobot<SimSwerve> robot, SimSwerveConfig config) {
     super(config, robot.arena());
     this.robot = robot;
@@ -94,26 +96,41 @@ public class SimSwerve extends SimDriveTrain {
     super.simTick();
   }
 
+  /**
+   * Simulates the module propulsion.
+   */
   private void simulateModulePropulsion() {
     Rotation2d rot = getChassisWorldPose2d().getRotation();
     Force totalForceX = Newtons.zero();
     Force totalForceY = Newtons.zero();
     Torque totalTorque = NewtonMeters.zero();
+    Force propulsionTotalMag = Newtons.zero();
 
+    // accumulate module forces
     for (SimSwerveModule mod : moduleSimulations) {
       XY<Distance> pos = XY.of(mod.translation().rotateBy(rot));
       XY<Force> propulsion = mod.force(rot);
+      propulsionTotalMag = propulsionTotalMag.plus(propulsion.magnitude());
       var pack = chassisMass.forcesDueToOffsetForces(propulsion, pos);
-
       totalForceX = totalForceX.plus(pack.getFirst().x());
       totalForceY = totalForceY.plus(pack.getFirst().y());
       totalTorque = totalTorque.plus(pack.getSecond());
-
       Logger.recordOutput("Propulsion/Module" + mod.id() + "/force", pack.getFirst());
       Logger.recordOutput("Propulsion/Module" + mod.id() + "/torque", pack.getSecond());
     }
 
-    // apply to body in 3D
+    // dynamic rotor inertia interpolation
+    double fx = totalForceX.in(Newtons);
+    double fy = totalForceY.in(Newtons);
+    double ft = propulsionTotalMag.in(Newtons);
+    double txRatio = ft > 1e-3 ? fx / ft : 0.0;
+    double tyRatio = ft > 1e-3 ? fy / ft : 0.0;
+    double transRatio = Math.hypot(txRatio, tyRatio);
+    this.rotorInertia = rotorInertiaWhenTranslating.times(transRatio)
+        .plus(rotorInertiaWhenRotating.times(1 - transRatio));
+    Logger.recordOutput("RotorInertia/translationRatio", transRatio);
+
+    // apply to body
     DVector3 f = new DVector3(totalForceX.in(Newtons), totalForceY.in(Newtons), 0.0);
     DVector3 tau = new DVector3(0.0, 0.0, totalTorque.in(NewtonMeters));
     chassis.addForce(f);
@@ -123,6 +140,9 @@ public class SimSwerve extends SimDriveTrain {
     Logger.recordOutput("Propulsion/TotalTorque", totalTorque);
   }
 
+  /**
+   * Simulates the module friction.
+   */
   private void simulateModuleFriction() {
     Rotation2d rot = getChassisWorldPose2d().getRotation();
     ChassisSpeeds speeds = getChassisWorldSpeeds();
@@ -131,41 +151,34 @@ public class SimSwerve extends SimDriveTrain {
     LinearAcceleration ay = MetersPerSecondPerSecond.zero();
     AngularAcceleration alpha = RadiansPerSecondPerSecond.zero();
 
+    // accumulate friction
     for (int i = 0; i < moduleSimulations.length; i++) {
       XY<Force> friction = moduleSimulations[i].friction(speeds, rot);
-      Pair<XY<LinearAcceleration>, AngularAcceleration> pack =
-          chassisMass.accelerationsDueToForce(
-              friction, XY.of(moduleSimulations[i].translation().rotateBy(rot)));
+      Pair<XY<LinearAcceleration>, AngularAcceleration> pack = chassisMass.accelerationsDueToForce(
+          friction, XY.of(moduleSimulations[i].translation().rotateBy(rot)));
       ax = ax.plus(pack.getFirst().x());
       ay = ay.plus(pack.getFirst().y());
       alpha = alpha.plus(pack.getSecond());
-
       Logger.recordOutput("Friction/Module" + i + "/force", friction);
-      Logger.recordOutput("Friction/Module" + i + "/linearAccel", pack.getFirst());
-      Logger.recordOutput("Friction/Module" + i + "/angularAccel", pack.getSecond());
     }
 
-    // clamp to no-reverse
-    ChassisSpeeds currentWs =
-        kinematics.toChassisSpeeds(
-            Arrays.stream(moduleSimulations)
-                .map(SimSwerveModule::state)
-                .toArray(SwerveModuleState[]::new));
-    ChassisSpeeds unwanted = currentWs.minus(speeds);
-
-    var axStop = MetersPerSecond.of(-unwanted.vxMetersPerSecond).div(timing.dt());
-    var ayStop = MetersPerSecond.of(-unwanted.vyMetersPerSecond).div(timing.dt());
-    var alphaStop = RadiansPerSecond.of(-unwanted.omegaRadiansPerSecond).div(timing.dt());
-
+    // clamp to no reverse
+    ChassisSpeeds wheelSpeeds = kinematics.toChassisSpeeds(
+        Arrays.stream(moduleSimulations)
+            .map(SimSwerveModule::state)
+            .toArray(SwerveModuleState[]::new));
+    ChassisSpeeds unwanted = wheelSpeeds.minus(speeds);
+    var axStop = MeasureMath.negate(MetersPerSecond.of(unwanted.vxMetersPerSecond)).div(timing.dt());
+    var ayStop = MeasureMath.negate(MetersPerSecond.of(unwanted.vyMetersPerSecond)).div(timing.dt());
+    var alphaStop = MeasureMath.negate(RadiansPerSecond.of(unwanted.omegaRadiansPerSecond)).div(timing.dt());
     ax = MeasureMath.clamp(ax, axStop);
     ay = MeasureMath.clamp(ay, ayStop);
     alpha = MeasureMath.clamp(alpha, alphaStop);
 
-    // convert to forces & torque, apply
+    // apply friction
     Force fx = chassisMass.forceDueToAcceleration(ax);
     Force fy = chassisMass.forceDueToAcceleration(ay);
     Torque tau = chassisMass.torqueDueToAcceleration(alpha);
-
     DVector3 f = new DVector3(fx.in(Newtons), fy.in(Newtons), 0.0);
     DVector3 t = new DVector3(0, 0, tau.in(NewtonMeters));
     chassis.addForce(f);
@@ -174,31 +187,21 @@ public class SimSwerve extends SimDriveTrain {
     Logger.recordOutput("Friction/TotalForce", new XY<>(fx, fy));
     Logger.recordOutput("Friction/TotalTorque", tau);
   }
-
-  // **
-  //  * Computes the small‐time‐step twist (dx, dy, dθ) from the change in chassis
-  //  * position and heading since the last tick.
-  //  */
+/* 
+  **
+   * Computes the smaFll‐time‐step twist (dx, dy, dθ) from the change in chassis
+   * position and heading since the last tick.
+   */
   public Twist2d getTickTwist() {
-    // Get the chassis’s change in position in robot‐local coordinates:
-    // You’ll need to track the previous pose each tick.
-    Pose2d prev = new Pose2d(); // TODO: make lastPose variable   // store this at end of simTick()
     Pose2d curr = getChassisWorldPose2d();
-
-    // Compute the delta in world frame:
-    double dx = curr.getX() - prev.getX();
-    double dy = curr.getY() - prev.getY();
-    double dtheta = curr.getRotation().minus(prev.getRotation()).getRadians();
-
-    // Rotate that world‐delta back into robot’s local frame at prev heading:
-    double sin = Math.sin(-prev.getRotation().getRadians());
-    double cos = Math.cos(-prev.getRotation().getRadians());
+    double dx = curr.getX() - lastPose.getX();
+    double dy = curr.getY() - lastPose.getY();
+    double dtheta = curr.getRotation().minus(lastPose.getRotation()).getRadians();
+    double sin = Math.sin(-lastPose.getRotation().getRadians());
+    double cos = Math.cos(-lastPose.getRotation().getRadians());
     double localDx = dx * cos - dy * sin;
     double localDy = dx * sin + dy * cos;
-
-    // Update lastPose for next tick
-    prev = curr;
-
+    lastPose = curr;
     return new Twist2d(localDx, localDy, dtheta);
   }
 
