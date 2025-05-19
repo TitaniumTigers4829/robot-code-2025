@@ -26,12 +26,15 @@ import java.util.function.BiConsumer;
  *
  *
  * <h1>Simulated Gyro</hh1>
+ *
+ * <p>This class simulates a gyro sensor in a simulated environment. It provides methods to update
+ * the gyro angle and angular velocity based on the simulated drivetrain's motion.
  */
 public class SimGyro {
   /* The threshold of instantaneous angular acceleration at which the chassis is considered to
   experience an "impact." */
   private static final AngularAcceleration START_DRIFTING = RadiansPerSecondPerSecond.of(500);
-  /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of
+  /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of 
   the angular acceleration threshold. */
   private static final Angle DRIFT_DUE_TO_IMPACT_COEFFICIENT = Radians.of(1);
 
@@ -88,7 +91,7 @@ public class SimGyro {
     AngularVelocity omegaV =
         actualAngularVelocity
             .plus(averageDriftingMotionless)
-            // .plus(getDriftingDueToImpact(actualAngularVelocity))
+            .plus(getDriftingDueToImpact(actualAngularVelocity))
             .plus(actualAngularVelocity.times(SimMath.generateRandomNormal(0.0, veloStdDev)));
 
     LinearVelocity lastXV = Meters.of(lastTwist.dx).div(timing.dt());
@@ -102,13 +105,30 @@ public class SimGyro {
     if (updateConsumer != null) {
       updateConsumer.accept(Pair.of(angleThisTick, omegaV), new XY<>(xA, yA));
     }
+
+    this.lastTwist = twistThisTick;
   }
 
+  /**
+   * Updates the gyro simulation for each tick.
+   *
+   * <p>This method updates the gyro simulation and should be called during every tick of the
+   * simulation.
+   *
+   * @param angleThisTick the current angle of the simulated drivetrain.
+   * @param twistThisTick the current pose twist of the simulated drivetrain.
+   */
   private AngularVelocity getDriftingDueToImpact(AngularVelocity actualAngularVelocity) {
-    AngularVelocity lastAngularVelocity =
-        RadiansPerSecond.of(lastTwist.dtheta * timing.dt().in(Seconds));
+    AngularVelocity lastAngularVelocity = Radians.of(lastTwist.dtheta).div(timing.dt());
+
+    // Calculate the angular acceleration
     AngularAcceleration angularAcceleration =
+        // Subtract the last angular velocity from the current angular velocity divided by time to
+        // get the angular acceleration
         actualAngularVelocity.minus(lastAngularVelocity).div(timing.dt());
+
+    // If the absolute value of the angular acceleration is greater than the threshold, calculate
+    // the drift due to impact
     if (MeasureMath.abs(angularAcceleration).gt(START_DRIFTING)) {
       return DRIFT_DUE_TO_IMPACT_COEFFICIENT
           .times(MeasureMath.signum(angularAcceleration))

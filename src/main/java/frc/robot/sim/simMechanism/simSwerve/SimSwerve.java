@@ -96,9 +96,7 @@ public class SimSwerve extends SimDriveTrain {
     super.simTick();
   }
 
-  /**
-   * Simulates the module propulsion.
-   */
+  /** Simulates the module propulsion. */
   private void simulateModulePropulsion() {
     Rotation2d rot = getChassisWorldPose2d().getRotation();
     Force totalForceX = Newtons.zero();
@@ -126,8 +124,10 @@ public class SimSwerve extends SimDriveTrain {
     double txRatio = ft > 1e-3 ? fx / ft : 0.0;
     double tyRatio = ft > 1e-3 ? fy / ft : 0.0;
     double transRatio = Math.hypot(txRatio, tyRatio);
-    this.rotorInertia = rotorInertiaWhenTranslating.times(transRatio)
-        .plus(rotorInertiaWhenRotating.times(1 - transRatio));
+    this.rotorInertia =
+        rotorInertiaWhenTranslating
+            .times(transRatio)
+            .plus(rotorInertiaWhenRotating.times(1 - transRatio));
     Logger.recordOutput("RotorInertia/translationRatio", transRatio);
 
     // apply to body
@@ -140,9 +140,7 @@ public class SimSwerve extends SimDriveTrain {
     Logger.recordOutput("Propulsion/TotalTorque", totalTorque);
   }
 
-  /**
-   * Simulates the module friction.
-   */
+  /** Simulates the module friction. */
   private void simulateModuleFriction() {
     Rotation2d rot = getChassisWorldPose2d().getRotation();
     ChassisSpeeds speeds = getChassisWorldSpeeds();
@@ -154,8 +152,9 @@ public class SimSwerve extends SimDriveTrain {
     // accumulate friction
     for (int i = 0; i < moduleSimulations.length; i++) {
       XY<Force> friction = moduleSimulations[i].friction(speeds, rot);
-      Pair<XY<LinearAcceleration>, AngularAcceleration> pack = chassisMass.accelerationsDueToForce(
-          friction, XY.of(moduleSimulations[i].translation().rotateBy(rot)));
+      Pair<XY<LinearAcceleration>, AngularAcceleration> pack =
+          chassisMass.accelerationsDueToForce(
+              friction, XY.of(moduleSimulations[i].translation().rotateBy(rot)));
       ax = ax.plus(pack.getFirst().x());
       ay = ay.plus(pack.getFirst().y());
       alpha = alpha.plus(pack.getSecond());
@@ -163,14 +162,18 @@ public class SimSwerve extends SimDriveTrain {
     }
 
     // clamp to no reverse
-    ChassisSpeeds wheelSpeeds = kinematics.toChassisSpeeds(
-        Arrays.stream(moduleSimulations)
-            .map(SimSwerveModule::state)
-            .toArray(SwerveModuleState[]::new));
+    ChassisSpeeds wheelSpeeds =
+        kinematics.toChassisSpeeds(
+            Arrays.stream(moduleSimulations)
+                .map(SimSwerveModule::state)
+                .toArray(SwerveModuleState[]::new));
     ChassisSpeeds unwanted = wheelSpeeds.minus(speeds);
-    var axStop = MeasureMath.negate(MetersPerSecond.of(unwanted.vxMetersPerSecond)).div(timing.dt());
-    var ayStop = MeasureMath.negate(MetersPerSecond.of(unwanted.vyMetersPerSecond)).div(timing.dt());
-    var alphaStop = MeasureMath.negate(RadiansPerSecond.of(unwanted.omegaRadiansPerSecond)).div(timing.dt());
+    var axStop =
+        MeasureMath.negate(MetersPerSecond.of(unwanted.vxMetersPerSecond)).div(timing.dt());
+    var ayStop =
+        MeasureMath.negate(MetersPerSecond.of(unwanted.vyMetersPerSecond)).div(timing.dt());
+    var alphaStop =
+        MeasureMath.negate(RadiansPerSecond.of(unwanted.omegaRadiansPerSecond)).div(timing.dt());
     ax = MeasureMath.clamp(ax, axStop);
     ay = MeasureMath.clamp(ay, ayStop);
     alpha = MeasureMath.clamp(alpha, alphaStop);
@@ -187,18 +190,21 @@ public class SimSwerve extends SimDriveTrain {
     Logger.recordOutput("Friction/TotalForce", new XY<>(fx, fy));
     Logger.recordOutput("Friction/TotalTorque", tau);
   }
-/* 
-  **
+
+  /*
+   **
    * Computes the smaFll‐time‐step twist (dx, dy, dθ) from the change in chassis
    * position and heading since the last tick.
    */
   public Twist2d getTickTwist() {
     Pose2d curr = getChassisWorldPose2d();
+
     double dx = curr.getX() - lastPose.getX();
     double dy = curr.getY() - lastPose.getY();
     double dtheta = curr.getRotation().minus(lastPose.getRotation()).getRadians();
     double sin = Math.sin(-lastPose.getRotation().getRadians());
     double cos = Math.cos(-lastPose.getRotation().getRadians());
+
     double localDx = dx * cos - dy * sin;
     double localDy = dx * sin + dy * cos;
     lastPose = curr;

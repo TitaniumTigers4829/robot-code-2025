@@ -392,7 +392,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotInit() {}
- 
+
   /** Sets up the subsystems based on the robot type */
   private void setupSubsystems() {
     switch (Constants.getRobot()) {
