@@ -34,7 +34,7 @@ public class SimGyro {
   /* The threshold of instantaneous angular acceleration at which the chassis is considered to
   experience an "impact." */
   private static final AngularAcceleration START_DRIFTING = RadiansPerSecondPerSecond.of(500);
-  /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of 
+  /* The amount of drift, in radians, that the gyro experiences as a result of each multiple of
   the angular acceleration threshold. */
   private static final Angle DRIFT_DUE_TO_IMPACT_COEFFICIENT = Radians.of(1);
 

@@ -2,7 +2,7 @@ package frc.robot.sim;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.HardwareConstants;
@@ -117,12 +117,12 @@ public class SimWorld {
    *
    * @param poseSupplier the pose supplier used to update the chassis's pose in the simulation world
    */
-  public void update(Supplier<Pose2d> poseSupplier) {
+  public void update(Supplier<Pose3d> poseSupplier) {
     robot().getDriveTrain().setChassisWorldPose(poseSupplier.get(), true);
     arena().simulationPeriodic();
 
-    final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose2d();
-    aprilTagSim.update(robotPose);
+    // final Pose2d robotPose = simRobot.getDriveTrain().getChassisWorldPose2d();
+    // aprilTagSim.update(new Pose2d());
     Logger.recordOutput("Odometry/ChassisPose", robot().getDriveTrain().getChassisWorldPose2d());
   }
 }

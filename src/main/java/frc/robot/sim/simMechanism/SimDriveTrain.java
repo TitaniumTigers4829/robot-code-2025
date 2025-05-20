@@ -2,7 +2,6 @@ package frc.robot.sim.simMechanism;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.extras.math.mathutils.GeomUtil;
 import frc.robot.sim.SimRobot;
@@ -43,7 +42,7 @@ public class SimDriveTrain {
     this.chassis = createBoxBody(world, config, timing);
 
     // Teleport to origin (Pose2d)
-    setChassisWorldPose(new Pose2d(), true);
+    setChassisWorldPose(new Pose3d(), true);
   }
 
   /**
@@ -61,9 +60,9 @@ public class SimDriveTrain {
 
   /** Teleport chassis to given 2D pose (Z=0). */
   // TODO: Use Pose3d!
-  public void setChassisWorldPose(Pose2d pose, boolean resetVel) {
-    chassis.setPosition(pose.getX(), pose.getY(), 0.0);
-    DQuaternionC q = GeomUtil.toOdeQuaternion(new Rotation3d(pose.getRotation()));
+  public void setChassisWorldPose(Pose3d pose, boolean resetVel) {
+    chassis.setPosition(pose.getX(), pose.getY(), pose.getZ());
+    DQuaternionC q = GeomUtil.toOdeQuaternion(pose.getRotation());
     chassis.setQuaternion(q);
     if (resetVel) {
       chassis.setLinearVel(0, 0, 0);
@@ -82,20 +81,6 @@ public class SimDriveTrain {
   public Pose3d getChassisWorldPose3d() {
     return GeomUtil.toWpilibPose(chassis.getPosition(), chassis.getQuaternion());
   }
-
-  // private static DBody createBoxBody(
-  //     DWorld world, DSpace space, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
-  //   DBody body = OdeHelper.createBody(world);
-  //   // set mass and attach geom created in the *same* space
-  //   DMass m = OdeHelper.createMass();
-  //   m.setBox(1.0, config.bumperLengthXMeters / 2.0, config.bumperWidthYMeters / 2.0, 0.1 / 2.0);
-  //   m.adjust(config.robotMassKg);
-  //   body.setMass(m);
-  //   DBox geom =
-  //       OdeHelper.createBox(space, config.bumperLengthXMeters, config.bumperWidthYMeters, 0.1);
-  //   geom.setBody(body);
-  //   return body;
-  // }
 
   private static DBody createBoxBody(
       DWorld world, SimDriveTrainConfig<?, ?> config, SimEnvTiming timing) {
@@ -127,7 +112,6 @@ public class SimDriveTrain {
   public void simTick() {
     Logger.recordOutput("Forces/DriveTrainPose2d", getChassisWorldPose2d());
     Logger.recordOutput("Forces/DriveTrainSpeeds", getChassisWorldSpeeds());
-    // world.step(timing.dt.in(Seconds));
   }
 
   /** Factory for different drivetrain types. */
@@ -138,6 +122,14 @@ public class SimDriveTrain {
       return (T) new SimSwerve((SimRobot<SimSwerve>) robot, (SimSwerveConfig) config);
     }
     throw new IllegalArgumentException("Unknown drivetrain configuration");
+  }
+
+  public void teardown() {
+    if (chassisAdded) {
+      DBox boxGeom = (DBox) chassis.getFirstGeom();
+      space.remove(boxGeom);
+      chassisAdded = false;
+    }
   }
 
   public DSpace getSpace() {
