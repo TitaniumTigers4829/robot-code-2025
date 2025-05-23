@@ -2,8 +2,6 @@ package frc.robot.sim.sim2025;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -19,7 +17,7 @@ import frc.robot.sim.simField.SimGamePiece.GamePieceVariant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.dyn4j.geometry.Geometry;
+import org.ode4j.ode.OdeHelper;
 
 public class ReefscapeSim {
   private static List<GamePieceTarget> createCoralTargets() {
@@ -115,7 +113,7 @@ public class ReefscapeSim {
           "Algae",
           Units.inchesToMeters(16),
           0.4,
-          Geometry.createCircle(0.176),
+          OdeHelper.createSphere(0.176),
           ALGAE_TARGETS,
           true,
           0.2);
@@ -124,7 +122,7 @@ public class ReefscapeSim {
           "Coral",
           Units.inchesToMeters(16),
           0.4,
-          Geometry.createCircle(0.176),
+          OdeHelper.createCylinder(0.176, Units.inchesToMeters(16)),
           CORAL_TARGETS,
           true,
           0.2);
@@ -141,57 +139,60 @@ public class ReefscapeSim {
    */
   public static class ReefscapeSimArena extends SimArena {
     public static final class ReefscapeFieldObstacleMap extends FieldMap {
-      public ReefscapeFieldObstacleMap() {
-        super();
+      //   public ReefscapeFieldObstacleMap() {
+      //     // super();
 
-        // blue wall
-        addBorderLine(new Translation2d(0, 1.270), new Translation2d(0, 6.782));
+      //     // // blue wall
+      //     // addBorderLine(new Translation2d(0, 1.270), new Translation2d(0, 6.782));
 
-        // blue coral stations
-        addBorderLine(new Translation2d(0, 1.270), new Translation2d(1.672, 0));
-        addBorderLine(new Translation2d(0, 6.782), new Translation2d(1.672, 8.052));
+      //     // // blue coral stations
+      //     // addBorderLine(new Translation2d(0, 1.270), new Translation2d(1.672, 0));
+      //     // addBorderLine(new Translation2d(0, 6.782), new Translation2d(1.672, 8.052));
 
-        // red wall
-        addBorderLine(new Translation2d(17.548, 1.270), new Translation2d(17.548, 6.782));
+      //     // // red wall
+      //     // addBorderLine(new Translation2d(17.548, 1.270), new Translation2d(17.548, 6.782));
 
-        // red coral stations
-        addBorderLine(new Translation2d(17.548, 1.270), new Translation2d(17.548 - 1.672, 0));
-        addBorderLine(new Translation2d(17.548, 6.782), new Translation2d(17.548 - 1.672, 8.052));
+      //     // // red coral stations
+      //     // addBorderLine(new Translation2d(17.548, 1.270), new Translation2d(17.548 - 1.672,
+      // 0));
+      //     // addBorderLine(new Translation2d(17.548, 6.782), new Translation2d(17.548 - 1.672,
+      // 8.052));
 
-        // upper walls
-        addBorderLine(new Translation2d(1.672, 8.052), new Translation2d(17.548 - 1.672, 8.052));
+      //     // upper walls
+      //     // addBorderLine(new Translation2d(1.672, 8.052), new Translation2d(17.548 - 1.672,
+      // 8.052));
 
-        // lower walls
-        addBorderLine(new Translation2d(1.672, 0), new Translation2d(17.548 - 1.672, 0));
+      //     // // lower walls
+      //     // addBorderLine(new Translation2d(1.672, 0), new Translation2d(17.548 - 1.672, 0));
 
-        // blue reef
-        Translation2d[] reefVerticesBlue =
-            new Translation2d[] {
-              new Translation2d(3.658, 3.546),
-              new Translation2d(3.658, 4.506),
-              new Translation2d(4.489, 4.987),
-              new Translation2d(5.3213, 4.506),
-              new Translation2d(5.3213, 3.546),
-              new Translation2d(4.489, 3.065)
-            };
-        for (int i = 0; i < 6; i++)
-          super.addBorderLine(reefVerticesBlue[i], reefVerticesBlue[(i + 1) % 6]);
+      //     // // blue reef
+      //     // Translation2d[] reefVerticesBlue =
+      //     //     new Translation2d[] {
+      //     //       new Translation2d(3.658, 3.546),
+      //     //       new Translation2d(3.658, 4.506),
+      //     //       new Translation2d(4.489, 4.987),
+      //     //       new Translation2d(5.3213, 4.506),
+      //     //       new Translation2d(5.3213, 3.546),
+      //     //       new Translation2d(4.489, 3.065)
+      //     //     };
+      //     // for (int i = 0; i < 6; i++)
+      //     //   super.addBorderLine(reefVerticesBlue[i], reefVerticesBlue[(i + 1) % 6]);
 
-        // red reef
-        Translation2d[] reefVorticesRed =
-            Arrays.stream(reefVerticesBlue)
-                .map(
-                    pointAtBlue ->
-                        new Translation2d(
-                            FieldConstants.FIELD_WIDTH_METERS - pointAtBlue.getX(),
-                            pointAtBlue.getY()))
-                .toArray(Translation2d[]::new);
-        for (int i = 0; i < 6; i++)
-          super.addBorderLine(reefVorticesRed[i], reefVorticesRed[(i + 1) % 6]);
+      //     // // red reef
+      //     // Translation2d[] reefVorticesRed =
+      //     //     Arrays.stream(reefVerticesBlue)
+      //     //         .map(
+      //     //             pointAtBlue ->
+      //     //                 new Translation2d(
+      //     //                     FieldConstants.FIELD_WIDTH_METERS - pointAtBlue.getX(),
+      //     //                     pointAtBlue.getY()))
+      //     //         .toArray(Translation2d[]::new);
+      //     // for (int i = 0; i < 6; i++)
+      //     //   super.addBorderLine(reefVorticesRed[i], reefVorticesRed[(i + 1) % 6]);
 
-        // the pillar in the middle of the field
-        addRectangularObstacle(0.305, 0.305, new Pose2d(8.774, 4.026, new Rotation2d()));
-      }
+      //     // the pillar in the middle of the field
+      //     addRectangularObstacle(0.305, 0.305, new Pose2d(8.774, 4.026, new Rotation2d()));
+      //   }
     }
 
     public ReefscapeSimArena(Time period, int simulationSubTick) {

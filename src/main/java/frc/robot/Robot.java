@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -525,7 +526,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     if (simWorld != null) {
-      simWorld.update(() -> swerveDrive.getEstimatedPose());
+      simWorld.update(() -> new Pose3d(swerveDrive.getEstimatedPose()));
     }
   }
 }

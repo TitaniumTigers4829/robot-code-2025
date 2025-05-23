@@ -7,72 +7,48 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
-/** Represents an indexer in the sim environment. An indexer can store game pieces. */
+/** Represents an indexer in the sim environment. */
 public class SimIndexer {
-  protected final Queue<SimGamePiece> gamePieces;
-  protected final Set<GamePieceVariant> gamePiecesSet;
-  protected final int numPieces;
+  private final Queue<SimGamePiece> queue;
+  private final Set<GamePieceVariant> allowed;
+  private final int capacity;
 
-  /**
-   * Creates a new GamePieceStorage that can store the given number of pieces.
-   *
-   * @param numPieces the number of pieces to store
-   * @param gamePieceVariantFilet the variants of game pieces to store, or an empty array to store
-   *     all variants
-   */
-  public SimIndexer(int numPieces, GamePieceVariant... gamePieceVariantFilet) {
-    gamePieces = new LinkedList<>();
-    this.numPieces = numPieces;
-    gamePiecesSet = Set.of(gamePieceVariantFilet);
+  public SimIndexer(int capacity, GamePieceVariant... variants) {
+    this.queue = new LinkedList<>();
+    this.capacity = capacity;
+    this.allowed = Set.of(variants);
   }
 
-  /** Inserts a game piece into the storage, regardless of the storage's current state. */
-  boolean forceInsertGamePiece(SimGamePiece gamePiece) {
-    if (gamePieces.size() < numPieces
-        && (gamePiecesSet.contains(gamePiece.variant()) || gamePiecesSet.isEmpty())) {
-      gamePiece.releaseControl();
-      gamePiece.withLib(gp -> gp.intake());
-      gamePieces.add(gamePiece);
+  /** Forcefully insert a piece (used by intake on successful grab). */
+  boolean forceInsertGamePiece(SimGamePiece piece) {
+    if (queue.size() < capacity && (allowed.isEmpty() || allowed.contains(piece.variant()))) {
+      // piece.intake() moves it into HELD
+      piece.intake();
+      queue.add(piece);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
-  /**
-   * Inserts a game piece into the storage.
-   *
-   * <p>Insertion will fail if the game piece is library-controlled, the storage is full or the game
-   * piece is not of the correct variant.
-   *
-   * @param gamePiece the game piece to insert
-   * @return if the game piece was successfully inserted
-   */
-  public boolean insertGamePiece(SimGamePiece gamePiece) {
-    if (gamePiece.isLibraryControlled()) {
+  /** Inserts a game piece if it’s user-controlled and allowed. */
+  public boolean insertGamePiece(SimGamePiece piece) {
+    if (!piece.isUserControlled()) {
       return false;
     }
-    return forceInsertGamePiece(gamePiece);
+    return forceInsertGamePiece(piece);
   }
 
-  /**
-   * Removes a game piece from the storage and returns it if a game piece is present.
-   *
-   * @return the game piece that was removed, or an empty optional if no game piece was present
-   */
+  /** Removes and returns the next piece, or empty if none. */
   public Optional<SimGamePiece> removeGamePiece() {
-    return Optional.ofNullable(gamePieces.poll()).map(SimGamePiece::userControlled);
+    SimGamePiece p = queue.poll();
+    return p != null ? Optional.of(p.userControlled()) : Optional.empty();
   }
 
-  /**
-   * Removes all game pieces from the storage.
-   *
-   * <p>This method also transitions all game pieces to limbo state.
-   */
+  /** Clears all stored pieces (sending them to LIMBO). */
   public void clear() {
-    for (var gamePiece : gamePieces) {
-      gamePiece.delete();
+    for (var p : queue) {
+      p.delete();
     }
-    gamePieces.clear();
+    queue.clear();
   }
 }

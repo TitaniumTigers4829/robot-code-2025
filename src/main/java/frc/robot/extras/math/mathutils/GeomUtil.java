@@ -4,251 +4,143 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Torque;
-import frc.robot.extras.math.forces.Velocity2d;
-import org.dyn4j.geometry.Rectangle;
-import org.dyn4j.geometry.Rotation;
-import org.dyn4j.geometry.Transform;
-import org.dyn4j.geometry.Vector2;
+import frc.robot.extras.math.forces.Velocity3d;
+import org.ode4j.math.DMatrix3;
+import org.ode4j.math.DQuaternion;
+import org.ode4j.math.DQuaternionC;
+import org.ode4j.math.DVector3;
+import org.ode4j.math.DVector3C;
 
-/** utils to convert between WPILIB and dyn4j geometry classes */
+/**
+ * utils to convert between WPILIB geometry classes and ODE4j math types (embedded in the XY plane:
+ * Z=0, axis up = (0,0,1)).
+ */
 public class GeomUtil {
 
-  /**
-   * Converts a WPILIB Translation2d to a dyn4j Vector2
-   *
-   * @param wpilibTranslation2d the Translation2d to convert
-   * @return the equivalent Vector2
-   */
-  public static Vector2 toDyn4jVector2(Translation2d wpilibTranslation2d) {
-    return new Vector2(wpilibTranslation2d.getX(), wpilibTranslation2d.getY());
+  /** ------------------- Translation & Velocity ------------------- */
+  public static DVector3 toOdeVector(Translation3d t) {
+    return new DVector3(t.getX(), t.getY(), t.getZ());
   }
 
-  /**
-   * Converts a Velocity2d to a dyn4j Vector2
-   *
-   * @param velocity2d the Velocity2d to convert
-   * @return the equivalent Vector2
-   */
-  public static Vector2 toDyn4jVector2(Velocity2d velocity2d) {
-    return new Vector2(velocity2d.getVX(), velocity2d.getVY());
+  public static DVector3 toOdeVector(Velocity3d v) {
+    return new DVector3(v.getVX(), v.getVY(), v.getVZ());
   }
 
-  /**
-   * Converts a dyn4j Vector2 to a WPILIB Translation2d
-   *
-   * @param dyn4jVector2 the Vector2 to convert
-   * @return the equivalent Translation2d
-   */
-  public static Translation2d toWpilibTranslation2d(Vector2 dyn4jVector2) {
-    return new Translation2d(dyn4jVector2.x, dyn4jVector2.y);
+  public static Translation3d toWpilibTranslation(DVector3C v) {
+    return new Translation3d(v.get0(), v.get1(), v.get2());
   }
 
-  /**
-   * Converts a WPILIB Rotation2d to a dyn4j Rotation
-   *
-   * @param wpilibRotation2d the Rotation2d to convert
-   * @return the equivalent Rotation
-   */
-  public static Rotation toDyn4jRotation(Rotation2d wpilibRotation2d) {
-    return new Rotation(wpilibRotation2d.getRadians());
+  /** ------------------------ Rotation ------------------------ */
+
+  /** Creates an ODE4j quaternion representing a rotation about +Z by the given angle. */
+  public static DQuaternion toOdeQuaternion(Rotation3d r) {
+    final Quaternion quat = r.getQuaternion();
+    return new DQuaternion(quat.getW(), quat.getX(), quat.getY(), quat.getZ());
   }
 
-  /**
-   * Converts a dyn4j Rotation to a WPILIB Rotation2d
-   *
-   * @param dyn4jRotation the Rotation to convert
-   * @return the equivalent Rotation2d
-   */
-  public static Rotation2d toWpilibRotation2d(Rotation dyn4jRotation) {
-    return new Rotation2d(dyn4jRotation.toRadians());
+  /** Extracts the heading (around Z) from an ODE quaternion. */
+  public static Rotation3d toWpilibRotation(DQuaternionC q) {
+    return new Rotation3d(new Quaternion(q.get0(), q.get1(), q.get2(), q.get3()));
   }
 
-  /**
-   * Converts a WPILIB Pose2d to a dyn4j Transform
-   *
-   * @param wpilibPose2d the Pose2d to convert
-   * @return the equivalent Transform
-   */
-  public static Transform toDyn4jTransform(Pose2d wpilibPose2d) {
-    final Transform transform = new Transform();
-    transform.setTranslation(toDyn4jVector2(wpilibPose2d.getTranslation()));
-    transform.setRotation(toDyn4jRotation(wpilibPose2d.getRotation()));
-    return transform;
+  /** ------------------------ Pose / Transform ------------------------ */
+
+  /** Packs a Pose2d into a pair of (translation, rotation). */
+  public static Pair<DVector3, DQuaternion> toOdePose(Pose3d pose) {
+    DVector3 pos = toOdeVector(pose.getTranslation());
+    DQuaternion rot = toOdeQuaternion(pose.getRotation());
+    return Pair.of(pos, rot);
   }
 
-  /**
-   * Converts a dyn4j Transform to a WPILIB Pose2d
-   *
-   * @param dyn4jTransform the Transform to convert
-   * @return the equivalent Pose2d
-   */
-  public static Pose2d toWpilibPose2d(Transform dyn4jTransform) {
-    return new Pose2d(
-        toWpilibTranslation2d(dyn4jTransform.getTranslation()),
-        toWpilibRotation2d(dyn4jTransform.getRotation()));
+  /** Unpacks an ODE4j (translation, rotation) back into a Pose2d. */
+  public static Pose3d toWpilibPose(DVector3C pos, DQuaternionC rot) {
+    return new Pose3d(toWpilibTranslation(pos), toWpilibRotation(rot));
   }
 
-  /**
-   * Converts a WPILIB ChassisSpeeds to a dyn4j Vector2
-   *
-   * @param wpilibChassisSpeeds the ChassisSpeeds to convert
-   * @return the equivalent Vector2
-   */
-  public static Vector2 toDyn4jLinearVelocity(ChassisSpeeds wpilibChassisSpeeds) {
-    return new Vector2(
-        wpilibChassisSpeeds.vxMetersPerSecond, wpilibChassisSpeeds.vyMetersPerSecond);
+  /** ---------------------- ChassisSpeeds ---------------------- */
+  public static DVector3 toOdeLinearVel(ChassisSpeeds speeds) {
+    return new DVector3(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, 0.0);
   }
 
-  /**
-   * Converts a WPILIB ChassisSpeeds to a dyn4j angular velocity in radians per second
-   *
-   * @param wpilibChassisSpeeds the ChassisSpeeds to convert
-   * @return the equivalent angular velocity in radians per second
-   */
-  public static ChassisSpeeds toWpilibChassisSpeeds(
-      Vector2 dyn4jLinearVelocity, double angularVelocityRadPerSec) {
-    return new ChassisSpeeds(
-        dyn4jLinearVelocity.x, dyn4jLinearVelocity.y, angularVelocityRadPerSec);
+  public static ChassisSpeeds toWpilibChassisSpeeds(DVector3C linVel, DVector3C angVelRadPerSec) {
+    return new ChassisSpeeds(linVel.get0(), linVel.get1(), angVelRadPerSec.get2());
   }
 
-  public static Rectangle toDyn4jRectangle(Rectangle2d wpilibRectangle) {
-    return new Rectangle(wpilibRectangle.getXWidth(), wpilibRectangle.getYWidth());
+  // TODO: rectangle 3d? rectangular prism? :skull: emoji
+  /** ------------------------ Rectangle2d ------------------------ */
+  public static org.ode4j.math.DMatrix3 toOdeRectangle(Rectangle2d r) {
+    // ODE4j has no direct Rectangle2d: you can store half‑widths in a diagonal matrix
+    // Here we pack (wh, hh, 0) into the diagonal of DMatrix3.
+    double hw = r.getXWidth() * 0.5;
+    double hh = r.getYWidth() * 0.5;
+    DMatrix3 m = new DMatrix3();
+    m.set(
+        hw, 0, 0, 0, hh, 0, 0, 0, 1 // Z‑scale = 1
+        );
+    return m;
   }
 
-  /**
-   * Gets the x and y velocities of a ChassisSpeeds
-   *
-   * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
-   * @return a Translation2d containing the velocities in the x and y direction in meters per second
-   */
-  public static Translation2d getChassisSpeedsTranslationalComponent(ChassisSpeeds chassisSpeeds) {
-    return new Translation2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  /** -------------------- Units: Force, Torque, Mass -------------------- */
+  public static Force toWpilibUnitForce(org.ode4j.math.DVector3C forceVec) {
+    // magnitude in N
+    return Newtons.of(forceVec.length());
   }
 
-  /**
-   * Gets the x and y velocities of a ChassisSpeeds
-   *
-   * @param chassisSpeeds the ChassisSpeeds to retrieve velocities from
-   * @return a Velocity2d containing the velocities in the x and y direction in meters per second
-   */
-  public static Velocity2d getChassisSpeedsVelocityComponent(ChassisSpeeds chassisSpeeds) {
-    return new Velocity2d(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+  public static Torque toWpilibUnitTorque(org.ode4j.math.DVector3C torqueVec) {
+    // treat as pure torque around Z
+    return NewtonMeters.of(torqueVec.length());
   }
 
-  /**
-   * Gets a dyn4j torque value as a wpilib unit
-   *
-   * @param torque the dyn4j torque to convert
-   * @return the converted torque value as a wpilib Unit of {@link Torque}.
-   */
-  public static Torque toWpilibUnit(org.dyn4j.dynamics.Torque torque) {
-    return NewtonMeters.of(torque.getTorque());
+  public static Pair<Mass, MomentOfInertia> toWpilibUnit(double mass, double inertiaAboutZ) {
+    return Pair.of(Kilograms.of(mass), KilogramSquareMeters.of(inertiaAboutZ));
   }
 
-  /**
-   * Gets a dyn4j force value as a wpilib unit
-   *
-   * @param force the dyn4j force to convert
-   * @return the converted force value as a wpilib Unit of {@link Force}.
-   */
-  public static Force toWpilibUnit(org.dyn4j.dynamics.Force force) {
-    return Newtons.of(force.getForce().getMagnitude());
-  }
-
-  /**
-   * Gets a dyn4j mass value as a wpilib unit
-   *
-   * @param mass the dyn4j mass to convert
-   * @return the converted mass value as a pair of a wpilib Unit of {@link Mass} and a Unit of
-   *     {@link MomentOfInertia}.
-   */
-  public static Pair<Mass, MomentOfInertia> toWpilibUnit(org.dyn4j.geometry.Mass mass) {
-    return Pair.of(Kilograms.of(mass.getMass()), KilogramSquareMeters.of(mass.getInertia()));
-  }
-
-  /**
-   * Checks if all translations in the input are within a certain threshold in meters.
-   *
-   * @param thresholdMeters the threshold between any two translations in meters
-   * @param translations Varargs of Translation2d objects
-   * @return true if all translations are within thresholdMeters of each other
-   */
-  public static boolean areTranslationsWithinThreshold(
-      double thresholdMeters, Translation2d... translations) {
-    int n = translations.length;
-
-    // Compare all pairs of translations
-    for (int i = 0; i < n; i++) {
-      for (int j = i + 1; j < n; j++) {
-        if (translations[i].getDistance(translations[j]) > thresholdMeters) {
-          return false; // Return false if any pair is out of threshold
+  /** ------------------- Threshold Checks ------------------- */
+  public static boolean areTranslationsWithinThreshold(double threshold, Translation2d... ts) {
+    for (int i = 0; i < ts.length; i++) {
+      for (int j = i + 1; j < ts.length; j++) {
+        if (ts[i].getDistance(ts[j]) > threshold) {
+          return false;
         }
       }
     }
-    return true; // Return true if all pairs are within threshold
+    return true;
   }
 
-  /**
-   * Checks if all rotations in the input are within a certain threshold in degrees.
-   *
-   * @param thresholdDegrees the threshold between any two rotations in degrees
-   * @param rotations Varargs of rotation values (in degrees)
-   * @return true if all rotations are within thresholdDegrees of each other
-   */
-  public static boolean areRotationsWithinThreshold(
-      double thresholdDegrees, Rotation2d... rotations) {
-    int n = rotations.length;
-
-    // Compare all pairs of rotations
-    for (int i = 0; i < n; i++) {
-      for (int j = i + 1; j < n; j++) {
-        if (Math.abs(rotations[i].minus(rotations[j]).getDegrees()) > thresholdDegrees) {
-          return false; // Return false if any pair is out of threshold
+  public static boolean areRotationsWithinThreshold(double thresholdDeg, Rotation2d... rs) {
+    for (int i = 0; i < rs.length; i++) {
+      for (int j = i + 1; j < rs.length; j++) {
+        if (Math.abs(rs[i].minus(rs[j]).getDegrees()) > thresholdDeg) {
+          return false;
         }
       }
     }
-    return true; // Return true if all pairs are within threshold
+    return true;
   }
 
-  /**
-   * Checks if all pairs of poses in the input list are within the given translation and rotation
-   * thresholds.
-   *
-   * @param translationThresholdMeters the maximum allowed distance between any two translations in
-   *     meters
-   * @param rotationThresholdDegrees the maximum allowed difference between any two rotations in
-   *     degrees
-   * @param poses a list of Pose2d objects
-   * @return true if all pairs of poses are within the given thresholds, false otherwise
-   */
   public static boolean arePosesWithinThreshold(
-      double translationThresholdMeters, double rotationThresholdDegrees, Pose2d... poses) {
-    int n = poses.length;
-
-    // Compare all pairs of poses
-    for (int i = 0; i < n; i++) {
-      for (int j = i + 1; j < n; j++) {
-        // Check translation threshold
-        if (poses[i].getTranslation().getDistance(poses[j].getTranslation())
-            > translationThresholdMeters) {
-          return false; // Return false if any pair of translations exceeds the threshold
-        }
-
-        // Check rotation threshold
-        if (Math.abs(poses[i].getRotation().minus(poses[j].getRotation()).getDegrees())
-            > rotationThresholdDegrees) {
-          return false; // Return false if any pair of rotations exceeds the threshold
+      double transThresh, double rotThreshDeg, Pose2d... poses) {
+    for (int i = 0; i < poses.length; i++) {
+      for (int j = i + 1; j < poses.length; j++) {
+        if (poses[i].getTranslation().getDistance(poses[j].getTranslation()) > transThresh
+            || Math.abs(poses[i].getRotation().minus(poses[j].getRotation()).getDegrees())
+                > rotThreshDeg) {
+          return false;
         }
       }
     }
-    return true; // Return true if all pairs are within the thresholds
+    return true;
   }
 }
