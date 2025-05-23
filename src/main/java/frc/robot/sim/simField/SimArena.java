@@ -74,7 +74,7 @@ public abstract class SimArena {
   protected SimArena(FieldMap obstaclesMap, double period, int ticksPerPeriod) {
     this.timing = new SimEnvTiming(period, ticksPerPeriod);
     this.odeWorld = OdeHelper.createWorld();
-    odeWorld.setGravity(0, 0, 0);
+    odeWorld.setGravity(0, 0, -9.81);
     this.odeSpace = OdeHelper.createSimpleSpace(null);
 
     // Add static obstacles

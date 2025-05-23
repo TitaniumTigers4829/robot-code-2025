@@ -128,9 +128,7 @@ public class SimSwerve extends SimDriveTrain {
     // setupCollisionCallbacks();
   }
 
-  // /**
-  //  * Sets up collision callbacks to integrate TippingManager's contact filtering.
-  //  */
+  // /** Sets up collision callbacks to integrate TippingManager's contact filtering. */
   // private void setupCollisionCallbacks(Object date) {
   //   // Register a near callback with the space
   //   OdeHelper.spaceCollide(getSpace(), date, this::nearCallback);
